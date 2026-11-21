@@ -5,6 +5,7 @@ import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, isoWeek, num, pct, toCsv } from "@/lib/format";
 import ControlsBar from "@/components/controls";
+import ResourceSandbox from "@/components/sandbox";
 import { Btn, Card, CardTitle, DataTable, Loading, Notice, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 
 const OPTIONS = [
@@ -54,5 +55,6 @@ export default function Response() {
     <Card className="mt-5"><CardTitle title={t("resp.generic")} sub="Generic, evidence-informed options for officers to review against national guidance" />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{OPTIONS.map((o) => (<div key={o.title} className="rounded-xl border border-line p-4"><h3 className="text-sm font-semibold text-forest">{o.title}</h3><p className="mt-1 text-[13px] text-ink-2">{o.body}</p><p className="mt-2 text-[11px] text-ink-3"><b>Consider when:</b> {o.when}</p></div>))}</div>
       <p className="mt-3 text-xs text-ink-3">These are not official government decisions or recommendations, and no resource quantities are suggested. They were written for this prototype as generic examples.</p></Card>
+  <ResourceSandbox />
   </>);
 }
