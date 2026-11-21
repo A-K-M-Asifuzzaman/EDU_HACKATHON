@@ -55,7 +55,7 @@ the organizer CSV download. Judge access and the end-to-end download path requir
 
 Global search (⌘K / Ctrl K) jumps to any page, forecast ward or hospital. An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
 
-The interface is bilingual (English / Bangla). [ARCHITECTURE.md](ARCHITECTURE.md) contains the system overview, validation design, cost controls and Mermaid diagrams for all seven subsystems.
+The interface is bilingual (English / Bangla). [ARCHITECTURE.md](ARCHITECTURE.md) summarizes the data flow, validation design and cost controls, with links to all seven [subsystem documents](docs/architecture/).
 Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
 
 ## Status

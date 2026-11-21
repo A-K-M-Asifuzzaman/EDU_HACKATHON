@@ -32,7 +32,7 @@ RATE_PER_HOUR = 30
 INDEX = ROOT / "app_data" / "rag_index.npz"
 USAGE_LOG = CACHE_ROOT / "copilot_usage.jsonl"
 
-APPROVED = ["README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "reports/eda/README.md", "reports/baselines/README.md"]
+APPROVED = ["README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/architecture/*.md", "reports/eda/README.md", "reports/baselines/README.md"]
 EXCLUDE_NAMES = {".env", ".env.example"}
 
 SYSTEM = """You are DengueShield Copilot, a research and decision-support assistant for the DengueShield AI dengue-forecasting project.
