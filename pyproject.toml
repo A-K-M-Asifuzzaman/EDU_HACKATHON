@@ -2,6 +2,19 @@
 name = "dengueshield"
 version = "0.1.0"
 requires-python = ">=3.12"
+# Runtime dependencies: must equal requirements.txt (Vercel installs from here; tests/test_deploy_config.py enforces it).
+dependencies = [
+  "numpy==2.5.1",
+  "pandas==3.0.5",
+  "scipy==1.18.0",
+  "scikit-learn==1.9.0",
+  "statsmodels==0.14.6",
+  "lightgbm==4.7.0",
+  "fastapi==0.165.0",
+  "uvicorn==0.54.0",
+  "httpx==0.28.1",
+  "openai==3.57.0",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

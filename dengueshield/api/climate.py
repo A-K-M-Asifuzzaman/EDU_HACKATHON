@@ -15,10 +15,10 @@ import httpx
 import numpy as np
 import pandas as pd
 
-from dengueshield.api.store import ROOT
+from dengueshield.api.store import CACHE_ROOT, ROOT
 
 CITY_COORDS = {"Dhaka": (23.8103, 90.4125), "Chattogram": (22.3569, 91.7832), "Gazipur": (23.9999, 90.4203), "Narayanganj": (23.6238, 90.5000)}
-CACHE_DIR = ROOT / ".cache" / "weather"
+CACHE_DIR = CACHE_ROOT / "weather"
 TTL = {"history": 86400, "current": 600, "forecast": 3600}
 MEM: dict = {}
 STATE: dict = {"nasa_power": {"last_ok": None, "last_err": None, "calls": 0}, "open_meteo": {"last_ok": None, "last_err": None, "calls": 0}}

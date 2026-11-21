@@ -6,6 +6,7 @@ import hashlib
 import json
 import time
 from collections import OrderedDict
+import os
 from pathlib import Path
 
 import numpy as np
@@ -15,6 +16,7 @@ from dengueshield.data import DEV_LAST_YEAR, RAW_PATH, ROOT, load_development_pa
 from dengueshield.inference import ForecastBundle
 
 APP_DATA = ROOT / "app_data"
+CACHE_ROOT = Path(os.environ.get("DENGUESHIELD_CACHE", str(ROOT / ".cache")))   # set to /tmp/... on read-only hosts
 BUNDLE_PATH = ROOT / "models" / "dengueshield_B.joblib"
 HORIZONS = (2, 3, 4)
 TIER_ORDER = {"Low": 0, "Medium": 1, "High": 2, "Critical": 3}

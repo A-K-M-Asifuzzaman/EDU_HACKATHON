@@ -1,0 +1,23 @@
+# Uploaded to Vercel by `vercel deploy` (the organizer CSV in data/raw IS included: the function reads it; see docs/deployment.md)
+.git
+.venv
+.cache
+.env
+.env.*
+**/node_modules
+frontend/.next
+frontend/out
+frontend/.env.local
+frontend/test-results
+frontend/playwright-report
+data/reference
+notebooks
+tests
+reports/*/figures
+reports/model_tournament
+reports/features
+reports/audit
+reports/screenshots
+docs/screenshots
+**/__pycache__
+.DS_Store

@@ -19,10 +19,10 @@ from typing import Optional
 import httpx
 
 from dengueshield.api.climate import cached_fetch
-from dengueshield.api.store import ROOT
+from dengueshield.api.store import CACHE_ROOT, ROOT
 
 LAYER = os.environ.get("DGHS_LAYER_URL", "https://gis.dghs.gov.bd/server/rest/services/Hosted/All_Wards_main/FeatureServer/0")
-CACHE_DIR = ROOT / ".cache" / "geo"
+CACHE_DIR = CACHE_ROOT / "geo"
 TTL = {"meta": 86400, "distinct": 86400, "geojson": 7 * 86400}   # administrative boundaries change rarely
 MAX_FEATURES = 3000          # hard cap per response (payload size); the response says when it truncated
 PAGE = 1000                  # upper bound; the server's maxRecordCount is respected when smaller
