@@ -65,3 +65,18 @@ def load_panel(path: Path = RAW_PATH, verify_checksum: bool = True) -> pd.DataFr
     df = df.sort_values(["ward_id", "date"], ignore_index=True)
     assert_regular_panel(df)
     return df
+
+
+DEV_LAST_YEAR = 2024  # Stage 2+ development window; 2025 is the locked test year
+
+
+def load_development_panel(path: Path = RAW_PATH) -> pd.DataFrame:
+    """Panel restricted to 2016-2024. Rows after 2024 are dropped immediately and never analysed.
+
+    Use this in every development/tuning workflow. The locked 2025 test year is only
+    read by the final one-shot evaluation, which must call `load_panel` explicitly.
+    """
+    df = load_panel(path)
+    df = df[df["date"].dt.year <= DEV_LAST_YEAR].reset_index(drop=True)
+    assert df["date"].max() < pd.Timestamp(f"{DEV_LAST_YEAR + 1}-01-01")
+    return df
