@@ -21,15 +21,15 @@ Measured: fresh clone to a healthy server in 59 s on the development Mac with wa
 flowchart TB
     repo[("GitHub repository")]
     subgraph vercel["Vercel: static dashboard (vercel.json, .vercelignore)"]
-        cdn["frontend/out on the CDN<br/>rewrite /api/* to Render"]
+        cdn["frontend/out on the CDN<br/>rewrite /api/* to the Space"]
     end
-    subgraph render["Render: API (render.yaml, Dockerfile.backend)"]
+    subgraph render["Hugging Face Space: API (scripts/deploy_space.py, Dockerfile.backend)"]
         img["Python 3.12 image: FastAPI, model bundle, app_data,<br/>dataset fetched and checksum-verified at build"]
     end
     repo --> vercel
     repo --> render
     cdn -->|"same-origin /api proxy"| img
-    secrets["Render env: OPENAI_API_KEY, ACCESS_PASSWORD,<br/>OPENAI_BUDGET_USD"] -.-> render
+    secrets["Space secrets: OPENAI_API_KEY, ACCESS_PASSWORD,<br/>OPENAI_BUDGET_USD"] -.-> render
     pub["Vercel env (public): NEXT_PUBLIC_MAPTILER_KEY"] -.-> vercel
 ```
 

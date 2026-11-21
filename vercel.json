@@ -3,5 +3,5 @@
   "installCommand": "cd frontend && npm ci --no-audit --no-fund",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/out",
-  "rewrites": [{ "source": "/api/:path*", "destination": "https://dengueshield-ai-api.onrender.com/api/:path*" }]
+  "rewrites": [{ "source": "/api/:path*", "destination": "https://asifzaman1912-dengueshield-ai-api.hf.space/api/:path*" }]
 }
