@@ -1,0 +1,366 @@
+{
+  "peak_methods": [
+    {
+      "method": "LightGBM quantile a=0.7",
+      "mae": 1.5398,
+      "mae_ordinary": 1.2204,
+      "high_mae": 3.6448,
+      "high_bias": -1.9409,
+      "high_under": 0.6073,
+      "recall": 0.765,
+      "precision": 0.5065,
+      "false_alert_rate": 0.0937,
+      "alerts": 513.1667
+    },
+    {
+      "method": "upper quantile 0.65 (Poisson)",
+      "mae": 1.4696,
+      "mae_ordinary": 1.0937,
+      "high_mae": 3.981,
+      "high_bias": -1.9547,
+      "high_under": 0.6278,
+      "recall": 0.7101,
+      "precision": 0.5717,
+      "false_alert_rate": 0.069,
+      "alerts": 426.2778
+    },
+    {
+      "method": "LightGBM quantile a=0.6",
+      "mae": 1.4194,
+      "mae_ordinary": 1.016,
+      "high_mae": 4.1106,
+      "high_bias": -3.3125,
+      "high_under": 0.7466,
+      "recall": 0.6568,
+      "precision": 0.5521,
+      "false_alert_rate": 0.0667,
+      "alerts": 406.2778
+    },
+    {
+      "method": "mean",
+      "mae": 1.4261,
+      "mae_ordinary": 0.9881,
+      "high_mae": 4.3447,
+      "high_bias": -3.0437,
+      "high_under": 0.7609,
+      "recall": 0.5464,
+      "precision": 0.6403,
+      "false_alert_rate": 0.0401,
+      "alerts": 292.5
+    },
+    {
+      "method": "peak multiplier on predicted means >= training q80 (median)",
+      "mae": 1.4044,
+      "mae_ordinary": 0.9498,
+      "high_mae": 4.4069,
+      "high_bias": -2.8448,
+      "high_under": 0.7069,
+      "recall": 0.6102,
+      "precision": 0.6093,
+      "false_alert_rate": 0.0516,
+      "alerts": 342.3333
+    },
+    {
+      "method": "alert: P(Y>=q90) >= tuned",
+      "mae": 1.3654,
+      "mae_ordinary": 0.9064,
+      "high_mae": 4.4245,
+      "high_bias": -3.2111,
+      "high_under": 0.7393,
+      "recall": 0.7745,
+      "precision": 0.5271,
+      "false_alert_rate": 0.0974,
+      "alerts": 518.6667
+    },
+    {
+      "method": "median (baseline)",
+      "mae": 1.3654,
+      "mae_ordinary": 0.9064,
+      "high_mae": 4.4245,
+      "high_bias": -3.2111,
+      "high_under": 0.7393,
+      "recall": 0.5813,
+      "precision": 0.6257,
+      "false_alert_rate": 0.045,
+      "alerts": 318.1111
+    },
+    {
+      "method": "isotonic-calibrated median",
+      "mae": 1.4706,
+      "mae_ordinary": 0.9381,
+      "high_mae": 4.719,
+      "high_bias": -3.6937,
+      "high_under": 0.7571,
+      "recall": 0.557,
+      "precision": 0.6199,
+      "false_alert_rate": 0.0513,
+      "alerts": 309.6111
+    },
+    {
+      "method": "LightGBM quantile a=0.5",
+      "mae": 1.3865,
+      "mae_ordinary": 0.8491,
+      "high_mae": 5.0161,
+      "high_bias": -4.779,
+      "high_under": 0.8756,
+      "recall": 0.4667,
+      "precision": 0.6148,
+      "false_alert_rate": 0.0361,
+      "alerts": 259.6667
+    },
+    {
+      "method": "DEPLOYED alert: P_NB(Y>=q90) >= tuned",
+      "mae": NaN,
+      "mae_ordinary": NaN,
+      "high_mae": NaN,
+      "high_bias": NaN,
+      "high_under": NaN,
+      "recall": 0.7746,
+      "precision": 0.5272,
+      "false_alert_rate": 0.0974,
+      "alerts": 518.7778
+    },
+    {
+      "method": "severity classifier (tuned threshold)",
+      "mae": NaN,
+      "mae_ordinary": NaN,
+      "high_mae": NaN,
+      "high_bias": NaN,
+      "high_under": NaN,
+      "recall": 0.7479,
+      "precision": 0.5048,
+      "false_alert_rate": 0.1174,
+      "alerts": 555.2222
+    }
+  ],
+  "deployed_alert_by_horizon": {
+    "2": {
+      "recall": 0.7839,
+      "precision": 0.6023,
+      "false_alert_rate": 0.0606
+    },
+    "3": {
+      "recall": 0.7773,
+      "precision": 0.5058,
+      "false_alert_rate": 0.0975
+    },
+    "4": {
+      "recall": 0.7626,
+      "precision": 0.4734,
+      "false_alert_rate": 0.1341
+    }
+  },
+  "interval_summary_B": [
+    {
+      "method": "conformal",
+      "level": 0.8,
+      "coverage": 0.872,
+      "coverage_high": 0.574,
+      "coverage_zero": 0.987,
+      "width": 3.7,
+      "width_high": 7.734,
+      "below": 0.061,
+      "above": 0.068
+    },
+    {
+      "method": "conformal",
+      "level": 0.9,
+      "coverage": 0.938,
+      "coverage_high": 0.736,
+      "coverage_zero": 0.996,
+      "width": 5.242,
+      "width_high": 11.669,
+      "below": 0.02,
+      "above": 0.043
+    },
+    {
+      "method": "nb_coverage",
+      "level": 0.8,
+      "coverage": 0.854,
+      "coverage_high": 0.607,
+      "coverage_zero": 0.98,
+      "width": 3.001,
+      "width_high": 8.168,
+      "below": 0.066,
+      "above": 0.08
+    },
+    {
+      "method": "nb_coverage",
+      "level": 0.9,
+      "coverage": 0.911,
+      "coverage_high": 0.74,
+      "coverage_zero": 0.987,
+      "width": 4.092,
+      "width_high": 11.409,
+      "below": 0.035,
+      "above": 0.054
+    },
+    {
+      "method": "nb_moment",
+      "level": 0.8,
+      "coverage": 0.912,
+      "coverage_high": 0.759,
+      "coverage_zero": 0.985,
+      "width": 4.215,
+      "width_high": 13.093,
+      "below": 0.027,
+      "above": 0.061
+    },
+    {
+      "method": "nb_moment",
+      "level": 0.9,
+      "coverage": 0.951,
+      "coverage_high": 0.856,
+      "coverage_zero": 0.992,
+      "width": 5.447,
+      "width_high": 16.881,
+      "below": 0.011,
+      "above": 0.038
+    },
+    {
+      "method": "poisson",
+      "level": 0.8,
+      "coverage": 0.854,
+      "coverage_high": 0.605,
+      "coverage_zero": 0.98,
+      "width": 2.99,
+      "width_high": 8.121,
+      "below": 0.066,
+      "above": 0.08
+    },
+    {
+      "method": "poisson",
+      "level": 0.9,
+      "coverage": 0.9,
+      "coverage_high": 0.709,
+      "coverage_zero": 0.986,
+      "width": 3.839,
+      "width_high": 10.405,
+      "below": 0.042,
+      "above": 0.058
+    }
+  ],
+  "interval_method": "nb_coverage",
+  "risk_schemes": [
+    {
+      "scheme": "median",
+      "accuracy": 0.7451,
+      "within_one_tier": 0.9939,
+      "sig_recall": 0.881,
+      "sig_precision": 0.7645,
+      "sig_false_alert_rate": 0.082,
+      "pred_share_Low": 0.5443,
+      "pred_share_Medium": 0.1883,
+      "pred_share_High": 0.2313,
+      "pred_share_Critical": 0.0362,
+      "actual_share_Low": 0.5507,
+      "actual_share_Medium": 0.2172,
+      "actual_share_High": 0.1729,
+      "actual_share_Critical": 0.0592,
+      "revision_flip_rate": 0.21
+    },
+    {
+      "scheme": "mean",
+      "accuracy": 0.743,
+      "within_one_tier": 0.9934,
+      "sig_recall": 0.8552,
+      "sig_precision": 0.7763,
+      "sig_false_alert_rate": 0.0745,
+      "pred_share_Low": 0.5968,
+      "pred_share_Medium": 0.1475,
+      "pred_share_High": 0.2225,
+      "pred_share_Critical": 0.0331,
+      "actual_share_Low": 0.5507,
+      "actual_share_Medium": 0.2172,
+      "actual_share_High": 0.1729,
+      "actual_share_Critical": 0.0592,
+      "revision_flip_rate": 0.207
+    },
+    {
+      "scheme": "upper 80% bound",
+      "accuracy": 0.5304,
+      "within_one_tier": 0.9767,
+      "sig_recall": 0.9731,
+      "sig_precision": 0.6818,
+      "sig_false_alert_rate": 0.1373,
+      "pred_share_Low": 0.2741,
+      "pred_share_Medium": 0.3946,
+      "pred_share_High": 0.21,
+      "pred_share_Critical": 0.1213,
+      "actual_share_Low": 0.5507,
+      "actual_share_Medium": 0.2172,
+      "actual_share_High": 0.1729,
+      "actual_share_Critical": 0.0592,
+      "revision_flip_rate": 0.3201
+    }
+  ],
+  "permutation_groups": {
+    "LightGBM Poisson (untuned)": {
+      "calendar": 1.3877,
+      "rain at target-lag 3": 0.1454,
+      "rain climatology / regime": 0.1369,
+      "other aligned rain (lags 2,4,5 + window)": 0.177,
+      "ward vulnerability": 0.2457,
+      "observation flags": 0.0
+    },
+    "champion": {
+      "calendar": 1.6436,
+      "rain at target-lag 3": 0.8288,
+      "rain climatology / regime": 0.3482,
+      "other aligned rain (lags 2,4,5 + window)": 0.3234,
+      "ward vulnerability": 0.2612,
+      "observation flags": NaN
+    }
+  },
+  "importance_rank_stability_mean_spearman_between_years": {
+    "champion": 0.44000000000000006,
+    "LightGBM Poisson (untuned)": 0.6000000000000001
+  },
+  "glm_top_coefficients_h3": {
+    "cal_org_cos1": -0.7685,
+    "cal_tgt_cos1": -0.7459,
+    "cal_org_monsoon": 0.5527,
+    "rain_pwet_tl3": 0.539,
+    "cal_org_sin2": 0.3179,
+    "rain_tl4": 0.3103,
+    "rain_clim_target": -0.2533,
+    "cal_org_cos2": -0.2414,
+    "waterlogging": 0.2088,
+    "cal_tgt_sin1": -0.1956,
+    "cal_tgt_sin3": 0.1796,
+    "rain_win": -0.1761
+  },
+  "shap_lgbm_top10": {
+    "cal_org_cos1": 1.013,
+    "cal_org_monsoon": 0.5307,
+    "cal_tgt_cos1": 0.3912,
+    "weeks_since_onset": 0.1092,
+    "cal_tgt_sin2": 0.0991,
+    "rain_win": 0.0945,
+    "rain_pwet_tl3": 0.0891,
+    "rain_tl4": 0.0868,
+    "waterlogging": 0.0747,
+    "cal_tgt_cos3": 0.0548
+  },
+  "bundles": {
+    "B": {
+      "path": "models/dengueshield_B.joblib",
+      "sha256": "133d7d322c2fc52785f2a5b0b32595b8a3d089a8f5d305baf6226bd7501f5e3b",
+      "build_s": 7.574669791967608,
+      "bytes": 11028
+    },
+    "A": {
+      "path": "models/dengueshield_A.joblib",
+      "sha256": "f12a558dc8ec916172c484e3e7222d27c352a9f39147805b7fe8ce61ba743940",
+      "build_s": 7.844381875009276,
+      "bytes": 10990
+    }
+  },
+  "inference_benchmarks_ms": {
+    "single ward, one horizon (ms)": 127.6,
+    "all 60 wards, one horizon (ms)": 129.1,
+    "all 60 wards x 3 horizons (ms)": 379.1,
+    "explain, all wards, one horizon (ms)": 125.2,
+    "load bundle from disk (ms)": 2.1
+  }
+}

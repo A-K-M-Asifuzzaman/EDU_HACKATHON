@@ -1,0 +1,199 @@
+model,year,horizon,group,mae_increase
+champion,2019,2,rain at target-lag 3,0.46566666666666673
+champion,2019,2,"other aligned rain (lags 2,4,5 + window)",0.39166666666666666
+champion,2019,2,rain climatology / regime,0.6665555555555557
+champion,2019,2,calendar,1.481888888888889
+champion,2019,2,ward vulnerability,0.32922222222222225
+champion,2019,3,rain at target-lag 3,0.25612244897959197
+champion,2019,3,"other aligned rain (lags 2,4,5 + window)",0.2185941043083901
+champion,2019,3,rain climatology / regime,0.39308390022675743
+champion,2019,3,calendar,2.0532879818594107
+champion,2019,3,ward vulnerability,0.2565759637188209
+champion,2019,4,rain at target-lag 3,0.019907407407407336
+champion,2019,4,"other aligned rain (lags 2,4,5 + window)",-0.09884259259259272
+champion,2019,4,rain climatology / regime,0.1649305555555555
+champion,2019,4,calendar,2.310648148148148
+champion,2019,4,ward vulnerability,0.1596064814814814
+champion,2020,2,rain at target-lag 3,0.23577777777777775
+champion,2020,2,"other aligned rain (lags 2,4,5 + window)",0.2581111111111111
+champion,2020,2,rain climatology / regime,0.4507777777777777
+champion,2020,2,calendar,1.2662222222222221
+champion,2020,2,ward vulnerability,0.2777777777777778
+champion,2020,3,rain at target-lag 3,-0.022902494331065837
+champion,2020,3,"other aligned rain (lags 2,4,5 + window)",0.1426303854875283
+champion,2020,3,rain climatology / regime,0.1727891156462585
+champion,2020,3,calendar,1.4518140589569162
+champion,2020,3,ward vulnerability,0.21938775510204075
+champion,2020,4,rain at target-lag 3,0.3579861111111113
+champion,2020,4,"other aligned rain (lags 2,4,5 + window)",0.44710648148148163
+champion,2020,4,rain climatology / regime,0.26944444444444454
+champion,2020,4,calendar,2.3621527777777778
+champion,2020,4,ward vulnerability,0.25474537037037054
+champion,2021,2,rain at target-lag 3,0.08277777777777777
+champion,2021,2,"other aligned rain (lags 2,4,5 + window)",0.05699999999999994
+champion,2021,2,rain climatology / regime,0.34088888888888896
+champion,2021,2,calendar,0.9201111111111112
+champion,2021,2,ward vulnerability,0.23977777777777778
+champion,2021,3,rain at target-lag 3,-0.18888888888888888
+champion,2021,3,"other aligned rain (lags 2,4,5 + window)",1.5348072562358277
+champion,2021,3,rain climatology / regime,0.11870748299319726
+champion,2021,3,calendar,1.187528344671202
+champion,2021,3,ward vulnerability,0.21133786848072558
+champion,2021,4,rain at target-lag 3,12.102199074074074
+champion,2021,4,"other aligned rain (lags 2,4,5 + window)",0.6200231481481482
+champion,2021,4,rain climatology / regime,0.7262731481481484
+champion,2021,4,calendar,1.5755787037037037
+champion,2021,4,ward vulnerability,0.1865740740740741
+champion,2022,2,rain at target-lag 3,0.5656666666666667
+champion,2022,2,"other aligned rain (lags 2,4,5 + window)",0.42211111111111116
+champion,2022,2,rain climatology / regime,0.5120000000000001
+champion,2022,2,calendar,1.3695555555555554
+champion,2022,2,ward vulnerability,0.30400000000000005
+champion,2022,3,rain at target-lag 3,0.014399092970521629
+champion,2022,3,"other aligned rain (lags 2,4,5 + window)",0.45113378684807265
+champion,2022,3,rain climatology / regime,0.28741496598639465
+champion,2022,3,calendar,1.6038548752834467
+champion,2022,3,ward vulnerability,0.27188208616780046
+champion,2022,4,rain at target-lag 3,0.0046296296296296875
+champion,2022,4,"other aligned rain (lags 2,4,5 + window)",0.000694444444444553
+champion,2022,4,rain climatology / regime,0.24571759259259265
+champion,2022,4,calendar,2.0944444444444446
+champion,2022,4,ward vulnerability,0.25462962962962976
+champion,2023,2,rain at target-lag 3,0.6055555555555556
+champion,2023,2,"other aligned rain (lags 2,4,5 + window)",0.5902222222222222
+champion,2023,2,rain climatology / regime,0.5584444444444445
+champion,2023,2,calendar,1.5537777777777777
+champion,2023,2,ward vulnerability,0.3992222222222222
+champion,2023,3,rain at target-lag 3,0.031292517006802655
+champion,2023,3,"other aligned rain (lags 2,4,5 + window)",0.22868480725623583
+champion,2023,3,rain climatology / regime,0.44931972789115643
+champion,2023,3,calendar,1.9098639455782314
+champion,2023,3,ward vulnerability,0.3462585034013605
+champion,2023,4,rain at target-lag 3,0.002662037037036935
+champion,2023,4,"other aligned rain (lags 2,4,5 + window)",-0.015277777777777871
+champion,2023,4,rain climatology / regime,0.39120370370370355
+champion,2023,4,calendar,2.210300925925926
+champion,2023,4,ward vulnerability,0.27060185185185176
+champion,2024,2,rain at target-lag 3,0.24346405228758172
+champion,2024,2,"other aligned rain (lags 2,4,5 + window)",0.11427015250544659
+champion,2024,2,rain climatology / regime,0.2899782135076252
+champion,2024,2,calendar,1.0515250544662307
+champion,2024,2,ward vulnerability,0.2389978213507625
+champion,2024,3,rain at target-lag 3,-0.0672222222222223
+champion,2024,3,"other aligned rain (lags 2,4,5 + window)",0.02533333333333328
+champion,2024,3,rain climatology / regime,0.12266666666666663
+champion,2024,3,calendar,1.2433333333333334
+champion,2024,3,ward vulnerability,0.2425555555555555
+champion,2024,4,rain at target-lag 3,0.2090702947845806
+champion,2024,4,"other aligned rain (lags 2,4,5 + window)",0.4321995464852609
+champion,2024,4,rain climatology / regime,0.10680272108843547
+champion,2024,4,calendar,1.9383219954648527
+champion,2024,4,ward vulnerability,0.23764172335600917
+LightGBM Poisson (untuned),2019,2,rain at target-lag 3,0.9986666666666667
+LightGBM Poisson (untuned),2019,2,"other aligned rain (lags 2,4,5 + window)",0.4548888888888889
+LightGBM Poisson (untuned),2019,2,rain climatology / regime,0.4114444444444445
+LightGBM Poisson (untuned),2019,2,observation flags,0.0
+LightGBM Poisson (untuned),2019,2,calendar,1.3513333333333335
+LightGBM Poisson (untuned),2019,2,ward vulnerability,0.3074444444444446
+LightGBM Poisson (untuned),2019,3,rain at target-lag 3,0.14693877551020415
+LightGBM Poisson (untuned),2019,3,"other aligned rain (lags 2,4,5 + window)",0.27108843537414967
+LightGBM Poisson (untuned),2019,3,rain climatology / regime,0.14047619047619056
+LightGBM Poisson (untuned),2019,3,observation flags,0.0
+LightGBM Poisson (untuned),2019,3,calendar,1.7785714285714287
+LightGBM Poisson (untuned),2019,3,ward vulnerability,0.2333333333333334
+LightGBM Poisson (untuned),2019,4,rain at target-lag 3,0.11909722222222219
+LightGBM Poisson (untuned),2019,4,"other aligned rain (lags 2,4,5 + window)",0.09988425925925926
+LightGBM Poisson (untuned),2019,4,rain climatology / regime,0.12673611111111102
+LightGBM Poisson (untuned),2019,4,observation flags,0.0
+LightGBM Poisson (untuned),2019,4,calendar,2.0282407407407406
+LightGBM Poisson (untuned),2019,4,ward vulnerability,0.18333333333333326
+LightGBM Poisson (untuned),2020,2,rain at target-lag 3,0.3581111111111111
+LightGBM Poisson (untuned),2020,2,"other aligned rain (lags 2,4,5 + window)",0.17922222222222225
+LightGBM Poisson (untuned),2020,2,rain climatology / regime,0.39222222222222225
+LightGBM Poisson (untuned),2020,2,observation flags,0.0
+LightGBM Poisson (untuned),2020,2,calendar,1.1731111111111112
+LightGBM Poisson (untuned),2020,2,ward vulnerability,0.23211111111111116
+LightGBM Poisson (untuned),2020,3,rain at target-lag 3,0.02505668934240372
+LightGBM Poisson (untuned),2020,3,"other aligned rain (lags 2,4,5 + window)",0.13752834467120198
+LightGBM Poisson (untuned),2020,3,rain climatology / regime,-0.00011337868480709723
+LightGBM Poisson (untuned),2020,3,observation flags,0.0
+LightGBM Poisson (untuned),2020,3,calendar,1.3806122448979596
+LightGBM Poisson (untuned),2020,3,ward vulnerability,0.21825396825396837
+LightGBM Poisson (untuned),2020,4,rain at target-lag 3,0.0030092592592592857
+LightGBM Poisson (untuned),2020,4,"other aligned rain (lags 2,4,5 + window)",0.007638888888888899
+LightGBM Poisson (untuned),2020,4,rain climatology / regime,0.030902777777777796
+LightGBM Poisson (untuned),2020,4,observation flags,0.0
+LightGBM Poisson (untuned),2020,4,calendar,1.4083333333333334
+LightGBM Poisson (untuned),2020,4,ward vulnerability,0.23622685185185185
+LightGBM Poisson (untuned),2021,2,rain at target-lag 3,0.05222222222222217
+LightGBM Poisson (untuned),2021,2,"other aligned rain (lags 2,4,5 + window)",0.09611111111111104
+LightGBM Poisson (untuned),2021,2,rain climatology / regime,0.14111111111111097
+LightGBM Poisson (untuned),2021,2,observation flags,0.0
+LightGBM Poisson (untuned),2021,2,calendar,0.8717777777777777
+LightGBM Poisson (untuned),2021,2,ward vulnerability,0.2017777777777777
+LightGBM Poisson (untuned),2021,3,rain at target-lag 3,-0.05249433106575959
+LightGBM Poisson (untuned),2021,3,"other aligned rain (lags 2,4,5 + window)",-0.14126984126984113
+LightGBM Poisson (untuned),2021,3,rain climatology / regime,-0.13072562358276638
+LightGBM Poisson (untuned),2021,3,observation flags,0.0
+LightGBM Poisson (untuned),2021,3,calendar,1.017233560090703
+LightGBM Poisson (untuned),2021,3,ward vulnerability,0.1668934240362813
+LightGBM Poisson (untuned),2021,4,rain at target-lag 3,-0.13900462962962967
+LightGBM Poisson (untuned),2021,4,"other aligned rain (lags 2,4,5 + window)",-0.20671296296296301
+LightGBM Poisson (untuned),2021,4,rain climatology / regime,-0.22743055555555566
+LightGBM Poisson (untuned),2021,4,observation flags,0.0
+LightGBM Poisson (untuned),2021,4,calendar,1.0400462962962962
+LightGBM Poisson (untuned),2021,4,ward vulnerability,0.16817129629629624
+LightGBM Poisson (untuned),2022,2,rain at target-lag 3,0.4476666666666667
+LightGBM Poisson (untuned),2022,2,"other aligned rain (lags 2,4,5 + window)",0.5233333333333333
+LightGBM Poisson (untuned),2022,2,rain climatology / regime,0.39599999999999996
+LightGBM Poisson (untuned),2022,2,observation flags,0.0
+LightGBM Poisson (untuned),2022,2,calendar,1.2822222222222222
+LightGBM Poisson (untuned),2022,2,ward vulnerability,0.2788888888888889
+LightGBM Poisson (untuned),2022,3,rain at target-lag 3,-1.4802973661668753e-16
+LightGBM Poisson (untuned),2022,3,"other aligned rain (lags 2,4,5 + window)",0.2909297052154194
+LightGBM Poisson (untuned),2022,3,rain climatology / regime,0.11734693877551017
+LightGBM Poisson (untuned),2022,3,observation flags,0.0
+LightGBM Poisson (untuned),2022,3,calendar,1.6410430839002264
+LightGBM Poisson (untuned),2022,3,ward vulnerability,0.28696145124716543
+LightGBM Poisson (untuned),2022,4,rain at target-lag 3,-0.005208333333333259
+LightGBM Poisson (untuned),2022,4,"other aligned rain (lags 2,4,5 + window)",0.019791666666666652
+LightGBM Poisson (untuned),2022,4,rain climatology / regime,0.15138888888888888
+LightGBM Poisson (untuned),2022,4,observation flags,0.0
+LightGBM Poisson (untuned),2022,4,calendar,1.7637731481481482
+LightGBM Poisson (untuned),2022,4,ward vulnerability,0.28518518518518526
+LightGBM Poisson (untuned),2023,2,rain at target-lag 3,0.6866666666666666
+LightGBM Poisson (untuned),2023,2,"other aligned rain (lags 2,4,5 + window)",0.799111111111111
+LightGBM Poisson (untuned),2023,2,rain climatology / regime,0.4833333333333334
+LightGBM Poisson (untuned),2023,2,observation flags,0.0
+LightGBM Poisson (untuned),2023,2,calendar,1.606333333333333
+LightGBM Poisson (untuned),2023,2,ward vulnerability,0.40099999999999997
+LightGBM Poisson (untuned),2023,3,rain at target-lag 3,-0.0014739229024942624
+LightGBM Poisson (untuned),2023,3,"other aligned rain (lags 2,4,5 + window)",0.4827664399092972
+LightGBM Poisson (untuned),2023,3,rain climatology / regime,0.10952380952380958
+LightGBM Poisson (untuned),2023,3,observation flags,0.0
+LightGBM Poisson (untuned),2023,3,calendar,1.839342403628118
+LightGBM Poisson (untuned),2023,3,ward vulnerability,0.3365079365079366
+LightGBM Poisson (untuned),2023,4,rain at target-lag 3,0.0018518518518518452
+LightGBM Poisson (untuned),2023,4,"other aligned rain (lags 2,4,5 + window)",0.059374999999999956
+LightGBM Poisson (untuned),2023,4,rain climatology / regime,0.20902777777777773
+LightGBM Poisson (untuned),2023,4,observation flags,0.0
+LightGBM Poisson (untuned),2023,4,calendar,1.620486111111111
+LightGBM Poisson (untuned),2023,4,ward vulnerability,0.2678240740740741
+LightGBM Poisson (untuned),2024,2,rain at target-lag 3,0.1594771241830064
+LightGBM Poisson (untuned),2024,2,"other aligned rain (lags 2,4,5 + window)",0.32015250544662305
+LightGBM Poisson (untuned),2024,2,rain climatology / regime,0.2862745098039215
+LightGBM Poisson (untuned),2024,2,observation flags,0.0
+LightGBM Poisson (untuned),2024,2,calendar,0.902723311546841
+LightGBM Poisson (untuned),2024,2,ward vulnerability,0.22167755991285398
+LightGBM Poisson (untuned),2024,3,rain at target-lag 3,-0.058666666666666645
+LightGBM Poisson (untuned),2024,3,"other aligned rain (lags 2,4,5 + window)",-0.06577777777777764
+LightGBM Poisson (untuned),2024,3,rain climatology / regime,-0.09788888888888884
+LightGBM Poisson (untuned),2024,3,observation flags,0.0
+LightGBM Poisson (untuned),2024,3,calendar,1.1494444444444447
+LightGBM Poisson (untuned),2024,3,ward vulnerability,0.18511111111111123
+LightGBM Poisson (untuned),2024,4,rain at target-lag 3,-0.1242630385487528
+LightGBM Poisson (untuned),2024,4,"other aligned rain (lags 2,4,5 + window)",-0.14217687074829924
+LightGBM Poisson (untuned),2024,4,rain climatology / regime,-0.07505668934240362
+LightGBM Poisson (untuned),2024,4,observation flags,0.0
+LightGBM Poisson (untuned),2024,4,calendar,1.123469387755102
+LightGBM Poisson (untuned),2024,4,ward vulnerability,0.21235827664399096
