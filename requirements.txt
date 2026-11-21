@@ -13,3 +13,7 @@ nbconvert==7.17.2
 ipykernel==7.4.0
 # Stage 2 models
 lightgbm==4.7.0
+# Stage 3 models and tuning
+xgboost==3.4.1
+catboost==1.2.10
+optuna==5.1.0

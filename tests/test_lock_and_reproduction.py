@@ -9,7 +9,7 @@ import pytest
 from dengueshield.data import RAW_PATH, ROOT
 
 NOTEBOOKS = ["04_feature_engineering", "05_feature_ablation", "06_feature_selection"]
-SOURCES = sorted((ROOT / "dengueshield" / "features").glob("*.py")) + sorted((ROOT / "dengueshield" / "evaluation").glob("*.py"))
+SOURCES = [f for d in ("features", "evaluation", "models", "optimization", "calibration", "inference") for f in sorted((ROOT / "dengueshield" / d).glob("*.py"))]
 
 
 def code_of(nb):
