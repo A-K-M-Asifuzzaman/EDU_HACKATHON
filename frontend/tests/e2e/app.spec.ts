@@ -319,3 +319,14 @@ test("map: A* insight mode reports real exploration counts for A* and Dijkstra",
   await expect(panel.getByText(/fewer nodes toward the goal/)).toBeVisible();
   await expect(panel.getByRole("link", { name: /Open in Google Maps/ })).toHaveAttribute("href", /google\.com\/maps\/dir\/\?api=1&origin=23\.7104,90\.4074&destination=/);
 });
+
+test("provenance document viewer follows relative links between architecture documents", async ({ page }) => {
+  await page.goto("/provenance/");
+  await page.getByRole("button", { name: /DengueShield AI: Architecture/ }).click();
+  const dlg = page.getByRole("dialog");
+  await dlg.getByRole("link", { name: "docs/architecture/ml-pipeline.md" }).click();      // relative link: must open in-app, not navigate to a 404
+  await expect(dlg.getByText("ML pipeline: from raw data to a calibrated forecast bundle")).toBeVisible();
+  await expect(page).toHaveURL(/\/provenance\/?$/);
+  await dlg.getByRole("link", { name: "Architecture overview" }).click();                  // ../../ARCHITECTURE.md resolves back
+  await expect(dlg.getByText("DengueShield AI: Architecture").first()).toBeVisible();
+});
