@@ -7,7 +7,7 @@ using only information available at the forecast origin.
 
 ## Status
 
-**Stage 1 (in progress): forensic data audit, EDA, leak-safe validation design, baselines.**
+**Stage 1 (complete): forensic data audit, EDA, leak-safe validation design, baselines.**
 No forecasting app or UI yet; those arrive in later stages.
 
 | Output | Location |
