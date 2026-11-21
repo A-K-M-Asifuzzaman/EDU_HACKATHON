@@ -1,0 +1,93 @@
+{
+  "source": "OpenStreetMap via the Overpass API",
+  "license": "Open Database License (ODbL) 1.0",
+  "attribution": "(c) OpenStreetMap contributors",
+  "built_at": "2026-11-21T16:53:48Z",
+  "speed_assumptions_kmh": {
+    "motorway": 50,
+    "trunk": 40,
+    "primary": 30,
+    "secondary": 25,
+    "tertiary": 22,
+    "unclassified": 18,
+    "residential": 15,
+    "living_street": 8,
+    "service": 10
+  },
+  "assumptions": [
+    "Speeds are assumed free-flow urban estimates by road class; no live or historical traffic data are used.",
+    "One-way rules follow OSM oneway/junction tags for motor vehicles; access=no/private roads are excluded.",
+    "Only the largest strongly connected part of each road network is kept, so every snapped point can reach every other.",
+    "Facility data are community-mapped; names, phones and tagged beds may be outdated. No live availability, capacity or doctor rosters exist."
+  ],
+  "areas": {
+    "greater_dhaka": {
+      "label": "Greater Dhaka (Dhaka, Narayanganj, Gazipur)",
+      "bbox": [
+        23.57,
+        90.33,
+        24.08,
+        90.56
+      ],
+      "cities": [
+        "Dhaka",
+        "Narayanganj",
+        "Gazipur"
+      ],
+      "osm_timestamp": "2026-11-21T16:29:06Z",
+      "raw_ways": 43529,
+      "vertices": 71129,
+      "directed_edges": 171339,
+      "segments": 91723,
+      "dropped_vertices_outside_largest_scc": 1373,
+      "strong_components": 334,
+      "oneway_segment_share": 0.132,
+      "total_road_km": 9647.3,
+      "max_speed_kmh": 50.0
+    },
+    "chattogram": {
+      "label": "Chattogram",
+      "bbox": [
+        22.24,
+        91.75,
+        22.42,
+        91.88
+      ],
+      "cities": [
+        "Chattogram"
+      ],
+      "osm_timestamp": "2026-11-21T16:34:08Z",
+      "raw_ways": 11566,
+      "vertices": 18766,
+      "directed_edges": 43899,
+      "segments": 23271,
+      "dropped_vertices_outside_largest_scc": 255,
+      "strong_components": 79,
+      "oneway_segment_share": 0.114,
+      "total_road_km": 2282.4,
+      "max_speed_kmh": 40.0
+    }
+  },
+  "facilities": {
+    "count": 914,
+    "dedup_rule": "same normalised name within 200 m merged (OSM point + outline duplicates)",
+    "by_city_kind": {
+      "Chattogram/clinic": 17,
+      "Chattogram/hospital": 145,
+      "Dhaka/clinic": 265,
+      "Dhaka/hospital": 450,
+      "Gazipur/clinic": 1,
+      "Gazipur/hospital": 31,
+      "Narayanganj/hospital": 5
+    },
+    "osm_timestamps": {
+      "Dhaka": "2026-11-21T16:40:17Z",
+      "Narayanganj": "2026-11-21T16:40:17Z",
+      "Gazipur": "2026-11-21T16:40:17Z",
+      "Chattogram": "2026-11-21T16:40:17Z"
+    },
+    "named": 884,
+    "with_phone": 59,
+    "far_from_road_over_300m": 2
+  }
+}

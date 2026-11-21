@@ -1,0 +1,21 @@
+{
+  "pairs": 400,
+  "equal_costs": 400,
+  "astar_ms_median": 5.7,
+  "dijkstra_ms_median": 9.5,
+  "expanded_ratio_median": 2.9,
+  "by_weight": {
+    "distance": {
+      "astar_ms_median": 4.6,
+      "dijkstra_ms_median": 9.4,
+      "expanded_ratio_median": 3.8
+    },
+    "time": {
+      "astar_ms_median": 6.9,
+      "dijkstra_ms_median": 9.7,
+      "expanded_ratio_median": 2.4
+    }
+  },
+  "method": "random vertex pairs in each area's largest strongly connected component; costs compared with relative tolerance 1e-6",
+  "machine_note": "timings measured on the development laptop (pure Python)"
+}
