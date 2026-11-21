@@ -56,7 +56,7 @@ pip time and a 36 s first import before the API was ready), so we do not claim a
 
 Global search (⌘K / Ctrl K) jumps to any page, forecast ward or hospital. An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
 
-The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**.
+The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**, with Mermaid diagrams for every subsystem in **`docs/architecture/`** (ML pipeline, backend, frontend, geospatial routing, Copilot, decision support, deployment and security).
 Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
 
 ## Status

@@ -1,113 +1,133 @@
 # DengueShield AI: Architecture
 
-One Python process serves the forecasting API **and** the pre-built dashboard on a single port. The forecasts come from a
-small statistical model fitted offline; the optional LLM and weather providers sit beside it and never feed it.
+One Python process serves the forecasting API **and** the pre-built dashboard on a single port. Forecasts come from a small statistical
+model fitted offline. Every external service (OpenAI, weather, maps, DGHS) is optional, sits beside the model and never feeds it.
 
-## 1. Data flow
+| Subsystem | Detailed architecture |
+|---|---|
+| Forecasting model, validation, calibration | [docs/architecture/ml-pipeline.md](docs/architecture/ml-pipeline.md) |
+| Backend API, caching, data loading | [docs/architecture/backend.md](docs/architecture/backend.md) |
+| Frontend, pages, shared state | [docs/architecture/frontend.md](docs/architecture/frontend.md) |
+| Facilities, road graphs, A* routing, emergency help | [docs/architecture/geospatial.md](docs/architecture/geospatial.md) |
+| Copilot (RAG + read-only tools) | [docs/architecture/copilot.md](docs/architecture/copilot.md) |
+| Reliability center, alert simulator, resource sandbox | [docs/architecture/decision-support.md](docs/architecture/decision-support.md) |
+| Launch, deployment, security | [docs/architecture/deployment-security.md](docs/architecture/deployment-security.md) |
 
+## 1. System context
+
+```mermaid
+flowchart LR
+    user(["Public-health officer / judge<br/>(browser, EN or BN)"])
+    subgraph app["DengueShield AI: one process, one port"]
+        ui["Next.js static dashboard<br/>12 routes, served by FastAPI"]
+        api["FastAPI backend<br/>/api/*"]
+        model[("Ridge Poisson GLM bundle<br/>11 KB, sha256-pinned")]
+        art[("Precomputed artifacts<br/>app_data/: replay, profiles,<br/>RAG index, OSM graphs")]
+        csv[("Organizer CSV<br/>2016-2024 only")]
+    end
+    openai["OpenAI<br/>(Copilot only)"]
+    wx["NASA POWER<br/>Open-Meteo"]
+    tiles["MapTiler<br/>tiles + geocoding"]
+    dghs["DGHS ArcGIS<br/>(boundaries)"]
+    user --> ui --> api
+    api --> model & art & csv
+    api -. optional .-> openai
+    api -. optional .-> wx
+    api -. optional .-> dghs
+    ui -. optional .-> tiles
 ```
- Organizer CSV (31,320 rows, 60 wards x 2016-2025, SYNTHETIC)
-        │  scripts/fetch_data.py  (SHA-256 verified)          2025 rows are dropped on load
-        ▼
- load_development_panel()  ── 2016-2024 only ──────────────────────────────────────────┐
-        │                                                                              │
-        ├── OFFLINE (research, notebooks 01-08)                                        │
-        │     features (F8, 24) → season-level out-of-time CV → champion → calibration │
-        │     └─► models/dengueshield_B.joblib  (ridge Poisson GLM, per horizon 2/3/4) │
-        │     └─► python -m dengueshield.appdata ─► app_data/*.json + replay.csv.gz    │
-        │                                                                              │
-        ▼                                                                              ▼
- ┌────────────────────────── FastAPI (dengueshield/api) ───────────────────────────────────┐
- │  /api/forecast*, /risk/wards, /reports/*   live inference: ForecastBundle.predict()    │
- │                                            (LRU cache by origin, horizon)              │
- │  /api/model/*, /data/*                     precomputed artifacts in app_data/          │
- │  /api/decision/*                           alert simulator + resource sandbox          │
- │                                            (saved 2019-2024 replay only; no refitting) │
- │  /api/assistant/chat   (SSE)               RAG: BM25 + embeddings → 7 read-only tools  │──► OpenAI
- │  /api/climate/*, /weather/*                NASA POWER + Open-Meteo, cached, optional   │──► NASA POWER / Open-Meteo
- │  /api/facilities, /api/route,              OSM facilities + A* on directed road graphs │
- │  /api/emergency/*                          (app_data/geo, ODbL; built offline)          │
- │  /api/geo/dghs/*                           DGHS ArcGIS boundaries, cached, optional     │──► DGHS GIS
- │  /  (everything else)                      static Next.js export  frontend/out         │
- └────────────────────────────────────────────────────────────────────────────────────────┘
-        ▲
- Browser: Next.js 16 static export · React 19 · Tailwind · ECharts · MapLibre · R3F (optional) · EN/BN
+
+Solid lines are required; dotted lines are optional services with timeouts, caches and graceful fallbacks.
+
+## 2. Data flow
+
+```mermaid
+flowchart TD
+    raw["Organizer CSV (31,320 rows, synthetic)"] -->|"scripts/fetch_data.py<br/>SHA-256 verified"| panel["load_development_panel()<br/>drops 2025 on load"]
+    panel --> feat["Feature pipeline<br/>F8: 24 features, convention B"]
+    feat --> cv["Season-level out-of-time CV<br/>outer seasons 2019-2024"]
+    cv --> champ["Champion selection rule<br/>(fixed before results)"]
+    champ --> cal["Calibration on 2 prior seasons<br/>NB intervals + alert threshold"]
+    cal --> bundle[("models/dengueshield_B.joblib")]
+    cv --> replay[("app_data/replay.csv.gz<br/>53,100 out-of-time predictions")]
+    panel --> appdata["python -m dengueshield.appdata<br/>profiles, correlations, lags"]
+    bundle --> api["FastAPI"]
+    replay --> api
+    appdata --> api
+    osm["OpenStreetMap (Overpass)<br/>build-time only"] --> geo[("app_data/geo<br/>914 facilities + road graphs")]
+    geo --> api
+    api --> ui["Dashboard"]
+    holdout["2025 rows"]:::locked -.->|"never loaded"| panel
+    classDef locked fill:#fde2e1,stroke:#b3262c,color:#7a1418
 ```
 
-Key separations:
+### Integrity boundaries
 
 | Boundary | Rule |
 |---|---|
-| Organizer data vs real weather | NASA POWER / Open-Meteo are shown **beside** the synthetic data in the Climate Observatory. They are never an input to the validated model. |
-| Live bundle vs Historical Replay | Replay = out-of-time predictions (seasons 2019-2024, nested calibration), used for accuracy claims. Live bundle = in-sample for origins ≤ 2024; it is for exploration, labelled as such. |
-| LLM vs numbers | The Copilot can only quote numbers returned by its read-only tools; it never computes forecasts and cannot call the model with arbitrary data. |
+| Organizer data vs real weather | NASA POWER / Open-Meteo are shown **beside** the synthetic data in the Climate Observatory; never a model input. |
+| Live bundle vs Historical Replay | Replay = out-of-time predictions (2019-2024, nested calibration), used for every accuracy claim. Bundle values for origins ≤ 2024 are in-sample and labelled. |
+| LLM vs numbers | The Copilot quotes only numbers returned by its read-only tools; it never computes forecasts. |
 | Real facilities vs synthetic wards | Hospitals and roads are real OSM records; forecasts appear on the map only as city-level aggregates. No facility, route or polygon is linked to a synthetic ward ID. |
-| Official boundaries vs dataset wards | DGHS polygons are context only. The dataset's ward IDs have no verified crosswalk to them, so no forecast is drawn on a polygon; predictions use an abstract matrix (`docs/dghs_gis_integration.md`). |
-| Frontend vs secrets | All keys (`OPENAI_API_KEY`) stay in the backend `.env`. Only public map keys live in `frontend/.env.local`. |
+| Official boundaries vs dataset wards | DGHS polygons are context only; with no verified crosswalk, predictions use an abstract matrix. |
+| Decision tools vs model | Reliability, alert-policy and allocation tools read saved replay rows only; nothing is refitted and the deployed alert rule is unchanged. |
+| Frontend vs secrets | `OPENAI_API_KEY` stays in the backend `.env`; only public map keys are in `frontend/.env.local`. |
 
-## 2. Chronological validation
+## 3. Chronological validation
 
-Random splits leak the future in a weekly panel, so every number in the app comes from a time-ordered scheme
-(`docs/validation_protocol.md`, `docs/model_selection.md` §2):
+```mermaid
+flowchart LR
+    subgraph fold["Outer fold for season Y (repeated for Y = 2019 ... 2024)"]
+        direction LR
+        train["Train on labels known<br/>by 31 Dec of Y-1"] --> inner["Tune on seasons Y-2, Y-1 only<br/>(dispersion, alert threshold,<br/>ensemble weights)"] --> pred["Predict every origin<br/>in season Y"]
+    end
+    pred --> score["Score season Y<br/>MAE, RMSE, coverage, alerts"]
+    lock["2025 test year"]:::locked
+    classDef locked fill:#fde2e1,stroke:#b3262c,color:#7a1418
+```
 
-- **Season-out-of-time.** For season *s* (2018-2024) the model is fitted on labels known by 31 Dec *s-1* and predicts season *s*.
-  Outer folds: **2019-2024**.
-- **Nesting.** Anything tuned for season *Y* (ensemble weights, interval dispersion, alert threshold) uses only seasons *Y-2* and *Y-1*.
-  Hyperparameter search ran on 2019-2021 only.
-- **Origin convention B (primary):** a forecast issued at the start of week *t* uses weather and cases through week *t-1*. Convention A
-  (end-of-week) is also available and labelled "assumes week *t* is complete".
-- **Locked holdout:** 2025 is removed on load. It is not used, displayed or scored (`docs/holdout_protocol.md`). The API refuses origins
-  later than the last data week + 1 and never fabricates observations.
+- **Origin convention B (primary):** a forecast issued at the start of week *t* uses weather and cases through week *t-1*; convention A is labelled "assumes week *t* is complete".
+- **Hyperparameter search** ran on 2019-2021 only; 2022-2024 is the benchmark window.
+- **Locked holdout:** 2025 is dropped on load, never displayed or scored (`docs/holdout_protocol.md`). The API refuses origins later than the last data week + 1.
 
-## 3. Why this model
+## 4. Why this model
 
-Rule fixed before the tuned/ensemble results were seen (`docs/model_selection.md` §7): shortlist everything within 0.05 MAE of the best,
+Rule fixed before the tuned and ensemble results were seen (`docs/model_selection.md` §7): shortlist everything within 0.05 MAE of the best,
 then take the simplest. Winner: **ridge Poisson GLM, 24 features, one model per horizon.**
 
 | | |
 |---|---|
 | MAE 2022-24 (h = 2/3/4) | 1.107 / 1.393 / 1.512 |
 | Cost | ~0.4 s to fit, sub-millisecond to predict, 11 KB bundle |
-| Why not boosting/ensembles | Gaps to the best candidate were 0.002-0.037 MAE, inside the noise of 3-6 seasons; GLM has the best high-incidence behaviour of the shortlist, lowest variability and additive per-driver explanations |
-| Intervals | Negative-binomial with dispersion calibrated on the two prior seasons. 80% / 90% coverage 0.855 / 0.911 on average |
-| Alert | P(cases ≥ training q90) ≥ tuned cut. Recall ≈ 0.78, precision ≈ 0.53 |
-| Known weakness | Intervals under-cover outbreak peaks (≈ 61% at the 80% level) and peaks are under-predicted by ≈ 3 cases. Shown next to the alert in the UI |
+| Why not boosting/ensembles | Gaps to the best candidate were 0.002-0.037 MAE, inside the noise of 3-6 seasons; the GLM has the best high-incidence behaviour of the shortlist, the lowest variability and additive per-driver explanations |
+| Intervals | Negative binomial, dispersion calibrated on the two prior seasons. 80% / 90% coverage 0.854 / 0.911 on average |
+| Alert | P(cases ≥ training q90) ≥ tuned cut. Recall ≈ 0.78, precision ≈ 0.53 (season means; pooled 3-week replay 0.758 / 0.508) |
+| Known weakness | Intervals under-cover outbreak peaks (0.607 at 80%, 0.740 at 90%) and peaks are under-predicted by ≈ 3 cases; shown in the UI |
 
-Risk tiers (Low/Medium/High/Critical) are quantiles of the training data (1 / 5 / 13 weekly cases), **statistical categories, not official warning levels.**
-
-## 4. Backend layout
-
-| Module | Role |
-|---|---|
-| `dengueshield/inference/` | `ForecastBundle` (load, `predict`, `explain`), refuses invalid origins |
-| `dengueshield/appdata.py` | builds `app_data/` (profile, correlations, seasonality, lag analysis, validation, `replay.csv.gz`) in ≈ 20 s |
-| `dengueshield/api/main.py` | routes, Pydantic validation, CORS (localhost), SPA serving |
-| `dengueshield/api/store.py` | loads dataset, bundle, artifacts; LRU cache |
-| `dengueshield/api/rag.py` | Copilot retrieval, tools, streaming, limits |
-| `dengueshield/api/climate.py`, `integrations.py` | external weather providers, status registry, `.env` loader |
-
-Interactive API reference: `/docs` (FastAPI OpenAPI) once running.
+Risk tiers (Low/Medium/High/Critical) are quantiles of the training data (1 / 5 / 13 weekly cases): **statistical categories, not official warning levels.**
 
 ## 5. Compute and API cost controls
 
 | Resource | Control |
 |---|---|
-| Model inference | No GPU. ≈ 0.25 s for a cold 60-ward origin, ≈ 6 ms warm (LRU). Replay table lookups ≈ 4 ms |
-| Dashboard | Static export (no server rendering). Charts, map and 3D are code-split and loaded on demand; 3D loads only on the Learn page, is skipped on small screens, low-core devices and without WebGL (an SVG explainer replaces it), and stops animating under reduced-motion |
-| OpenAI | Backend only, key from `.env`. `gpt-5.4-mini` for answers, `text-embedding-3-small` (512 dims) for retrieval; the document index is built once into `app_data/rag_index.npz`. Output capped at 900 tokens, 30 requests/hour, request-size limits, a USD budget guard (`OPENAI_BUDGET_USD`, default 1.00), response cache, usage log without message content. Measured ≈ $0.002-0.004 per answer. Without a key, Copilot falls back to retrieval-only |
-| NASA POWER | Per-city daily point query, 40 s timeout, memory + disk cache (`.cache/weather`), history TTL 24 h, stale fallback when the provider is down |
-| Open-Meteo | Archive (24 h TTL) and forecast/current (10 min / 1 h TTL), 15-40 s timeouts, same stale fallback. Free non-commercial tier; attribution shown |
-| Decision tools | `dengueshield/decision.py` reads only the saved out-of-time replay (2019–2024) and pre-origin observations: alert curve 15 ms, allocation 8 ms, season allocation 375 ms, cached per query. No refitting, no 2025 data; the deployed alert rule is unchanged (`docs/decision_support.md`) |
-| Routing | Local and free: graphs load in ≈ 0.3 s; A* median 5.7 ms per route (400/400 equal to Dijkstra). OSM is queried only by the offline build script (3 requests, cached). MapTiler geocoding runs from the browser only when the user searches places |
-| DGHS GIS | Connect timeout 6 s, 60 s circuit breaker, paginated queries capped at 3,000 features, boundaries cached 7 days with stale fallback; no key needed |
-| Deployment access | Optional shared password (`ACCESS_PASSWORD`, HTTP Basic) for private previews; per-client Copilot rate limit works behind the platform proxy. See `docs/deployment.md` |
-| Map tiles | MapTiler key in `frontend/.env.local`; without it the city-risk table is shown instead |
+| Model inference | No GPU. ≈ 0.25 s for a cold 60-ward origin, ≈ 6 ms warm (LRU). Replay lookups ≈ 4 ms |
+| Dashboard | Static export, no server rendering. Charts, map and 3D are code-split and loaded on demand; the 3D intro and Learn model fall back to SVG without WebGL or on low-end devices and are skipped or still under reduced motion. Command Center LCP 220 ms cold, 88 ms warm (local) |
+| OpenAI | Backend only. `gpt-5.4-mini` answers, `text-embedding-3-small` (512 dims) retrieval index built once into `app_data/rag_index.npz` (≈ $0.0008 per rebuild). 900 output tokens, 30 requests/hour per client, input-size limit, USD budget guard (`OPENAI_BUDGET_USD`, default 1.00), 1 h response cache, usage log without content; ≈ $0.002-0.004 per answer. Without a key: retrieval-only |
+| NASA POWER / Open-Meteo | Per-city queries, 15-40 s timeouts, memory + disk cache (history 24 h, current 10 min), stale fallback |
+| Decision tools | Saved replay only: alert curve 15 ms, allocation 8 ms, season allocation 375 ms, cached per query |
+| Routing | Local and free: graphs load in ≈ 0.3 s; A* median 5.7 ms (400/400 equal to Dijkstra). OSM is queried only by the offline build script; MapTiler geocoding runs from the browser only when the user searches places |
+| DGHS GIS | 6 s connect timeout, 60 s circuit breaker, pagination capped at 3,000 features, 7-day cache with stale fallback |
+| Deployment access | Optional shared password (`ACCESS_PASSWORD`, HTTP Basic); per-client Copilot rate limit works behind a proxy |
+| Map tiles | MapTiler key in `frontend/.env.local`; without it the map uses a blank basemap and facilities, routes and directory still work |
 
-If any external service fails, the affected panel shows a status message; every other page keeps working
-(`/api/integrations/status` reports what is reachable).
+If any external service fails, its panel shows a status message and every other page keeps working (`/api/integrations/status`).
 
 ## 6. Testing
 
-- `pytest tests`: 244 tests (leakage, feature alignment, models, bundle invariants, API contracts, A* vs Dijkstra, one-way handling, decision tools without look-ahead, regressions).
-- `cd frontend && npx playwright test`: 26 end-to-end tests (all routes, map routing and A* insight, emergency help, intro, reliability center, alert simulator, resource sandbox, brief, search, console errors, mobile overflow, Bangla, Copilot markdown
-  sanitisation, 3D fallback, secret scan of served assets).
+```mermaid
+flowchart LR
+    py["pytest: 244 tests<br/>leakage, alignment, models, bundle,<br/>API contracts, A* vs Dijkstra,<br/>decision tools without look-ahead"] --> gate{{"release gate"}}
+    pw["Playwright: 26 end-to-end tests<br/>all routes, console errors, mobile 390 px,<br/>Bangla, map routing, emergency, intro,<br/>reliability, simulator, sandbox, brief,<br/>search, secret scan"] --> gate
+    build["next build + typecheck"] --> gate
+    clone["fresh-clone launch smoke test"] --> gate
+```
