@@ -299,6 +299,37 @@ def model_calibration():
     return {k: v[k] for k in ("interval_coverage", "interval_coverage_detail", "peak_methods", "risk_schemes")}
 
 
+@app.get("/api/model/diagnostics")
+def model_diagnostics(horizon: H = 3):
+    """Out-of-time diagnostics computed from the Historical Replay table (seasons 2019-2024): residuals, actual vs predicted, bias by outcome size, alert reliability."""
+    need("replay")
+    key = ("diag", horizon)
+    def build():
+        r = S.replay[S.replay.horizon == horizon].copy()
+        res = r["median"] - r.y_true
+        edges = np.arange(-15.5, 16.5, 1.0)
+        hist, _ = np.histogram(res.clip(-15, 15), bins=edges)
+        cap = 25
+        heat = np.zeros((cap + 1, cap + 1), int)
+        np.add.at(heat, (np.minimum(r.y_true.to_numpy().astype(int), cap), np.minimum(r["median"].to_numpy().astype(int), cap)), 1)
+        bucket = pd.cut(r.y_true, [-1, 0, 2, 5, 9, 13, 20, 1000], labels=["0", "1-2", "3-5", "6-9", "10-13", "14-20", "21+"])
+        by = r.assign(bucket=bucket, err=res, abs=res.abs(), under=res < 0).groupby("bucket", observed=True).agg(n=("err", "size"), bias=("err", "mean"), mae=("abs", "mean"), under_share=("under", "mean")).round(3).reset_index()
+        hi = r.y_true >= r.thr_q90
+        rel = r.assign(bin=pd.cut(r.p_outbreak, np.linspace(0, 1, 11), include_lowest=True), hit=hi).groupby("bin", observed=True).agg(n=("hit", "size"), predicted=("p_outbreak", "mean"), observed=("hit", "mean")).round(4).reset_index()
+        rel["bin"] = rel["bin"].astype(str)
+        seas = r.assign(err=res, abs=res.abs(), sq=res ** 2).groupby("year").agg(n=("abs", "size"), mae=("abs", "mean"), rmse=("sq", lambda x: float(np.sqrt(x.mean()))), bias=("err", "mean")).round(3).reset_index()
+        cov80 = ((r.y_true >= r.lo80) & (r.y_true <= r.hi80)); cov90 = ((r.y_true >= r.lo90) & (r.y_true <= r.hi90))
+        return {"horizon": horizon, "n": int(len(r)), "mae": round(float(res.abs().mean()), 4), "rmse": round(float(np.sqrt((res ** 2).mean())), 4), "bias": round(float(res.mean()), 4),
+                "mae_mean_forecast": round(float((r["mean"] - r.y_true).abs().mean()), 4), "high_incidence": {"n": int(hi.sum()), "mae": round(float(res[hi].abs().mean()), 3), "bias": round(float(res[hi].mean()), 3), "under_share": round(float((res[hi] < 0).mean()), 3)},
+                "alert": {"recall": round(float(r.alert[hi].mean()), 3), "precision": round(float(hi[r.alert].mean()), 3), "false_alert_rate": round(float(r.alert[~hi].mean()), 3), "note": "pooled over all validation rows"},
+                "coverage": {"80": round(float(cov80.mean()), 3), "90": round(float(cov90.mean()), 3), "80_high_weeks": round(float(cov80[hi].mean()), 3), "90_high_weeks": round(float(cov90[hi].mean()), 3),
+                             "mean_width_80": round(float((r.hi80 - r.lo80).mean()), 2), "mean_width_90": round(float((r.hi90 - r.lo90).mean()), 2)},
+                "residual_hist": {"edges": edges[:-1].tolist(), "counts": hist.tolist()}, "heatmap": {"cap": cap, "counts": heat.tolist()}, "by_outcome_size": by.astype({"bucket": str}).to_dict("records"),
+                "reliability": rel.to_dict("records"), "by_season": seas.to_dict("records"), "source": "Historical Replay, convention B, seasons 2019-2024 (out-of-time)"}
+    v, _ = S.cache.get_or(key, build)
+    return v
+
+
 # ------------------------------------------------------------------ data profiling
 @app.get("/api/data/profile")
 def data_profile():
@@ -334,20 +365,22 @@ def weather_historical(ward_id: Optional[str] = None, city: Optional[str] = None
     for d in (start, end):
         if not DATE_RE.match(d):
             bad("dates must be YYYY-MM-DD")
-    p = S.panel[(S.panel.date >= start) & (S.panel.date <= min(end, "2024-12-31"))]
+    full = S.panel
     if ward_id:
-        p = p[p.ward_id == ward_check(ward_id)]
+        full = full[full.ward_id == ward_check(ward_id)]
         scope = ward_id
     elif city:
-        p = p[p.city == city]
+        full = full[full.city == city]
         scope = city
     else:
         scope = "all wards"
+    p = full[(full.date >= start) & (full.date <= min(end, "2024-12-31"))]
     if p.empty:
         bad("no data for the selection", 404)
     g = p.groupby("date")[["rainfall_mm", "avg_temp_c", "relative_humidity_pct", "dengue_cases"]].mean().round(3).reset_index()
     g["date"] = g.date.dt.date.astype(str)
-    clim = p.assign(woy=p.date.dt.isocalendar().week.astype(int).clip(upper=52)).groupby("woy")[metric].mean().round(3)
+    # typical-for-the-week = mean over ALL development years (2016-2024) of the same scope, never just the requested window
+    clim = full.assign(woy=full.date.dt.isocalendar().week.astype(int).clip(upper=52)).groupby("woy")[metric].mean().round(3)
     return {"scope": scope, "source": "organizer dataset (synthetic weather)", "metric": metric, "rows": records(g), "climatology_by_iso_week": clim.to_dict(),
             "provenance": "Training weather. Not real-world observations."}
 
@@ -415,6 +448,29 @@ def integrations_status():
     return integrations.status(S)
 
 
+# ------------------------------------------------------------------ methodology documents (allow-listed, read-only)
+def _doc_index() -> dict:
+    out = {}
+    for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md"):
+        for f in sorted(ROOT.glob(pat)):
+            if f.is_file() and f.name not in {".env", ".env.example"}:
+                out[str(f.relative_to(ROOT))] = f
+    return out
+
+
+@app.get("/api/docs")
+def docs_list():
+    return [{"path": k, "title": next((l.lstrip("# ").strip() for l in v.read_text(errors="ignore").splitlines() if l.startswith("#")), k), "bytes": v.stat().st_size} for k, v in _doc_index().items()]
+
+
+@app.get("/api/docs/read")
+def docs_read(path: str = Query(max_length=80)):
+    idx = _doc_index()
+    if path not in idx:
+        raise HTTPException(404, "document not found (only approved methodology documents can be read)")
+    return {"path": path, "text": idx[path].read_text(errors="ignore")[:200_000]}
+
+
 # ------------------------------------------------------------------ assistant
 @app.post("/api/assistant/chat")
 async def assistant_chat(req: ChatRequest, request: Request):
@@ -439,7 +495,7 @@ WEB = ROOT / "frontend" / "out"
 if WEB.exists():
     app.mount("/_next", StaticFiles(directory=WEB / "_next"), name="next")
 
-    @app.get("/{path:path}", include_in_schema=False)
+    @app.api_route("/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
     def spa(path: str):
         if path.startswith("api/"):
             raise HTTPException(404, "unknown API route")
