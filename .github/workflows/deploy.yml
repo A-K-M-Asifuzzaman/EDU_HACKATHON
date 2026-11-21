@@ -1,0 +1,93 @@
+name: Deploy
+
+# Runs after CI succeeds on main (or manually). Backend -> Hugging Face Space, dashboard -> Vercel (static, proxies /api to the Space).
+# Needs repository secrets: HF_TOKEN (write access), VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID. Without them the jobs skip and say why.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  HF_SPACE: AsifZaman1912/dengueshield-ai-api
+
+jobs:
+  backend:
+    name: Backend to Hugging Face Space
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - name: Check secret
+        id: gate
+        run: |
+          if [ -z "$HF_TOKEN" ]; then echo "HF_TOKEN is not set: skipping backend deploy"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.gate.outputs.go == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - if: steps.gate.outputs.go == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - if: steps.gate.outputs.go == 'true'
+        run: pip install huggingface_hub && python scripts/deploy_space.py "$HF_SPACE"
+      - name: Wait for the Space and smoke-test it
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          URL="https://$(echo "$HF_SPACE" | tr '[:upper:]/_' '[:lower:]--').hf.space"
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/api/health" || true)
+            [ "$code" = "200" ] && break; sleep 15
+          done
+          echo "health: $code"; [ "$code" = "200" ]
+          curl -sf "$URL/api/forecast?ward_id=DNCC_Ward_19&origin=2024-08-05&horizon=3" > /dev/null
+
+  frontend:
+    name: Dashboard to Vercel
+    needs: backend
+    if: always() && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && needs.backend.result != 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Check secrets
+        id: gate
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then echo "Vercel secrets not set: skipping frontend deploy"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.gate.outputs.go == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - if: steps.gate.outputs.go == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Stage a git-free frontend folder (only frontend/ and vercel.json are uploaded)
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          mkdir -p /tmp/stage/.vercel && cp vercel.json /tmp/stage/
+          rsync -a --exclude node_modules --exclude .next --exclude out frontend/ /tmp/stage/frontend/
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > /tmp/stage/.vercel/project.json
+      - if: steps.gate.outputs.go == 'true'
+        working-directory: /tmp/stage
+        run: npx --yes vercel@50 deploy --prod --yes --token "$VERCEL_TOKEN"
+      - name: Smoke-test production
+        if: steps.gate.outputs.go == 'true'
+        run: |
+          sleep 10
+          curl -sf https://dengueshield-ai.vercel.app/ > /dev/null
+          curl -sf https://dengueshield-ai.vercel.app/api/health
