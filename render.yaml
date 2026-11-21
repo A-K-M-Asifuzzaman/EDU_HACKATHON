@@ -1,0 +1,18 @@
+# Render Blueprint. Dashboard: New > Blueprint > pick this repo. Secrets are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: dengueshield-ai
+    runtime: docker
+    plan: starter            # ~$7/month, always on. The free plan sleeps after 15 min idle and cold-starts in about a minute.
+    region: singapore        # closest to Bangladesh
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: OPENAI_API_KEY        # Copilot. Backend-only; remove the variable to turn the Copilot off (retrieval-only fallback).
+        sync: false
+      - key: ACCESS_PASSWORD       # optional team password (browser prompt; any username). Strongly recommended while the repo and dataset terms are private.
+        sync: false
+      - key: OPENAI_BUDGET_USD     # in-memory spend guard (resets on restart); also set a hard monthly limit in the OpenAI dashboard
+        value: "1.0"
+      - key: NEXT_PUBLIC_MAPTILER_KEY   # public browser key baked into the build; restrict it to the onrender.com domain in MapTiler
+        sync: false

@@ -27,6 +27,10 @@ Optional keys (the app runs without them, with the affected feature disabled):
 
 Both files are git-ignored. NASA POWER and Open-Meteo need no key.
 
+### Deploying for teammates
+
+A `Dockerfile` and Render blueprint (`render.yaml`) are included; steps, secrets and cost controls are in `docs/deployment.md`.
+
 ### Fresh-clone measurement
 
 Measured 21 Nov 2026 on the development Mac (Apple silicon, broadband): `git clone` of the repository followed by `PORT=8200 ./scripts/launch.sh`

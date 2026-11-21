@@ -4,6 +4,9 @@
 """
 from __future__ import annotations
 
+import base64
+import hmac
+import os
 import re
 import time
 from datetime import date
@@ -29,6 +32,20 @@ app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http
                    allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 S = Store()
 H = Annotated[int, Query(ge=2, le=4, description="forecast horizon in weeks (2, 3 or 4)")]
+@app.middleware("http")
+async def access_gate(request: Request, call_next):
+    """Optional shared-password gate (HTTP Basic, any username) for private deployments. Off unless ACCESS_PASSWORD is set; /api/health stays open for platform probes."""
+    pw = os.environ.get("ACCESS_PASSWORD")
+    if pw and request.url.path != "/api/health":
+        try:
+            given = base64.b64decode(request.headers.get("authorization", "")[6:]).decode().split(":", 1)[1]
+        except Exception:
+            given = ""
+        if not hmac.compare_digest(given.encode(), pw.encode()):
+            return JSONResponse({"detail": "Authentication required"}, status_code=401, headers={"WWW-Authenticate": 'Basic realm="DengueShield AI (team preview)"'})
+    return await call_next(request)
+
+
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 DISCLAIMER = ("Historical Replay on a synthetic competition dataset (2016-2024). Not a live surveillance system. Risk tiers are statistical categories "
               "derived from training quantiles, not official public-health warning levels.")

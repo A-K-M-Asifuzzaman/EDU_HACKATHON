@@ -215,3 +215,15 @@ def test_weather_climatology_uses_all_years_not_the_requested_window(client):
     wk27 = short["climatology_by_iso_week"]["28"]
     observed_28 = [r["rainfall_mm"] for r in short["rows"] if r["date"] == "2024-07-08"][0]
     assert wk27 != observed_28                                                          # a real climatology, not the observation itself
+
+
+def test_optional_access_gate_protects_everything_but_health(client, monkeypatch):
+    monkeypatch.setenv("ACCESS_PASSWORD", "team-pass")
+    assert client.get("/api/health").status_code == 200                                   # probes stay open
+    for u in ("/", "/api/metadata", "/api/forecast?ward_id=DNCC_Ward_19&origin=2024-08-05&horizon=3"):
+        r = client.get(u)
+        assert r.status_code == 401 and "Basic" in r.headers["www-authenticate"]
+    assert client.get("/api/metadata", auth=("anyone", "wrong")).status_code == 401
+    assert client.get("/api/metadata", auth=("anyone", "team-pass")).status_code == 200
+    monkeypatch.delenv("ACCESS_PASSWORD")
+    assert client.get("/api/metadata").status_code == 200                                 # gate is off by default

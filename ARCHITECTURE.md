@@ -93,6 +93,7 @@ Interactive API reference: `/docs` (FastAPI OpenAPI) once running.
 | NASA POWER | Per-city daily point query, 40 s timeout, memory + disk cache (`.cache/weather`), history TTL 24 h, stale fallback when the provider is down |
 | Open-Meteo | Archive (24 h TTL) and forecast/current (10 min / 1 h TTL), 15-40 s timeouts, same stale fallback. Free non-commercial tier; attribution shown |
 | DGHS GIS | Connect timeout 6 s, 60 s circuit breaker, paginated queries capped at 3,000 features, boundaries cached 7 days with stale fallback; no key needed |
+| Deployment access | Optional shared password (`ACCESS_PASSWORD`, HTTP Basic) for private previews; per-client Copilot rate limit works behind the platform proxy. See `docs/deployment.md` |
 | Map tiles | MapTiler key in `frontend/.env.local`; without it the city-risk table is shown instead |
 
 If any external service fails, the affected panel shows a status message; every other page keeps working
