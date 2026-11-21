@@ -103,3 +103,14 @@ def test_api_routes_to_a_real_facility_and_nearest_is_sorted_by_road_time():
     assert len(times) == 5 and times == sorted(times)
     assert c.get("/api/route", params={"from_lat": 24.9, "from_lon": 91.9, "to_lat": 23.75, "to_lon": 90.4}).status_code == 422
     assert c.get("/api/route", params={"from_lat": 23.71, "from_lon": 90.40, "to_facility": "osm:node/1; DROP"}).status_code == 422
+
+
+@pytest.mark.skipif(not BUILT, reason="road graphs not built")
+def test_insight_trace_is_bounded_ordered_and_consistent():
+    G = routing.Graph("greater_dhaka")
+    ins = routing.insight(G, 100, G.n // 3, "distance", cap=500)
+    assert ins["cost_equal"] and ins["astar"]["expanded"] <= ins["dijkstra"]["expanded"]
+    for k in ("astar", "dijkstra"):
+        pts = ins[k]["explored"]
+        assert 0 < len(pts) <= 500 and len(pts) == min(500, ins[k]["expanded"])
+        assert pts[0] == pytest.approx([G.lon[100], G.lat[100]], abs=1e-5)                 # exploration starts at the origin

@@ -502,7 +502,7 @@ def facilities_list(city: Optional[Literal["Dhaka", "Narayanganj", "Gazipur", "C
 
 @app.get("/api/route")
 def route_between(from_lat: Lat, from_lon: Lon, to_lat: Optional[Lat] = None, to_lon: Optional[Lon] = None,
-                  to_facility: Annotated[Optional[str], Query(max_length=40, pattern=r"^osm:(node|way|relation)/\d+$")] = None, verify: bool = True):
+                  to_facility: Annotated[Optional[str], Query(max_length=40, pattern=r"^osm:(node|way|relation)/\d+$")] = None, verify: bool = True, insight: bool = False):
     """Shortest-distance and estimated-fastest A* routes on the directed OSM road graph, each verified against Dijkstra."""
     _routing_ready()
     dest = None
@@ -514,7 +514,7 @@ def route_between(from_lat: Lat, from_lon: Lon, to_lat: Optional[Lat] = None, to
     if to_lat is None or to_lon is None:
         bad("give to_lat and to_lon, or to_facility")
     try:
-        out = routing.route(from_lat, from_lon, to_lat, to_lon, verify)
+        out = routing.route(from_lat, from_lon, to_lat, to_lon, verify, insight)
     except routing.RoutingError as e:
         bad(str(e))
     out.update({"facility": dest, "attribution": OSM_ATTR, "assumptions": routing.manifest()["assumptions"],

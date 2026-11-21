@@ -67,7 +67,8 @@ class Graph:
         a = math.sin(dl / 2) ** 2 + self.cos[v] * self.cos[t] * math.sin(dn / 2) ** 2
         return 2 * R_EARTH * math.asin(min(1.0, math.sqrt(a))) * (1 - 1e-9)   # tiny margin keeps float rounding admissible
 
-    def search(self, s: int, t: int, weight: str = "distance", astar: bool = True) -> dict:
+    def search(self, s: int, t: int, weight: str = "distance", astar: bool = True, trace: int = 0) -> dict:
+        """trace > 0 also returns up to `trace` expanded vertices (evenly sampled, in expansion order) for visualisation."""
         if weight not in self.w:
             raise RoutingError("weight must be 'distance' or 'time'")
         W, indptr, dst = self.w[weight], self.indptr, self.dst
@@ -79,6 +80,7 @@ class Graph:
         heap = [(h(s), 0.0, s)]
         closed = set()
         expanded = 0
+        order: list[int] = [] if trace else None   # type: ignore[assignment]
         while heap:
             _, gv, v = heapq.heappop(heap)
             if v in closed:
@@ -87,6 +89,8 @@ class Graph:
                 break
             closed.add(v)
             expanded += 1
+            if trace:
+                order.append(v)
             for e in range(indptr[v], indptr[v + 1]):
                 u = dst[e]
                 ng = gv + W[e]
@@ -104,7 +108,11 @@ class Graph:
             edges.append(e)
             v = self._src(e)
         edges.reverse()
-        return {"found": True, "cost": g[t], "edges": edges, "expanded": expanded, "ms": round(ms, 2)}
+        out = {"found": True, "cost": g[t], "edges": edges, "expanded": expanded, "ms": round(ms, 2)}
+        if trace:
+            idx = order if len(order) <= trace else [order[int(i * len(order) / trace)] for i in range(trace)]
+            out["explored"] = [[round(float(self.lon[v]), 5), round(float(self.lat[v]), 5)] for v in idx]
+        return out
 
     def _src(self, e: int) -> int:
         # source vertex of directed edge e (binary search in indptr)
@@ -215,7 +223,15 @@ def _route_summary(G: Graph, res: dict, s: int, weight: str) -> dict:
             "geometry": {"type": "LineString", "coordinates": G.geometry(res["edges"], s)}}
 
 
-def route(from_lat: float, from_lon: float, to_lat: float, to_lon: float, verify: bool = True) -> dict:
+def insight(G: Graph, s: int, t: int, weight: str = "distance", cap: int = 2500) -> dict:
+    """A* and Dijkstra exploration fronts for the same query (bounded sample), for the Algorithm Insight view."""
+    a, d = G.search(s, t, weight, True, cap), G.search(s, t, weight, False, cap)
+    return {"weight": weight, "astar": {"expanded": a["expanded"], "ms": a["ms"], "explored": a.get("explored", [])},
+            "dijkstra": {"expanded": d["expanded"], "ms": d["ms"], "explored": d.get("explored", [])},
+            "cost_equal": a["found"] and d["found"] and abs(a["cost"] - d["cost"]) <= 1e-6 * max(1.0, d["cost"]), "sample_cap": cap}
+
+
+def route(from_lat: float, from_lon: float, to_lat: float, to_lon: float, verify: bool = True, with_insight: bool = False) -> dict:
     a1, a2 = area_for(from_lat, from_lon), area_for(to_lat, to_lon)
     if a1 != a2:
         raise RoutingError("origin and destination are in different routing areas")
@@ -233,6 +249,8 @@ def route(from_lat: float, from_lon: float, to_lat: float, to_lon: float, verify
             out["verification"][name] = {"dijkstra_cost": round(ref["cost"], 3), "astar_cost": round(res["cost"], 3),
                                          "equal": abs(ref["cost"] - res["cost"]) <= 1e-6 * max(1.0, ref["cost"]),
                                          "dijkstra_expanded": ref["expanded"], "dijkstra_ms": ref["ms"], "astar_expanded": res["expanded"], "astar_ms": res["ms"]}
+    if with_insight:
+        out["insight"] = insight(G, s, t, "distance")
     return out
 
 

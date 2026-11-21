@@ -24,13 +24,14 @@ function arrowImage(): ImageData {
 
 interface Props {
   facilities: any | null; dghs: any | null; cityRisk: CityOverlay[]; weather: WeatherPt[]; layers: Layers; origin: LngLat | null;
-  routes: { fastest?: LngLat[]; shortest?: LngLat[] }; selectedId?: string | null; reduce: boolean; height?: number;
+  routes: { fastest?: LngLat[]; shortest?: LngLat[] }; selectedId?: string | null; reduce: boolean; height?: number | string;
+  routeMode?: "fastest" | "shortest" | "both"; dest?: LngLat | null; explored?: { astar?: LngLat[]; dijkstra?: LngLat[] } | null;
   onPick: (p: LngLat) => void; onFacility: (f: any) => void; onBuildings?: (available: boolean) => void;
 }
 
 const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
   const el = useRef<HTMLDivElement>(null), map = useRef<any>(null), lib = useRef<any>(null);
-  const markers = useRef<any[]>([]), originMarker = useRef<any>(null), anim = useRef<number>(0);
+  const markers = useRef<any[]>([]), originMarker = useRef<any>(null), destMarker = useRef<any>(null), anim = useRef<number>(0), anim2 = useRef<number>(0);
   const cb = useRef(p); cb.current = p;
   const [ready, setReady] = useState(false), [failed, setFailed] = useState(false);
 
@@ -74,11 +75,17 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
             } catch { bld = false; }
           }
           cb.current.onBuildings?.(bld);
+          // A* insight: sampled exploration fronts (Dijkstra faint amber, A* cyan), drawn beneath the routes
+          for (const [k, col, op] of [["expl-d", "#e0a526", 0.35], ["expl-a", "#22b8d6", 0.75]] as const) {
+            mp.addSource(k, { type: "geojson", data: EMPTY });
+            mp.addLayer({ id: k, type: "circle", source: k, paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 1.6, 15, 3.2], "circle-color": col, "circle-opacity": op } });
+          }
           for (const k of ["shortest", "fastest"]) mp.addSource(`route-${k}`, { type: "geojson", data: EMPTY });
           mp.addLayer({ id: "route-shortest", type: "line", source: "route-shortest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#2563eb", "line-width": 4, "line-dasharray": [1.4, 1.1], "line-opacity": 0.9 } });
           mp.addLayer({ id: "route-fastest-casing", type: "line", source: "route-fastest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-width": 9 } });
           mp.addLayer({ id: "route-fastest", type: "line", source: "route-fastest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#0e8f66", "line-width": 5.5 } });
           mp.addLayer({ id: "route-arrows", type: "symbol", source: "route-fastest", layout: { "symbol-placement": "line", "symbol-spacing": 70, "icon-image": "route-arrow", "icon-size": 0.55, "icon-allow-overlap": true, "icon-rotation-alignment": "map" } });
+          mp.addLayer({ id: "route-arrows-s", type: "symbol", source: "route-shortest", layout: { "symbol-placement": "line", "symbol-spacing": 70, "icon-image": "route-arrow", "icon-size": 0.5, "icon-allow-overlap": true, "icon-rotation-alignment": "map", visibility: "none" } });
           mp.addSource("fac", { type: "geojson", data: EMPTY, cluster: true, clusterRadius: 44, clusterMaxZoom: 15 });
           mp.addLayer({ id: "fac-cluster", type: "circle", source: "fac", filter: ["has", "point_count"],
             paint: { "circle-color": "#1d4ed8", "circle-opacity": 0.85, "circle-stroke-color": "#fff", "circle-stroke-width": 2, "circle-radius": ["step", ["get", "point_count"], 14, 10, 18, 50, 24, 200, 30] } });
@@ -97,7 +104,7 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
         });
       } catch { setFailed(true); }
     }).catch(() => setFailed(true));
-    return () => { dead = true; cancelAnimationFrame(anim.current); markers.current.forEach((x) => x.remove()); originMarker.current?.remove(); map.current?.remove(); map.current = null; };
+    return () => { dead = true; cancelAnimationFrame(anim.current); cancelAnimationFrame(anim2.current); markers.current.forEach((x) => x.remove()); originMarker.current?.remove(); destMarker.current?.remove(); map.current?.remove(); map.current = null; };
   }, []);
 
   // data layers
@@ -145,6 +152,34 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
     const d = document.createElement("div"); d.className = "ds-origin"; d.setAttribute("aria-label", "Starting point");
     originMarker.current = new lib.current.Marker({ element: d }).setLngLat(p.origin).addTo(map.current);
   }, [ready, p.origin]);
+
+  useEffect(() => {
+    if (!ready || !lib.current) return;
+    destMarker.current?.remove(); destMarker.current = null;
+    if (!p.dest) return;
+    const d = document.createElement("div"); d.className = "ds-dest"; d.setAttribute("aria-label", "Destination");
+    destMarker.current = new lib.current.Marker({ element: d, anchor: "bottom" }).setLngLat(p.dest).addTo(map.current);
+  }, [ready, p.dest]);
+
+  // which route(s) are visible
+  useEffect(() => {
+    if (!ready) return;
+    const m = p.routeMode ?? "both", vis = (id: string, on: boolean) => map.current.getLayer(id) && map.current.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+    vis("route-shortest", m !== "fastest"); vis("route-fastest", m !== "shortest"); vis("route-fastest-casing", m !== "shortest"); vis("route-arrows", m !== "shortest"); vis("route-arrows-s", m === "shortest");
+  }, [ready, p.routeMode]);
+
+  // A* insight: reveal the exploration fronts in expansion order (instant under reduced motion)
+  useEffect(() => {
+    if (!ready) return;
+    cancelAnimationFrame(anim2.current);
+    const pts = (c?: LngLat[]) => ({ type: "FeatureCollection", features: (c ?? []).map((x) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: x } })) });
+    const a = p.explored?.astar ?? [], d = p.explored?.dijkstra ?? [];
+    const set = (k: number) => { map.current.getSource("expl-a")?.setData(pts(a.slice(0, Math.ceil(a.length * k)))); map.current.getSource("expl-d")?.setData(pts(d.slice(0, Math.ceil(d.length * k)))); };
+    if (p.reduce || !p.explored) { set(1); return; }
+    const t0 = performance.now(), dur = 1800;
+    const step = (t: number) => { const k = Math.min(1, (t - t0) / dur); set(k); if (k < 1) anim2.current = requestAnimationFrame(step); };
+    anim2.current = requestAnimationFrame(step);
+  }, [ready, p.explored, p.reduce]);
 
   // animated route drawing (instant under reduced motion)
   useEffect(() => {
