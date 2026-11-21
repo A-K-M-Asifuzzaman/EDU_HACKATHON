@@ -1,0 +1,22 @@
+{
+  "n_configs_convA": 51,
+  "n_fits": 918,
+  "best_by_model": {
+    "glm": {
+      "config": "F3plus_zero_infl",
+      "mae_h2": 1.069318082788671,
+      "mae_h3": 1.1281156462585034,
+      "mae_h4": 1.433834089191232,
+      "mae_avg": 1.2104226060794687
+    },
+    "lgbm": {
+      "config": "F3plus_humidity",
+      "mae_h2": 1.0962701525054468,
+      "mae_h3": 1.1652585034013605,
+      "mae_h4": 1.4700184240362812,
+      "mae_avg": 1.2438490266476963
+    }
+  },
+  "forward_keep": [],
+  "decision_rule": "both models: mean gain >= 0.01 and >= 2/3 folds improved"
+}

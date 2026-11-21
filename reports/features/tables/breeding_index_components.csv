@@ -1,0 +1,9 @@
+config,glm,lgbm
+breed_breed_no_temp,1.286,1.283
+breed_breed_rain_only,1.29,1.285
+F2_rain_memory,1.291,1.286
+breed_breed_hum,1.312,1.287
+breed_breed_no_wl,1.312,1.286
+breed_breed_full,1.313,1.296
+breed_breed_log,1.319,1.287
+breed_breed_aligned,1.333,1.289

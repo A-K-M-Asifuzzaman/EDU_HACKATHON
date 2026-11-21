@@ -1,0 +1,11 @@
+bundle,model,gain_over_F1
+rain_lag+rain_roll (F2),glm,0.1808
+rain_lag+rain_roll (F2),lgbm,0.2333
+rain_align (F3),glm,0.2551
+rain_align (F3),lgbm,0.2706
+F4 bundle,glm,0.2128
+F4 bundle,lgbm,0.2593
+case (F5),glm,-0.0191
+case (F5),lgbm,0.0012
+hist (F6),glm,0.0611
+hist (F6),lgbm,0.0832

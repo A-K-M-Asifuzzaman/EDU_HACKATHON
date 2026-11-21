@@ -1,9 +1,9 @@
 convention,horizon,rows,features,build_seconds,matrix_MB
-A_end_of_week,2,28080,204,0.155,45.8
-A_end_of_week,3,28020,204,0.162,45.7
-A_end_of_week,4,27960,204,0.178,45.6
-A_end_of_week,"3 (one origin, all 60 wards)",60,204,0.149,0.098
-B_start_of_week,2,28080,204,0.166,45.8
-B_start_of_week,3,28020,204,0.177,45.7
-B_start_of_week,4,27960,204,0.184,45.6
-B_start_of_week,"3 (one origin, all 60 wards)",60,204,0.168,0.098
+A_end_of_week,2,28080,204,0.12,45.8
+A_end_of_week,3,28020,204,0.126,45.7
+A_end_of_week,4,27960,204,0.131,45.6
+A_end_of_week,"3 (one origin, all 60 wards)",60,204,0.12,0.098
+B_start_of_week,2,28080,204,0.142,45.8
+B_start_of_week,3,28020,204,0.133,45.7
+B_start_of_week,4,27960,204,0.141,45.6
+B_start_of_week,"3 (one origin, all 60 wards)",60,204,0.121,0.098

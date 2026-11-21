@@ -1,0 +1,134 @@
+{
+  "families_kept_by_rule": [],
+  "candidate_n_features": 38,
+  "F8_n_features": 24,
+  "dropped_from_candidate": [
+    "cal_tgt_cos2",
+    "cal_tgt_month",
+    "cal_tgt_monsoon",
+    "log_pop_density",
+    "rain_tl2_obs",
+    "rain_tl3_obs",
+    "rain_tl4_obs",
+    "rain_tl5",
+    "rain_tl5_obs",
+    "rain_win_nobs",
+    "rain_clim_wetcond_tl3",
+    "rain_clim_drycond_tl3",
+    "monsoon_started",
+    "weeks_since_onset"
+  ],
+  "per_horizon_overrides": [],
+  "permutation_importance_by_family": {
+    "calendar": {
+      "glm": 1.3194,
+      "lgbm": 1.3396
+    },
+    "rain_align": {
+      "glm": 1.0406,
+      "lgbm": 0.9857
+    },
+    "static": {
+      "glm": 0.2981,
+      "lgbm": 0.2978
+    }
+  },
+  "shap_top10": {
+    "cal_org_cos1": 0.8634,
+    "cal_org_monsoon": 0.5003,
+    "cal_tgt_cos1": 0.387,
+    "regime_wet_now": 0.2606,
+    "rain_tl3": 0.2319,
+    "rain_win": 0.0887,
+    "waterlogging": 0.0761,
+    "cal_tgt_sin2": 0.0696,
+    "rain_pwet_tl3": 0.0653,
+    "rain_tl4": 0.0523
+  },
+  "shap_by_family": {
+    "calendar": 1.9506,
+    "rain_align": 0.7871,
+    "static": 0.136
+  },
+  "error_high_incidence_F8": [
+    {
+      "model": "glm",
+      "high": false,
+      "mae": 0.741,
+      "bias": 0.242,
+      "under": 0.147,
+      "n": 23091
+    },
+    {
+      "model": "glm",
+      "high": true,
+      "mae": 4.335,
+      "bias": -3.245,
+      "under": 0.773,
+      "n": 3549
+    },
+    {
+      "model": "lgbm",
+      "high": false,
+      "mae": 0.763,
+      "bias": 0.302,
+      "under": 0.137,
+      "n": 23091
+    },
+    {
+      "model": "lgbm",
+      "high": true,
+      "mae": 4.394,
+      "bias": -3.425,
+      "under": 0.764,
+      "n": 3549
+    }
+  ],
+  "peak_rss_MB": 767,
+  "stage1_vs_stage2_avg": [
+    {
+      "stage2_config": "F3_aligned_rain",
+      "model": "glm",
+      "stage1_avg": 1.2747,
+      "stage2_avg": 1.2163,
+      "reduction_pct": 4.5767
+    },
+    {
+      "stage2_config": "F3_aligned_rain",
+      "model": "lgbm",
+      "stage1_avg": 1.2747,
+      "stage2_avg": 1.2484,
+      "reduction_pct": 2.0569
+    },
+    {
+      "stage2_config": "F7_combined",
+      "model": "glm",
+      "stage1_avg": 1.2747,
+      "stage2_avg": 1.2754,
+      "reduction_pct": -0.0596
+    },
+    {
+      "stage2_config": "F8_compact",
+      "model": "glm",
+      "stage1_avg": 1.2747,
+      "stage2_avg": 1.2232,
+      "reduction_pct": 4.0388
+    },
+    {
+      "stage2_config": "F8_compact",
+      "model": "lgbm",
+      "stage1_avg": 1.2747,
+      "stage2_avg": 1.2505,
+      "reduction_pct": 1.8958
+    }
+  ],
+  "verification": {
+    "shap_additivity_max_abs_error": 5.773159728050814e-15,
+    "permute_none_delta_mae": 0.0,
+    "permute_all_delta_mae": 3.852380952380953,
+    "family_permutation_nonnegative": true,
+    "reproduced_mae": 1.1438775510204082,
+    "saved_mae": 1.1438775510204082,
+    "reproduction_abs_diff": 0.0
+  }
+}

@@ -1,0 +1,13 @@
+config,model,peak_months,mae,bias
+F0_stage1_features,glm,False,0.548,-0.188
+F0_stage1_features,glm,True,3.288,-0.475
+F0_stage1_features,lgbm,False,0.561,-0.143
+F0_stage1_features,lgbm,True,3.159,-0.51
+F3_aligned_rain,glm,False,0.512,-0.16
+F3_aligned_rain,glm,True,3.105,-0.327
+F3_aligned_rain,lgbm,False,0.537,-0.149
+F3_aligned_rain,lgbm,True,3.156,-0.35
+F8_compact,glm,False,0.512,-0.174
+F8_compact,glm,True,3.13,-0.353
+F8_compact,lgbm,False,0.536,-0.149
+F8_compact,lgbm,True,3.167,-0.318

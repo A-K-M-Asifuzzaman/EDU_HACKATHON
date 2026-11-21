@@ -1,0 +1,5 @@
+config,glm,lgbm
+F1_calendar_static,1.471,1.519
+inc_temp,1.5,1.526
+inc_temp_no_maxmin,1.485,1.539
+inc_maxmin_only,1.498,1.517

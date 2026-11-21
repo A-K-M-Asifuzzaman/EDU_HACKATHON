@@ -1,0 +1,17 @@
+config,model,mean,median,median_gain
+F0_stage1_features,glm,1.336,1.293,0.043
+F0_stage1_features,lgbm,1.307,1.267,0.04
+F1_calendar_static,glm,1.557,1.471,0.086
+F1_calendar_static,lgbm,1.553,1.519,0.034
+F2_rain_memory,glm,1.347,1.291,0.056
+F2_rain_memory,lgbm,1.318,1.286,0.033
+F3_aligned_rain,glm,1.269,1.216,0.053
+F3_aligned_rain,lgbm,1.284,1.248,0.036
+F4_climate_interactions,glm,1.311,1.259,0.052
+F4_climate_interactions,lgbm,1.294,1.26,0.034
+F5_case_history,glm,1.563,1.491,0.073
+F5_case_history,lgbm,1.551,1.518,0.033
+F6_hist_seasonal,glm,1.498,1.41,0.087
+F6_hist_seasonal,lgbm,1.468,1.436,0.032
+F7_combined,glm,1.339,1.275,0.063
+F7_combined,lgbm,1.305,1.271,0.035

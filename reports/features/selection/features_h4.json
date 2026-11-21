@@ -1,0 +1,43 @@
+{
+ "horizon": 4,
+ "convention": "A_end_of_week",
+ "features": [
+  "cal_tgt_sin1",
+  "cal_tgt_cos1",
+  "cal_tgt_sin2",
+  "cal_tgt_sin3",
+  "cal_tgt_cos3",
+  "cal_org_sin1",
+  "cal_org_cos1",
+  "cal_org_sin2",
+  "cal_org_cos2",
+  "cal_tgt_isoweek",
+  "cal_org_monsoon",
+  "pop_density",
+  "waterlogging",
+  "sanitation",
+  "rain_tl2",
+  "rain_tl3",
+  "rain_tl4",
+  "rain_win",
+  "rain_clim_tl3",
+  "rain_clim_sd_tl3",
+  "rain_pwet_tl3",
+  "rain_clim_target",
+  "rain_anom_now",
+  "regime_wet_now"
+ ],
+ "families": [
+  "calendar",
+  "rain_align",
+  "static"
+ ],
+ "n_features": 24,
+ "rule": "pre-registered family rule + training-only gain >= 0.2%",
+ "validation_folds_used_for_selection": [
+  "val_2022",
+  "val_2023",
+  "val_2024"
+ ],
+ "warning": "selected with chronological validation on only three seasons; 2025 untouched"
+}

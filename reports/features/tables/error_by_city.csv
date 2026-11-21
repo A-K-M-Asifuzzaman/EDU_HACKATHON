@@ -1,0 +1,7 @@
+config,model,Chattogram,Dhaka North,Dhaka South,Gazipur,Narayanganj
+F0_stage1_features,glm,1.258,1.282,1.274,1.472,1.255
+F0_stage1_features,lgbm,1.232,1.25,1.24,1.482,1.253
+F3_aligned_rain,glm,1.164,1.196,1.211,1.392,1.205
+F3_aligned_rain,lgbm,1.217,1.239,1.217,1.432,1.247
+F8_compact,glm,1.183,1.195,1.219,1.398,1.213
+F8_compact,lgbm,1.215,1.244,1.219,1.433,1.245
