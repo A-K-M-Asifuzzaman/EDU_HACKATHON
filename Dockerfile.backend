@@ -1,0 +1,22 @@
+# DengueShield AI backend only (FastAPI + model + data). The dashboard is a static site on Vercel, which proxies /api/* here.
+# Used by Render (render.yaml) and runnable anywhere: docker build -f Dockerfile.backend -t dengueshield-api . && docker run -p 7860:7860 dengueshield-api
+FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*   # LightGBM runtime
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml README.md ARCHITECTURE.md ./
+COPY dengueshield ./dengueshield
+COPY models ./models
+COPY app_data ./app_data
+COPY scripts ./scripts
+COPY docs ./docs
+COPY data/README.md ./data/README.md
+COPY reports/eda/README.md ./reports/eda/README.md
+COPY reports/baselines/README.md ./reports/baselines/README.md
+# The organizer CSV is not in git: fetched and SHA-256 verified at build time (the build fails if the download or checksum fails).
+RUN python scripts/fetch_data.py
+# Caches go to /tmp so the app also runs on read-only or non-root hosts.
+ENV PYTHONUNBUFFERED=1 DENGUESHIELD_CACHE=/tmp/dengueshield-cache PORT=7860
+EXPOSE 7860
+CMD ["sh", "-c", "exec python -m uvicorn dengueshield.api.main:app --host 0.0.0.0 --port ${PORT:-7860} --proxy-headers --forwarded-allow-ips='*'"]
