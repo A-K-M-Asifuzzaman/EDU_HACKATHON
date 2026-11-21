@@ -1,0 +1,184 @@
+{
+ "convention_primary": "B_start_of_week",
+ "rule": "see notebook 07 section 6",
+ "failed_models": {
+  "glm_nb": "unpenalised NB IRLS diverged in short-history seasons (season MAE 2.47 in 2018, 1.95 in 2019)",
+  "lgbm_l1": "point forecast only (no predictive distribution, so no intervals or expected cases)"
+ },
+ "per_horizon": {
+  "2": {
+   "model": "glm_poisson",
+   "fs": "F8",
+   "tag": "",
+   "params": {}
+  },
+  "3": {
+   "model": "glm_poisson",
+   "fs": "F8",
+   "tag": "",
+   "params": {}
+  },
+  "4": {
+   "model": "glm_poisson",
+   "fs": "F8",
+   "tag": "",
+   "params": {}
+  }
+ },
+ "best_scoring_alternative_B_bench": {
+  "model": "ens_glm+spline",
+  "fs": "F3",
+  "tag": "ensemble",
+  "mae_avg": 1.335287118551124
+ },
+ "validation": {
+  "B": {
+   "2": {
+    "bench_2022_2024": {
+     "mae": 1.107,
+     "rmse": 2.2205,
+     "mae_mean": 1.1608,
+     "rmse_mean": 2.2055,
+     "high_mae": 3.9336,
+     "high_bias": -2.541,
+     "recall": 0.6236,
+     "precision": 0.7705,
+     "false_alert_rate": 0.0243
+    },
+    "outer_2019_2024": {
+     "mae": 1.1129,
+     "rmse": 2.2137,
+     "mae_mean": 1.1604,
+     "rmse_mean": 2.2021,
+     "high_mae": 3.9826,
+     "high_bias": -2.8571,
+     "recall": 0.5948,
+     "precision": 0.7227,
+     "false_alert_rate": 0.0256
+    }
+   },
+   "3": {
+    "bench_2022_2024": {
+     "mae": 1.3929,
+     "rmse": 2.7935,
+     "mae_mean": 1.447,
+     "rmse_mean": 2.7746,
+     "high_mae": 4.8643,
+     "high_bias": -3.7083,
+     "recall": 0.5516,
+     "precision": 0.6346,
+     "false_alert_rate": 0.0428
+    },
+    "outer_2019_2024": {
+     "mae": 1.3903,
+     "rmse": 2.754,
+     "mae_mean": 1.4492,
+     "rmse_mean": 2.7453,
+     "high_mae": 4.5577,
+     "high_bias": -3.4525,
+     "recall": 0.563,
+     "precision": 0.5805,
+     "false_alert_rate": 0.0484
+    }
+   },
+   "4": {
+    "bench_2022_2024": {
+     "mae": 1.5122,
+     "rmse": 2.9876,
+     "mae_mean": 1.5948,
+     "rmse_mean": 2.9762,
+     "high_mae": 4.8954,
+     "high_bias": -4.0772,
+     "recall": 0.5573,
+     "precision": 0.6297,
+     "false_alert_rate": 0.0463
+    },
+    "outer_2019_2024": {
+     "mae": 1.5932,
+     "rmse": 3.0931,
+     "mae_mean": 1.6688,
+     "rmse_mean": 3.0936,
+     "high_mae": 4.7332,
+     "high_bias": -3.3236,
+     "recall": 0.5862,
+     "precision": 0.5738,
+     "false_alert_rate": 0.0609
+    }
+   }
+  },
+  "A": {
+   "2": {
+    "bench_2022_2024": {
+     "mae": 1.0686,
+     "rmse": 2.1242,
+     "mae_mean": 1.1202,
+     "rmse_mean": 2.1026,
+     "high_mae": 3.8119,
+     "high_bias": -2.6491,
+     "recall": 0.6277,
+     "precision": 0.7962,
+     "false_alert_rate": 0.0225
+    },
+    "outer_2019_2024": {
+     "mae": 1.0886,
+     "rmse": 2.1466,
+     "mae_mean": 1.1405,
+     "rmse_mean": 2.1291,
+     "high_mae": 4.009,
+     "high_bias": -2.9745,
+     "recall": 0.5621,
+     "precision": 0.7221,
+     "false_alert_rate": 0.0253
+    }
+   },
+   "3": {
+    "bench_2022_2024": {
+     "mae": 1.1519,
+     "rmse": 2.2769,
+     "mae_mean": 1.1993,
+     "rmse_mean": 2.2551,
+     "high_mae": 3.9676,
+     "high_bias": -2.5235,
+     "recall": 0.6207,
+     "precision": 0.755,
+     "false_alert_rate": 0.0268
+    },
+    "outer_2019_2024": {
+     "mae": 1.1636,
+     "rmse": 2.2814,
+     "mae_mean": 1.2079,
+     "rmse_mean": 2.2656,
+     "high_mae": 4.0319,
+     "high_bias": -2.8397,
+     "recall": 0.5974,
+     "precision": 0.7141,
+     "false_alert_rate": 0.0278
+    }
+   },
+   "4": {
+    "bench_2022_2024": {
+     "mae": 1.4589,
+     "rmse": 2.8756,
+     "mae_mean": 1.5267,
+     "rmse_mean": 2.8548,
+     "high_mae": 4.977,
+     "high_bias": -3.9143,
+     "recall": 0.5356,
+     "precision": 0.6347,
+     "false_alert_rate": 0.0428
+    },
+    "outer_2019_2024": {
+     "mae": 1.4505,
+     "rmse": 2.8308,
+     "mae_mean": 1.5054,
+     "rmse_mean": 2.82,
+     "high_mae": 4.6006,
+     "high_bias": -3.4146,
+     "recall": 0.572,
+     "precision": 0.5902,
+     "false_alert_rate": 0.0509
+    }
+   }
+  }
+ }
+}
