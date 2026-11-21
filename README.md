@@ -45,7 +45,7 @@ pip time and a 36 s first import before the API was ready), so we do not claim a
 | Command Center | Forecast, calibrated interval, outbreak probability and risk tier for any ward, origin week and horizon; city map; Historical Replay |
 | Data Profiling Studio | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
 | Ward Risk Explorer | Rank and filter all 60 wards by tier or alert |
-| Geography (DGHS) | Official DGHS ward boundaries (ArcGIS REST, filtered by district/city/ward) as context only, beside the abstract ward-risk matrix. Boundaries are never joined to the synthetic ward IDs; hidden gracefully if the service is unreachable. See `docs/dghs_gis_integration.md` |
+| Map & Emergency Routing | The app's single map: 914 OpenStreetMap hospitals and clinics (clustered, searchable, click-to-call), A* routing on the directed OSM road graph (fastest vs shortest, each verified against Dijkstra), nearest hospitals by road time, city-level forecast and weather overlays, optional DGHS boundaries and 3D buildings. Facility data are community-mapped, not DGHS-verified; no live beds or doctors. See `docs/geospatial_routing.md` |
 | AI Forecast Lab | Horizon comparison, driver contributions, uncertainty fan |
 | Copilot | Chat grounded in the app's data and docs (OpenAI Responses API, read-only tools, citations, English and Bangla) |
 | Model Evidence | Leaderboard, validation per season, calibration, known weaknesses |
@@ -53,6 +53,8 @@ pip time and a 36 s first import before the API was ready), so we do not claim a
 | Climate Observatory | Real NASA POWER and Open-Meteo observations/forecast, shown separately from the synthetic organizer data |
 | Learn | Rainfall-to-cases explainer; optional lightweight 3D mosquito (procedural, no external model) |
 | System & Provenance | Versions, data checksums, integrations status, methodology documents |
+
+An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
 
 The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**.
 Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
@@ -87,7 +89,7 @@ recall 0.78 (precision 0.53). Details and limitations: `docs/model_selection.md`
 | Web platform | `dengueshield/api/`, `frontend/`, `app_data/`, `ARCHITECTURE.md` |
 | Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; API in `dengueshield/inference/`; `docs/stage4_handoff.md` |
 | One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
-| Leakage, alignment, model and bundle tests | `tests/` (225 tests) |
+| Leakage, alignment, model and bundle tests | `tests/` (234 tests) |
 
 ## Manual setup, research stack (Python 3.12)
 
@@ -100,7 +102,7 @@ pip install -r requirements-research.txt   # adds XGBoost, CatBoost, Optuna, Jup
 ## Reproduce
 
 ```bash
-pytest                                   # 225 tests; the real-data ones skip if the CSV is absent
+pytest                                   # 234 tests; the real-data ones skip if the CSV is absent
 for nb in 01_data_audit 02_eda 03_validation_and_baselines 04_feature_engineering 05_feature_ablation 06_feature_selection 07_model_tournament 08_model_diagnostics; do
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=7200 notebooks/$nb.ipynb
 done
@@ -121,14 +123,16 @@ The competition requires listing all AI assistants and external APIs.
 | Claude Code, model Claude Sonnet 5.5 | Anthropic | Stage 2: feature pipeline, ablation tournament, selection analysis, tests, documentation |
 | Claude Code, model Claude Opus 5.5 | Anthropic | Stage 3: model tournament, tuning, calibration, inference bundle, tests, documentation |
 
-| Claude Code, model Claude Sonnet 5.5 | Anthropic | Stage 4: FastAPI backend, Next.js frontend, Copilot, climate integrations, tests, documentation |
+| Claude Code, models Claude Sonnet 5.5 and Claude Opus 5.5 | Anthropic | Stage 4: FastAPI backend, Next.js frontend, Copilot, climate and DGHS integrations, OSM facility database, A* routing, intro, tests, documentation |
 
 All AI-written code and conclusions were produced under the team's direction; numbers in the reports come from executed notebooks and saved artifacts.
 
 - **External APIs at runtime (all optional; the app degrades gracefully if any is unavailable):**
   - OpenAI (Responses API `gpt-5.4-mini`; Embeddings `text-embedding-3-small`): Copilot only, called from the backend, key never sent to the browser.
   - NASA POWER daily point API and Open-Meteo (archive and forecast): real weather in the Climate Observatory, with attribution; never used to train or feed the forecasting model.
-  - MapTiler tiles: map background.
+  - MapTiler: basemap tiles, 3D building heights and place search (geocoding), called from the browser with the public map key.
+  - OpenStreetMap via the Overpass API: hospitals, clinics and road network, fetched **once at build time** (`scripts/build_geodata.py`) and committed under ODbL in `app_data/geo/`; routing itself runs locally with no API.
+  - Public information shown in the Emergency panel: Bangladesh 999 and DGHS 16263 numbers, WHO dengue warning signs.
   - DGHS Bangladesh GIS (ArcGIS REST FeatureServer): official ward boundaries, display only. Access and reuse terms could not be verified from the development network; see `docs/dghs_gis_integration.md`.
   - Dataset download from the organizers' shared sheet (`scripts/fetch_data.py`).
 - The forecasts themselves need no external service: they run locally from the committed 11 KB bundle.

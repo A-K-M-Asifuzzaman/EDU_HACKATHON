@@ -23,6 +23,8 @@ small statistical model fitted offline; the optional LLM and weather providers s
  │  /api/model/*, /data/*                     precomputed artifacts in app_data/          │
  │  /api/assistant/chat   (SSE)               RAG: BM25 + embeddings → 6 read-only tools  │──► OpenAI
  │  /api/climate/*, /weather/*                NASA POWER + Open-Meteo, cached, optional   │──► NASA POWER / Open-Meteo
+ │  /api/facilities, /api/route,              OSM facilities + A* on directed road graphs │
+ │  /api/emergency/*                          (app_data/geo, ODbL; built offline)          │
  │  /api/geo/dghs/*                           DGHS ArcGIS boundaries, cached, optional     │──► DGHS GIS
  │  /  (everything else)                      static Next.js export  frontend/out         │
  └────────────────────────────────────────────────────────────────────────────────────────┘
@@ -37,6 +39,7 @@ Key separations:
 | Organizer data vs real weather | NASA POWER / Open-Meteo are shown **beside** the synthetic data in the Climate Observatory. They are never an input to the validated model. |
 | Live bundle vs Historical Replay | Replay = out-of-time predictions (seasons 2019-2024, nested calibration), used for accuracy claims. Live bundle = in-sample for origins ≤ 2024; it is for exploration, labelled as such. |
 | LLM vs numbers | The Copilot can only quote numbers returned by its read-only tools; it never computes forecasts and cannot call the model with arbitrary data. |
+| Real facilities vs synthetic wards | Hospitals and roads are real OSM records; forecasts appear on the map only as city-level aggregates. No facility, route or polygon is linked to a synthetic ward ID. |
 | Official boundaries vs dataset wards | DGHS polygons are context only. The dataset's ward IDs have no verified crosswalk to them, so no forecast is drawn on a polygon; predictions use an abstract matrix (`docs/dghs_gis_integration.md`). |
 | Frontend vs secrets | All keys (`OPENAI_API_KEY`) stay in the backend `.env`. Only public map keys live in `frontend/.env.local`. |
 
@@ -92,6 +95,7 @@ Interactive API reference: `/docs` (FastAPI OpenAPI) once running.
 | OpenAI | Backend only, key from `.env`. `gpt-5.4-mini` for answers, `text-embedding-3-small` (512 dims) for retrieval; the document index is built once into `app_data/rag_index.npz`. Output capped at 900 tokens, 30 requests/hour, request-size limits, a USD budget guard (`OPENAI_BUDGET_USD`, default 1.00), response cache, usage log without message content. Measured ≈ $0.002-0.004 per answer. Without a key, Copilot falls back to retrieval-only |
 | NASA POWER | Per-city daily point query, 40 s timeout, memory + disk cache (`.cache/weather`), history TTL 24 h, stale fallback when the provider is down |
 | Open-Meteo | Archive (24 h TTL) and forecast/current (10 min / 1 h TTL), 15-40 s timeouts, same stale fallback. Free non-commercial tier; attribution shown |
+| Routing | Local and free: graphs load in ≈ 0.3 s; A* median 5.7 ms per route (400/400 equal to Dijkstra). OSM is queried only by the offline build script (3 requests, cached). MapTiler geocoding runs from the browser only when the user searches places |
 | DGHS GIS | Connect timeout 6 s, 60 s circuit breaker, paginated queries capped at 3,000 features, boundaries cached 7 days with stale fallback; no key needed |
 | Deployment access | Optional shared password (`ACCESS_PASSWORD`, HTTP Basic) for private previews; per-client Copilot rate limit works behind the platform proxy. See `docs/deployment.md` |
 | Map tiles | MapTiler key in `frontend/.env.local`; without it the city-risk table is shown instead |
@@ -101,6 +105,6 @@ If any external service fails, the affected panel shows a status message; every 
 
 ## 6. Testing
 
-- `pytest tests`: 225 tests (leakage, feature alignment, models, bundle invariants, API contracts and regressions).
-- `cd frontend && npx playwright test`: 17 end-to-end tests (all routes, console errors, mobile overflow, Bangla, Copilot markdown
+- `pytest tests`: 234 tests (leakage, feature alignment, models, bundle invariants, API contracts, A* vs Dijkstra, one-way handling, regressions).
+- `cd frontend && npx playwright test`: 21 end-to-end tests (all routes, map routing, emergency help, intro, console errors, mobile overflow, Bangla, Copilot markdown
   sanitisation, 3D fallback, secret scan of served assets).
