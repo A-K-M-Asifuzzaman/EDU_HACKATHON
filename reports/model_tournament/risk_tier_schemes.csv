@@ -1,0 +1,4 @@
+scheme,accuracy,within_one_tier,sig_recall,sig_precision,sig_false_alert_rate,pred_share_Low,pred_share_Medium,pred_share_High,pred_share_Critical,actual_share_Low,actual_share_Medium,actual_share_High,actual_share_Critical,revision_flip_rate
+median,0.745,0.994,0.881,0.764,0.082,0.544,0.188,0.231,0.036,0.551,0.217,0.173,0.059,0.21
+mean,0.743,0.993,0.855,0.776,0.074,0.597,0.148,0.223,0.033,0.551,0.217,0.173,0.059,0.207
+upper 80% bound,0.53,0.977,0.973,0.682,0.137,0.274,0.395,0.21,0.121,0.551,0.217,0.173,0.059,0.32
