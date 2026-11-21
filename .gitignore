@@ -1,0 +1,10 @@
+# Raw organizer data and reference material stay local (see data/README.md)
+data/raw/
+data/reference/
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# OS
+.DS_Store
