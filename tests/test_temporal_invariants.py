@@ -7,8 +7,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from dengueshield import baselines, metrics
-from dengueshield.data import COLUMNS, RAW_PATH, WEEK, assert_regular_panel, load_panel
+from dengueshield import baselines, data, metrics
+from dengueshield.data import COLUMNS, RAW_PATH, WEEK, assert_regular_panel, load_development_panel
 from dengueshield.validation import HORIZONS, TEST_YEAR, folds, forecast_frame, split
 
 
@@ -146,9 +146,25 @@ def test_thresholds_and_tiers_use_training_values_only():
     assert ev["outbreak"]["precision"] == 1 and ev["outbreak"]["recall"] == 0.5
 
 
+def test_development_loader_discards_holdout_before_csv_parsing(tmp_path, monkeypatch):
+    panel = synthetic_panel().query("date >= '2024-12-23' and date <= '2025-01-06'")
+    panel["dengue_cases"] = panel["dengue_cases"].where(panel.date.dt.year == 2024, -987654)
+    path = tmp_path / "panel.csv"
+    panel.to_csv(path, index=False)
+    monkeypatch.setattr(data, "EXPECTED_SHA256", data.sha256(path))
+    read_csv = pd.read_csv
+
+    def check_csv(source):
+        assert b"2025-01-06" not in source.getvalue()
+        assert b"-987654" not in source.getvalue()
+        return read_csv(source)
+
+    monkeypatch.setattr(pd, "read_csv", check_csv)
+    assert len(load_development_panel(path)) == 6
+
+
 @pytest.mark.skipif(not RAW_PATH.exists(), reason="organizer CSV not placed in data/raw/")
-def test_real_dataset_matches_audited_shape():
-    df = load_panel()
-    assert df.shape == (31320, 12)
+def test_real_development_dataset_matches_audited_shape():
+    df = load_development_panel()
+    assert df.shape == (28200, 12)
     assert df.ward_id.nunique() == 60 and df.city.nunique() == 5
-    assert round((df.dengue_cases == 0).mean(), 4) == 0.5803

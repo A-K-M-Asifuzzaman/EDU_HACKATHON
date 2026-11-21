@@ -229,10 +229,13 @@ def test_optional_access_gate_protects_everything_but_health(client, monkeypatch
     assert client.get("/api/metadata").status_code == 200                                 # gate is off by default
 
 
-def test_document_viewer_serves_architecture_docs_and_still_refuses_everything_else(client):
+def test_document_viewer_serves_consolidated_architecture_and_refuses_unlisted_files(client):
     paths = {d["path"] for d in client.get("/api/docs").json()}
-    assert {"ARCHITECTURE.md", "docs/architecture/ml-pipeline.md", "docs/architecture/geospatial.md"} <= paths
+    assert "ARCHITECTURE.md" in paths
+    assert not any(path.startswith("docs/architecture/") for path in paths)
     assert not any(p.startswith(("data/raw", ".env", "frontend", "app_data")) or p.endswith((".env", ".py", ".csv")) for p in paths)
-    assert "mermaid" in client.get("/api/docs/read", params={"path": "docs/architecture/ml-pipeline.md"}).json()["text"]
-    for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py"):
+    document = client.get("/api/docs/read", params={"path": "ARCHITECTURE.md"})
+    assert document.status_code == 200
+    assert {"## ML pipeline", "## Geospatial and emergency routing", "## Deployment and security"} <= set(document.json()["text"].splitlines())
+    for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py", "docs/architecture/ml-pipeline.md"):
         assert client.get("/api/docs/read", params={"path": bad}).status_code == 404

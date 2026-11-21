@@ -7,7 +7,7 @@ using only information available at the forecast origin.
 
 ## Quick start
 
-Requirements: Python 3.12 (the tested version), Node 20+ and npm, internet access for the first run (PyPI, npm, and the organizer dataset).
+Requirements: Python 3.12, Node 20.9+ and npm (CI uses Node 22), and internet access for the first run (PyPI, npm, and the organizer dataset).
 
 ```bash
 git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
@@ -33,10 +33,9 @@ The dashboard is a static site on Vercel and the API runs on a Hugging Face Spac
 
 ### Fresh-clone measurement
 
-Measured 21 Nov 2026 on the development Mac (Apple silicon, broadband): `git clone` of the repository followed by `PORT=8200 ./scripts/launch.sh`
-reached a healthy API serving the dashboard in **55 s**, and the first forecast request returned in 0.13 s. This used **warm pip and npm caches** and
-a clone of the local repository, not of GitHub. A cold-cache run will take longer (the first Stage 4 runtime install in a fresh venv alone took 20 s of
-pip time and a 36 s first import before the API was ready), so we do not claim a three-minute figure for every machine; re-measure on the target machine.
+On 22 Nov 2026, an authenticated shallow GitHub clone took about **4 s** on Apple silicon. With Python 3.12.6, Node 25.2.0, empty pip and npm caches,
+and a verified 2016–2024 fixture already in place, `./scripts/launch.sh` reached a healthy API and dashboard in **97 s**. The measurement excludes
+the organizer CSV download. Judge access and the end-to-end download path require a separate verification.
 
 ## What is in the app (Stage 4)
 
@@ -56,7 +55,7 @@ pip time and a 36 s first import before the API was ready), so we do not claim a
 
 Global search (⌘K / Ctrl K) jumps to any page, forecast ward or hospital. An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
 
-The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**, with Mermaid diagrams for every subsystem in **`docs/architecture/`** (ML pipeline, backend, frontend, geospatial routing, Copilot, decision support, deployment and security).
+The interface is bilingual (English / Bangla). [ARCHITECTURE.md](ARCHITECTURE.md) contains the system overview, validation design, cost controls and Mermaid diagrams for all seven subsystems.
 Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
 
 ## Status
@@ -120,6 +119,7 @@ The competition requires listing all AI assistants and external APIs.
 | Tool | Provider | Used for |
 |---|---|---|
 | Claude Code (Claude Opus and Sonnet models) | Anthropic | Development assistant: website building (frontend, backend API, map and routing), suggestions for data handling and feature ideas, test writing and documentation |
+| Codex | OpenAI | Release audit, browser and API verification, Vercel deployment fixes and architecture documentation |
 
 The team directed the work and set the requirements, reviewed the results, and chose the validation protocol and model. Reported numbers come from executed notebooks and saved artifacts, not from an AI model's statements, and the tests in `tests/` check them.
 

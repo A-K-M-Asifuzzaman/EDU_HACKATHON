@@ -1,29 +1,28 @@
 # DengueShield AI: Architecture
 
-One Python process serves the forecasting API **and** the pre-built dashboard on a single port. Forecasts come from a small statistical
-model fitted offline. Every external service (OpenAI, weather, maps, DGHS) is optional, sits beside the model and never feeds it.
+Locally, FastAPI serves the prebuilt Next.js dashboard and forecasting API on one port. In production, Vercel serves the dashboard and proxies API requests to FastAPI on Hugging Face Spaces. Forecasts use a statistical model fitted offline. OpenAI, external weather, maps and DGHS are optional and supply no model inputs.
 
-| Subsystem | Detailed architecture |
+| Subsystem | Scope |
 |---|---|
-| Forecasting model, validation, calibration | [docs/architecture/ml-pipeline.md](docs/architecture/ml-pipeline.md) |
-| Backend API, caching, data loading | [docs/architecture/backend.md](docs/architecture/backend.md) |
-| Frontend, pages, shared state | [docs/architecture/frontend.md](docs/architecture/frontend.md) |
-| Facilities, road graphs, A* routing, emergency help | [docs/architecture/geospatial.md](docs/architecture/geospatial.md) |
-| Copilot (RAG + read-only tools) | [docs/architecture/copilot.md](docs/architecture/copilot.md) |
-| Reliability center, alert simulator, resource sandbox | [docs/architecture/decision-support.md](docs/architecture/decision-support.md) |
-| Launch, deployment, security | [docs/architecture/deployment-security.md](docs/architecture/deployment-security.md) |
+| [ML pipeline](#ml-pipeline) | Forecasting, validation and calibration |
+| [Backend API](#backend-api) | Request lifecycle, endpoints, caches and fallbacks |
+| [Frontend dashboard](#frontend-dashboard) | Page structure, shared state and data access |
+| [Geospatial and emergency routing](#geospatial-and-emergency-routing) | Facilities, A* routing and the emergency flow |
+| [Copilot](#copilot) | Retrieval, read-only tools and response streaming |
+| [Decision support](#decision-support) | Reliability, alert policy and resource planning |
+| [Deployment and security](#deployment-and-security) | Local launch, hosted services and safeguards |
 
 ## 1. System context
 
 ```mermaid
 flowchart LR
     user(["Public-health officer / judge<br/>(browser, EN or BN)"])
-    subgraph app["DengueShield AI: one process, one port"]
-        ui["Next.js static dashboard<br/>12 routes, served by FastAPI"]
-        api["FastAPI backend<br/>/api/*"]
+    subgraph app["DengueShield AI"]
+        ui["Next.js static dashboard<br/>Vercel in production, FastAPI locally"]
+        api["FastAPI backend<br/>/api/* · Hugging Face Space in production"]
         model[("Ridge Poisson GLM bundle<br/>11 KB, sha256-pinned")]
         art[("Precomputed artifacts<br/>app_data/: replay, profiles,<br/>RAG index, OSM graphs")]
-        csv[("Organizer CSV<br/>2016-2024 only")]
+        csv[("Development panel<br/>2016–2024")]
     end
     openai["OpenAI<br/>(Copilot only)"]
     wx["NASA POWER<br/>Open-Meteo"]
@@ -57,7 +56,7 @@ flowchart TD
     osm["OpenStreetMap (Overpass)<br/>build-time only"] --> geo[("app_data/geo<br/>914 facilities + road graphs")]
     geo --> api
     api --> ui["Dashboard"]
-    holdout["2025 rows"]:::locked -.->|"never loaded"| panel
+    holdout["2025 rows excluded from feature building and scoring"]:::locked
     classDef locked fill:#fde2e1,stroke:#b3262c,color:#7a1418
 ```
 
@@ -131,3 +130,434 @@ flowchart LR
     build["next build + typecheck"] --> gate
     clone["fresh-clone launch smoke test"] --> gate
 ```
+
+## Subsystem reference
+
+## ML pipeline
+
+Details: [`model_selection.md`](docs/model_selection.md), [`calibration_and_uncertainty.md`](docs/calibration_and_uncertainty.md), [`validation_protocol.md`](docs/validation_protocol.md)
+
+### Stages
+
+```mermaid
+flowchart LR
+    s1["Stage 1<br/>audit, EDA,<br/>leak-safe validation,<br/>baselines"] --> s2["Stage 2<br/>204 candidate features,<br/>ablation tournament,<br/>F3 (38) and F8 (24)"]
+    s2 --> s3["Stage 3<br/>11 model families x 2 feature sets,<br/>tuned boosters, 9 ensembles,<br/>calibration, alerts, tiers"]
+    s3 --> s4["Stage 4<br/>inference bundle,<br/>replay table,<br/>web platform"]
+```
+
+### Forecast for one ward, origin and horizon
+
+```mermaid
+flowchart TD
+    panel[("Development panel<br/>2016-2024, 60 wards, weekly")] --> avail{"Convention B:<br/>data through week t-1"}
+    avail --> f["24 F8 features<br/>seasonality, rainfall lags<br/>(observed + climatology projection),<br/>ward vulnerability"]
+    f --> glm["Ridge Poisson GLM<br/>one model per horizon h = 2, 3, 4"]
+    glm --> mu["Expected cases (mean)"]
+    mu --> nb["Negative binomial with dispersion<br/>learned on the 2 prior seasons"]
+    nb --> med["Median (headline forecast)"]
+    nb --> pi["80% and 90% intervals"]
+    nb --> p["P(cases ≥ training q90)"]
+    p --> alert{"≥ threshold tuned<br/>on 2 prior seasons?"}
+    alert -->|yes| a1["Outbreak alert"]
+    med --> tier["Risk tier from training quantiles<br/>q60 / q80 / q95 = 1 / 5 / 13 cases"]
+    glm --> expl["Explain: additive log-rate contributions<br/>season, rainfall, vulnerability"]
+```
+
+### Validation that every reported number comes from
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant D as Data ≤ 31 Dec (Y-1)
+    participant M as Model for season Y
+    participant I as Inner seasons Y-2, Y-1
+    participant S as Season Y (outer)
+    D->>M: fit features + GLM
+    M->>I: out-of-time predictions on Y-2, Y-1
+    I-->>M: dispersion α, alert threshold τ, ensemble weights
+    M->>S: forecast every origin in Y (h = 2, 3, 4)
+    S-->>S: score MAE, RMSE, coverage, recall, precision
+    Note over D,S: Repeated for Y = 2019 ... 2024. 2025 is never loaded.
+```
+
+### Artifacts
+
+| Artifact | Produced by | Used by |
+|---|---|---|
+| `models/dengueshield_B.joblib` (primary), `_A.joblib` | Stage 3 notebooks | `/api/forecast*` live inference, `explain` |
+| `app_data/replay.csv.gz` (53,100 rows) | `python -m dengueshield.appdata` from Stage 3 out-of-time predictions | Historical Replay, reliability center, alert simulator, resource sandbox |
+| `reports/model_tournament/*.csv`, `app_data/validation.json` | notebooks 07-08 | Model Evidence |
+| `app_data/{profile,distributions,correlations,seasonality,lag_analysis}.json` | `dengueshield.appdata` | Data Profiling Studio, Forecast Lab |
+
+### Results (unchanged since Stage 3)
+
+| Horizon | MAE 2022-24 | Coverage 80 / 90 (all weeks) | Coverage 80 / 90 (peaks) | Alert recall / precision (pooled replay) |
+|---|---|---|---|---|
+| 2 weeks | 1.107 | season means: 0.854 / 0.911 | season means: 0.607 / 0.740 | per horizon in the Reliability center |
+| 3 weeks | 1.393 | | | 0.758 / 0.508 |
+| 4 weeks | 1.512 | | | |
+
+## Backend API
+
+Interactive reference: `/docs` (OpenAPI) on a running server
+
+### Modules
+
+```mermaid
+flowchart TB
+    main["api/main.py<br/>routes, validation, CORS,<br/>access gate, SPA serving"]
+    store["api/store.py<br/>Store: dataset, bundle, artifacts,<br/>replay, LRU cache"]
+    inf["inference/<br/>ForecastBundle.predict / explain"]
+    dec["decision.py<br/>alert curve, allocation"]
+    rt["routing.py<br/>A*, Dijkstra, nearest facilities"]
+    rag["api/rag.py<br/>retrieval, 7 tools, streaming"]
+    clim["api/climate.py<br/>NASA POWER, Open-Meteo"]
+    geo["api/geo.py<br/>DGHS ArcGIS"]
+    integ["api/integrations.py<br/>status registry, .env loader"]
+    main --> store --> inf
+    main --> dec & rt & rag & clim & geo & integ
+    rag --> main
+    store --> files[("app_data/, models/, data/raw")]
+    clim & geo --> cache[("CACHE_ROOT: .cache/ or /tmp on read-only hosts")]
+```
+
+### Request lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser
+    participant G as access gate (optional)
+    participant R as route handler
+    participant C as LRU cache
+    participant M as bundle / replay / routing
+    B->>G: GET /api/forecast?ward_id&origin&horizon
+    G->>R: password ok (or gate off)
+    R->>R: Pydantic + regex validation (Monday grid, horizon 2-4, known ward)
+    R->>C: key (bundle sha, origin, horizon)
+    alt cached
+        C-->>R: frame
+    else miss
+        R->>M: predict 60 wards (≈ 0.25 s)
+        M-->>C: store
+    end
+    R-->>B: JSON (gzip ≥ 2 KB)
+```
+
+### Endpoint groups
+
+| Group | Endpoints | Source |
+|---|---|---|
+| Health and metadata | `/api/health`, `/api/metadata`, `/api/cities`, `/api/wards`, `/api/integrations/status` | Store |
+| Forecasts | `/api/forecast`, `/api/forecast/compare`, `/api/forecast/series`, `/api/risk/wards`, `/api/reports/summary` | bundle (live) or replay |
+| Model evidence | `/api/model/{metrics,features,validation,calibration,diagnostics}` | committed artifacts |
+| Data profile | `/api/data/{profile,distributions,correlations,seasonality,lag-analysis}`, `/api/weather/historical` | `app_data/` |
+| Decision support | `/api/decision/{alert-curve,allocate,allocation-season}` | replay + pre-origin panel |
+| Geospatial | `/api/facilities`, `/api/route`, `/api/emergency/{nearest,info}`, `/api/routing/status`, `/api/geo/dghs/{status,filters,wards}` | `app_data/geo`, DGHS |
+| Climate | `/api/climate/{observations,current,compare}` | NASA POWER, Open-Meteo |
+| Copilot | `/api/assistant/chat` (SSE), `/api/assistant/status` | OpenAI (optional) |
+| Documents | `/api/docs`, `/api/docs/read` | allow-listed Markdown only |
+
+### Failure handling
+
+```mermaid
+stateDiagram-v2
+    [*] --> Fresh: cache hit within TTL
+    [*] --> Fetch: miss
+    Fetch --> Fresh: provider ok
+    Fetch --> Stale: provider down, disk copy exists
+    Fetch --> Unavailable: provider down, no copy
+    Unavailable --> Breaker: DGHS only, 60 s fail-fast
+    Stale --> [*]: served and labelled stale
+    Unavailable --> [*]: 503 status unavailable, rest of app unaffected
+```
+
+## Frontend dashboard
+
+Next.js 16 (static export), React 19, TypeScript, Tailwind 4, ECharts 6 (tree-shaken), MapLibre 6 with MapTiler, React Three Fiber (intro and Learn
+page only), Motion. The build output `frontend/out` is served by FastAPI on the same origin, so there is no CORS and no server rendering.
+
+### Application shell
+
+```mermaid
+flowchart TB
+    layout["app/layout.tsx<br/>Providers: i18n, selection, toasts"] --> shell["components/shell.tsx"]
+    shell --> nav["Sidebar navigation (11 pages)"]
+    shell --> top["Header: provenance chips,<br/>⌘K search, Emergency help, EN/BN"]
+    shell --> main["Page content"]
+    shell --> foot["Footer: sources and licences"]
+    shell --> intro["Intro overlay (once per session)"]
+    shell --> fab["Copilot button"]
+```
+
+### Pages
+
+```mermaid
+flowchart LR
+    cc["Command Center<br/>hero, time machine,<br/>verdict, brief"]
+    prof["Data Profiling Studio"]
+    wards["Ward Risk Explorer"]
+    map["Map & Emergency Routing<br/>(the single map)"]
+    lab["AI Forecast Lab"]
+    cop["Research Copilot"]
+    ev["Model Evidence<br/>reliability center,<br/>alert simulator"]
+    resp["Response Intelligence<br/>resource sandbox"]
+    clim["Climate Observatory"]
+    learn["Learn: Aedes & rainfall"]
+    prov["System & Provenance"]
+    sel(("Shared selection<br/>city, ward, origin,<br/>horizon, source"))
+    sel --- cc & wards & lab & map & resp
+```
+
+### Data access in the browser
+
+```mermaid
+sequenceDiagram
+    participant P as Page component
+    participant H as useAsync hook
+    participant A as lib/api.ts
+    participant S as FastAPI
+    P->>H: deps change (ward, origin, horizon)
+    H->>A: api(path, signal)
+    A->>A: memory cache (TTL) hit?
+    A->>S: fetch same-origin /api/...
+    S-->>A: JSON or error detail
+    A-->>H: data, or ApiError (aborts never look like empty data)
+    H-->>P: loading / error with retry / data
+```
+
+### Cross-cutting rules
+
+| Concern | Implementation |
+|---|---|
+| Bilingual | `lib/i18n.tsx` EN/BN dictionary, Bengali digits and dates, Noto Sans Bengali |
+| Design system | tokens in `app/globals.css` (midnight navy, forest, teal, restrained cyan, ivory), atoms in `components/ui.tsx` |
+| Charts | `components/echart.tsx` lazy ECharts, shared axis style, accessible labels |
+| Performance | code-split map, charts and 3D; Command Center LCP 220 ms cold / 88 ms warm (local) |
+| Accessibility | keyboard-reachable controls, ARIA roles on tabs, switches, dialogs; reduced-motion respected everywhere |
+| Safety | Copilot Markdown sanitised; no secrets in the bundle (tested) |
+
+## Geospatial and emergency routing
+
+Details: [`geospatial_routing.md`](docs/geospatial_routing.md), [`dghs_gis_integration.md`](docs/dghs_gis_integration.md)
+
+### Build-time data pipeline
+
+```mermaid
+flowchart LR
+    ov["Overpass API<br/>(OpenStreetMap, ODbL)"] -->|"3 cached requests"| raw[(".cache/osm<br/>raw JSON")]
+    raw --> roads["Drivable ways<br/>oneway, access filters"]
+    roads --> contract["Contract at intersections<br/>keep street geometry"]
+    contract --> scc["Largest strongly<br/>connected component"]
+    scc --> graphs[("greater_dhaka_graph.npz<br/>chattogram_graph.npz")]
+    raw --> fac["Hospitals and clinics<br/>normalise, dedupe point+outline"]
+    fac --> snap["Snap to nearest graph vertex"]
+    graphs --> snap
+    snap --> geojson[("facilities.geojson<br/>914 records")]
+    graphs --> bench["A* vs Dijkstra benchmark<br/>400/400 equal"]
+```
+
+### Routing request
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User (map)
+    participant API as /api/route
+    participant G as Graph (CSR arrays + KD-tree)
+    U->>API: start (GPS, click or search) + facility id
+    API->>G: area for both points, snap each to nearest intersection (≤ 1 km)
+    G->>G: A* on distance (haversine heuristic)
+    G->>G: A* on estimated time (haversine / max speed)
+    G->>G: Dijkstra on both (verification)
+    G-->>API: paths, costs, nodes expanded, ms
+    opt A* Insight Mode
+        API->>G: bounded exploration samples (≤ 2,500 nodes each)
+    end
+    API-->>U: fastest + shortest GeoJSON, equal-cost flags, assumptions, attribution
+```
+
+### Map composition (one map)
+
+```mermaid
+flowchart TB
+    base["MapTiler streets basemap<br/>(blank fallback without key)"]
+    b3d["3D buildings<br/>(OpenMapTiles heights)"]
+    facl["OSM facilities<br/>clustered, click to detail"]
+    route["Routes: fastest (arrows) / shortest,<br/>A* and Dijkstra exploration fronts"]
+    city["City-level forecast pills<br/>(aggregate of synthetic wards)"]
+    wx["Weather now<br/>(Open-Meteo, timestamped)"]
+    dghs["DGHS boundaries<br/>(context only, optional)"]
+    base --> b3d --> dghs --> facl --> route --> city --> wx
+```
+
+Synthetic ward forecasts are never attached to real geometry: the map shows them only as city aggregates, and the abstract ward-risk matrix sits beside the map.
+
+### Emergency flow
+
+```mermaid
+flowchart LR
+    btn["Emergency help<br/>(every page, also during intro)"] --> modal["Instant modal, no API call:<br/>tap-to-call 999 and 16263,<br/>WHO warning signs"]
+    modal --> near["Find nearest hospitals by road"]
+    near --> loc{"Location permission?"}
+    loc -->|granted| md["Multi-target Dijkstra<br/>on estimated time"]
+    loc -->|denied| click["Click the map to set a start"] --> md
+    md --> list["Top 5 hospitals: time, distance,<br/>phone if mapped, route, Google Maps link"]
+```
+
+No beds, admissions, doctors on duty or live traffic exist in these sources, and none are shown.
+
+## Copilot
+
+### Components
+
+```mermaid
+flowchart LR
+    q["Question (EN or BN)<br/>+ page context"] --> lim["Limits: input size,<br/>30 req/h per client,<br/>USD budget guard"]
+    lim --> ret["Hybrid retrieval<br/>BM25 + text-embedding-3-small"]
+    corpus[("Approved documents only<br/>README, ARCHITECTURE, docs/*.md")] --> idx[("rag_index.npz<br/>512-dim vectors")]
+    idx --> ret
+    ret --> llm["gpt-5.4-mini<br/>Responses API, streaming"]
+    llm <-->|"strict schemas"| tools["7 read-only tools<br/>forecast, compare, rankings,<br/>metrics, importance, profile,<br/>facilities"]
+    tools --> app["App functions<br/>(same code as the API)"]
+    llm --> ans["Answer with citations<br/>streamed as SSE"]
+    lim -.->|"no key / budget spent"| fb["Retrieval-only fallback"]
+```
+
+### One answer
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as User
+    participant API as /api/assistant/chat
+    participant R as Retriever
+    participant L as OpenAI Responses
+    participant T as Tools
+    U->>API: question, language, selected ward/origin
+    API->>R: top passages (approved docs only)
+    API->>L: system rules + passages + tool schemas
+    loop at most a few rounds
+        L->>API: tool call (validated, city filter only if the user named one)
+        API->>T: run read-only tool
+        T-->>API: numbers from the app
+        API->>L: tool result
+    end
+    L-->>U: streamed answer + sources (final round: no more tools)
+```
+
+| Guard | Behaviour |
+|---|---|
+| Secrets | Key only in the backend `.env`; the model is told never to reveal configuration, and secret scans run in tests |
+| Holdout | Tools cannot read 2025; requests for 2025 actuals are refused |
+| Cost | 900 output tokens, 1 h cache for identical questions, usage log without message content, ≈ $0.002-0.004 per answer |
+| Prompt injection | Retrieval is limited to an allow-list of project documents; tool outputs are data, not instructions |
+
+## Decision support
+
+Evidence and numbers: [`decision_support.md`](docs/decision_support.md)
+
+### Inputs and outputs
+
+```mermaid
+flowchart LR
+    replay[("Saved out-of-time replay<br/>2019-2024, 53,100 ward-weeks<br/>p_outbreak, alert, y_true, thr_q90")]
+    panel[("Development panel<br/>cases before each origin")]
+    diag[("Saved diagnostics and<br/>calibration tables")]
+    replay --> curve["Alert curve<br/>τ grid 0.02-0.98"]
+    replay --> nested["Nested re-selection<br/>τ from seasons Y-2, Y-1 only"]
+    replay --> alloc["Allocation<br/>equal / historical / forecast"]
+    panel --> alloc
+    diag --> rel["Reliability center"]
+    replay --> tm["Time-machine verdict<br/>error, interval hit, alert outcome"]
+    curve & nested --> sim["Alert policy simulator UI"]
+    alloc --> sand["Resource planning sandbox UI"]
+    lock["No refitting · deployed rule unchanged · 2025 never read"]:::info
+    classDef info fill:#fff4dc,stroke:#e0a526
+```
+
+### Why the simulator cannot leak
+
+```mermaid
+flowchart TB
+    subgraph honest["Reported as honest estimates"]
+        dep["Deployed rule<br/>τ per season from 2 prior seasons<br/>(Stage 3)"]
+        nes["Nested F1 re-selection<br/>τ for 2021-2024 from 2 prior replay seasons"]
+    end
+    subgraph optimistic["Labelled optimistic"]
+        sel["Any τ picked on the slider"]
+        best["Best in-sample τ"]
+    end
+    eval["Scored on the same replay rows"]
+    dep --> eval
+    nes --> eval
+    sel --> eval
+    best --> eval
+```
+
+### Resource sandbox rules
+
+| Rule | Ranking key (available at the origin) | Tie-break |
+|---|---|---|
+| Equal (risk-blind) | round-robin across cities | ward ID |
+| Historical risk | mean weekly cases strictly before the origin | ward ID |
+| Forecast | calibrated P(outbreak) at the origin | expected cases, then ward ID |
+
+Outcome = retrospective coverage of actual outbreak wards and cases in the target week. It is a planning simulation, not a claim about prevented infections or real capacity.
+
+## Deployment and security
+
+Steps: [`deployment.md`](docs/deployment.md)
+
+### Local launch (judges)
+
+```mermaid
+flowchart LR
+    clone["git clone"] --> sh["./scripts/launch.sh"]
+    sh --> venv["Python venv<br/>pip install -r requirements.txt"]
+    sh --> data["scripts/fetch_data.py<br/>download + SHA-256 check"]
+    sh --> fe["npm ci && npm run build<br/>(static export)"]
+    venv & data & fe --> run["uvicorn on one port<br/>API + dashboard"]
+```
+
+An authenticated GitHub clone and cold-cache launch reached a healthy server in about 101 seconds with a verified 2016–2024 fixture already in place. See the [fresh-clone measurement](README.md#fresh-clone-measurement) for the setup and what the timing covers.
+
+### Deployment targets
+
+```mermaid
+flowchart TB
+    repo[("GitHub repository")]
+    subgraph vercel["Vercel: static dashboard (vercel.json, .vercelignore)"]
+        cdn["frontend/out on the CDN<br/>rewrite /api/* to the Space"]
+    end
+    subgraph space["Hugging Face Space: API (scripts/deploy_space.py, Dockerfile.backend)"]
+        img["Python 3.12 image: FastAPI, model bundle, app_data,<br/>dataset fetched and checksum-verified at build"]
+    end
+    repo --> vercel
+    repo --> space
+    cdn -->|"same-origin /api proxy"| img
+    secrets["Space secrets: OPENAI_API_KEY, ACCESS_PASSWORD,<br/>OPENAI_BUDGET_USD"] -.-> space
+    pub["Vercel env (public): NEXT_PUBLIC_MAPTILER_KEY"] -.-> vercel
+```
+
+Single-container alternative: the root `Dockerfile` bundles dashboard and API (used for local or one-host runs).
+
+### Security model
+
+```mermaid
+flowchart LR
+    b["Browser"] -->|"HTTP Basic (optional ACCESS_PASSWORD)"| gate["Access gate<br/>(all routes except /api/health)"]
+    gate --> api["API: validated inputs,<br/>allow-listed documents,<br/>read-only tools"]
+    api --> sec[("Backend-only secrets<br/>.env, platform env")]
+    b -.->|"public keys only"| tiles["MapTiler (domain-restricted key)"]
+```
+
+| Control | Where |
+|---|---|
+| Secrets never in git or the browser bundle | `.gitignore`, `.dockerignore`, `.vercelignore`; Playwright secret scan of served assets |
+| Input validation | Pydantic types, regex patterns, bounded numbers (horizon 2-4, teams 1-60, simplify ≤ 0.01) |
+| Injection-safe external queries | DGHS filter values quoted and validated; facility IDs pattern-checked |
+| Bounded compute | routing snap ≤ 1 km, insight samples ≤ 2,500, DGHS ≤ 3,000 features, Copilot rate and budget limits |
+| Data licences | OSM ODbL (`app_data/geo/LICENSE.md`), Open-Meteo CC BY 4.0, NASA POWER acknowledgement, MapTiler/OSM attribution on the map |
+| Organizer data | not committed; fetched and checksum-verified; served only as derived views |

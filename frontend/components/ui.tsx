@@ -127,18 +127,31 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       className={cls("card max-h-[88vh] w-full overflow-auto p-6", wide ? "max-w-4xl" : "max-w-xl")}><div className="mb-3 flex items-center justify-between"><h2 className="text-lg font-semibold text-forest">{title}</h2>
       <button aria-label={t("act.close")} onClick={onClose} className="rounded-lg p-1.5 hover:bg-mint-l"><Icon name="close" /></button></div>{children}</motion.div></motion.div>)}</AnimatePresence>);
 }
-/** Resolve a relative Markdown link against the document that contains it ("docs/architecture/x.md" + "../../README.md" -> "README.md"). */
+/** Resolve a relative Markdown link against the document that contains it. */
 function resolveDoc(from: string, href: string): string {
   const parts = from.split("/").slice(0, -1);
   for (const seg of href.split("#")[0].split("/")) { if (seg === "..") parts.pop(); else if (seg && seg !== ".") parts.push(seg); }
   return parts.join("/");
 }
 export function Markdown({ children, docPath, docs, onDoc }: { children: string; docPath?: string; docs?: string[]; onDoc?: (path: string) => void }) {
+  const sectionId = (slug: string) => `doc-section-${docPath}-${slug}`;
   return <div className="prose-md text-[13.5px] leading-relaxed"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}
-    components={{ a: ({ href, children }) => {
+    components={{ h2: ({ children }) => {
+      const slug = String(children).toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, "").trim().replace(/\s+/g, "-");
+      return <h2 id={docPath ? sectionId(slug) : undefined} tabIndex={docPath ? -1 : undefined}>{children}</h2>;
+    }, a: ({ href, children }) => {
+      if (docPath && href?.startsWith("#")) {
+        const id = sectionId(href.slice(1));
+        return <a href={`#${id}`} onClick={(e) => {
+          e.preventDefault();
+          const heading = document.getElementById(id);
+          heading?.focus({ preventScroll: true });
+          heading?.scrollIntoView({ block: "start" });
+        }} className="text-emerald-d underline">{children}</a>;
+      }
       const rel = !!href && !/^([a-z][a-z0-9+.-]*:|#|\/\/)/i.test(href);
-      if (docPath && onDoc && (rel || href?.startsWith("#"))) {      // inside the in-app document viewer: relative links open other approved documents
-        const target = rel ? resolveDoc(docPath, href!) : "";
+      if (docPath && onDoc && rel) {
+        const target = resolveDoc(docPath, href!);
         if (target && docs?.includes(target)) return <a href={`#${target}`} onClick={(e) => { e.preventDefault(); onDoc(target); }} className="text-emerald-d underline">{children}</a>;
         return <span title="Not available in the in-app viewer; see the repository">{children}</span>;
       }

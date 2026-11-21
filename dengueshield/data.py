@@ -1,12 +1,12 @@
 """Loading and hard integrity guards for the organizer dataset.
 
-The raw CSV is never modified. Every downstream module loads it through
-`load_panel`, which fails loudly if the file or its panel structure differs
-from what the research was validated against.
+The raw CSV is never modified. Both loaders verify the audited file and check
+the structure of the panel they return.
 """
 from __future__ import annotations
 
 import hashlib
+import io
 from pathlib import Path
 
 import pandas as pd
@@ -52,13 +52,14 @@ def assert_regular_panel(df: pd.DataFrame) -> None:
         raise ValueError("a static ward attribute varies over time")
 
 
-def load_panel(path: Path = RAW_PATH, verify_checksum: bool = True) -> pd.DataFrame:
-    """Load the raw CSV as a ward x week panel sorted by (ward_id, date)."""
+def _verify_file(path: Path, verify_checksum: bool = True) -> None:
     if not path.exists():
         raise FileNotFoundError(f"{path} missing; see data/README.md for placement")
     if verify_checksum and sha256(path) != EXPECTED_SHA256:
         raise ValueError(f"{path} checksum differs from the audited file")
-    df = pd.read_csv(path)
+
+
+def _validate_panel(df: pd.DataFrame) -> pd.DataFrame:
     if list(df.columns) != COLUMNS:
         raise ValueError(f"unexpected columns: {list(df.columns)}")
     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")
@@ -67,16 +68,24 @@ def load_panel(path: Path = RAW_PATH, verify_checksum: bool = True) -> pd.DataFr
     return df
 
 
+def load_panel(path: Path = RAW_PATH, verify_checksum: bool = True) -> pd.DataFrame:
+    """Load the raw CSV as a ward x week panel sorted by (ward_id, date)."""
+    _verify_file(path, verify_checksum)
+    return _validate_panel(pd.read_csv(path))
+
+
 DEV_LAST_YEAR = 2024  # Stage 2+ development window; 2025 is the locked test year
 
 
 def load_development_panel(path: Path = RAW_PATH) -> pd.DataFrame:
-    """Panel restricted to 2016-2024. Rows after 2024 are dropped immediately and never analysed.
+    """Parse only development rows, leaving the locked test year outside the panel.
 
     Use this in every development/tuning workflow. The locked 2025 test year is only
     read by the final one-shot evaluation, which must call `load_panel` explicitly.
     """
-    df = load_panel(path)
-    df = df[df["date"].dt.year <= DEV_LAST_YEAR].reset_index(drop=True)
-    assert df["date"].max() < pd.Timestamp(f"{DEV_LAST_YEAR + 1}-01-01")
-    return df
+    _verify_file(path)
+    cutoff = f"{DEV_LAST_YEAR + 1}-01-01".encode("ascii")
+    with path.open("rb") as raw:
+        # The checksum guarantees the organizer's unquoted ISO date in column one.
+        development = io.BytesIO(raw.readline() + b"".join(row for row in raw if row.split(b",", 1)[0] < cutoff))
+    return _validate_panel(pd.read_csv(development))
