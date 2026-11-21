@@ -91,7 +91,18 @@ export default function CommandCenter() {
         <div><div className="eyebrow">{t("fc.interval80")} / 90%</div><div className="num text-base font-semibold">{f.lower_80}–{f.upper_80} / {f.lower_90}–{f.upper_90}</div></div>
         <div><div className="eyebrow">{t("fc.threshold")}</div><div className="num text-base font-semibold">≥ {f.outbreak_threshold} {t("fc.cases")}</div></div></div>
       <div className="flex flex-col items-start gap-2 sm:items-end"><RiskBadge tier={f.risk_tier} size="lg" pulse /><ProvChip tone={f.outbreak_alert ? "warn" : "ok"}>{f.outbreak_alert ? t("fc.yes") : t("fc.no")}</ProvChip>
-        {f.actual_cases !== null && <span className="text-xs text-ink-3">{t("fc.actual")}: <b className="num text-coral-d">{f.actual_cases}</b></span>}</div></div></Card>}
+        {f.actual_cases !== null && <span className="text-xs text-ink-3">{t("fc.actual")}: <b className="num text-coral-d">{f.actual_cases}</b></span>}</div></div>
+      {f.actual_cases !== null && (() => {   // time-machine verdict: what actually happened (target weeks up to 2024 only; 2025 is locked)
+        const y = f.actual_cases as number, err = y - f.median_cases, in80 = y >= f.lower_80 && y <= f.upper_80, in90 = y >= f.lower_90 && y <= f.upper_90, out = f.outbreak_threshold != null && y >= f.outbreak_threshold;
+        const call = f.outbreak_alert ? (out ? ["Correct alert", "text-emerald-d"] : ["False alert", "text-amber-d"]) : out ? ["Missed outbreak", "text-coral-d"] : ["Correctly quiet", "text-emerald-d"];
+        return (<div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-line bg-canvas/70 px-4 py-2.5 text-[13px]">
+          <span className="eyebrow">Time-machine verdict</span>
+          <span>Error (actual − median): <b className={`num ${Math.abs(err) <= 2 ? "text-emerald-d" : "text-coral-d"}`}>{err > 0 ? "+" : ""}{err}</b> cases</span>
+          <span>80% interval: <b className={in80 ? "text-emerald-d" : "text-coral-d"}>{in80 ? "covered ✓" : "missed ✗"}</b></span>
+          <span>90% interval: <b className={in90 ? "text-emerald-d" : "text-coral-d"}>{in90 ? "covered ✓" : "missed ✗"}</b></span>
+          <span>Alert: <b className={call[1]}>{call[0]}</b></span>
+          <span className="text-[11.5px] text-ink-3">{S?.source === "replay" ? `Out-of-time: forecast by a model trained only on seasons before ${f.target_date.slice(0, 4)}.` : "In-sample: the deployed model saw this period in training."}</span></div>);
+      })()}</Card>}
 
     <div className="grid gap-5 xl:grid-cols-[1.55fr_1fr]">
       <Card>

@@ -127,6 +127,16 @@ export default function GeoCommand() {
   const explored = useMemo(() => (insightOn && route?.insight ? { astar: route.insight.astar.explored, dijkstra: route.insight.dijkstra.explored } : null), [insightOn, route]);
   const dest: LngLat | null = route?.facility?.geometry?.coordinates ?? (tab === "nearest" ? nearest?.results?.[0]?.facility?.geometry?.coordinates : null) ?? null;
   const toggle = (k: keyof Layers) => setLayers((l) => ({ ...l, [k]: !l[k] }));
+  // city intelligence: real facility counts (OSM) beside the forecast aggregate of each city's synthetic wards (separate layers, never joined)
+  const cityIntel = useMemo(() => Object.keys(JUMP).map((c) => {
+    const fs = (fac.data?.features ?? []).filter((f: any) => f.properties.city === c);
+    const fc = cityRisk.filter((r) => (c === "Dhaka" ? r.city.startsWith("Dhaka") : r.city === c));
+    const wardsN = fc.reduce((a, r) => a + r.wards, 0);
+    return { city: c, hospitals: fs.filter((f: any) => f.properties.kind === "hospital").length, clinics: fs.filter((f: any) => f.properties.kind === "clinic").length,
+      phone: fs.filter((f: any) => f.properties.phone?.length).length, emergency: fs.filter((f: any) => f.properties.emergency === "yes").length,
+      alerts: fc.reduce((a, r) => a + r.alerts, 0), wards: wardsN, meanP: wardsN ? fc.reduce((a, r) => a + r.meanP * r.wards, 0) / wardsN : null,
+      wx: weather.find((w) => w.city === c)?.label.replace(`${c} `, "") };
+  }), [fac.data, cityRisk, weather]);
   const m = rstat.data?.manifest;
   const P = picked?.properties;
 
@@ -232,6 +242,15 @@ export default function GeoCommand() {
       </aside>
     </section>
     <p className="mt-2 text-[11px] leading-relaxed text-ink-3">City pills show the forecast aggregated over each city's synthetic wards for {dateFmt(sel.origin, lang)}, {sel.horizon} {t("ctl.weeks")} ahead. Blue = hospitals, teal = clinics (OpenStreetMap, community-mapped). Estimated times assume free-flow speeds; no traffic data.</p>
+
+    <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="City intelligence">{cityIntel.map((c) => (
+      <button key={c.city} onClick={() => { mapRef.current?.flyTo(JUMP[c.city].c, JUMP[c.city].z); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className="card card-hover p-4 text-left">
+        <div className="flex items-baseline justify-between"><span className="text-[15px] font-semibold text-navy">{c.city}</span>{c.wx && <span className="text-[11px] text-ink-3">{c.wx}</span>}</div>
+        <div className="mt-2 grid grid-cols-2 gap-2 text-[12px]">
+          <div className="rounded-lg bg-canvas p-2"><div className="text-[10.5px] uppercase tracking-wide text-ink-3">Facilities · OSM</div><b className="num text-[17px] text-navy">{c.hospitals + c.clinics}</b><div className="text-[11px] text-ink-3">{c.hospitals} hospitals · {c.clinics} clinics</div><div className="text-[11px] text-ink-3">{c.phone} with phone · {c.emergency} emergency-tagged</div></div>
+          <div className="rounded-lg bg-canvas p-2"><div className="text-[10.5px] uppercase tracking-wide text-ink-3">Forecast · synthetic</div><b className="num text-[17px] text-navy">{c.wards ? `${c.alerts}/${c.wards}` : "—"}</b><div className="text-[11px] text-ink-3">wards on alert</div>{c.meanP != null && <div className="text-[11px] text-ink-3">mean P(outbreak) {Math.round(c.meanP * 100)}%</div>}</div></div>
+      </button>))}</div>
+    <p className="mt-2 text-[11px] text-ink-3">City intelligence pairs two independent layers: real OpenStreetMap facilities and the forecast aggregated over the dataset's synthetic wards for that city. They are shown side by side, never joined.</p>
 
     <div className="mt-5 grid gap-5 xl:grid-cols-[1.3fr_1fr]">
       <Card><CardTitle title={`Facility directory (${dirRows.length})`} sub="OpenStreetMap hospitals and clinics in the four covered cities. Click a name to show it on the map." />
