@@ -5,23 +5,25 @@ import { useI18n } from "@/lib/i18n";
 import { num } from "@/lib/format";
 import { Card, CardTitle, DataTable, Kpi, Loading, Notice, PageHeader, ProvChip, Segmented, Tabs, useAsync } from "@/components/ui";
 import { Chart, PALETTE, axisStyle } from "@/components/echart";
+import ReliabilityCenter from "@/components/reliability";
 
 const NAMES: Record<string, string> = { glm_poisson: "Ridge Poisson GLM", glm_spline: "Spline Poisson GLM", glm_tweedie: "Tweedie GLM", glm_nb: "Negative-binomial GLM", glm_poisson_nbdisp: "Poisson GLM + NB dispersion", lgbm_poisson: "LightGBM Poisson", lgbm_tweedie: "LightGBM Tweedie", lgbm_l1: "LightGBM L1", xgb_poisson: "XGBoost Poisson", cat_poisson: "CatBoost Poisson", hurdle_lgbm: "Hurdle (LightGBM)" };
 const nm = (r: any) => (NAMES[r.model] ?? r.model.replace("ens_", "Ensemble ")) + (r.tag === "tuned" ? " (tuned)" : "") + ` · ${r.fs}`;
 
 export default function Evidence() {
   const { t, lang } = useI18n();
-  const [tab, setTab] = useState("choice");
+  const [tab, setTab] = useState("reliab");
   const val = useAsync((s) => api("/api/model/validation", { ttl: 600_000, signal: s }), []);
   const met = useAsync((s) => api("/api/model/metrics", { ttl: 600_000, signal: s }), []);
   const cal = useAsync((s) => api("/api/model/calibration", { ttl: 600_000, signal: s }), []);
   const feat = useAsync((s) => api("/api/model/features", { ttl: 600_000, signal: s }), []);
   const [conv, setConv] = useState("B");
   const [win, setWin] = useState("bench_2022_2024");
-  const tabs = [["choice", "Why this model"], ["board", "Tournament"], ["seasons", "Seasons & baselines"], ["unc", "Uncertainty & alerts"], ["imp", "Importance"], ["limits", "Limitations"]].map(([id, label]) => ({ id, label }));
+  const tabs = [["reliab", "Reliability center"], ["choice", "Why this model"], ["board", "Tournament"], ["seasons", "Seasons & baselines"], ["unc", "Uncertainty & alerts"], ["imp", "Importance"], ["limits", "Limitations"]].map(([id, label]) => ({ id, label }));
   return (<>
     <PageHeader eyebrow="Source: committed Stage 1–3 research reports" title={t("nav.evidence")} sub="Why the ridge Poisson GLM is deployed, how it was validated, and where it falls short. All numbers come from the committed reports and are served by the API." right={<ProvChip tone="warn">2025 holdout locked</ProvChip>} />
     <Tabs tabs={tabs} value={tab} onChange={setTab} />
+    {tab === "reliab" && <ReliabilityCenter />}
     {tab === "choice" && <Loading q={met} h={300}>{(m: any) => { const c = m.champion.validation.B; return (<div className="grid gap-5">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4"><Kpi label="MAE, 2 weeks (B)" value={c["2"].bench_2022_2024.mae} digits={3} /><Kpi label="MAE, 3 weeks (B)" value={c["3"].bench_2022_2024.mae} digits={3} /><Kpi label="MAE, 4 weeks (B)" value={c["4"].bench_2022_2024.mae} digits={3} /><Kpi label="Mean MAE 2022–24" value={(c["2"].bench_2022_2024.mae + c["3"].bench_2022_2024.mae + c["4"].bench_2022_2024.mae) / 3} digits={3} tone="ok" hint="convention B (start of week)" /></div>
       <Card><CardTitle title="Selection rule (fixed before the tuned and ensemble results were seen)" />

@@ -22,7 +22,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from dengueshield import routing
+from dengueshield import decision, routing
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
@@ -463,6 +463,42 @@ def climate_compare(city: CityName = "Dhaka", start: str = "2016-01-01", end: st
                         "Coarse grids tend to overcount light-rain days; wet days use a >= 1 mm threshold (stated convention).",
                         "Neither real source is an input to the validated forecasting model, which was trained on the synthetic organizer weather."]}
 
+
+
+
+# ------------------------------------------------------------------ decision support (retrospective, saved out-of-time replay only)
+def _replay_or_503():
+    if S.replay is None or S.panel is None:
+        raise HTTPException(503, "replay or dataset not loaded")
+    return S.replay
+
+
+@app.get("/api/decision/alert-curve")
+def alert_curve(horizon: Optional[H] = None, years: Annotated[Optional[str], Query(pattern=r"^20(19|2[0-4])(,20(19|2[0-4]))*$")] = None):
+    """Retrospective alert-policy explorer over 2019-2024 out-of-time predictions. The deployed rule is unchanged."""
+    R = _replay_or_503()
+    ys = sorted({int(y) for y in years.split(",")}) if years else None
+    v, _ = S.cache.get_or(("alert_curve", horizon, tuple(ys or ())), lambda: decision.alert_curve(R, horizon, ys))
+    return v
+
+
+@app.get("/api/decision/allocate")
+def decision_allocate(origin: str, horizon: H = 3, teams: Annotated[int, Query(ge=1, le=60)] = 10):
+    R = _replay_or_503()
+    if not DATE_RE.match(origin):
+        bad("origin must be YYYY-MM-DD")
+    try:
+        v, _ = S.cache.get_or(("allocate", origin, horizon, teams), lambda: decision.allocate(R, S.panel, origin, horizon, teams))
+    except ValueError as e:
+        bad(str(e))
+    return v
+
+
+@app.get("/api/decision/allocation-season")
+def decision_allocation_season(year: Annotated[int, Query(ge=2019, le=2024)], horizon: H = 3, teams: Annotated[int, Query(ge=1, le=60)] = 10):
+    R = _replay_or_503()
+    v, _ = S.cache.get_or(("alloc_season", year, horizon, teams), lambda: decision.allocation_season(R, S.panel, year, horizon, teams))
+    return v
 
 
 # ------------------------------------------------------------------ healthcare facilities, A* routing, emergency help (OpenStreetMap, ODbL)
