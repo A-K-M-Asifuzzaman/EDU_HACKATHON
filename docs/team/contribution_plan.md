@@ -74,10 +74,10 @@ Core forecasting and engineering architecture (already in the repository), deplo
 | **Contributors** list and contribution graph | built from commits on the default branch whose author email is linked to an account (graph also needs the repo to be non-fork and the commit to be on `main` or `gh-pages`) | repository → Insights → Contributors, GitHub profile graph |
 
 Consequences:
-- **Each teammate must commit with their own identity** (`git config user.name/user.email` in their clone) and push with their own GitHub login (their own PAT/SSH key/`gh auth login`). The lead cannot push on their behalf and must not set their identity on the lead's machine: that would misattribute the work.
+- **Each teammate uses their own identity** for the work they authored. Set that identity with `git config --local user.name` and `git config --local user.email` in their clone. A push authenticates the pusher and does not change the authors of the commits it uploads. The lead can merge teammate-authored commits into `main`.
 - A teammate's email must be **added and verified in their GitHub account** (Settings → Emails) or they must use their `ID+username@users.noreply.github.com` address. Otherwise their commits appear as an unlinked name.
-- **Merging a PR**: *Squash and merge* keeps the PR opener as author; *Rebase and merge* keeps each original author; both preserve attribution. Do not use anything that rewrites authors.
-- The lead's new commits use `A-K-M-Asifuzzaman <zasif855@gmail.com>`. Whether that e-mail is verified on the account could not be checked from the CLI (it needs the `user` scope); check the next commit's avatar. If it shows no link, add and verify the address under Settings → Emails (existing commits are unaffected and stay linked through the noreply address).
+- **Merging a PR**: Use *Create a merge commit* to preserve the original commits and their authors. Use GitHub's *Rebase and merge* if the repository requires linear history. It preserves each author and creates new commit IDs. Avoid squashing when the separate commits are needed for review or attribution.
+- GitHub links the lead's commit `f154588` to **A-K-M-Asifuzzaman** as both author and committer. Each teammate can verify their account link on their commit page or through the Commits API.
 - Commits are currently **unsigned**, so GitHub shows no "Verified" badge. Signing is optional; if wanted, set up SSH/GPG signing under the lead's own account.
 
 ## 5. Safe commands
@@ -86,8 +86,8 @@ Teammate, from their own machine and GitHub login:
 
 ```bash
 git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
-git config user.name  "<your GitHub username>"
-git config user.email "<an email verified on YOUR GitHub account, or ID+username@users.noreply.github.com>"
+git config --local user.name  "<your GitHub username>"
+git config --local user.email "<your GitHub-linked commit email or GitHub-provided noreply address>"
 git switch -c feat/<task-branch>            # one branch per task, from main
 # ... make the genuine change, run: pytest -q   and   (cd frontend && npx tsc --noEmit)
 git add <only the files you changed> && git commit -m "<what and why>"
@@ -100,7 +100,7 @@ Lead, release (no force, no rewrites):
 ```bash
 git fetch origin && git status                      # confirm main is up to date and the tree is clean
 gh pr list                                          # review each PR; run pytest and the Playwright suite on the merged result
-gh pr merge <N> --squash                            # or --rebase; never --admin and never force-push
+gh pr merge <N> --merge                             # use --rebase if linear history is required
 git pull --ff-only && git push origin main          # plain fast-forward push only
 git ls-remote origin refs/heads/main && git rev-parse HEAD   # remote HEAD must equal local HEAD
 gh api repos/A-K-M-Asifuzzaman/EDU_HACKATHON/contributors --jq '.[] | "\(.login) \(.contributions)"'
