@@ -21,9 +21,12 @@ export default function Palette({ pages }: { pages: readonly (readonly [string, 
     const k = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); setOpen((o) => !o); } };
     window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
   }, []);
-  useEffect(() => {
+  useEffect(() => {                         // reset only when the palette opens (not when data arrives: that would wipe what the user typed)
     if (!open) return;
     setQ(""); setI(0); setTimeout(() => input.current?.focus(), 30);
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
     if (!wards.length) api("/api/wards", { ttl: 600_000 }).then((d: any) => setWards(d.wards ?? d)).catch(() => {});
     if (!fac.length) api("/api/facilities", { ttl: 600_000 }).then((d: any) => setFac(d.features ?? [])).catch(() => {});
   }, [open, wards.length, fac.length]);

@@ -246,6 +246,11 @@ test.describe("intro", () => {
     await page.keyboard.press("Escape");
     await expect(page.getByRole("dialog", { name: /introduction/ })).toBeHidden();
   });
+  test("sound is off by default and only starts on request", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.removeItem("ds.intro.seen"));
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "Turn sound on" })).toHaveAttribute("aria-pressed", "false");
+  });
   test.describe("reduced motion", () => {
     test.use({ reducedMotion: "reduce" });
     test("is skipped entirely under prefers-reduced-motion", async ({ page }) => {
@@ -255,4 +260,62 @@ test.describe("intro", () => {
       await expect(page.getByRole("dialog", { name: /introduction/ })).toHaveCount(0);
     });
   });
+});
+
+// ---- decision intelligence and release-polish features
+test("reliability center shows saved out-of-time diagnostics and the alert policy simulator reproduces the deployed rule", async ({ page }) => {
+  const errs = trackErrors(page);
+  await page.goto("/evidence/");
+  await expect(page.getByRole("tab", { name: "Reliability center" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByText("Coverage by incidence severity")).toBeVisible();
+  await expect(page.getByText("0.607")).toBeVisible();                                           // documented peak coverage, 80% nominal
+  await expect(page.getByText("0.740")).toBeVisible();
+  await expect(page.getByText("Outbreak alert policy simulator")).toBeVisible();
+  const deployed = page.getByRole("row", { name: /Deployed rule \(as validated\)/ });
+  await expect(deployed).toContainText("75.8%");                                                 // recall at 3 weeks, same as diagnostics
+  const before = await page.getByText("Flagged ward-weeks").locator("..").innerText();
+  await page.getByRole("slider", { name: "Alert threshold" }).fill("0.6");
+  await expect(page.getByText("Flagged ward-weeks").locator("..")).not.toHaveText(before);
+  await expect(page.getByText(/optimistic/).first()).toBeVisible();
+  expect(errs).toEqual([]);
+});
+
+test("resource sandbox compares three transparent rules and labels itself a planning simulation", async ({ page }) => {
+  await page.goto("/response/");
+  await expect(page.getByText("Planning simulation, not a deployment recommendation.")).toBeVisible();
+  for (const n of ["Equal (risk-blind)", "Historical risk", "Forecast alert priority"]) await expect(page.getByText(n).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/share of actual outbreak ward-weeks/)).toBeVisible({ timeout: 20_000 });
+});
+
+test("command center: time-machine verdict, play control, intelligence brief and global search", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("Time-machine verdict")).toBeVisible();
+  await expect(page.getByText(/Out-of-time: forecast by a model trained only on seasons before/)).toBeVisible();
+  const dl = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download intelligence brief" }).click();
+  const file = await dl; expect(file.suggestedFilename()).toMatch(/^dengueshield_brief_\d{4}-\d{2}-\d{2}_h\d\.html$/);
+  const html = await (await import("node:fs")).promises.readFile(await file.path(), "utf8");
+  expect(html).toContain("Historical Replay"); expect(html).toContain("not medical advice"); expect(html).not.toMatch(/<script/i);
+  await page.getByRole("button", { name: /Play time machine/ }).click();
+  await expect(page.getByRole("button", { name: /Pause time machine/ })).toBeVisible();
+  await page.getByRole("button", { name: /Pause time machine/ }).click();
+  await page.keyboard.press("Control+k");
+  await page.getByRole("textbox", { name: "Search query" }).fill("square hospital");
+  await expect(page.getByRole("option").filter({ hasText: "Square Hospital" }).first()).toBeVisible({ timeout: 10_000 });
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/geography\/\?facility=osm/);
+  await expect(page.getByRole("complementary", { name: /Facility, route/ }).getByText("Square Hospital").first()).toBeVisible({ timeout: 20_000 });
+});
+
+test("map: A* insight mode reports real exploration counts for A* and Dijkstra", async ({ page, context }) => {
+  await context.grantPermissions(["geolocation"]); await context.setGeolocation({ latitude: 23.7104, longitude: 90.4074 });
+  await page.goto("/geography/");
+  await page.getByRole("button", { name: "Use my location" }).click();
+  await page.fill("#geo-search", "Square Hospital"); await page.getByRole("option").first().click();
+  const panel = page.getByRole("complementary", { name: /Facility, route/ });
+  await panel.getByRole("button", { name: /Route from start/ }).click();
+  await panel.getByRole("switch", { name: /A\* Algorithm Insight/ }).click();
+  await expect(panel.getByText(/costs equal ✓/)).toBeVisible({ timeout: 20_000 });
+  await expect(panel.getByText(/fewer nodes toward the goal/)).toBeVisible();
+  await expect(panel.getByRole("link", { name: /Open in Google Maps/ })).toHaveAttribute("href", /google\.com\/maps\/dir\/\?api=1&origin=23\.7104,90\.4074&destination=/);
 });
