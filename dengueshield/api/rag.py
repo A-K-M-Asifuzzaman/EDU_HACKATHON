@@ -20,7 +20,7 @@ from typing import Iterator
 import numpy as np
 
 from dengueshield.api import integrations
-from dengueshield.api.store import ROOT
+from dengueshield.api.store import CACHE_ROOT, ROOT
 
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4-mini")
 EMBED_MODEL = os.environ.get("OPENAI_EMBED_MODEL", "text-embedding-3-small")
@@ -30,7 +30,7 @@ PRICE_IN, PRICE_OUT = float(os.environ.get("OPENAI_PRICE_IN", 0.25)), float(os.e
 BUDGET = float(os.environ.get("OPENAI_BUDGET_USD", 1.0))
 RATE_PER_HOUR = 30
 INDEX = ROOT / "app_data" / "rag_index.npz"
-USAGE_LOG = ROOT / ".cache" / "copilot_usage.jsonl"
+USAGE_LOG = CACHE_ROOT / "copilot_usage.jsonl"
 
 APPROVED = ["README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "reports/eda/README.md", "reports/baselines/README.md"]
 EXCLUDE_NAMES = {".env", ".env.example"}
@@ -203,6 +203,9 @@ TOOLS = [
      "parameters": {"type": "object", "properties": {}, "additionalProperties": False}},
     {"type": "function", "name": "get_data_profile", "description": "Dataset profile: size, coverage, schema, missingness, target distribution and key statistics (development years only).",
      "parameters": {"type": "object", "properties": {}, "additionalProperties": False}},
+    {"type": "function", "name": "find_health_facilities", "description": "Search hospitals and clinics (OpenStreetMap, community-mapped, NOT verified by DGHS; no live beds, availability or doctor rosters). Use for questions about where hospitals are, their contact numbers or emergency departments.",
+     "parameters": {"type": "object", "properties": {"query": {"type": "string", "description": "name, area or address words; empty for all"}, "city": {"type": "string", "enum": ["Dhaka", "Narayanganj", "Gazipur", "Chattogram"]},
+                                                       "kind": {"type": "string", "enum": ["hospital", "clinic"]}, "limit": {"type": "integer", "minimum": 1, "maximum": 10}}, "additionalProperties": False}},
 ]
 
 
@@ -245,6 +248,12 @@ def run_tool(S, name: str, args: dict, ctx: dict):
         if name == "get_data_profile":
             p = S.art["profile"]
             return {k: p[k] for k in ("rows", "columns", "date_min", "date_max", "weeks", "wards", "cities", "duplicate_rows", "target", "holdout_note")}
+        if name == "find_health_facilities":
+            r = M.facilities_list(args.get("city"), args.get("kind"), (args.get("query") or None), 3000)
+            keep = ("name", "name_bn", "kind", "city", "address", "phone", "emergency", "operator", "osm_url")
+            return {"total_matches": r["meta"]["count"], "results": [{k: f["properties"].get(k) for k in keep} for f in r["features"][: int(args.get("limit", 5))]],
+                    "note": r["meta"]["note"], "attribution": r["meta"]["attribution"], "emergency_numbers": "999 (national emergency), 16263 (DGHS health line)",
+                    "routing": "For directions, the Map & Emergency Routing page computes A* road routes."}
     except Exception as e:                      # tool errors go back to the model as data
         detail = getattr(e, "detail", None) or str(e)
         return {"error": str(detail)[:300]}
@@ -272,7 +281,7 @@ def _sse(obj) -> str:
 
 def _log(rec: dict):
     try:
-        USAGE_LOG.parent.mkdir(exist_ok=True)
+        USAGE_LOG.parent.mkdir(parents=True, exist_ok=True)
         with USAGE_LOG.open("a") as f:
             f.write(json.dumps({"t": int(time.time()), **rec}) + "\n")
     except Exception:

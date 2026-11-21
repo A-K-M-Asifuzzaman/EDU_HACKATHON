@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import hmac
 import os
 import re
@@ -21,6 +22,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from dengueshield import routing
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
@@ -460,6 +462,88 @@ def climate_compare(city: CityName = "Dhaka", start: str = "2016-01-01", end: st
             "caveats": ["NASA POWER and Open-Meteo are model/reanalysis products at city-centre coordinates, not rain-gauge measurements, and they can disagree substantially on rainfall.",
                         "Coarse grids tend to overcount light-rain days; wet days use a >= 1 mm threshold (stated convention).",
                         "Neither real source is an input to the validated forecasting model, which was trained on the synthetic organizer weather."]}
+
+
+
+# ------------------------------------------------------------------ healthcare facilities, A* routing, emergency help (OpenStreetMap, ODbL)
+APP_DATA_GEO = ROOT / "app_data" / "geo"
+OSM_ATTR = "Facilities and roads (c) OpenStreetMap contributors, ODbL 1.0"
+FACILITY_NOTE = ("Community-mapped data, not verified by DGHS. Names, phone numbers and tagged bed counts may be outdated. "
+                 "There is no live information on availability, beds, admissions or doctors on duty: call before travelling.")
+Lat = Annotated[float, Query(ge=-90, le=90)]
+Lon = Annotated[float, Query(ge=-180, le=180)]
+EMERGENCY = {"numbers": [
+    {"number": "999", "label": "National Emergency Service (police, fire service, ambulance)", "source": "Bangladesh National Emergency Service 999"},
+    {"number": "16263", "label": "Shasthya Batayon: DGHS health call centre (medical advice, 24/7)", "source": "Directorate General of Health Services (DGHS)"}],
+    "warning_signs": {"source": "World Health Organization, Dengue and severe dengue fact sheet",
+                      "intro": "Seek medical care immediately if any of these warning signs appear, usually 24-48 hours after the fever goes down:",
+                      "signs": ["severe abdominal pain", "persistent vomiting", "rapid breathing", "bleeding gums or nose", "fatigue or restlessness",
+                                "blood in vomit or stool", "being very thirsty", "pale and cold skin", "feeling weak"]},
+    "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999."}
+
+
+def _routing_ready():
+    if not routing.manifest():
+        raise HTTPException(503, "Facility and road data are not built. Run: python scripts/build_geodata.py")
+
+
+@app.get("/api/facilities")
+def facilities_list(city: Optional[Literal["Dhaka", "Narayanganj", "Gazipur", "Chattogram"]] = None, kind: Optional[Literal["hospital", "clinic"]] = None,
+                    q: Annotated[Optional[str], Query(max_length=60)] = None, limit: Annotated[int, Query(ge=1, le=3000)] = 3000):
+    _routing_ready()
+    ql = (q or "").strip().lower()
+    feats = [f for f in routing.facilities()["features"]
+             if (city is None or f["properties"]["city"] == city) and (kind is None or f["properties"]["kind"] == kind)
+             and (not ql or any(ql in str(f["properties"].get(k) or "").lower() for k in ("name", "name_bn", "address", "operator")))]
+    return {"type": "FeatureCollection", "features": feats[:limit],
+            "meta": {"count": len(feats), "returned": min(len(feats), limit), "attribution": OSM_ATTR, "note": FACILITY_NOTE,
+                     "osm_timestamps": routing.manifest().get("facilities", {}).get("osm_timestamps")}}
+
+
+@app.get("/api/route")
+def route_between(from_lat: Lat, from_lon: Lon, to_lat: Optional[Lat] = None, to_lon: Optional[Lon] = None,
+                  to_facility: Annotated[Optional[str], Query(max_length=40, pattern=r"^osm:(node|way|relation)/\d+$")] = None, verify: bool = True):
+    """Shortest-distance and estimated-fastest A* routes on the directed OSM road graph, each verified against Dijkstra."""
+    _routing_ready()
+    dest = None
+    if to_facility:
+        dest = next((f for f in routing.facilities()["features"] if f["properties"]["id"] == to_facility), None)
+        if dest is None:
+            bad(f"unknown facility '{to_facility}'", 404)
+        to_lon, to_lat = dest["geometry"]["coordinates"]
+    if to_lat is None or to_lon is None:
+        bad("give to_lat and to_lon, or to_facility")
+    try:
+        out = routing.route(from_lat, from_lon, to_lat, to_lon, verify)
+    except routing.RoutingError as e:
+        bad(str(e))
+    out.update({"facility": dest, "attribution": OSM_ATTR, "assumptions": routing.manifest()["assumptions"],
+                "speeds_kmh": routing.manifest()["speed_assumptions_kmh"]})
+    return out
+
+
+@app.get("/api/emergency/nearest")
+def emergency_nearest(lat: Lat, lon: Lon, k: Annotated[int, Query(ge=1, le=10)] = 5, kind: Literal["hospital", "clinic", "any"] = "hospital"):
+    """Nearest facilities by estimated road travel time (not straight-line distance)."""
+    _routing_ready()
+    try:
+        out = routing.nearest_facilities(lat, lon, k, None if kind == "any" else kind)
+    except routing.RoutingError as e:
+        bad(str(e))
+    out.update({"attribution": OSM_ATTR, "note": FACILITY_NOTE, "emergency": EMERGENCY["numbers"]})
+    return out
+
+
+@app.get("/api/emergency/info")
+def emergency_info():
+    return EMERGENCY
+
+
+@app.get("/api/routing/status")
+def routing_status():
+    m = routing.manifest()
+    bench = APP_DATA_GEO / "benchmark.json"
+    return {"ready": bool(m), "manifest": m, "benchmark": json.loads(bench.read_text()) if bench.exists() else None, "attribution": OSM_ATTR}
 
 
 # ------------------------------------------------------------------ DGHS official boundaries (contextual geography; never joined to dataset ward IDs)

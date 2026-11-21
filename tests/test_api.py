@@ -150,7 +150,7 @@ def test_rag_corpus_is_approved_documents_only_and_tools_are_strict():
     assert "docs/model_selection.md" in srcs
     assert not any(s.startswith(("data/raw", ".env")) or s.endswith(".env") for s in srcs)
     names = {t["name"] for t in rag.TOOLS}
-    assert names == {"get_ward_forecast", "compare_wards", "get_risk_rankings", "get_model_metrics", "get_feature_importance", "get_data_profile"}
+    assert names == {"get_ward_forecast", "compare_wards", "get_risk_rankings", "get_model_metrics", "get_feature_importance", "get_data_profile", "find_health_facilities"}
     assert all(t["parameters"].get("additionalProperties") is False for t in rag.TOOLS)
     hits = rag.retriever().search("why was the Poisson GLM chosen instead of LightGBM")
     assert hits and any("model_selection" in h["source"] for h in hits)
