@@ -42,6 +42,32 @@ export default function Intro() {
   const [r, setR] = useState(0);
   const state = useRef<FlightState>({ px: 0, py: 0, pointer: false, swatted: false });
   const root = useRef<HTMLDivElement>(null);
+  // optional sound, muted by default; synthesised with Web Audio (no audio files) and started only by a user click
+  const [sound, setSound] = useState(false);
+  const audio = useRef<{ ctx: AudioContext; stop: () => void } | null>(null);
+  const stopSound = useCallback(() => { audio.current?.stop(); audio.current = null; setSound(false); }, []);
+  const startSound = useCallback(() => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator(), lfo = ctx.createOscillator(), lfoGain = ctx.createGain(), bp = ctx.createBiquadFilter(), gain = ctx.createGain();
+      osc.type = "sawtooth"; osc.frequency.value = 540; lfo.frequency.value = 34; lfoGain.gain.value = 22;   // wing-beat vibrato
+      bp.type = "bandpass"; bp.frequency.value = 900; bp.Q.value = 5; gain.gain.value = 0.03;
+      lfo.connect(lfoGain).connect(osc.frequency); osc.connect(bp).connect(gain).connect(ctx.destination); osc.start(); lfo.start();
+      let done = false;
+      audio.current = { ctx, stop: () => { if (done) return; done = true; try { osc.stop(); lfo.stop(); } catch {} ctx.close().catch(() => {}); } };   // idempotent
+      setSound(true);
+    } catch { setSound(false); }
+  }, []);
+  const thwack = useCallback(() => {
+    const a = audio.current; if (!a) return;
+    const { ctx } = a, n = Math.floor(ctx.sampleRate * 0.16), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    const src = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = buf; lp.type = "lowpass"; lp.frequency.value = 700; g.gain.value = 0.5;
+    src.connect(lp).connect(g).connect(ctx.destination); src.start();
+    setTimeout(() => a.stop(), 220);
+  }, []);
+  useEffect(() => () => audio.current?.stop(), []);
 
   useEffect(() => {
     let seen = false;
@@ -58,6 +84,7 @@ export default function Intro() {
   useEffect(() => { if (show) root.current?.focus(); }, [show]);
 
   const finish = useCallback(() => {
+    audio.current?.stop(); audio.current = null;
     try { sessionStorage.setItem(SEEN, "1"); } catch {}
     setShow(false);
     document.getElementById("main")?.animate([{ opacity: 0.4, transform: "scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 650, easing: "cubic-bezier(.2,.7,.2,1)" });
@@ -65,14 +92,14 @@ export default function Intro() {
 
   const swat = useCallback((x: number, y: number) => {
     if (phase !== "fly") return;
-    state.current.swatted = true; setHit({ x, y }); setPhase("swat");
+    state.current.swatted = true; setHit({ x, y }); setPhase("swat"); thwack();
     setTimeout(() => {
       setPhase("reveal");
       const max = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 40, t0 = performance.now();
       const step = (t: number) => { const k = Math.min(1, (t - t0) / 850); setR(max * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(step); else finish(); };
       requestAnimationFrame(step);
     }, 480);
-  }, [phase, finish]);
+  }, [phase, finish, thwack]);
 
   if (!show) return null;
   const mask = phase === "reveal" && hit ? `radial-gradient(circle at ${hit.x}px ${hit.y}px, transparent ${r}px, #000 ${r + 2}px)` : undefined;
@@ -95,6 +122,7 @@ export default function Intro() {
     </div>
     <div className="absolute right-4 top-4 flex gap-2">
       <button onClick={(e) => { e.stopPropagation(); finish(); openEmergency(); }} className="rounded-xl bg-coral-d px-3.5 py-2 text-[13px] font-semibold text-white shadow-lg hover:bg-coral">✚ Emergency help</button>
+      <button onClick={(e) => { e.stopPropagation(); if (sound) stopSound(); else startSound(); }} aria-pressed={sound} aria-label={sound ? "Mute sound" : "Turn sound on"} className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur hover:bg-white/20">{sound ? "🔊 Sound on" : "🔈 Sound off"}</button>
       <button onClick={(e) => { e.stopPropagation(); finish(); }} className="rounded-xl border border-white/25 bg-white/10 px-3.5 py-2 text-[13px] font-semibold text-white backdrop-blur hover:bg-white/20">Skip intro</button>
     </div>
   </div>);

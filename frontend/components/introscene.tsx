@@ -11,8 +11,8 @@ export interface FlightState { px: number; py: number; pointer: boolean; swatted
 function Flyer({ s }: { s: React.MutableRefObject<FlightState> }) {
   const g = useRef<THREE.Group>(null);
   const { viewport } = useThree();
-  const pos = useRef(new THREE.Vector3(-viewport.width * 0.7, 0.6, 0));
-  const vel = useRef(new THREE.Vector3(2.5, 0, 0));
+  const pos = useRef(new THREE.Vector3(-viewport.width * 0.2, viewport.height * 0.1, 0.8));   // composed first frame: visible, left of centre
+  const vel = useRef(new THREE.Vector3(1.6, 0.35, 0));
   const fall = useRef(0);
   const tmp = useRef({ target: new THREE.Vector3(), p: new THREE.Vector3(), look: new THREE.Vector3() });
   useFrame(({ clock }, dtRaw) => {
