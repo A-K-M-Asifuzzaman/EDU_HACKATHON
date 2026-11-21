@@ -5,9 +5,10 @@ import { motion } from "motion/react";
 import { api, qs, addWeeks, TIERS, type Forecast } from "@/lib/api";
 import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
-import { dateFmt, num, pct } from "@/lib/format";
+import { dateFmt, download, num, pct } from "@/lib/format";
+import { buildBrief } from "@/lib/brief";
 import ControlsBar from "@/components/controls";
-import { Card, CardTitle, EmptyState, ErrorState, Kpi, Loading, Notice, PageHeader, ProvChip, RiskBadge, Skeleton, useAsync } from "@/components/ui";
+import { Card, CardTitle, EmptyState, ErrorState, Kpi, Loading, Notice, ProvChip, RiskBadge, Skeleton, useAsync } from "@/components/ui";
 import { DriverBars, FanChart, Gauge, TierBar } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
 import HorizonCompare from "@/components/horizons";
@@ -23,6 +24,12 @@ export default function CommandCenter() {
   const year = Number(sel.origin.slice(0, 4));
   const series = useAsync((s) => (year >= 2019 && year <= 2024 ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
   const rain = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -26), end: addWeeks(sel.origin, 0), metric: "rainfall_mm" })}`, { signal: s }), [sel.ward, sel.origin, ready]);
+  const metrics = useAsync((s) => api("/api/model/metrics", { signal: s, ttl: 3_600_000 }), []);
+  const calib = useAsync((s) => api("/api/model/calibration", { signal: s, ttl: 3_600_000 }), []);
+  const cov = useMemo(() => {
+    const ic = calib.data?.interval_coverage ?? []; const g = (lvl: number) => ic.find((r: any) => r.method === "nb_coverage" && r.level === lvl);
+    return g(0.8) ? { c80: g(0.8).coverage, c90: g(0.9)?.coverage, h80: g(0.8).coverage_high } : null;
+  }, [calib.data]);
   const f: Forecast | undefined = fc.data?.forecast;
   const S = summary.data;
   const tierCounts = S?.tier_counts ?? {};
@@ -37,7 +44,31 @@ export default function CommandCenter() {
   }, [rain.data]);
 
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.command")} sub={t("mode.replay.desc")} right={<ProvChip tone="info">{t("fresh.convention")}</ProvChip>} />
+    <section className="hero-surface relative mb-5 overflow-hidden rounded-[22px] p-6 shadow-[var(--shadow-pop)] sm:p-8" aria-labelledby="cc-title">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)", backgroundSize: "44px 44px", maskImage: "radial-gradient(ellipse at 70% 30%, #000 0%, transparent 70%)" }} />
+      <div className="relative grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <div>
+          <div className="mb-3 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-mint/85"><span className="rounded-full bg-white/10 px-2.5 py-1 ring-1 ring-white/15">{t("mode.replay")}</span><span className="rounded-full bg-white/10 px-2.5 py-1 ring-1 ring-white/15">2025 holdout locked</span></div>
+          <h1 id="cc-title" className="text-[30px] font-bold leading-tight tracking-[-0.025em] sm:text-[38px]">{t("nav.command")}</h1>
+          <p className="mt-1 text-[19px] font-semibold leading-snug sm:text-[23px]"><span className="text-gradient">Forecast dengue 2–4 weeks ahead.</span> Route people to care.</p>
+          <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-white/75">{S ? <>For the week of <b className="text-white">{dateFmt(S.target_date, lang)}</b> (forecast made {dateFmt(S.origin, lang)}, {sel.horizon} weeks ahead), the model expects <b className="text-white">{num(S.median_cases_total, lang)}</b> cases across {S.wards} synthetic wards, with <b className="text-white">{S.alerts}</b> wards on outbreak alert. {S.source === "replay" ? "Validated out-of-time replay." : "Deployed model, recomputed on demand."}</> : t("mode.replay.desc")}</p>
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <Link href="/geography/" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy shadow-lg transition hover:-translate-y-0.5">Open map &amp; emergency routing →</Link>
+            <Link href="/copilot/" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15">Ask the Copilot</Link>
+            <button disabled={!S} onClick={() => download(`dengueshield_brief_${sel.origin}_h${sel.horizon}.html`, buildBrief({ sel, S, f, top: ranking.data?.wards ?? [], metrics: metrics.data, coverage: cov, meta }), "text/html")} className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15 disabled:opacity-50">Download intelligence brief</button>
+          </div>
+        </div>
+        <div className="glass-dark rounded-2xl p-4 sm:p-5">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mint/80">Validated performance · out-of-time 2022–2024</div>
+          <div className="mt-3 grid grid-cols-3 gap-2">{[2, 3, 4].map((h) => { const m = metrics.data?.champion?.validation?.B?.[h]?.bench_2022_2024; return (<div key={h} className="rounded-xl bg-white/6 p-3 ring-1 ring-white/10"><div className="text-[11px] text-white/60">{h}-week MAE</div><div className="num mt-0.5 text-[24px] font-bold">{m ? m.mae.toFixed(2) : "…"}</div><div className="text-[10.5px] text-white/50">cases / week</div></div>); })}</div>
+          <div className="mt-3 space-y-1.5 text-[12.5px] text-white/75">
+            <div className="flex justify-between"><span>80% / 90% interval coverage</span><b className="num text-white">{cov ? `${cov.c80.toFixed(2)} / ${cov.c90?.toFixed(2)}` : "…"}</b></div>
+            <div className="flex justify-between"><span>80% coverage at outbreak peaks</span><b className="num text-amber">{cov ? cov.h80.toFixed(2) : "…"}</b></div>
+            <p className="pt-1 text-[11px] leading-snug text-white/55">Peaks are under-predicted by about 3 cases; intervals are honest on average and optimistic at peaks. Model: ridge Poisson GLM, 24 features.</p>
+          </div>
+        </div>
+      </div>
+    </section>
     {error && <div className="mb-4"><ErrorState error={error} onRetry={reload} /></div>}
     <ControlsBar />
     {S && <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-3"><ProvChip tone={S.source === "replay" ? "ok" : "warn"}>{S.source === "replay" ? t("src.replay") : t("src.bundle")}</ProvChip>

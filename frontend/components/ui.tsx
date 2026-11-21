@@ -29,11 +29,11 @@ export function Card({ children, className = "", pad = true, as: As = "section",
   return <As className={cls("card", pad && "p-5", className)} {...rest}>{children}</As>;
 }
 export function CardTitle({ title, sub, right }: { title: string; sub?: string; right?: React.ReactNode }) {
-  return (<div className="mb-3 flex flex-wrap items-start justify-between gap-2"><div><h2 className="text-[15px] font-semibold text-forest">{title}</h2>{sub && <p className="mt-0.5 text-xs text-ink-3">{sub}</p>}</div>{right}</div>);
+  return (<div className="mb-3 flex flex-wrap items-start justify-between gap-2"><div><h2 className="text-[15px] font-semibold text-navy">{title}</h2>{sub && <p className="mt-0.5 text-xs text-ink-3">{sub}</p>}</div>{right}</div>);
 }
 export function PageHeader({ title, sub, right, eyebrow }: { title: string; sub?: string; right?: React.ReactNode; eyebrow?: string }) {
-  return (<header className="mb-6 flex flex-wrap items-end justify-between gap-4"><div>{eyebrow && <div className="eyebrow mb-1">{eyebrow}</div>}<h1 className="text-[26px] font-bold tracking-tight text-forest sm:text-[30px]">{title}</h1>
-    {sub && <p className="mt-1 max-w-3xl text-sm text-ink-2">{sub}</p>}</div>{right}</header>);
+  return (<header className="mb-6 flex flex-wrap items-end justify-between gap-4"><div>{eyebrow && <div className="eyebrow mb-1.5 flex items-center gap-2 text-teal"><span className="h-1.5 w-1.5 rounded-full bg-cyan shadow-[0_0_0_3px_rgba(43,181,207,0.18)]" />{eyebrow}</div>}<h1 className="text-[27px] font-bold tracking-[-0.02em] text-navy sm:text-[32px]">{title}</h1>
+    {sub && <p className="mt-1.5 max-w-3xl text-[14px] leading-relaxed text-ink-2">{sub}</p>}</div>{right}</header>);
 }
 export const Skeleton = ({ h = 20, w = "100%", className = "" }: { h?: number; w?: number | string; className?: string }) => <div className={cls("skeleton", className)} style={{ height: h, width: w }} aria-hidden="true" />;
 
@@ -71,9 +71,9 @@ export function CountUp({ value, digits = 0, suffix = "" }: { value: number; dig
 }
 export function Kpi({ label, value, digits = 0, suffix, hint, tone, loading }: { label: string; value?: number | null; digits?: number; suffix?: string; hint?: string; tone?: "ok" | "warn" | "bad"; loading?: boolean }) {
   const bar = { ok: "bg-emerald", warn: "bg-amber", bad: "bg-coral" }[tone ?? "ok"];
-  return (<motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="card relative overflow-hidden p-4">
-    <span className={cls("absolute left-0 top-0 h-full w-1", bar)} /><div className="eyebrow">{label}</div>
-    <div className="mt-1.5 text-[30px] font-bold leading-none tracking-tight text-forest">{loading || value === undefined || value === null ? <Skeleton h={30} w={90} /> : <CountUp value={value} digits={digits} suffix={suffix} />}</div>
+  return (<motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="card card-hover relative overflow-hidden p-4">
+    <span className={cls("absolute inset-x-4 top-0 h-[3px] rounded-b-full", bar)} /><div className="eyebrow">{label}</div>
+    <div className="mt-2 text-[30px] font-bold leading-none tracking-[-0.02em] text-navy">{loading || value === undefined || value === null ? <Skeleton h={30} w={90} /> : <CountUp value={value} digits={digits} suffix={suffix} />}</div>
     {hint && <div className="mt-1.5 text-xs text-ink-3">{hint}</div>}</motion.div>);
 }
 

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo , useEffect, useState} from "react";
 import { useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { addWeeks, isMonday } from "@/lib/api";
@@ -20,6 +20,15 @@ export default function ControlsBar({ show = ["city", "ward", "origin", "horizon
   const idx = Math.max(0, Math.round((new Date(sel.origin).getTime() - new Date(min).getTime()) / (7 * 86400000)));
   const total = Math.round((new Date(max).getTime() - new Date(min).getTime()) / (7 * 86400000));
   const setIdx = (i: number) => set({ origin: addWeeks(min, Math.min(total, Math.max(0, i))) });
+  // Forecast time machine: step the origin forward one week at a time through real forecasts
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    if (!playing) return;
+    if (idx >= total) { setPlaying(false); return; }
+    const id = setTimeout(() => setIdx(idx + 1), 1200);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, idx, total]);
   return (
     <div className="card mb-6 flex flex-wrap items-end gap-4 p-4">
       {show.includes("city") && <Select label={t("ctl.city")} value={sel.city} onChange={(v) => { const first = wards.find((w) => v === "All" || w.city === v); set({ city: v, ward: v === "All" || list.some((w) => w.ward_id === sel.ward) && wards.find((w) => w.ward_id === sel.ward)?.city === v ? sel.ward : first?.ward_id ?? sel.ward }); }}
@@ -29,6 +38,7 @@ export default function ControlsBar({ show = ["city", "ward", "origin", "horizon
       {show.includes("origin") && (<div className="w-full flex-1 basis-full sm:basis-[260px]">
         <div className="mb-1 flex items-center justify-between"><span className="eyebrow">{t("ctl.origin")}</span><span className="text-sm font-semibold text-forest">{dateFmt(sel.origin, lang)}</span></div>
         <div className="flex items-center gap-2">
+          <Btn variant={playing ? "dark" : "ghost"} aria-label={playing ? "Pause time machine" : "Play time machine: step forward week by week"} aria-pressed={playing} title="Time machine: replay forecasts week by week" onClick={() => setPlaying((p) => !p)} className="!px-2.5">{playing ? "❚❚" : "▶"}</Btn>
           <Btn variant="ghost" aria-label="Previous week" onClick={() => setIdx(idx - 1)} className="!px-2.5">‹</Btn>
           <input type="range" aria-label={t("ctl.origin")} min={0} max={total} value={Math.min(idx, total)} onChange={(e) => setIdx(Number(e.target.value))} className="h-2 w-full accent-emerald" />
           <Btn variant="ghost" aria-label="Next week" onClick={() => setIdx(idx + 1)} className="!px-2.5">›</Btn></div>

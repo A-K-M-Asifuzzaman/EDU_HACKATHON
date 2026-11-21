@@ -11,6 +11,7 @@ import { ProvChip } from "./ui";
 import { CopilotFab } from "./chat";
 import Emergency from "./emergency";
 import Intro from "./intro";
+import Palette from "./palette";
 
 const NAV = [["/", "nav.command", "command"], ["/profiling/", "nav.profiling", "profiling"], ["/wards/", "nav.wards", "wards"], ["/geography/", "nav.geography", "geography"], ["/lab/", "nav.lab", "lab"], ["/copilot/", "nav.copilot", "copilot"],
   ["/evidence/", "nav.evidence", "evidence"], ["/response/", "nav.response", "response"], ["/climate/", "nav.climate", "climate"], ["/learn/", "nav.learn", "learn"], ["/provenance/", "nav.provenance", "provenance"]] as const;
@@ -25,12 +26,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <nav aria-label="Primary" className="flex flex-col gap-0.5">
       {NAV.map(([href, key, icon]) => { const a = isActive(href); return (
         <Link key={href} href={href} onClick={() => setOpen(false)} aria-current={a ? "page" : undefined}
-          className={cls("group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition", a ? "text-white" : "text-mint/80 hover:text-white")}>
-          {a && <motion.span layoutId="navpill" className="absolute inset-0 rounded-xl bg-white/12 ring-1 ring-white/15" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
+          className={cls("group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition", a ? "text-white" : "text-white/65 hover:bg-white/5 hover:text-white")}>
+          {a && <motion.span layoutId="navpill" className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/14 to-white/5 ring-1 ring-cyan/30 shadow-[inset_3px_0_0_0_#2bb5cf]" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
           <Icon name={icon} size={18} className="relative" /><span className="relative">{t(key)}</span></Link>); })}
     </nav>);
   const side = (
-    <div className="flex h-full flex-col bg-[radial-gradient(120%_80%_at_0%_0%,#0d5a42_0%,#073b2b_55%,#052a1f_100%)] p-4 text-white">
+    <div className="flex h-full flex-col bg-[radial-gradient(90%_50%_at_0%_0%,rgba(43,181,207,0.18)_0%,transparent_60%),radial-gradient(80%_45%_at_100%_100%,rgba(14,143,102,0.28)_0%,transparent_65%),linear-gradient(180deg,#0b1b2e_0%,#0b2433_55%,#0a2e27_100%)] p-4 text-white">
       <Link href="/" className="mb-6 flex items-center gap-2.5 px-1"><Logo /><div><div className="text-[17px] font-bold leading-none tracking-tight">DengueShield <span className="text-mint">AI</span></div>
         <div className="mt-1 text-[10.5px] leading-tight text-mint/70">{t("brand.tagline")}</div></div></Link>
       {nav}
@@ -52,11 +53,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <span className="hidden sm:inline-flex"><ProvChip>{t("fresh.model")}: {meta.model.bundle_version ? `v${meta.model.bundle_version}` : "—"} · {meta.model.features} features</ProvChip></span></>}
           {error && <ProvChip tone="warn">{t("state.offline")}</ProvChip>}
           <div className="ml-auto flex items-center gap-2">
+            <Palette pages={NAV} />
             <Emergency />
             <button onClick={() => setLang(lang === "en" ? "bn" : "en")} className="rounded-xl border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-forest shadow-sm hover:bg-mint-l" aria-label="Switch language">{t("lang.switch")}</button>
           </div>
         </div>
         <main id="main" className="mx-auto max-w-[1360px] px-4 py-6 sm:px-6">{children}</main>
+        <footer className="mx-auto max-w-[1360px] px-4 pb-24 pt-4 text-[11px] leading-relaxed text-ink-3 sm:px-6">
+          <div className="border-t border-line pt-4"><b className="text-ink-2">DengueShield AI</b> · Historical Replay on the organizers' synthetic dataset (2016–2024); the 2025 test year is locked. Not live surveillance, not medical advice.
+            <br />Sources: organizer dataset (EDU AI Engineering Hackathon 2026) · hospitals, clinics and roads © OpenStreetMap contributors (ODbL) · basemap © MapTiler © OpenStreetMap · weather: NASA POWER, Open-Meteo (CC BY 4.0) · boundaries: DGHS Bangladesh GIS · Copilot: OpenAI (server-side). Emergency: call 999.</div></footer>
         <Intro />
       </div>
       <CopilotFab />
