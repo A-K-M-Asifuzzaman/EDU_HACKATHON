@@ -21,7 +21,9 @@ small statistical model fitted offline; the optional LLM and weather providers s
  │  /api/forecast*, /risk/wards, /reports/*   live inference: ForecastBundle.predict()    │
  │                                            (LRU cache by origin, horizon)              │
  │  /api/model/*, /data/*                     precomputed artifacts in app_data/          │
- │  /api/assistant/chat   (SSE)               RAG: BM25 + embeddings → 6 read-only tools  │──► OpenAI
+ │  /api/decision/*                           alert simulator + resource sandbox          │
+ │                                            (saved 2019-2024 replay only; no refitting) │
+ │  /api/assistant/chat   (SSE)               RAG: BM25 + embeddings → 7 read-only tools  │──► OpenAI
  │  /api/climate/*, /weather/*                NASA POWER + Open-Meteo, cached, optional   │──► NASA POWER / Open-Meteo
  │  /api/facilities, /api/route,              OSM facilities + A* on directed road graphs │
  │  /api/emergency/*                          (app_data/geo, ODbL; built offline)          │
@@ -95,6 +97,7 @@ Interactive API reference: `/docs` (FastAPI OpenAPI) once running.
 | OpenAI | Backend only, key from `.env`. `gpt-5.4-mini` for answers, `text-embedding-3-small` (512 dims) for retrieval; the document index is built once into `app_data/rag_index.npz`. Output capped at 900 tokens, 30 requests/hour, request-size limits, a USD budget guard (`OPENAI_BUDGET_USD`, default 1.00), response cache, usage log without message content. Measured ≈ $0.002-0.004 per answer. Without a key, Copilot falls back to retrieval-only |
 | NASA POWER | Per-city daily point query, 40 s timeout, memory + disk cache (`.cache/weather`), history TTL 24 h, stale fallback when the provider is down |
 | Open-Meteo | Archive (24 h TTL) and forecast/current (10 min / 1 h TTL), 15-40 s timeouts, same stale fallback. Free non-commercial tier; attribution shown |
+| Decision tools | `dengueshield/decision.py` reads only the saved out-of-time replay (2019–2024) and pre-origin observations: alert curve 15 ms, allocation 8 ms, season allocation 375 ms, cached per query. No refitting, no 2025 data; the deployed alert rule is unchanged (`docs/decision_support.md`) |
 | Routing | Local and free: graphs load in ≈ 0.3 s; A* median 5.7 ms per route (400/400 equal to Dijkstra). OSM is queried only by the offline build script (3 requests, cached). MapTiler geocoding runs from the browser only when the user searches places |
 | DGHS GIS | Connect timeout 6 s, 60 s circuit breaker, paginated queries capped at 3,000 features, boundaries cached 7 days with stale fallback; no key needed |
 | Deployment access | Optional shared password (`ACCESS_PASSWORD`, HTTP Basic) for private previews; per-client Copilot rate limit works behind the platform proxy. See `docs/deployment.md` |
@@ -105,6 +108,6 @@ If any external service fails, the affected panel shows a status message; every 
 
 ## 6. Testing
 
-- `pytest tests`: 234 tests (leakage, feature alignment, models, bundle invariants, API contracts, A* vs Dijkstra, one-way handling, regressions).
-- `cd frontend && npx playwright test`: 21 end-to-end tests (all routes, map routing, emergency help, intro, console errors, mobile overflow, Bangla, Copilot markdown
+- `pytest tests`: 244 tests (leakage, feature alignment, models, bundle invariants, API contracts, A* vs Dijkstra, one-way handling, decision tools without look-ahead, regressions).
+- `cd frontend && npx playwright test`: 26 end-to-end tests (all routes, map routing and A* insight, emergency help, intro, reliability center, alert simulator, resource sandbox, brief, search, console errors, mobile overflow, Bangla, Copilot markdown
   sanitisation, 3D fallback, secret scan of served assets).

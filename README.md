@@ -42,22 +42,22 @@ pip time and a 36 s first import before the API was ready), so we do not claim a
 
 | Page | Purpose |
 |---|---|
-| Command Center | Forecast, calibrated interval, outbreak probability and risk tier for any ward, origin week and horizon; city map; Historical Replay |
+| Command Center | Hero with the selected week's forecast and validated performance (MAE by horizon, interval coverage incl. the peak weakness); forecast, calibrated intervals, outbreak probability and risk tier for any ward, origin and horizon; **time machine** (▶ steps through real weekly forecasts) with a verdict row (error, interval hit, alert outcome) on validation weeks; downloadable **intelligence brief** |
 | Data Profiling Studio | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
 | Ward Risk Explorer | Rank and filter all 60 wards by tier or alert |
 | Map & Emergency Routing | The app's single map: 914 OpenStreetMap hospitals and clinics (clustered, searchable, click-to-call), A* routing on the directed OSM road graph (fastest vs shortest, each verified against Dijkstra), nearest hospitals by road time, city-level forecast and weather overlays, optional DGHS boundaries and 3D buildings. Facility data are community-mapped, not DGHS-verified; no live beds or doctors. See `docs/geospatial_routing.md` |
 | AI Forecast Lab | Horizon comparison, driver contributions, uncertainty fan |
 | Copilot | Chat grounded in the app's data and docs (OpenAI Responses API, read-only tools, citations, English and Bangla) |
-| Model Evidence | Leaderboard, validation per season, calibration, known weaknesses |
-| Response Intelligence | Turn forecasts into resource-planning signals |
+| Model Evidence | **Reliability center** (per-horizon MAE/RMSE/bias, alert recall/precision/false alerts, coverage and width, peak coverage 0.607/0.740, error by outcome size, MAE by season, reliability diagram) and the **alert policy simulator** (retrospective; deployed rule vs nested re-selection vs optimistic in-sample); leaderboard, seasons, calibration, importance, limitations |
+| Response Intelligence | Generic response options plus the **resource planning sandbox**: N teams allocated risk-blind vs by historical risk vs by forecast, with retrospective coverage of actual outbreak wards (planning simulation only) |
 | Climate Observatory | Real NASA POWER and Open-Meteo observations/forecast, shown separately from the synthetic organizer data |
 | Learn | Rainfall-to-cases explainer; optional lightweight 3D mosquito (procedural, no external model) |
 | System & Provenance | Versions, data checksums, integrations status, methodology documents |
 
-An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
+Global search (⌘K / Ctrl K) jumps to any page, forecast ward or hospital. An **Emergency help** button on every page gives tap-to-call 999 and 16263, WHO dengue warning signs and the nearest hospitals by road. A short interactive intro (swat the mosquito) plays once per session; it is skipped under reduced motion and has Skip and Emergency buttons.
 
 The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**.
-Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
+Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
 
 ## Status
 
@@ -89,7 +89,7 @@ recall 0.78 (precision 0.53). Details and limitations: `docs/model_selection.md`
 | Web platform | `dengueshield/api/`, `frontend/`, `app_data/`, `ARCHITECTURE.md` |
 | Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; API in `dengueshield/inference/`; `docs/stage4_handoff.md` |
 | One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
-| Leakage, alignment, model and bundle tests | `tests/` (234 tests) |
+| Leakage, alignment, model and bundle tests | `tests/` (244 tests) |
 
 ## Manual setup, research stack (Python 3.12)
 
@@ -102,7 +102,7 @@ pip install -r requirements-research.txt   # adds XGBoost, CatBoost, Optuna, Jup
 ## Reproduce
 
 ```bash
-pytest                                   # 234 tests; the real-data ones skip if the CSV is absent
+pytest                                   # 244 tests; the real-data ones skip if the CSV is absent
 for nb in 01_data_audit 02_eda 03_validation_and_baselines 04_feature_engineering 05_feature_ablation 06_feature_selection 07_model_tournament 08_model_diagnostics; do
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=7200 notebooks/$nb.ipynb
 done
