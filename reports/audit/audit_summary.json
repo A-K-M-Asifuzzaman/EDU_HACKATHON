@@ -1,0 +1,273 @@
+{
+  "file": {
+    "path": "data/raw/bangladesh_dengue_large_dataset.csv",
+    "sha256": "a4088765084a0bcf37b86222e22f89d06ef92ad2ac68a40c8057a21e13703dd7",
+    "sha256_matches_expected": true,
+    "bytes": 2581377,
+    "rows": 31320,
+    "n_columns": 12
+  },
+  "parse_failures": {
+    "date": 0,
+    "population_density_sqkm": 0,
+    "water_logging_risk_index": 0,
+    "sanitation_score": 0,
+    "avg_temp_c": 0,
+    "max_temp_c": 0,
+    "min_temp_c": 0,
+    "rainfall_mm": 0,
+    "relative_humidity_pct": 0,
+    "dengue_cases": 0
+  },
+  "missing_values": {
+    "date": 0,
+    "city": 0,
+    "ward_id": 0,
+    "population_density_sqkm": 0,
+    "water_logging_risk_index": 0,
+    "sanitation_score": 0,
+    "avg_temp_c": 0,
+    "max_temp_c": 0,
+    "min_temp_c": 0,
+    "rainfall_mm": 0,
+    "relative_humidity_pct": 0,
+    "dengue_cases": 0
+  },
+  "duplicate_rows": 0,
+  "duplicate_ward_date": 0,
+  "cases_non_integer": 0,
+  "cases_negative": 0,
+  "calendar": {
+    "first": "2016-01-04",
+    "last": "2025-12-29",
+    "unique_dates": 522,
+    "expected_weekly_dates": 522,
+    "missing_weeks": [],
+    "weekday_counts": {
+      "Monday": 31320
+    },
+    "weeks_per_year": {
+      "2016": 52,
+      "2017": 52,
+      "2018": 53,
+      "2019": 52,
+      "2020": 52,
+      "2021": 52,
+      "2022": 52,
+      "2023": 52,
+      "2024": 53,
+      "2025": 52
+    },
+    "step_days_counts": {
+      "7": 31260
+    },
+    "rows_per_ward": [
+      522
+    ]
+  },
+  "geography": {
+    "wards_per_city": {
+      "Chattogram": 10,
+      "Dhaka North": 20,
+      "Dhaka South": 20,
+      "Gazipur": 5,
+      "Narayanganj": 5
+    },
+    "total_wards": 60,
+    "wards_in_multiple_cities": 0,
+    "ward_prefix_city_mismatches": 0
+  },
+  "attribute_variation": {
+    "city": "static_per_ward",
+    "population_density_sqkm": "static_per_ward",
+    "water_logging_risk_index": "static_per_ward",
+    "sanitation_score": "static_per_ward",
+    "avg_temp_c": "time_varying",
+    "max_temp_c": "time_varying",
+    "min_temp_c": "time_varying",
+    "rainfall_mm": "time_varying",
+    "relative_humidity_pct": "time_varying",
+    "dengue_cases": "time_varying"
+  },
+  "ranges": {
+    "min": {
+      "population_density_sqkm": 18314.0,
+      "water_logging_risk_index": 0.22,
+      "sanitation_score": 0.25,
+      "avg_temp_c": 15.74,
+      "max_temp_c": 23.12,
+      "min_temp_c": 13.06,
+      "rainfall_mm": 0.0,
+      "relative_humidity_pct": 41.84,
+      "dengue_cases": 0.0
+    },
+    "25%": {
+      "population_density_sqkm": 30573.5,
+      "water_logging_risk_index": 0.378,
+      "sanitation_score": 0.38,
+      "avg_temp_c": 22.88,
+      "max_temp_c": 27.85,
+      "min_temp_c": 18.0,
+      "rainfall_mm": 0.92,
+      "relative_humidity_pct": 60.468,
+      "dengue_cases": 0.0
+    },
+    "50%": {
+      "population_density_sqkm": 42854.0,
+      "water_logging_risk_index": 0.545,
+      "sanitation_score": 0.57,
+      "avg_temp_c": 26.85,
+      "max_temp_c": 31.505,
+      "min_temp_c": 21.67,
+      "rainfall_mm": 8.37,
+      "relative_humidity_pct": 68.22,
+      "dengue_cases": 0.0
+    },
+    "75%": {
+      "population_density_sqkm": 54168.25,
+      "water_logging_risk_index": 0.82,
+      "sanitation_score": 0.712,
+      "avg_temp_c": 31.022,
+      "max_temp_c": 35.99,
+      "min_temp_c": 25.97,
+      "rainfall_mm": 59.42,
+      "relative_humidity_pct": 83.98,
+      "dengue_cases": 4.0
+    },
+    "max": {
+      "population_density_sqkm": 74252.0,
+      "water_logging_risk_index": 0.94,
+      "sanitation_score": 0.88,
+      "avg_temp_c": 37.51,
+      "max_temp_c": 40.79,
+      "min_temp_c": 31.64,
+      "rainfall_mm": 268.83,
+      "relative_humidity_pct": 99.0,
+      "dengue_cases": 41.0
+    },
+    "mean": {
+      "population_density_sqkm": 43157.733,
+      "water_logging_risk_index": 0.579,
+      "sanitation_score": 0.555,
+      "avg_temp_c": 26.923,
+      "max_temp_c": 31.889,
+      "min_temp_c": 21.949,
+      "rainfall_mm": 35.63,
+      "relative_humidity_pct": 71.176,
+      "dengue_cases": 2.636
+    },
+    "std": {
+      "population_density_sqkm": 14865.378,
+      "water_logging_risk_index": 0.238,
+      "sanitation_score": 0.192,
+      "avg_temp_c": 4.482,
+      "max_temp_c": 4.517,
+      "min_temp_c": 4.528,
+      "rainfall_mm": 50.238,
+      "relative_humidity_pct": 12.969,
+      "dengue_cases": 4.608
+    }
+  },
+  "plausibility": {
+    "min_temp_gt_avg": 0,
+    "avg_temp_gt_max": 0,
+    "rainfall_negative": 0,
+    "humidity_outside_0_100": 0,
+    "humidity_exactly_99": 89,
+    "humidity_max": 99.0,
+    "weekly_rain_gt_200mm": 361,
+    "avg_temp_outside_10_40": 0,
+    "index_outside_0_1": 0
+  },
+  "weather_outliers_robust_z_gt5_within_month": {
+    "avg_temp_c": 0,
+    "max_temp_c": 60,
+    "min_temp_c": 0,
+    "rainfall_mm": 1091,
+    "relative_humidity_pct": 193
+  },
+  "synthetic_fingerprints": {
+    "avg_temp_c": {
+      "mean_within_city_week_sd": 0.581,
+      "sd_of_city_week_means": 4.446,
+      "min_corr_city_vs_national_weekly_mean": 0.9983
+    },
+    "rainfall_mm": {
+      "mean_within_city_week_sd": 3.955,
+      "sd_of_city_week_means": 50.086,
+      "min_corr_city_vs_national_weekly_mean": 0.9993
+    },
+    "relative_humidity_pct": {
+      "mean_within_city_week_sd": 2.41,
+      "sd_of_city_week_means": 12.756,
+      "min_corr_city_vs_national_weekly_mean": 0.9965
+    },
+    "max_minus_avg_temp": {
+      "mean": 4.966,
+      "std": 1.044,
+      "min": 1.6,
+      "max": 8.36
+    },
+    "avg_minus_min_temp": {
+      "mean": 4.973,
+      "std": 1.065,
+      "min": 1.6,
+      "max": 8.39
+    },
+    "corr_avg_vs_midrange_temp": 0.9814,
+    "max_decimals_weather": 2,
+    "share_rain_exactly_zero_by_month": {
+      "1": 0.393,
+      "2": 0.389,
+      "3": 0.384,
+      "4": 0.044,
+      "5": 0.06,
+      "6": 0.0,
+      "7": 0.0,
+      "8": 0.0,
+      "9": 0.026,
+      "10": 0.414,
+      "11": 0.417,
+      "12": 0.422
+    },
+    "monthly_mean_rainfall": {
+      "1": 2.99,
+      "2": 3.23,
+      "3": 3.53,
+      "4": 16.36,
+      "5": 24.3,
+      "6": 94.15,
+      "7": 94.21,
+      "8": 94.4,
+      "9": 85.21,
+      "10": 2.77,
+      "11": 2.89,
+      "12": 2.87
+    },
+    "zero_case_share_sd_across_wards": 0.0264,
+    "dates_all_monday": true
+  },
+  "target": {
+    "zero_share": 0.5803,
+    "mean": 2.6364,
+    "variance": 21.2312,
+    "dispersion_index": 8.053,
+    "median_dispersion_within_ward_month_cells": 2.664,
+    "max": 41,
+    "total_cases": 82572
+  },
+  "hard_checks": {
+    "checksum": true,
+    "column_order_matches_spec": true,
+    "no_parse_failures": true,
+    "no_missing": true,
+    "no_duplicate_ward_date": true,
+    "cases_nonnegative_integer": true,
+    "no_missing_weeks": true,
+    "all_steps_7_days": true,
+    "balanced_panel": true,
+    "one_city_per_ward": true,
+    "ward_prefix_matches_city": true
+  },
+  "hard_failures": []
+}
