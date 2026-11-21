@@ -1,0 +1,378 @@
+{
+  "annual_totals_2016_2024": {
+    "2016": 9151,
+    "2017": 8481,
+    "2018": 6621,
+    "2019": 9967,
+    "2020": 7669,
+    "2021": 6530,
+    "2022": 10013,
+    "2023": 9955,
+    "2024": 6760
+  },
+  "ward_mean_cases_range_dev": [
+    1.323,
+    4.096
+  ],
+  "national_peak_week_by_year": {
+    "2016": 31,
+    "2017": 35,
+    "2018": 39,
+    "2019": 32,
+    "2020": 40,
+    "2021": 38,
+    "2022": 26,
+    "2023": 32,
+    "2024": 35
+  },
+  "city_peak_week_range_within_year_max": 6,
+  "active_season_weeks_mean_ge_1": {
+    "2016": {
+      "min": 18,
+      "max": 41
+    },
+    "2017": {
+      "min": 18,
+      "max": 42
+    },
+    "2018": {
+      "min": 22,
+      "max": 41
+    },
+    "2019": {
+      "min": 21,
+      "max": 41
+    },
+    "2020": {
+      "min": 20,
+      "max": 43
+    },
+    "2021": {
+      "min": 21,
+      "max": 41
+    },
+    "2022": {
+      "min": 24,
+      "max": 41
+    },
+    "2023": {
+      "min": 21,
+      "max": 41
+    },
+    "2024": {
+      "min": 17,
+      "max": 41
+    }
+  },
+  "monsoon": {
+    "2016": {
+      "onset": "2016-04-25",
+      "end": "2016-09-26",
+      "weeks_onset_to_mean_ge_1": "1",
+      "weeks_onset_to_peak": "14",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2017": {
+      "onset": "2017-04-10",
+      "end": "2017-09-25",
+      "weeks_onset_to_mean_ge_1": "3",
+      "weeks_onset_to_peak": "20",
+      "weeks_end_to_mean_lt_1": "4"
+    },
+    "2018": {
+      "onset": "2018-06-04",
+      "end": "2018-09-24",
+      "weeks_onset_to_mean_ge_1": "3",
+      "weeks_onset_to_peak": "16",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2019": {
+      "onset": "2019-05-06",
+      "end": "2019-09-23",
+      "weeks_onset_to_mean_ge_1": "2",
+      "weeks_onset_to_peak": "13",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2020": {
+      "onset": "2020-04-20",
+      "end": "2020-09-21",
+      "weeks_onset_to_mean_ge_1": "3",
+      "weeks_onset_to_peak": "23",
+      "weeks_end_to_mean_lt_1": "5"
+    },
+    "2021": {
+      "onset": "2021-05-31",
+      "end": "2021-09-27",
+      "weeks_onset_to_mean_ge_1": "0",
+      "weeks_onset_to_peak": "16",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2022": {
+      "onset": "2022-05-30",
+      "end": "2022-09-26",
+      "weeks_onset_to_mean_ge_1": "2",
+      "weeks_onset_to_peak": "4",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2023": {
+      "onset": "2023-05-01",
+      "end": "2023-09-25",
+      "weeks_onset_to_mean_ge_1": "3",
+      "weeks_onset_to_peak": "14",
+      "weeks_end_to_mean_lt_1": "3"
+    },
+    "2024": {
+      "onset": "2024-04-01",
+      "end": "2024-09-23",
+      "weeks_onset_to_mean_ge_1": "3",
+      "weeks_onset_to_peak": "21",
+      "weeks_end_to_mean_lt_1": "3"
+    }
+  },
+  "ccf_peak_lag": {
+    "raw|rainfall_mm": 3,
+    "raw|avg_temp_c": 8,
+    "raw|relative_humidity_pct": 2,
+    "seasonal_anomaly|rainfall_mm": 3,
+    "seasonal_anomaly|avg_temp_c": 1,
+    "seasonal_anomaly|relative_humidity_pct": 7,
+    "in_season_raw|rainfall_mm": 3,
+    "in_season_raw|avg_temp_c": 8,
+    "in_season_raw|relative_humidity_pct": 2
+  },
+  "ccf_rain": {
+    "0": {
+      "raw": 0.559,
+      "seasonal_anomaly": 0.092,
+      "in_season_raw": 0.263
+    },
+    "1": {
+      "raw": 0.621,
+      "seasonal_anomaly": 0.129,
+      "in_season_raw": 0.359
+    },
+    "2": {
+      "raw": 0.685,
+      "seasonal_anomaly": 0.191,
+      "in_season_raw": 0.466
+    },
+    "3": {
+      "raw": 0.738,
+      "seasonal_anomaly": 0.426,
+      "in_season_raw": 0.556
+    },
+    "4": {
+      "raw": 0.685,
+      "seasonal_anomaly": 0.308,
+      "in_season_raw": 0.45
+    },
+    "5": {
+      "raw": 0.555,
+      "seasonal_anomaly": 0.006,
+      "in_season_raw": 0.223
+    },
+    "6": {
+      "raw": 0.508,
+      "seasonal_anomaly": 0.048,
+      "in_season_raw": 0.199
+    },
+    "7": {
+      "raw": 0.46,
+      "seasonal_anomaly": 0.044,
+      "in_season_raw": 0.167
+    },
+    "8": {
+      "raw": 0.382,
+      "seasonal_anomaly": -0.055,
+      "in_season_raw": 0.129
+    }
+  },
+  "adjusted_glm": {
+    "deviance_explained": 0.8567,
+    "pearson_dispersion": 1.194,
+    "rain_coef_by_lag": {
+      "0": 0.00037,
+      "1": 0.00035,
+      "2": 0.00263,
+      "3": 0.00551,
+      "4": 0.0042,
+      "5": 0.00116,
+      "6": 0.00045,
+      "7": 0.00023,
+      "8": -0.00049
+    },
+    "static_coefs": {
+      "dens_10k": 0.0751,
+      "water_logging_risk_index": 0.8795,
+      "sanitation_score": -0.3541
+    }
+  },
+  "static_spearman_with_peak_season_cases": {
+    "water_logging_risk_index": 0.809,
+    "sanitation_score": -0.41,
+    "population_density_sqkm": 0.536
+  },
+  "ward_level_log_cases_R2_from_statics": 0.961,
+  "interaction_lr_tests": {
+    "rain_l3:water_logging_risk_index": {
+      "LR_stat": 1.152,
+      "p_value": 0.2831
+    },
+    "rain_l3:sanitation_score": {
+      "LR_stat": 0.4461,
+      "p_value": 0.5042
+    },
+    "rain_l3:dens_10k": {
+      "LR_stat": 0.4637,
+      "p_value": 0.4959
+    },
+    "water_logging_risk_index:sanitation_score": {
+      "LR_stat": 19.6245,
+      "p_value": 0.0
+    },
+    "water_logging_risk_index:dens_10k": {
+      "LR_stat": 25.0545,
+      "p_value": 0.0
+    },
+    "rh_l2:water_logging_risk_index": {
+      "LR_stat": 3.9044,
+      "p_value": 0.0482
+    }
+  },
+  "acf": {
+    "ward_lag": {
+      "1": 0.738,
+      "2": 0.652,
+      "3": 0.582,
+      "4": 0.497,
+      "52": 0.546
+    },
+    "ward_anomaly_lag": {
+      "1": 0.254,
+      "2": 0.15,
+      "3": 0.106,
+      "4": 0.068,
+      "52": -0.193
+    },
+    "ward_pacf_lag": {
+      "1": 0.741,
+      "2": 0.257,
+      "3": 0.103,
+      "4": -0.018
+    }
+  },
+  "outbreak_threshold_q90_2016_2021": 9.0,
+  "transitions": {
+    "h1": {
+      "P_outbreak_given_zero": 0.0013,
+      "P_outbreak_stays": 0.5524
+    },
+    "h2": {
+      "P_outbreak_given_zero": 0.0034,
+      "P_outbreak_stays": 0.4971
+    },
+    "h4": {
+      "P_outbreak_given_zero": 0.0086,
+      "P_outbreak_stays": 0.391
+    }
+  },
+  "outbreak_weeks_preceded_by_zero": {
+    "2w_before": 0.0176,
+    "3w_before": 0.0219,
+    "4w_before": 0.0438
+  },
+  "city_profile_shape_corr_min": 0.9954,
+  "city_peak_week_of_mean_profile": {
+    "Dhaka North": 35,
+    "Dhaka South": 32,
+    "Chattogram": 32,
+    "Gazipur": 35,
+    "Narayanganj": 35
+  },
+  "ward_weather_deviation_corr_lag3": {
+    "rainfall_mm": 0.0696,
+    "relative_humidity_pct": 0.0085,
+    "avg_temp_c": 0.014
+  },
+  "extreme_weather": {
+    "counts": {
+      "extreme rain": {
+        "ward_weeks": 939,
+        "distinct_dates": 24
+      },
+      "extreme heat": {
+        "ward_weeks": 939,
+        "distinct_dates": 67
+      },
+      "extreme humidity": {
+        "ward_weeks": 939,
+        "distinct_dates": 91
+      }
+    },
+    "peak_response": {
+      "extreme rain": [
+        3,
+        3.221
+      ],
+      "extreme heat": [
+        1,
+        0.057
+      ],
+      "extreme humidity": [
+        7,
+        0.516
+      ]
+    }
+  },
+  "severity_rain_corr": {
+    "2016_2024": 0.923,
+    "2016_2021": 0.916
+  },
+  "artifacts": {
+    "anomaly_corr_same_city_mean": 0.5189,
+    "anomaly_corr_diff_city_mean": 0.5223,
+    "mean_cases_iso_week_52_53_1_2": {
+      "52": 0.0037,
+      "53": 0.0,
+      "1": 0.0017,
+      "2": 0.0056
+    },
+    "share_even_among_positive": 0.429,
+    "share_multiples_of_5_among_counts_ge_5": 0.2577,
+    "share_cases_in_jan_mar_nov_dec": 0.0035
+  },
+  "rain_l3_coef_by_year_x10": {
+    "2016": 0.0769,
+    "2017": 0.0554,
+    "2018": 0.0804,
+    "2019": 0.0628,
+    "2020": 0.0575,
+    "2021": 0.108,
+    "2022": 0.0536,
+    "2023": 0.0824,
+    "2024": 0.0662
+  },
+  "weather_predictability": {
+    "rain_anomaly_acf": {
+      "1": 0.039,
+      "2": -0.004,
+      "3": 0.144,
+      "4": -0.013
+    },
+    "humidity_anomaly_acf": {
+      "1": -0.031,
+      "2": 0.011,
+      "3": 0.029,
+      "4": 0.05
+    },
+    "temp_anomaly_acf": {
+      "1": 0.009,
+      "2": 0.15,
+      "3": 0.016,
+      "4": 0.052
+    },
+    "P_wet_t_plus_2_given_wet_t": 0.811,
+    "P_wet_t_plus_2_given_dry_t": 0.098,
+    "rain_variance_explained_by_ward_week_climatology": 0.732
+  }
+}

@@ -1,0 +1,46 @@
+city,year,peak_week,peak_mean_cases_per_ward
+Chattogram,2016,32,18.6
+Chattogram,2017,35,15.9
+Chattogram,2018,39,9.5
+Chattogram,2019,32,17.7
+Chattogram,2020,40,11.9
+Chattogram,2021,38,12.0
+Chattogram,2022,26,16.8
+Chattogram,2023,32,20.7
+Chattogram,2024,35,14.1
+Dhaka North,2016,31,19.15
+Dhaka North,2017,35,13.4
+Dhaka North,2018,37,10.95
+Dhaka North,2019,32,16.7
+Dhaka North,2020,40,13.3
+Dhaka North,2021,38,10.35
+Dhaka North,2022,26,15.8
+Dhaka North,2023,32,17.45
+Dhaka North,2024,35,13.55
+Dhaka South,2016,31,19.15
+Dhaka South,2017,35,13.9
+Dhaka South,2018,37,10.1
+Dhaka South,2019,32,17.05
+Dhaka South,2020,40,12.15
+Dhaka South,2021,38,10.65
+Dhaka South,2022,26,15.2
+Dhaka South,2023,32,17.3
+Dhaka South,2024,35,13.4
+Gazipur,2016,31,21.8
+Gazipur,2017,41,17.8
+Gazipur,2018,36,12.8
+Gazipur,2019,30,20.2
+Gazipur,2020,40,19.0
+Gazipur,2021,34,13.4
+Gazipur,2022,26,16.8
+Gazipur,2023,32,24.2
+Gazipur,2024,35,21.8
+Narayanganj,2016,31,16.4
+Narayanganj,2017,41,13.4
+Narayanganj,2018,39,10.6
+Narayanganj,2019,32,16.6
+Narayanganj,2020,40,14.0
+Narayanganj,2021,38,12.2
+Narayanganj,2022,26,14.2
+Narayanganj,2023,32,16.8
+Narayanganj,2024,35,13.4
