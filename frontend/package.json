@@ -1,0 +1,41 @@
+{
+  "name": "dengueshield-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "npx serve out -l 3000",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "prebuild": "node scripts/copy-maplibre.mjs",
+    "predev": "node scripts/copy-maplibre.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource/noto-sans-bengali": "5.3.0",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
+    "echarts": "6.1.0",
+    "gsap": "3.15.1",
+    "maplibre-gl": "6.19.0",
+    "motion": "14.14.0",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "rehype-sanitize": "6.0.0",
+    "remark-gfm": "4.0.1",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@tailwindcss/postcss": "4.3.5",
+    "@types/node": "^22.0.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.187.0",
+    "tailwindcss": "4.3.5",
+    "typescript": "~5.9.0"
+  }
+}

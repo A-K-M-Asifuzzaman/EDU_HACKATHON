@@ -17,3 +17,5 @@ __pycache__/
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+public/maplibre/
+frontend/tsconfig.tsbuildinfo
