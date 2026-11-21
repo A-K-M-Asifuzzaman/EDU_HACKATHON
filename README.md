@@ -27,6 +27,13 @@ Optional keys (the app runs without them, with the affected feature disabled):
 
 Both files are git-ignored. NASA POWER and Open-Meteo need no key.
 
+### Fresh-clone measurement
+
+Measured 21 Nov 2026 on the development Mac (Apple silicon, broadband): `git clone` of the repository followed by `PORT=8200 ./scripts/launch.sh`
+reached a healthy API serving the dashboard in **55 s**, and the first forecast request returned in 0.13 s. This used **warm pip and npm caches** and
+a clone of the local repository, not of GitHub. A cold-cache run will take longer (the first Stage 4 runtime install in a fresh venv alone took 20 s of
+pip time and a 36 s first import before the API was ready), so we do not claim a three-minute figure for every machine; re-measure on the target machine.
+
 ## What is in the app (Stage 4)
 
 | Page | Purpose |
@@ -34,6 +41,7 @@ Both files are git-ignored. NASA POWER and Open-Meteo need no key.
 | Command Center | Forecast, calibrated interval, outbreak probability and risk tier for any ward, origin week and horizon; city map; Historical Replay |
 | Data Profiling Studio | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
 | Ward Risk Explorer | Rank and filter all 60 wards by tier or alert |
+| Geography (DGHS) | Official DGHS ward boundaries (ArcGIS REST, filtered by district/city/ward) as context only, beside the abstract ward-risk matrix. Boundaries are never joined to the synthetic ward IDs; hidden gracefully if the service is unreachable. See `docs/dghs_gis_integration.md` |
 | AI Forecast Lab | Horizon comparison, driver contributions, uncertainty fan |
 | Copilot | Chat grounded in the app's data and docs (OpenAI Responses API, read-only tools, citations, English and Bangla) |
 | Model Evidence | Leaderboard, validation per season, calibration, known weaknesses |
@@ -75,7 +83,7 @@ recall 0.78 (precision 0.53). Details and limitations: `docs/model_selection.md`
 | Web platform | `dengueshield/api/`, `frontend/`, `app_data/`, `ARCHITECTURE.md` |
 | Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; API in `dengueshield/inference/`; `docs/stage4_handoff.md` |
 | One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
-| Leakage, alignment, model and bundle tests | `tests/` (212 tests) |
+| Leakage, alignment, model and bundle tests | `tests/` (225 tests) |
 
 ## Manual setup, research stack (Python 3.12)
 
@@ -88,7 +96,7 @@ pip install -r requirements-research.txt   # adds XGBoost, CatBoost, Optuna, Jup
 ## Reproduce
 
 ```bash
-pytest                                   # 212 tests; the real-data ones skip if the CSV is absent
+pytest                                   # 225 tests; the real-data ones skip if the CSV is absent
 for nb in 01_data_audit 02_eda 03_validation_and_baselines 04_feature_engineering 05_feature_ablation 06_feature_selection 07_model_tournament 08_model_diagnostics; do
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=7200 notebooks/$nb.ipynb
 done
@@ -116,7 +124,8 @@ All AI-written code and conclusions were produced under the team's direction; nu
 - **External APIs at runtime (all optional; the app degrades gracefully if any is unavailable):**
   - OpenAI (Responses API `gpt-5.4-mini`; Embeddings `text-embedding-3-small`): Copilot only, called from the backend, key never sent to the browser.
   - NASA POWER daily point API and Open-Meteo (archive and forecast): real weather in the Climate Observatory, with attribution; never used to train or feed the forecasting model.
-  - MapTiler tiles: city map background.
+  - MapTiler tiles: map background.
+  - DGHS Bangladesh GIS (ArcGIS REST FeatureServer): official ward boundaries, display only. Access and reuse terms could not be verified from the development network; see `docs/dghs_gis_integration.md`.
   - Dataset download from the organizers' shared sheet (`scripts/fetch_data.py`).
 - The forecasts themselves need no external service: they run locally from the committed 11 KB bundle.
 - **Package downloads:** Python packages from PyPI (`requirements.txt` for the app, `requirements-research.txt` for the research notebooks) and npm packages for the frontend (`frontend/package-lock.json`).
