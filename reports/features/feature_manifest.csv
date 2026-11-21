@@ -1,0 +1,205 @@
+feature,family,subfamily,description,avail_A_h2,avail_A_h3,avail_A_h4,avail_B_h2,avail_B_h3,avail_B_h4
+cal_tgt_sin1,calendar,fourier,Fourier harmonic 1 of target-week midpoint day of year,3,3,3,3,3,3
+cal_tgt_cos1,calendar,fourier,Fourier harmonic 1 (cos),3,3,3,3,3,3
+cal_tgt_sin2,calendar,fourier,Fourier harmonic 2 of target-week midpoint day of year,3,3,3,3,3,3
+cal_tgt_cos2,calendar,fourier,Fourier harmonic 2 (cos),3,3,3,3,3,3
+cal_tgt_sin3,calendar,fourier,Fourier harmonic 3 of target-week midpoint day of year,3,3,3,3,3,3
+cal_tgt_cos3,calendar,fourier,Fourier harmonic 3 (cos),3,3,3,3,3,3
+cal_org_sin1,calendar,fourier,origin-week harmonic,3,3,3,3,3,3
+cal_org_cos1,calendar,fourier,origin-week harmonic (cos),3,3,3,3,3,3
+cal_org_sin2,calendar,fourier,origin-week harmonic,3,3,3,3,3,3
+cal_org_cos2,calendar,fourier,origin-week harmonic (cos),3,3,3,3,3,3
+cal_tgt_month,calendar,discrete,calendar month of target-week midpoint,3,3,3,3,3,3
+cal_tgt_isoweek,calendar,discrete,ISO week of target (week 53 folded into 52),3,3,3,3,3,3
+cal_tgt_monsoon,calendar,discrete,target midpoint in Jun-Sep (fixed calendar definition),3,3,3,3,3,3
+cal_org_monsoon,calendar,discrete,origin midpoint in Jun-Sep,3,3,3,3,3,3
+pop_density,static,raw,population density per km2 (not a population count),3,3,3,3,3,3
+log_pop_density,static,raw,log density,3,3,3,3,3,3
+waterlogging,static,raw,water_logging_risk_index,3,3,3,3,3,3
+sanitation,static,raw,sanitation_score,3,3,3,3,3,3
+rain_lag0,rain_lag,lag,rain 0 weeks before the latest observed week,1,1,1,1,1,1
+rain_lag1,rain_lag,lag,rain 1 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag2,rain_lag,lag,rain 2 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag3,rain_lag,lag,rain 3 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag4,rain_lag,lag,rain 4 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag5,rain_lag,lag,rain 5 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag6,rain_lag,lag,rain 6 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag7,rain_lag,lag,rain 7 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag8,rain_lag,lag,rain 8 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag10,rain_lag,lag,rain 10 weeks before the latest observed week,2,2,2,2,2,2
+rain_lag12,rain_lag,lag,rain 12 weeks before the latest observed week,2,2,2,2,2,2
+rain_sum2,rain_roll,sum,2-week rain sum,2,2,2,2,2,2
+rain_mean2,rain_roll,mean,2-week rain mean (rescaled duplicate of the sum),2,2,2,2,2,2
+rain_max2,rain_roll,max,2-week max weekly rain,2,2,2,2,2,2
+rain_sum3,rain_roll,sum,3-week rain sum,2,2,2,2,2,2
+rain_mean3,rain_roll,mean,3-week rain mean (rescaled duplicate of the sum),2,2,2,2,2,2
+rain_max3,rain_roll,max,3-week max weekly rain,2,2,2,2,2,2
+rain_std3,rain_roll,std,3-week rain SD,2,2,2,2,2,2
+rain_sum4,rain_roll,sum,4-week rain sum,2,2,2,2,2,2
+rain_mean4,rain_roll,mean,4-week rain mean (rescaled duplicate of the sum),2,2,2,2,2,2
+rain_max4,rain_roll,max,4-week max weekly rain,2,2,2,2,2,2
+rain_std4,rain_roll,std,4-week rain SD,2,2,2,2,2,2
+rain_sum6,rain_roll,sum,6-week rain sum,2,2,2,2,2,2
+rain_mean6,rain_roll,mean,6-week rain mean (rescaled duplicate of the sum),2,2,2,2,2,2
+rain_max6,rain_roll,max,6-week max weekly rain,2,2,2,2,2,2
+rain_std6,rain_roll,std,6-week rain SD,2,2,2,2,2,2
+rain_sum8,rain_roll,sum,8-week rain sum,2,2,2,2,2,2
+rain_mean8,rain_roll,mean,8-week rain mean (rescaled duplicate of the sum),2,2,2,2,2,2
+rain_max8,rain_roll,max,8-week max weekly rain,2,2,2,2,2,2
+rain_std8,rain_roll,std,8-week rain SD,2,2,2,2,2,2
+rain_wetfreq4,rain_roll,wetfreq,share of the last 4 weeks above the fitted wet threshold,2,2,2,2,2,2
+rain_wetfreq8,rain_roll,wetfreq,share of the last 8 weeks above the fitted wet threshold,2,2,2,2,2,2
+rain_wetfreq12,rain_roll,wetfreq,share of the last 12 weeks above the fitted wet threshold,2,2,2,2,2,2
+rain_consec_wet,rain_roll,run,consecutive wet weeks ending at the latest observed week,2,2,2,2,2,2
+rain_consec_dry,rain_roll,run,consecutive dry weeks,2,2,2,2,2,2
+rain_momentum,rain_roll,shape,2-week mean minus the previous 2-week mean,2,2,2,2,2,2
+rain_accel,rain_roll,shape,change in rain momentum,2,2,2,2,2,2
+rain_trend4,rain_roll,shape,OLS slope of weekly rain over 4 weeks,2,2,2,2,2,2
+rain_trend8,rain_roll,shape,OLS slope of weekly rain over 8 weeks,2,2,2,2,2,2
+rain_intensity8,rain_roll,shape,mean rain of wet weeks within 8 weeks,2,2,2,2,2,2
+rain_excess4,rain_roll,excess,4-week sum of rain above the fitted wet-season q75,2,2,2,2,2,2
+rain_excess8,rain_roll,excess,8-week sum of rain above the fitted wet-season q75,2,2,2,2,2,2
+rain_ewm2,rain_roll,ewm,"exponentially weighted rain, mean age 2 weeks",2,2,2,2,2,2
+rain_ewm3,rain_roll,ewm,"exponentially weighted rain, mean age 3 weeks",2,2,2,2,2,2
+rain_ewm4,rain_roll,ewm,"exponentially weighted rain, mean age 4 weeks",2,2,2,2,2,2
+rain_ewm6,rain_roll,ewm,"exponentially weighted rain, mean age 6 weeks",2,2,2,2,2,2
+rain_tl2,rain_align,aligned,"rain at target-date minus 2 weeks (observed if available, else estimate [regime])",1,4,4,4,4,4
+rain_tl2_obs,rain_align,aligned,"1 if rain_tl2 is an observation, 0 if a projection",3,3,3,3,3,3
+rain_tl3,rain_align,aligned,"rain at target-date minus 3 weeks (observed if available, else estimate [regime])",2,1,4,1,4,4
+rain_tl3_obs,rain_align,aligned,"1 if rain_tl3 is an observation, 0 if a projection",3,3,3,3,3,3
+rain_tl4,rain_align,aligned,"rain at target-date minus 4 weeks (observed if available, else estimate [regime])",2,2,1,2,1,4
+rain_tl4_obs,rain_align,aligned,"1 if rain_tl4 is an observation, 0 if a projection",3,3,3,3,3,3
+rain_tl5,rain_align,aligned,"rain at target-date minus 5 weeks (observed if available, else estimate [regime])",2,2,2,2,2,1
+rain_tl5_obs,rain_align,aligned,"1 if rain_tl5 is an observation, 0 if a projection",3,3,3,3,3,3
+rain_win,rain_align,aligned,"Stage-1-weighted mean of rain at target-lags 2,3,4 (projected where unobserved)",2,4,4,4,4,4
+rain_win_nobs,rain_align,aligned,how many of target-lags 2-4 are observed (weather-uncertainty indicator),3,3,3,3,3,3
+rain_clim_tl3,rain_align,clim,past-year city climatology (+-2 weeks) of rain at target-lag 3,4,4,4,4,4,4
+rain_clim_sd_tl3,rain_align,clim,across-year SD of that climatology (projection uncertainty),4,4,4,4,4,4
+rain_pwet_tl3,rain_align,clim,share of past years wet at target-lag 3 (smoothed seasonal wet probability),4,4,4,4,4,4
+rain_clim_wetcond_tl3,rain_align,clim,past-year mean among wet years at that week,4,4,4,4,4,4
+rain_clim_drycond_tl3,rain_align,clim,past-year mean among dry years at that week,4,4,4,4,4,4
+rain_clim_target,rain_align,clim,past-year climatology of rain in the target week itself,4,4,4,4,4,4
+rain_anom_now,rain_align,clim,latest observed city rain minus its past-year climatology,2,2,2,2,2,2
+regime_wet_now,rain_align,regime,recent 2-week city rain above the fitted wet threshold,2,2,2,2,2,2
+monsoon_started,rain_align,onset,monsoon onset observed this calendar year (first 2-week wet spell),2,2,2,2,2,2
+weeks_since_onset,rain_align,onset,weeks since the observed onset (0 before onset),2,2,2,2,2,2
+temp_lag0,temp,lag,average temperature 0 weeks back,1,1,1,1,1,1
+temp_lag1,temp,lag,average temperature 1 weeks back,2,2,2,2,2,2
+temp_lag2,temp,lag,average temperature 2 weeks back,2,2,2,2,2,2
+temp_lag3,temp,lag,average temperature 3 weeks back,2,2,2,2,2,2
+temp_lag4,temp,lag,average temperature 4 weeks back,2,2,2,2,2,2
+temp_lag6,temp,lag,average temperature 6 weeks back,2,2,2,2,2,2
+temp_lag8,temp,lag,average temperature 8 weeks back,2,2,2,2,2,2
+tmax_lag0,temp,maxmin,"weekly max temperature, latest observed week",1,1,1,1,1,1
+tmin_lag0,temp,maxmin,"weekly min temperature, latest observed week",1,1,1,1,1,1
+temp_range0,temp,maxmin,max - min temperature (diurnal-range proxy),1,1,1,1,1,1
+tmax_mean4,temp,maxmin,4-week mean of max temperature,2,2,2,2,2,2
+tmin_mean4,temp,maxmin,4-week mean of min temperature,2,2,2,2,2,2
+temp_mean4,temp,roll,4-week mean temperature,2,2,2,2,2,2
+temp_mean8,temp,roll,8-week mean temperature,2,2,2,2,2,2
+temp_std4,temp,roll,4-week temperature SD,2,2,2,2,2,2
+temp_anom0,temp,anom,latest temperature minus past-year same-week climatology,2,2,2,2,2,2
+temp_anom_mean4,temp,anom,4-week mean temperature anomaly,2,2,2,2,2,2
+temp_suit0,temp,nonlin,"Gaussian suitability around 28.5 C (a-priori, unvalidated)",2,2,2,2,2,2
+temp_suit4,temp,nonlin,4-week mean suitability,2,2,2,2,2,2
+temp_sq0,temp,nonlin,squared deviation from the reference temperature,2,2,2,2,2,2
+temp_tl6,temp,aligned,"temp at target-date minus 6 weeks (observed if available, else estimate [clim])",2,2,2,2,2,2
+temp_tl6_obs,temp,aligned,"1 if temp_tl6 is an observation, 0 if a projection",3,3,3,3,3,3
+temp_tl7,temp,aligned,"temp at target-date minus 7 weeks (observed if available, else estimate [clim])",2,2,2,2,2,2
+temp_tl7_obs,temp,aligned,"1 if temp_tl7 is an observation, 0 if a projection",3,3,3,3,3,3
+temp_tl8,temp,aligned,"temp at target-date minus 8 weeks (observed if available, else estimate [clim])",2,2,2,2,2,2
+temp_tl8_obs,temp,aligned,"1 if temp_tl8 is an observation, 0 if a projection",3,3,3,3,3,3
+rh_lag0,humidity,lag,humidity 0 weeks back,1,1,1,1,1,1
+rh_lag1,humidity,lag,humidity 1 weeks back,2,2,2,2,2,2
+rh_lag2,humidity,lag,humidity 2 weeks back,2,2,2,2,2,2
+rh_lag3,humidity,lag,humidity 3 weeks back,2,2,2,2,2,2
+rh_lag4,humidity,lag,humidity 4 weeks back,2,2,2,2,2,2
+rh_lag5,humidity,lag,humidity 5 weeks back,2,2,2,2,2,2
+rh_lag6,humidity,lag,humidity 6 weeks back,2,2,2,2,2,2
+rh_mean4,humidity,roll,4-week mean humidity,2,2,2,2,2,2
+rh_mean8,humidity,roll,8-week mean humidity,2,2,2,2,2,2
+rh_anom0,humidity,anom,latest humidity minus past-year climatology,2,2,2,2,2,2
+rh_anom_mean4,humidity,anom,4-week mean humidity anomaly,2,2,2,2,2,2
+rh_hi_run,humidity,run,consecutive weeks above the fitted humidity q75,2,2,2,2,2,2
+rh_hi_freq8,humidity,run,share of last 8 weeks above that threshold,2,2,2,2,2,2
+rh_tl2,humidity,aligned,"rh at target-date minus 2 weeks (observed if available, else estimate [clim])",1,4,4,4,4,4
+rh_tl2_obs,humidity,aligned,"1 if rh_tl2 is an observation, 0 if a projection",3,3,3,3,3,3
+int_rain4_x_temp,climate_int,rain_temp,4-week rain sum x 4-week temperature suitability,2,2,2,2,2,2
+int_ewm3_x_temp,climate_int,rain_temp,rain memory (age 3) x temperature suitability,2,2,2,2,2,2
+int_rain4_x_rh,climate_int,rain_hum,4-week rain sum x humidity fraction,2,2,2,2,2,2
+int_temp_x_rh,climate_int,temp_hum,temperature x humidity fraction,2,2,2,2,2,2
+int_rh_x_wl,climate_int,hum_wl,humidity x waterlogging,2,2,2,2,2,2
+int_rtl3_x_temp,climate_int,rain_temp,rain at target-lag 3 x temperature suitability,2,2,2,2,2,2
+breed_full,breeding,breed_full,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_no_temp,breeding,breed_no_temp,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_no_wl,breeding,breed_no_wl,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_rain_only,breeding,breed_rain_only,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_hum,breeding,breed_hum,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_aligned,breeding,breed_aligned,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+breed_log,breeding,breed_log,hypothesised breeding index (rain memory x suitability x waterlogging variants); not validated,2,2,2,2,2,2
+vuln_wl_x_ewm3,vuln,wl_rain,waterlogging x ewm3,2,2,2,2,2,2
+vuln_san_x_ewm3,vuln,san_rain,(1 - sanitation) x ewm3,2,2,2,2,2,2
+vuln_dens_x_ewm3,vuln,dens_rain,density(1e4) x ewm3,2,2,2,2,2,2
+vuln_wl_x_rsum4,vuln,wl_rain,waterlogging x rsum4,2,2,2,2,2,2
+vuln_san_x_rsum4,vuln,san_rain,(1 - sanitation) x rsum4,2,2,2,2,2,2
+vuln_dens_x_rsum4,vuln,dens_rain,density(1e4) x rsum4,2,2,2,2,2,2
+vuln_wl_x_rtl3,vuln,wl_rain,waterlogging x rtl3,2,2,2,2,2,2
+vuln_san_x_rtl3,vuln,san_rain,(1 - sanitation) x rtl3,2,2,2,2,2,2
+vuln_dens_x_rtl3,vuln,dens_rain,density(1e4) x rtl3,2,2,2,2,2,2
+vuln_wl_x_win,vuln,wl_rain,waterlogging x win,2,2,2,2,2,2
+vuln_san_x_win,vuln,san_rain,(1 - sanitation) x win,2,2,2,2,2,2
+vuln_dens_x_win,vuln,dens_rain,density(1e4) x win,2,2,2,2,2,2
+vuln_wl_x_san,vuln,static_int,waterlogging x (1 - sanitation),3,3,3,3,3,3
+vuln_dens_x_wl,vuln,static_int,density x waterlogging,3,3,3,3,3,3
+vuln_three_way,vuln,static_int,density x waterlogging x (1 - sanitation),3,3,3,3,3,3
+vuln_three_way_x_win,vuln,wl_rain,three-way exposure x aligned rain,2,2,2,2,2,2
+case_lag0,case,lag,cases 0 weeks before the latest reported week,2,2,2,2,2,2
+case_lag1,case,lag,cases 1 weeks before the latest reported week,2,2,2,2,2,2
+case_lag2,case,lag,cases 2 weeks before the latest reported week,2,2,2,2,2,2
+case_lag3,case,lag,cases 3 weeks before the latest reported week,2,2,2,2,2,2
+case_lag4,case,lag,cases 4 weeks before the latest reported week,2,2,2,2,2,2
+case_lag5,case,lag,cases 5 weeks before the latest reported week,2,2,2,2,2,2
+case_lag6,case,lag,cases 6 weeks before the latest reported week,2,2,2,2,2,2
+case_lag7,case,lag,cases 7 weeks before the latest reported week,2,2,2,2,2,2
+case_lag8,case,lag,cases 8 weeks before the latest reported week,2,2,2,2,2,2
+case_lag9,case,lag,cases 9 weeks before the latest reported week,2,2,2,2,2,2
+case_lag10,case,lag,cases 10 weeks before the latest reported week,2,2,2,2,2,2
+case_lag11,case,lag,cases 11 weeks before the latest reported week,2,2,2,2,2,2
+case_log_last,case,lag,log1p of the latest reported count,2,2,2,2,2,2
+case_log_mean4,case,lag,log1p of the 4-week mean count (Stage 1 baseline feature),2,2,2,2,2,2
+case_sum2,case,roll,2-week case sum,2,2,2,2,2,2
+case_max2,case,roll,2-week max,2,2,2,2,2,2
+case_sum4,case,roll,4-week case sum,2,2,2,2,2,2
+case_max4,case,roll,4-week max,2,2,2,2,2,2
+case_sum8,case,roll,8-week case sum,2,2,2,2,2,2
+case_max8,case,roll,8-week max,2,2,2,2,2,2
+case_sum12,case,roll,12-week case sum,2,2,2,2,2,2
+case_max12,case,roll,12-week max,2,2,2,2,2,2
+case_zero_frac4,case,zero,share of zero weeks in the last 4,2,2,2,2,2,2
+case_zero_frac8,case,zero,share of zero weeks in the last 8,2,2,2,2,2,2
+case_zero_frac12,case,zero,share of zero weeks in the last 12,2,2,2,2,2,2
+case_weeks_since_pos,case,zero,weeks since a non-zero count,2,2,2,2,2,2
+case_momentum,case,shape,2-week mean minus previous 2-week mean,2,2,2,2,2,2
+case_accel,case,shape,change in momentum,2,2,2,2,2,2
+case_growth,case,shape,log growth of the 2-week mean over 2 weeks,2,2,2,2,2,2
+case_ewm2,case,ewm,"exponentially weighted cases, mean age 2 weeks",2,2,2,2,2,2
+case_ewm4,case,ewm,"exponentially weighted cases, mean age 4 weeks",2,2,2,2,2,2
+case_outbreak_run,case,outbreak,consecutive weeks at/above the fitted training q90 count,2,2,2,2,2,2
+case_outbreak_freq8,case,outbreak,share of last 8 weeks at/above q90,2,2,2,2,2,2
+case_since_peak12,case,outbreak,weeks since the 12-week peak (0 if now),2,2,2,2,2,2
+case_recovery,case,outbreak,latest count / 12-week peak,2,2,2,2,2,2
+case_zero_to_pos,case,outbreak,latest week is the first non-zero after a zero week,2,2,2,2,2,2
+case_active,case,outbreak,any case in the last 4 weeks,2,2,2,2,2,2
+hist_case_mean_tgt,hist,ward_season,ward's mean cases in the target week (+-2 weeks) over previous years,4,4,4,4,4,4
+hist_case_sd_tgt,hist,ward_season,across-year SD of that ward-season level,4,4,4,4,4,4
+hist_case_mean_org,hist,ward_season,ward's historical mean in the origin week,4,4,4,4,4,4
+hist_prev_year_wk,hist,prev_year,cases one year (52 weeks) before the target week,4,4,4,4,4,4
+hist_prev_year_win,hist,prev_year,3-week mean around the same week one year earlier,4,4,4,4,4,4
+hist_cases_52w,hist,intensity,cases in the last 52 reported weeks,2,2,2,2,2,2
+hist_ratio_org,hist,anomaly,recent 4-week mean vs the ward's historical origin-week level (season running hot/cold),2,2,2,2,2,2
+hist_rain_anom4,hist,anomaly,4-week mean city-rain anomaly vs past-year climatology,2,2,2,2,2,2
+zi_hist_zero_share,zero_infl,hist,share of previous years with zero cases at this ward-season,4,4,4,4,4,4
+zi_city_zero_share,zero_infl,hist,"same, averaged over the city's wards (less noisy)",4,4,4,4,4,4
+zi_recent_pos,zero_infl,recent,latest reported week non-zero,2,2,2,2,2,2
+zi_pos_frac26,zero_infl,recent,non-zero share over 26 weeks,2,2,2,2,2,2
+zi_breeding_active,zero_infl,regime,wet regime and 3-week rain above the wet threshold (breeding-window activation proxy),2,2,2,2,2,2

@@ -287,6 +287,7 @@ def _cases(c: Ctx):
     for k in range(0, 12):
         c.add(f"case_lag{k}", ops.lag(y, k), "case", "lag", 2, f"cases {k} weeks before the latest reported week")
     c.add("case_log_last", np.log1p(y), "case", "lag", 2, "log1p of the latest reported count")
+    c.add("case_log_mean4", np.log1p(ops.roll(y, 4, "mean")), "case", "lag", 2, "log1p of the 4-week mean count (Stage 1 baseline feature)")
     for n in (2, 4, 8, 12):
         c.add(f"case_sum{n}", ops.roll(y, n, "sum"), "case", "roll", 2, f"{n}-week case sum")
         c.add(f"case_max{n}", ops.roll(y, n, "max"), "case", "roll", 2, f"{n}-week max")
