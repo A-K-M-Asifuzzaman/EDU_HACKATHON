@@ -5,12 +5,52 @@ EDU AI Engineering Hackathon 2026 (preliminary round). Goal: forecast weekly
 dengue cases and outbreak risk tiers 2, 3 and 4 weeks ahead for each of 60 wards,
 using only information available at the forecast origin.
 
+## Quick start
+
+Requirements: Python 3.12 (the tested version), Node 20+ and npm, internet access for the first run (PyPI, npm, and the organizer dataset).
+
+```bash
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
+./scripts/launch.sh            # http://127.0.0.1:8000   (PORT=8100 ./scripts/launch.sh if 8000 is busy)
+```
+
+The script creates `.venv`, installs the runtime dependencies (`requirements.txt`), downloads and checksum-verifies the organizer CSV
+(`scripts/fetch_data.py`; see `data/README.md` if the download fails), builds the dashboard (`npm ci && npm run build`) and starts one
+process that serves both the API and the dashboard. Measured clone-to-running time: see "Fresh-clone measurement" below.
+
+Optional keys (the app runs without them, with the affected feature disabled):
+
+| Feature | Where | Variable |
+|---|---|---|
+| Copilot (OpenAI) | `.env` in the repo root (see `.env.example`) | `OPENAI_API_KEY` |
+| City map tiles | `frontend/.env.local` (see `frontend/.env.example`) | `NEXT_PUBLIC_MAPTILER_KEY` |
+
+Both files are git-ignored. NASA POWER and Open-Meteo need no key.
+
+## What is in the app (Stage 4)
+
+| Page | Purpose |
+|---|---|
+| Command Center | Forecast, calibrated interval, outbreak probability and risk tier for any ward, origin week and horizon; city map; Historical Replay |
+| Data Profiling Studio | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
+| Ward Risk Explorer | Rank and filter all 60 wards by tier or alert |
+| AI Forecast Lab | Horizon comparison, driver contributions, uncertainty fan |
+| Copilot | Chat grounded in the app's data and docs (OpenAI Responses API, read-only tools, citations, English and Bangla) |
+| Model Evidence | Leaderboard, validation per season, calibration, known weaknesses |
+| Response Intelligence | Turn forecasts into resource-planning signals |
+| Climate Observatory | Real NASA POWER and Open-Meteo observations/forecast, shown separately from the synthetic organizer data |
+| Learn | Rainfall-to-cases explainer; optional lightweight 3D mosquito (procedural, no external model) |
+| System & Provenance | Versions, data checksums, integrations status, methodology documents |
+
+The interface is bilingual (English / Bangla). Architecture, validation design and cost controls: **`ARCHITECTURE.md`**.
+Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
+
 ## Status
 
-**Stage 1 (complete):** forensic data audit, EDA, leak-safe validation design, baselines.
-**Stage 2 (complete):** temporal feature pipeline (204 candidates), feature-family ablation tournament, selection and interpretability.
-**Stage 3 (complete):** count-aware model tournament, bounded tuning, nested ensembles, calibrated intervals, outbreak alerts, risk tiers,
-deployable inference bundles. No dashboard yet (Stage 4). The locked 2025 test year has **not** been used.
+**Stage 1-3 (complete):** data audit, EDA, leak-safe validation, 204-feature pipeline, model tournament, calibrated intervals,
+outbreak alerts, risk tiers, deployable bundles. **Stage 4 (complete):** FastAPI + Next.js platform, Copilot, external weather hub, tests.
+The locked 2025 test year has **not** been used. The dataset is synthetic; nothing in the app is live surveillance, and the demo
+mode is labelled **Historical Replay**.
 
 Headline (Stage 3; validation seasons 2022-2024; Poisson-median MAE). The champion is a ridge Poisson GLM on 24 features:
 - **start-of-week origin (primary):** 1.107 / 1.393 / 1.512 for h = 2 / 3 / 4;
@@ -32,22 +72,23 @@ recall 0.78 (precision 0.53). Details and limitations: `docs/model_selection.md`
 | Library code | `dengueshield/data.py`, `validation.py`, `metrics.py`, `baselines.py` (Stage 1); `features/`, `evaluation/` (Stage 2); `models/`, `optimization/`, `calibration/`, `inference/` (Stage 3) |
 | Model tournament | `notebooks/07_model_tournament.ipynb`, `docs/model_selection.md`, `reports/model_tournament/` |
 | Diagnostics, intervals, alerts, risk tiers | `notebooks/08_model_diagnostics.ipynb`, `docs/calibration_and_uncertainty.md` |
+| Web platform | `dengueshield/api/`, `frontend/`, `app_data/`, `ARCHITECTURE.md` |
 | Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; API in `dengueshield/inference/`; `docs/stage4_handoff.md` |
 | One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
-| Leakage, alignment, model and bundle tests | `tests/` (194 tests) |
+| Leakage, alignment, model and bundle tests | `tests/` (212 tests) |
 
-## Setup (Python 3.12)
+## Manual setup, research stack (Python 3.12)
 
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-research.txt   # adds XGBoost, CatBoost, Optuna, Jupyter; the app itself needs only requirements.txt
 # place the organizer CSV first: see data/README.md
 ```
 
 ## Reproduce
 
 ```bash
-pytest                                   # 194 invariants; the real-data ones skip if the CSV is absent
+pytest                                   # 212 tests; the real-data ones skip if the CSV is absent
 for nb in 01_data_audit 02_eda 03_validation_and_baselines 04_feature_engineering 05_feature_ablation 06_feature_selection 07_model_tournament 08_model_diagnostics; do
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=7200 notebooks/$nb.ipynb
 done
@@ -68,8 +109,15 @@ The competition requires listing all AI assistants and external APIs.
 | Claude Code, model Claude Sonnet 5.5 | Anthropic | Stage 2: feature pipeline, ablation tournament, selection analysis, tests, documentation |
 | Claude Code, model Claude Opus 5.5 | Anthropic | Stage 3: model tournament, tuning, calibration, inference bundle, tests, documentation |
 
+| Claude Code, model Claude Sonnet 5.5 | Anthropic | Stage 4: FastAPI backend, Next.js frontend, Copilot, climate integrations, tests, documentation |
+
 All AI-written code and conclusions were produced under the team's direction; numbers in the reports come from executed notebooks and saved artifacts.
 
-- **External APIs at runtime:** none. All analysis runs locally on the organizer CSV.
-- **Package downloads:** Python packages from PyPI (see `requirements.txt`; Stage 2 adds LightGBM, Stage 3 adds XGBoost, CatBoost, Optuna).
+- **External APIs at runtime (all optional; the app degrades gracefully if any is unavailable):**
+  - OpenAI (Responses API `gpt-5.4-mini`; Embeddings `text-embedding-3-small`): Copilot only, called from the backend, key never sent to the browser.
+  - NASA POWER daily point API and Open-Meteo (archive and forecast): real weather in the Climate Observatory, with attribution; never used to train or feed the forecasting model.
+  - MapTiler tiles: city map background.
+  - Dataset download from the organizers' shared sheet (`scripts/fetch_data.py`).
+- The forecasts themselves need no external service: they run locally from the committed 11 KB bundle.
+- **Package downloads:** Python packages from PyPI (`requirements.txt` for the app, `requirements-research.txt` for the research notebooks) and npm packages for the frontend (`frontend/package-lock.json`).
 - Team members must add any other AI assistant or external API they use to this table.

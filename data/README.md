@@ -24,8 +24,14 @@ shasum -a 256 data/raw/bangladesh_dengue_large_dataset.csv
 
 The organizer brief (PDF) is kept locally in `data/reference/` and is also not committed.
 
+## Automatic download
+
+`python scripts/fetch_data.py` (run by `./scripts/launch.sh`) downloads the CSV from the organizers' own shared sheet, verifies the
+SHA-256 above and writes the file atomically; it refuses to save a file with a different checksum. If the download fails, save the
+sheet manually as described under "Placement".
+
 ## Open decision
 
-The judging rubric requires a clone-and-launch in three minutes or less. If the team confirms
-that the organizer CSV may be redistributed, commit it (2.6 MB) before the final submission;
-otherwise the README must instruct judges to download it.
+The repository still does not contain the CSV, because the brief does not state redistribution terms. The team must either confirm
+that the organizers allow it (then commit the 2.6 MB file) or keep the fetch script. Judges need internet access for the first run
+either way. The repository is private until that decision and the final submission step are made.
