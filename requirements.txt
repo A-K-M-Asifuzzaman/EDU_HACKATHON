@@ -1,19 +1,11 @@
-# Python 3.12. Exact pins for reproducibility of Stage 1 research outputs.
+# Runtime: everything needed to run the DengueShield API + dashboard (Python 3.12). `pip install -r requirements.txt`
 numpy==2.5.1
 pandas==3.0.5
 scipy==1.18.0
-statsmodels==0.14.6
 scikit-learn==1.9.0
-matplotlib==3.11.1
-pytest==8.4.2
-# Notebook execution (notebooks/*.ipynb)
-nbformat==5.11.1
-nbclient==0.11.0
-nbconvert==7.17.2
-ipykernel==7.4.0
-# Stage 2 models
+statsmodels==0.14.6
 lightgbm==4.7.0
-# Stage 3 models and tuning
-xgboost==3.4.1
-catboost==1.2.10
-optuna==5.1.0
+fastapi==0.165.0
+uvicorn==0.54.0
+httpx==0.28.1
+openai==3.57.0

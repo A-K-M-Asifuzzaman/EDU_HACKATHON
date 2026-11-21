@@ -16,7 +16,8 @@ export function useAsync<T>(fn: (signal: AbortSignal) => Promise<T>, deps: unkno
   useEffect(() => {
     const ac = new AbortController();
     set((s) => ({ ...s, loading: true, error: null }));
-    fn(ac.signal).then((data) => set({ data, error: null, loading: false })).catch((e) => { if (e?.name !== "AbortError") set({ data: null, error: e, loading: false }); });
+    fn(ac.signal).then((data) => { if (!ac.signal.aborted) set({ data, error: null, loading: false }); })
+      .catch((e) => { if (e?.name !== "AbortError" && !ac.signal.aborted) set({ data: null, error: e, loading: false }); });
     return () => ac.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, tick]);
@@ -90,16 +91,16 @@ export function Btn({ children, variant = "solid", className = "", ...p }: any) 
   return <button className={cls("inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-[13px] font-medium transition active:scale-[0.98] disabled:opacity-50", v, className)} {...p}>{children}</button>;
 }
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="flex min-w-[130px] flex-col gap-1"><span className="eyebrow">{label}</span>{children}</label>;
+  return <label className="flex min-w-[120px] max-w-full flex-col gap-1"><span className="eyebrow">{label}</span>{children}</label>;
 }
 export function Select({ label, value, onChange, options }: { label: string; value: string | number; onChange: (v: string) => void; options: { value: string | number; label: string }[] }) {
-  return (<Field label={label}><div className="relative"><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full appearance-none rounded-xl border border-line bg-white py-2 pl-3 pr-8 text-sm text-ink shadow-sm hover:border-emerald/50">
+  return (<Field label={label}><div className="relative"><select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} className="w-full appearance-none rounded-xl border border-line bg-white py-2 pl-3 pr-8 text-sm text-ink shadow-sm hover:border-emerald/50">
     {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select><Icon name="chevron" size={16} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-3" /></div></Field>);
 }
 export function Segmented<T extends string | number>({ label, value, onChange, options }: { label?: string; value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
-  return (<div className="flex flex-col gap-1">{label && <span className="eyebrow">{label}</span>}<div role="radiogroup" aria-label={label} className="inline-flex rounded-xl border border-line bg-white p-0.5 shadow-sm">
+  return (<div className="flex flex-col gap-1">{label && <span className="eyebrow">{label}</span>}<div role="radiogroup" aria-label={label} className="scroll-thin inline-flex max-w-full overflow-x-auto rounded-xl border border-line bg-white p-0.5 shadow-sm">
     {options.map((o) => (<button key={String(o.value)} role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}
-      className={cls("relative rounded-[10px] px-3 py-1.5 text-[13px] font-medium transition", o.value === value ? "bg-forest text-white" : "text-ink-2 hover:bg-mint-l")}>{o.label}</button>))}</div></div>);
+      className={cls("relative whitespace-nowrap rounded-[10px] px-3 py-1.5 text-[13px] font-medium transition", o.value === value ? "bg-forest text-white" : "text-ink-2 hover:bg-mint-l")}>{o.label}</button>))}</div></div>);
 }
 export function Tabs({ tabs, value, onChange }: { tabs: { id: string; label: string }[]; value: string; onChange: (v: string) => void }) {
   return (<div role="tablist" className="scroll-thin -mx-1 mb-5 flex gap-1 overflow-x-auto px-1 pb-1">{tabs.map((x) => (

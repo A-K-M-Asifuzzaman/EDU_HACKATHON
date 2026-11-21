@@ -21,11 +21,14 @@ export async function api<T = any>(path: string, opts: { ttl?: number; signal?: 
   let r: Response;
   try { r = await fetch(BASE + path, { signal: opts.signal }); }
   catch (e: any) { if (e?.name === "AbortError") throw e; throw new ApiError("Cannot reach the DengueShield API. Is the backend running on port 8000?", 0); }
-  const body = await r.json().catch(() => ({}));
+  let body: any = null;
+  try { body = await r.json(); }
+  catch (e: any) { if (e?.name === "AbortError") throw e; body = null; }              // an aborted read must never look like a valid (empty) response
   if (!r.ok) {
     const d = body?.detail ?? body?.error;
     throw new ApiError(typeof d === "string" ? d : Array.isArray(d) ? d.map((x: any) => x.msg).join("; ") : `Request failed (${r.status})`, r.status);
   }
+  if (body === null || typeof body !== "object") throw new ApiError("The server returned an unreadable response.", r.status);
   mem.set(path, { t: Date.now(), v: body });
   return body as T;
 }

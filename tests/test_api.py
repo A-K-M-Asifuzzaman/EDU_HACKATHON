@@ -206,3 +206,12 @@ def test_nasa_fill_values_become_missing_not_zero(monkeypatch):
     monkeypatch.setattr(climate.httpx, "get", lambda *a, **k: R())
     d = climate._nasa(23.8, 90.4, "2024-01-01", "2024-01-02")["daily"]
     assert d[1]["temp_c"] is None and d[1]["rain_mm"] is None and d[0]["rain_mm"] == 0.0
+
+
+def test_weather_climatology_uses_all_years_not_the_requested_window(client):
+    short = client.get(f"/api/weather/historical?ward_id={W}&start=2024-07-01&end=2024-07-29").json()
+    long_ = client.get(f"/api/weather/historical?ward_id={W}&start=2016-01-01&end=2024-12-30").json()
+    assert short["climatology_by_iso_week"] == long_["climatology_by_iso_week"]          # independent of the window
+    wk27 = short["climatology_by_iso_week"]["28"]
+    observed_28 = [r["rainfall_mm"] for r in short["rows"] if r["date"] == "2024-07-08"][0]
+    assert wk27 != observed_28                                                          # a real climatology, not the observation itself

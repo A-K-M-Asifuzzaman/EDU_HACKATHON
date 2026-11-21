@@ -60,3 +60,7 @@ body { margin: 0; -webkit-font-smoothing: antialiased; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
 }
+
+/* grid/flex children must be allowed to shrink, otherwise no-wrap content stretches the page on narrow screens */
+.grid > *, .flex > * { min-width: 0; }
+main { min-width: 0; overflow-x: clip; }
