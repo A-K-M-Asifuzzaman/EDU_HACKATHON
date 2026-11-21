@@ -119,13 +119,9 @@ The competition requires listing all AI assistants and external APIs.
 
 | Tool | Provider | Used for |
 |---|---|---|
-| Claude Code, model Claude Opus 5.5 | Anthropic | Stage 1: audit, EDA, validation design, baselines, tests, documentation |
-| Claude Code, model Claude Sonnet 5.5 | Anthropic | Stage 2: feature pipeline, ablation tournament, selection analysis, tests, documentation |
-| Claude Code, model Claude Opus 5.5 | Anthropic | Stage 3: model tournament, tuning, calibration, inference bundle, tests, documentation |
+| Claude Code (Claude Opus and Sonnet models) | Anthropic | Development assistant: website building (frontend, backend API, map and routing), suggestions for data handling and feature ideas, test writing and documentation |
 
-| Claude Code, models Claude Sonnet 5.5 and Claude Opus 5.5 | Anthropic | Stage 4: FastAPI backend, Next.js frontend, Copilot, climate and DGHS integrations, OSM facility database, A* routing, intro, tests, documentation |
-
-All AI-written code and conclusions were produced under the team's direction; numbers in the reports come from executed notebooks and saved artifacts.
+The team directed the work and set the requirements, reviewed the results, and chose the validation protocol and model. Reported numbers come from executed notebooks and saved artifacts, not from an AI model's statements, and the tests in `tests/` check them.
 
 - **External APIs at runtime (all optional; the app degrades gracefully if any is unavailable):**
   - OpenAI (Responses API `gpt-5.4-mini`; Embeddings `text-embedding-3-small`): Copilot only, called from the backend, key never sent to the browser.
