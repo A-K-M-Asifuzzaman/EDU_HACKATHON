@@ -45,9 +45,13 @@ above 200 mm of weekly rain (max 268.8 mm), all in monsoon months, which is plau
    with the national weekly mean. Within a city-week the spread across wards is small:
    rainfall SD 4.0 mm against 50.1 mm between weeks, temperature 0.58 against 4.45 °C, humidity
    2.4 against 12.8 pp. Ward-level weather differences are therefore mostly noise, not microclimate.
-2. **Constructed temperature bands.** `max_temp_c − avg_temp_c` and `avg_temp_c − min_temp_c` both
-   have mean ≈ 4.97 °C and SD ≈ 1.05, and corr(avg, (max+min)/2) = 0.98. Max and min add
-   essentially no information beyond the average.
+2. **Loosely constructed temperature bands.** `max_temp_c − avg_temp_c` and `avg_temp_c − min_temp_c` both
+   have mean ≈ 4.97 °C and SD ≈ 1.05 (about 600 distinct offset values each, range 1.6–8.4 °C), the two
+   offsets correlate at −0.34, and corr(avg, (max+min)/2) = 0.98. Max and min are **highly redundant with the
+   average (R² ≈ 0.94–0.95) but are not exact copies** of it.
+   *Correction (Stage 2): the original Stage 1 text called these "avg ± ~5 °C" and said they add "essentially no
+   information". Redundancy is now measured (`reports/features/tables/temperature_redundancy.csv`) and their
+   incremental predictive value was tested in the Stage 2 ablation rather than assumed.*
 3. **Step-function rainfall regime.** Monthly mean rainfall is about 3 mm from October to March,
    then 16 mm (April), 24 mm (May), and about 94 mm (June–August). The monsoon regime starts
    between April and June but **ends in the last week of September in every year** (Sept 21–27).
@@ -85,7 +89,7 @@ Descriptive totals by year (all years, from `reports/audit/target_by_year.csv`):
 
 - Positional lags are safe because the panel is perfectly regular, and `load_panel` asserts this
   on every load. Target alignment still merges on calendar dates, as a second layer of defence.
-- `max_temp_c` and `min_temp_c` are near-redundant with `avg_temp_c`. Expect little gain from them.
+- `max_temp_c` and `min_temp_c` are highly redundant with `avg_temp_c` (R² ≈ 0.94–0.95) but not duplicates. Stage 2 measured their value: adding temperature features (with or without max/min) to calendar + static did not help (GLM MAE 1.471 → 1.485–1.500; LightGBM 1.519 → 1.517–1.539).
 - City-level smoothed weather may beat raw ward weather, because ward deviations are mostly noise.
 - Static attributes behave like ward identifiers. A model can memorise ward levels from them,
   which is fine for these 60 known wards but will not generalise to unseen wards.

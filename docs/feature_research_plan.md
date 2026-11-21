@@ -1,5 +1,7 @@
 # Feature research plan (input to Stage 2)
 
+> **Stage 2 outcome:** see `docs/feature_selection_report.md` for which of these hypotheses survived chronological validation.
+
 Evidence comes from `reports/eda/README.md`, which uses 2016–2021 for every relationship analysis,
 and from the baselines in `reports/baselines/`. Each family is rated on four things: how strong the
 **evidence** is, **availability** at origin *t* for each horizon, **leakage risk**, and expected
@@ -86,7 +88,7 @@ Notation: "rain lag *k*" means rain *k* weeks before the **target**. For a forec
 
 | Family | Verdict | Reason |
 |---|---|---|
-| max/min temperature, diurnal range | drop | built as avg ± ~5 °C; corr(avg, midrange) 0.98 |
+| max/min temperature, diurnal range | tested in Stage 2: no gain | offsets from the average scatter (SD ≈ 1.05 °C, R² ≈ 0.94–0.95), so they are redundant but **not** exact copies (Stage 1 text corrected); ablation showed no incremental benefit |
 | avg temperature lags | low | raw association is seasonal confounding; anomaly correlation −0.12 to −0.02 |
 | city fixed effects | low | city anomalies are no more correlated within cities than across them (0.52 vs 0.52) |
 | ward ID one-hot | optional | redundant with statics; risks overfitting ward noise |
