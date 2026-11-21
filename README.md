@@ -88,7 +88,7 @@ recall 0.78 (precision 0.53). Details and limitations: `docs/model_selection.md`
 | Web platform | `dengueshield/api/`, `frontend/`, `app_data/`, `ARCHITECTURE.md` |
 | Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; API in `dengueshield/inference/`; `docs/stage4_handoff.md` |
 | One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
-| Leakage, alignment, model and bundle tests | `tests/` (244 tests) |
+| Leakage, alignment, model and bundle tests | `tests/` |
 
 ## Manual setup, research stack (Python 3.12)
 
@@ -101,7 +101,7 @@ pip install -r requirements-research.txt   # adds XGBoost, CatBoost, Optuna, Jup
 ## Reproduce
 
 ```bash
-pytest                                   # 244 tests; the real-data ones skip if the CSV is absent
+pytest                                   # organizer-data tests skip if the CSV is absent
 for nb in 01_data_audit 02_eda 03_validation_and_baselines 04_feature_engineering 05_feature_ablation 06_feature_selection 07_model_tournament 08_model_diagnostics; do
   jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=7200 notebooks/$nb.ipynb
 done

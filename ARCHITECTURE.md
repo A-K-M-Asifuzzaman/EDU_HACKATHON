@@ -125,8 +125,8 @@ If any external service fails, its panel shows a status message and every other 
 
 ```mermaid
 flowchart LR
-    py["pytest: 244 tests<br/>leakage, alignment, models, bundle,<br/>API contracts, A* vs Dijkstra,<br/>decision tools without look-ahead"] --> gate{{"release gate"}}
-    pw["Playwright: 26 end-to-end tests<br/>all routes, console errors, mobile 390 px,<br/>Bangla, map routing, emergency, intro,<br/>reliability, simulator, sandbox, brief,<br/>search, secret scan"] --> gate
+    py["pytest<br/>leakage, alignment, models, bundle,<br/>API contracts, A* vs Dijkstra,<br/>decision tools without look-ahead"] --> gate{{"release gate"}}
+    pw["Playwright<br/>all routes, console errors, mobile 390 px,<br/>Bangla, map routing, emergency, intro,<br/>reliability, simulator, sandbox, brief,<br/>search, secret scan"] --> gate
     build["next build + typecheck"] --> gate
     clone["fresh-clone launch smoke test"] --> gate
 ```
