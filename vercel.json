@@ -3,11 +3,5 @@
   "installCommand": "cd frontend && npm ci --no-audit --no-fund",
   "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/out",
-  "functions": {
-    "api/index.py": {
-      "maxDuration": 60,
-      "includeFiles": "{dengueshield/**,models/**,app_data/**,docs/**,data/**,reports/**,README.md,ARCHITECTURE.md}"
-    }
-  },
-  "rewrites": [{ "source": "/api/:path*", "destination": "/api/index" }]
+  "rewrites": [{ "source": "/api/:path*", "destination": "https://dengueshield-ai-api.onrender.com/api/:path*" }]
 }

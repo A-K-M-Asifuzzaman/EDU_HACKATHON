@@ -42,7 +42,7 @@ Rebuild: `python scripts/build_geodata.py` (3 Overpass requests, cached raw in `
   shortest estimated road travel time, not straight-line distance.
 
 **Measured** (`app_data/geo/benchmark.json`, 400 random origin-destination pairs × both weights, development laptop, pure Python):
-A* matched Dijkstra's optimal cost in **400/400** cases. Median **5.7 ms vs 9.5 ms**, and A* expanded **2.9×** fewer nodes (3.8× for distance, where the heuristic is tighter).
+A* matched Dijkstra's optimal cost in **400/400** cases. Median **6.5 ms vs 10.9 ms**, and A* expanded **2.9×** fewer nodes (3.8× for distance, where the heuristic is tighter).
 Loading the Greater Dhaka graph takes about 0.3 s.
 
 ## 4. Interface

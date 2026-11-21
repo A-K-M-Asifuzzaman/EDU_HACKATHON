@@ -29,7 +29,7 @@ Both files are git-ignored. NASA POWER and Open-Meteo need no key.
 
 ### Deploying for teammates
 
-A `Dockerfile` and Render blueprint (`render.yaml`) are included; steps, secrets and cost controls are in `docs/deployment.md`.
+The dashboard is a static site on Vercel and the API runs on Render (`Dockerfile.backend`, `render.yaml`, `vercel.json`); steps, secrets and cost controls are in `docs/deployment.md`.
 
 ### Fresh-clone measurement
 

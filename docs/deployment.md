@@ -1,34 +1,31 @@
-# Deploying DengueShield AI to Render
+# Deployment: static dashboard on Vercel, API on Render
 
-One Docker web service serves the API and the dashboard (`Dockerfile`, `render.yaml`). The image build (≈ 1 min locally) compiles the
-frontend, installs the runtime dependencies and downloads + checksum-verifies the organizer CSV (it is not in git). A running container uses
-≈ 220 MB of RAM; the Starter plan (512 MB) is enough. The free plan sleeps after 15 minutes idle, so it is not suitable for a demo.
+```mermaid
+flowchart LR
+    user(["Browser"]) --> v["Vercel<br/>static Next.js dashboard<br/>(frontend/out)"]
+    v -->|"rewrite /api/* (same origin, no CORS)"| r["Render web service<br/>FastAPI + model + data<br/>Dockerfile.backend"]
+    r -.-> o["OpenAI (Copilot, optional)"]
+    r -.-> w["NASA POWER / Open-Meteo / DGHS (optional)"]
+    v -.-> m["MapTiler (public key, browser)"]
+```
+
+| Part | Where | Config | Secrets |
+|---|---|---|---|
+| Dashboard | Vercel project `dengueshield-ai` | `vercel.json` (build `frontend`, rewrite `/api/*` to the Render URL), `.vercelignore` (uploads only `frontend/`) | `NEXT_PUBLIC_MAPTILER_KEY`, `NEXT_PUBLIC_MAP_PROVIDER` (public, baked in at build) |
+| API | Render web service `dengueshield-ai-api` | `render.yaml`, `Dockerfile.backend` (dataset fetched and SHA-256 verified at build) | `OPENAI_API_KEY`, `ACCESS_PASSWORD`, `OPENAI_BUDGET_USD` (set in Render, never in git) |
 
 ## Steps
 
-1. Push the repository to GitHub (`git push origin main`; it stays private).
-2. Render dashboard → **New → Blueprint** → select `EDU_HACKATHON` (authorise Render's GitHub app for that one private repo). Render reads `render.yaml`.
-3. Enter the three secrets when prompted. All are optional; each feature switches off cleanly without its variable:
+1. **API (Render):** New + Blueprint from this repository (or create a Docker web service pointing at `Dockerfile.backend`), then set the three variables above. Health check: `/api/health`.
+2. **Dashboard (Vercel):** set the destination host in `vercel.json` to your Render URL, then `vercel deploy --prod` from a clean checkout. Only `frontend/` is uploaded.
+3. Open the Vercel URL. The first API call asks for the team password (HTTP Basic, any username) because the API is gated; `/api/health` stays open for health checks.
 
-   | Variable | Effect |
-   |---|---|
-   | `ACCESS_PASSWORD` | Browser password prompt (any username) for everything except `/api/health`. **Set this**: the URL is otherwise public to anyone who has it. |
-   | `OPENAI_API_KEY` | Enables the Copilot. Without it the Copilot shows its retrieval-only fallback. |
-   | `NEXT_PUBLIC_MAPTILER_KEY` | Basemap tiles (baked into the frontend at build time). Without it the maps use a blank basemap or the table view. |
+## Behaviour to know
 
-4. After the first deploy, open `https://<service>.onrender.com`. Health check: `/api/health`.
-
-## Cost and abuse controls
-
-- Copilot spend: ≈ US$0.003 per answer, 30 questions/hour per client IP (the container runs uvicorn with `--proxy-headers`), 900 output tokens,
-  and `OPENAI_BUDGET_USD` (default 1.00; held in memory, so it resets when the service restarts). Also set a hard monthly limit in the OpenAI dashboard.
-- MapTiler key: it is visible in the browser by design. In the MapTiler dashboard restrict it to your `onrender.com` domain.
-- External services (NASA POWER, Open-Meteo, DGHS GIS) are optional and cached; the container's disk is ephemeral, so caches restart empty.
-
-## Things to know
-
-- The raw CSV exists only inside the container image, and the app serves derived views of it (profiles, forecasts, replay), never the file. The organizers' redistribution terms
-  are still undecided (`data/README.md`), which is another reason to keep the password on.
-- Updating: `git push` triggers a redeploy (`autoDeployTrigger: commit`). If you change any approved document (README, ARCHITECTURE, `docs/*.md`) rebuild the
-  Copilot embedding index afterwards (`python -m dengueshield.api.rag build`, ≈ US$0.003) and commit `app_data/rag_index.npz`; otherwise the Copilot falls back to keyword-only retrieval.
-- Local test of the exact image: `docker build -t dengueshield-ai . && docker run --rm -p 8300:10000 -e ACCESS_PASSWORD=test dengueshield-ai`.
+- **Render free plan** sleeps after 15 minutes without traffic and needs about a minute to wake on the next request; the Starter plan (card required) stays on. Wake the service before a demo by opening `/api/health`.
+- **Password:** the static dashboard pages are public but contain no data; every API response is behind `ACCESS_PASSWORD`. Rotate it by changing the Render variable.
+- **Costs:** Copilot answers cost about US$0.003 each, limited to 30 per hour per client IP (`--proxy-headers` keeps the real client IP), 900 output tokens and an in-memory budget (`OPENAI_BUDGET_USD`, default 1.00, resets on restart). Set a hard monthly limit in the OpenAI dashboard as well.
+- **MapTiler key** is visible in the browser by design; restrict it to your Vercel domain in the MapTiler dashboard.
+- **Rebuilding the Copilot index:** if you change README/ARCHITECTURE/`docs/*.md`, run `python -m dengueshield.api.rag build` (about US$0.001) and commit `app_data/rag_index.npz`, otherwise the Copilot falls back to keyword-only retrieval.
+- **Local test of the backend image:** `docker build -f Dockerfile.backend -t dengueshield-api . && docker run --rm -p 7860:7860 -e ACCESS_PASSWORD=test dengueshield-api`.
+- **Single-container alternative:** `Dockerfile` builds the dashboard and API into one image (used by `./scripts/launch.sh` style local runs).

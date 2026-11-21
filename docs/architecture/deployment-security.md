@@ -20,17 +20,20 @@ Measured: fresh clone to a healthy server in 59 s on the development Mac with wa
 ```mermaid
 flowchart TB
     repo[("GitHub repository")]
-    subgraph docker["Docker / Render (Dockerfile, render.yaml)"]
-        img["Multi-stage image: Node build → Python 3.12 runtime<br/>dataset fetched at build, ≈ 220 MB RAM"]
+    subgraph vercel["Vercel: static dashboard (vercel.json, .vercelignore)"]
+        cdn["frontend/out on the CDN<br/>rewrite /api/* to Render"]
     end
-    subgraph vercel["Vercel (vercel.json, api/index.py)"]
-        cdn["Static dashboard on the CDN"]
-        fn["Python function api/index<br/>(≈ 64 MB bundle)"]
+    subgraph render["Render: API (render.yaml, Dockerfile.backend)"]
+        img["Python 3.12 image: FastAPI, model bundle, app_data,<br/>dataset fetched and checksum-verified at build"]
     end
-    repo --> docker
     repo --> vercel
-    secrets["Secrets in the platform's env settings:<br/>OPENAI_API_KEY, ACCESS_PASSWORD,<br/>NEXT_PUBLIC_MAPTILER_KEY"] -.-> docker & vercel
+    repo --> render
+    cdn -->|"same-origin /api proxy"| img
+    secrets["Render env: OPENAI_API_KEY, ACCESS_PASSWORD,<br/>OPENAI_BUDGET_USD"] -.-> render
+    pub["Vercel env (public): NEXT_PUBLIC_MAPTILER_KEY"] -.-> vercel
 ```
+
+Single-container alternative: the root `Dockerfile` bundles dashboard and API (used for local or one-host runs).
 
 ## Security model
 

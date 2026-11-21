@@ -1,4 +1,4 @@
-# Uploaded to Vercel by `vercel deploy` (the organizer CSV in data/raw IS included: the function reads it; see docs/deployment.md)
+# Vercel serves ONLY the static dashboard (frontend/); the FastAPI backend runs on Render (Dockerfile.backend, render.yaml).
 .git
 .venv
 .cache
@@ -10,14 +10,18 @@ frontend/out
 frontend/.env.local
 frontend/test-results
 frontend/playwright-report
-data/reference
+dengueshield
+models
+app_data
+data
 notebooks
+reports
 tests
-reports/*/figures
-reports/model_tournament
-reports/features
-reports/audit
-reports/screenshots
-docs/screenshots
+scripts
+docs
+api
+pyproject.toml
+requirements*.txt
+Dockerfile*
 **/__pycache__
 .DS_Store

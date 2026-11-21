@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import heapq
 import json
+from array import array
 import math
 import time
 from functools import lru_cache
@@ -37,14 +38,15 @@ class Graph:
         self.area = area
         self.n = len(z["lat"])
         self.lat, self.lon = z["lat"], z["lon"]
-        self.latr = np.radians(self.lat).tolist()
-        self.lonr = np.radians(self.lon).tolist()
-        self.cos = np.cos(np.radians(self.lat)).tolist()
-        self.indptr = z["indptr"].tolist()
-        self.dst = z["dst"].tolist()
+        # compact typed arrays instead of Python lists (about 4x less memory; indexing stays fast)
+        self.latr = array("d", np.radians(self.lat))
+        self.lonr = array("d", np.radians(self.lon))
+        self.cos = array("d", np.cos(np.radians(self.lat)))
+        self.indptr = array("i", z["indptr"])
+        self.dst = array("i", z["dst"])
         seg = z["seg"]
-        self.seg, self.rev = seg.tolist(), z["rev"].tolist()
-        self.w = {"distance": z["seg_len"].astype(float)[seg].tolist(), "time": z["seg_time"].astype(float)[seg].tolist()}
+        self.seg, self.rev = array("i", seg), array("b", z["rev"].astype(np.int8))
+        self.w = {"distance": array("d", z["seg_len"].astype(float)[seg]), "time": array("d", z["seg_time"].astype(float)[seg])}
         self.seg_len, self.seg_time = z["seg_len"].astype(float), z["seg_time"].astype(float)
         self.vmax = float(z["seg_speed"].max()) / 3.6                      # m/s, for the admissible time heuristic
         self.gptr, self.glat, self.glon = z["geom_ptr"], z["geom_lat"], z["geom_lon"]

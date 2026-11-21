@@ -17,6 +17,6 @@ COPY reports/baselines/README.md ./reports/baselines/README.md
 # The organizer CSV is not in git: fetched and SHA-256 verified at build time (the build fails if the download or checksum fails).
 RUN python scripts/fetch_data.py
 # Caches go to /tmp so the app also runs on read-only or non-root hosts.
-ENV PYTHONUNBUFFERED=1 DENGUESHIELD_CACHE=/tmp/dengueshield-cache PORT=7860
+ENV PYTHONUNBUFFERED=1 DENGUESHIELD_CACHE=/tmp/dengueshield-cache PORT=7860 MALLOC_ARENA_MAX=2
 EXPOSE 7860
 CMD ["sh", "-c", "exec python -m uvicorn dengueshield.api.main:app --host 0.0.0.0 --port ${PORT:-7860} --proxy-headers --forwarded-allow-ips='*'"]

@@ -1,8 +1,11 @@
 """Application state: dataset, serialized bundle, precomputed artifacts and caches. Read-only; nothing here trains models."""
 from __future__ import annotations
 
+import ctypes
+import gc
 import gzip
 import hashlib
+import threading
 import json
 import time
 from collections import OrderedDict
@@ -21,6 +24,19 @@ BUNDLE_PATH = ROOT / "models" / "dengueshield_B.joblib"
 HORIZONS = (2, 3, 4)
 TIER_ORDER = {"Low": 0, "Medium": 1, "High": 2, "Critical": 3}
 STARTED = time.time()
+
+
+# Heavy model calls build a full-history feature frame (~100 MB transient). They run one at a time, and freed memory is handed back to the OS,
+# so a 512 MB host (Render free plan) never sees stacked spikes from concurrent requests.
+_HEAVY = threading.Lock()
+
+
+def trim_memory() -> None:
+    gc.collect()
+    try:
+        ctypes.CDLL("libc.so.6").malloc_trim(0)          # glibc only; a no-op elsewhere
+    except Exception:
+        pass
 
 
 class LRU(OrderedDict):
@@ -114,12 +130,19 @@ class Store:
         """All wards for one origin/horizon from the deployed bundle (live inference, cached by origin+horizon)."""
         self.need("bundle"), self.need("dataset")
         key = ("bundle", self.bundle_sha, origin, horizon)
-        v, hit = self.cache.get_or(key, lambda: self.timed("bundle_predict", lambda: self.bundle.predict(self.panel, origin, horizon)))
+        v, hit = self.cache.get_or(key, lambda: self._heavy(lambda: self.timed("bundle_predict", lambda: self.bundle.predict(self.panel, origin, horizon))))
         return v
+
+    def _heavy(self, fn):
+        with _HEAVY:
+            try:
+                return fn()
+            finally:
+                trim_memory()
 
     def drivers(self, origin: str, horizon: int) -> pd.DataFrame:
         key = ("drv", self.bundle_sha, origin, horizon)
-        v, _ = self.cache.get_or(key, lambda: self.bundle.explain(self.panel, origin, horizon))
+        v, _ = self.cache.get_or(key, lambda: self._heavy(lambda: self.bundle.explain(self.panel, origin, horizon)))
         return v
 
 
