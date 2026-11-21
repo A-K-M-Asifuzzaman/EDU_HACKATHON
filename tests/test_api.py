@@ -227,3 +227,12 @@ def test_optional_access_gate_protects_everything_but_health(client, monkeypatch
     assert client.get("/api/metadata", auth=("anyone", "team-pass")).status_code == 200
     monkeypatch.delenv("ACCESS_PASSWORD")
     assert client.get("/api/metadata").status_code == 200                                 # gate is off by default
+
+
+def test_document_viewer_serves_architecture_docs_and_still_refuses_everything_else(client):
+    paths = {d["path"] for d in client.get("/api/docs").json()}
+    assert {"ARCHITECTURE.md", "docs/architecture/ml-pipeline.md", "docs/architecture/geospatial.md"} <= paths
+    assert not any(p.startswith(("data/raw", ".env", "frontend", "app_data")) or p.endswith((".env", ".py", ".csv")) for p in paths)
+    assert "mermaid" in client.get("/api/docs/read", params={"path": "docs/architecture/ml-pipeline.md"}).json()["text"]
+    for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py"):
+        assert client.get("/api/docs/read", params={"path": bad}).status_code == 404
