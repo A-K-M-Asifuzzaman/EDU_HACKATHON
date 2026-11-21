@@ -4,6 +4,9 @@ const ROUTES = ["/", "/profiling/", "/wards/", "/geography/", "/lab/", "/copilot
 const WARD = "DNCC_Ward_19", ORIGIN = "2024-08-05";
 const IGNORE = /Failed to load resource|ERR_ABORTED|WebGL|GPU stall|tile|maptiler|WebSocket/i;
 
+// The intro plays once per session; every test except the intro tests starts with it already seen.
+test.beforeEach(async ({ page }) => { await page.addInitScript(() => sessionStorage.setItem("ds.intro.seen", "1")); });
+
 function trackErrors(page: Page) {
   const errs: string[] = [];
   page.on("pageerror", (e) => errs.push("PAGEERROR " + e.message));
@@ -175,33 +178,81 @@ test("no API key or secret appears in served pages, scripts or API responses", a
   expect(all).not.toMatch(/OPENAI_API_KEY\s*=\s*sk/);
 });
 
-// ---- Geography (DGHS official boundaries). The success case uses a MOCK payload with invented attributes (a test fixture, not DGHS data).
-const GEO_FIXTURE = { type: "FeatureCollection", features: [
-  { type: "Feature", properties: { dist_name: "MockDistrict", city_name: "MockCity", ward_no: 1 }, geometry: { type: "Polygon", coordinates: [[[90.3, 23.7], [90.4, 23.7], [90.4, 23.8], [90.3, 23.7]]] } },
-  { type: "Feature", properties: { dist_name: "MockDistrict", city_name: "MockCity", ward_no: 2 }, geometry: { type: "Polygon", coordinates: [[[90.4, 23.7], [90.5, 23.7], [90.5, 23.8], [90.4, 23.7]]] } }],
-  dghs: { count: 2, pages: 1, truncated: false, max_features: 3000, cache: { cached: false, stale: false }, attribution: "MOCK attribution text", license: "MOCK licence text",
-          detected_fields: { district: { name: "dist_name" }, city: { name: "city_name" }, ward: { name: "ward_no" } } } };
-
-test("Geography: boundaries are context only and predictions stay in the abstract matrix", async ({ page }) => {
-  const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
-  await page.route("**/api/geo/dghs/status", (r) => r.fulfill({ json: { status: "ok", attribution: "MOCK attribution text", license: "MOCK licence text", id_mapping: { status: "unmapped", verified: false, reason: "No crosswalk." }, detected_fields: GEO_FIXTURE.dghs.detected_fields } }));
-  await page.route("**/api/geo/dghs/filters*", (r) => r.fulfill({ json: { options: { district: ["MockDistrict"], city: ["MockCity"], ward: [1, 2] }, detected_fields: GEO_FIXTURE.dghs.detected_fields } }));
-  await page.route("**/api/geo/dghs/wards*", (r) => r.fulfill({ json: GEO_FIXTURE }));
+// ---- Map & Emergency Routing (real OSM facilities and A* routes served by the API; DGHS boundaries are optional context)
+test("map: search a hospital, route to it with A* (verified by Dijkstra), and list the nearest hospitals by road", async ({ page, context }) => {
+  const errs = trackErrors(page);
+  await context.grantPermissions(["geolocation"]); await context.setGeolocation({ latitude: 23.7104, longitude: 90.4074 });
   await page.goto("/geography/");
-  await expect(page.getByText("2 features")).toBeVisible();
-  await expect(page.getByText("MOCK attribution text").first()).toBeVisible();
-  await expect(page.getByText("not linked to forecasts").first()).toBeVisible();
-  await expect(page.getByText(/No verified crosswalk exists/)).toBeVisible();
-  await expect(page.getByRole("button", { name: /^DNCC_Ward_\d+ / }).first()).toBeVisible();      // abstract matrix of synthetic wards
-  await expect(page.getByRole("cell", { name: "MockCity" }).first()).toBeVisible();                  // attributes shown exactly as published
-  await expect(page.locator("main canvas").first()).toBeVisible();
-  expect(errors).toEqual([]);
+  await expect(page.getByText("Not live hospital information.")).toBeVisible();
+  await page.getByRole("button", { name: "Use my location" }).click();
+  await expect(page.getByText(/Your location/)).toBeVisible();
+  await page.fill("#geo-search", "Square Hospital");
+  await page.getByRole("option").first().click();
+  const panel = page.getByRole("complementary", { name: /Facility, route/ });
+  await expect(panel.getByText("community-mapped (OpenStreetMap); not verified by DGHS", { exact: false })).toBeVisible();
+  await expect(panel.locator('a[href^="tel:"]').first()).toBeVisible();                            // click-to-call from OSM contact data
+  await panel.getByRole("button", { name: /Route from start/ }).click();
+  await expect(panel.getByText("Dijkstra check")).toBeVisible({ timeout: 20_000 });
+  await expect(panel.getByText("✓ equal")).toHaveCount(2);
+  await page.getByRole("button", { name: "Nearest hospitals by road" }).click();
+  await expect(panel.getByText(/Closest hospitals by estimated road travel time/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/Routing engine diagnostics/)).toBeVisible();
+  await expect(page.getByText(/A\* matched Dijkstra's optimal cost in/)).toBeVisible();
+  expect(errs).toEqual([]);
 });
 
-test("Geography degrades gracefully when the DGHS GIS service is unreachable", async ({ page }) => {
+test("map: forecasts stay at city level, the abstract ward matrix is separate, and an unreachable DGHS layer degrades gracefully", async ({ page }) => {
   await page.route("**/api/geo/dghs/**", (r) => r.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ status: "unavailable", error: "ConnectTimeout: simulated", id_mapping: { verified: false } }) }));
   await page.goto("/geography/");
-  await expect(page.getByText(/Optional service unavailable/)).toBeVisible();
-  await expect(page.getByText(/Boundary data is unavailable/)).toBeVisible();
-  await expect(page.getByRole("button", { name: /^DNCC_Ward_\d+ / }).first()).toBeVisible();      // predictions unaffected
+  await expect(page.getByRole("img", { name: /forecast: \d+ of \d+ synthetic wards alerting/ }).first()).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("button", { name: /^DNCC_Ward_\d+ / }).first()).toBeVisible();      // abstract matrix of synthetic wards
+  await page.getByRole("switch", { name: "DGHS boundaries" }).click();
+  await expect(page.getByText(/DGHS boundaries unavailable/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(/Facility directory \(\d+\)/)).toBeVisible();                       // the rest of the page keeps working
+});
+
+test("emergency help is one click away on every page and opens instantly with published numbers", async ({ page }) => {
+  await page.route("**/api/**", (r) => r.abort());                                                // works even when the API is down
+  await page.goto("/evidence/");
+  await page.getByRole("button", { name: /Emergency help/ }).click();
+  const dlg = page.getByRole("dialog", { name: "Emergency help" });
+  await expect(dlg.locator('a[href="tel:999"]')).toBeVisible();
+  await expect(dlg.locator('a[href="tel:16263"]')).toBeVisible();
+  await expect(dlg.getByText("severe abdominal pain")).toBeVisible();
+});
+
+test.describe("intro", () => {
+  test.use({ reducedMotion: "no-preference" });                                                  // the config default is "reduce", which (correctly) skips the intro
+  test("plays once: swat to reveal the dashboard, never replays on navigation", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.removeItem("ds.intro.seen"));                   // runs after the global seen-flag script
+    await page.goto("/");
+    const intro = page.getByRole("dialog", { name: /introduction/ });
+    await expect(intro).toBeVisible();
+    await expect(page.locator("main h1")).toBeAttached();                                         // the app loads underneath, not blocked
+    await page.mouse.click(700, 420);
+    await expect(intro).toBeHidden({ timeout: 5_000 });
+    await page.getByRole("link", { name: /Model Evidence/ }).first().click();
+    await expect(page.locator("main h1")).toBeVisible();
+    await expect(intro).toHaveCount(0);
+  });
+  test("skip and keyboard work; emergency help is reachable from the intro", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.removeItem("ds.intro.seen"));
+    await page.goto("/");
+    await page.getByRole("dialog", { name: /introduction/ }).getByRole("button", { name: /Emergency help/ }).click();
+    await expect(page.getByRole("dialog", { name: "Emergency help" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.evaluate(() => sessionStorage.removeItem("ds.intro.seen")); await page.reload();
+    await expect(page.getByRole("dialog", { name: /introduction/ })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: /introduction/ })).toBeHidden();
+  });
+  test.describe("reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+    test("is skipped entirely under prefers-reduced-motion", async ({ page }) => {
+      await page.addInitScript(() => sessionStorage.removeItem("ds.intro.seen"));
+      await page.goto("/");
+      await expect(page.locator("main h1")).toBeVisible();
+      await expect(page.getByRole("dialog", { name: /introduction/ })).toHaveCount(0);
+    });
+  });
 });

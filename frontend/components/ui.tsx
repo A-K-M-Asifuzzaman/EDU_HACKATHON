@@ -87,7 +87,7 @@ export function RiskBadge({ tier, size = "md", pulse }: { tier: Tier; size?: "sm
 
 // ------------------------------------------------------------------ controls
 export function Btn({ children, variant = "solid", className = "", ...p }: any) {
-  const v = { solid: "bg-emerald text-white hover:bg-emerald-d shadow-sm", ghost: "bg-white text-forest border border-line hover:bg-mint-l", dark: "bg-forest text-white hover:bg-forest-2" }[variant as string];
+  const v = { solid: "bg-emerald text-white hover:bg-emerald-d shadow-sm", ghost: "bg-white text-forest border border-line hover:bg-mint-l", dark: "bg-forest text-white hover:bg-forest-2", danger: "bg-coral-d text-white hover:bg-coral shadow-sm" }[variant as string];
   return <button className={cls("inline-flex items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-[13px] font-medium transition active:scale-[0.98] disabled:opacity-50", v, className)} {...p}>{children}</button>;
 }
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {

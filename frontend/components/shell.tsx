@@ -9,6 +9,8 @@ import { dateFmt, cls } from "@/lib/format";
 import { Icon, Logo } from "./icons";
 import { ProvChip } from "./ui";
 import { CopilotFab } from "./chat";
+import Emergency from "./emergency";
+import Intro from "./intro";
 
 const NAV = [["/", "nav.command", "command"], ["/profiling/", "nav.profiling", "profiling"], ["/wards/", "nav.wards", "wards"], ["/geography/", "nav.geography", "geography"], ["/lab/", "nav.lab", "lab"], ["/copilot/", "nav.copilot", "copilot"],
   ["/evidence/", "nav.evidence", "evidence"], ["/response/", "nav.response", "response"], ["/climate/", "nav.climate", "climate"], ["/learn/", "nav.learn", "learn"], ["/provenance/", "nav.provenance", "provenance"]] as const;
@@ -50,10 +52,12 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <span className="hidden sm:inline-flex"><ProvChip>{t("fresh.model")}: {meta.model.bundle_version ? `v${meta.model.bundle_version}` : "—"} · {meta.model.features} features</ProvChip></span></>}
           {error && <ProvChip tone="warn">{t("state.offline")}</ProvChip>}
           <div className="ml-auto flex items-center gap-2">
+            <Emergency />
             <button onClick={() => setLang(lang === "en" ? "bn" : "en")} className="rounded-xl border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-forest shadow-sm hover:bg-mint-l" aria-label="Switch language">{t("lang.switch")}</button>
           </div>
         </div>
         <main id="main" className="mx-auto max-w-[1360px] px-4 py-6 sm:px-6">{children}</main>
+        <Intro />
       </div>
       <CopilotFab />
     </div>);

@@ -5,7 +5,7 @@ import { cls } from "@/lib/format";
 
 export interface CityPoint { city: string; wards: number; alerts: number; meanP: number; expected: number }
 // Approximate city-centre positions (NOT ward boundaries). Ward IDs in the organizer data cannot be matched to real boundaries.
-const POS: Record<string, [number, number]> = { "Dhaka North": [90.395, 23.84], "Dhaka South": [90.41, 23.72], Chattogram: [91.7832, 22.3569], Gazipur: [90.4203, 23.9999], Narayanganj: [90.5, 23.6238] };
+export const CITY_POS: Record<string, [number, number]> = { "Dhaka North": [90.395, 23.84], "Dhaka South": [90.41, 23.72], Chattogram: [91.7832, 22.3569], Gazipur: [90.4203, 23.9999], Narayanganj: [90.5, 23.6238] };
 const KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
 const colour = (p: number) => (p > 0.75 ? "#d93a42" : p > 0.5 ? "#e8782f" : p > 0.25 ? "#e0a526" : "#0e8f66");
 
@@ -34,7 +34,7 @@ export default function CityMap({ points, selected, onSelect, height = 380 }: { 
     if (!map.current || !lib.current) return;
     markers.current.forEach((x) => x.remove()); markers.current = [];
     for (const p of points) {
-      const pos = POS[p.city]; if (!pos) continue;
+      const pos = CITY_POS[p.city]; if (!pos) continue;
       const d = document.createElement("button");
       const size = 24 + Math.min(18, p.wards * 0.9);
       d.setAttribute("aria-label", `${p.city}: ${p.alerts} of ${p.wards} wards alerting, mean outbreak probability ${Math.round(p.meanP * 100)}%`);

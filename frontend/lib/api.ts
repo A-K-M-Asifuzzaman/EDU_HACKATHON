@@ -38,6 +38,7 @@ export const qs = (o: Record<string, string | number | boolean | undefined | nul
 
 // ISO helpers (weekly Monday grid)
 export const addWeeks = (iso: string, n: number) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() + 7 * n); return d.toISOString().slice(0, 10); };
+export const isoMonday = (iso: string) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d.toISOString().slice(0, 10); };
 export const isMonday = (iso: string) => new Date(iso + "T00:00:00Z").getUTCDay() === 1;
 
 export const TIER_COLOR: Record<Tier, string> = { Low: "#0e8f66", Medium: "#e0a526", High: "#e8782f", Critical: "#d93a42" };

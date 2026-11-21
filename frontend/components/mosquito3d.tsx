@@ -19,14 +19,14 @@ function Leg({ side, i }: { side: 1 | -1; i: number }) {
     <mesh position={[side * (spread + 0.2), -0.78, 0]} rotation={[0, 0, side * 0.35]}><cylinderGeometry args={[0.015, 0.015, 0.1, 6]} /><meshStandardMaterial color={BAND} /></mesh></group>);
 }
 
-function Mosquito({ active, onHover, animate }: { active: Part | null; onHover: (p: Part | null) => void; animate: boolean }) {
+export function Mosquito({ active, onHover, animate, flapSpeed = 18, flapAmp = 0.16, hover = true }: { active: Part | null; onHover: (p: Part | null) => void; animate: boolean; flapSpeed?: number; flapAmp?: number; hover?: boolean }) {
   const wl = useRef<THREE.Mesh>(null), wr = useRef<THREE.Mesh>(null), body = useRef<THREE.Group>(null);
   useFrame(({ clock }) => {
     if (!animate) return;
-    const t = clock.elapsedTime, f = Math.sin(t * 18) * 0.16;           // subtle flutter, not a flight simulation
+    const t = clock.elapsedTime, f = Math.sin(t * flapSpeed) * flapAmp;           // subtle flutter, not a flight simulation
     if (wl.current) wl.current.rotation.z = 0.5 + f;
     if (wr.current) wr.current.rotation.z = -0.5 - f;
-    if (body.current) body.current.position.y = Math.sin(t * 1.4) * 0.04;
+    if (body.current && hover) body.current.position.y = Math.sin(t * 1.4) * 0.04;
   });
   const glow = (p: Part) => (active === p ? 0.55 : 0);
   const hit = (p: Part) => ({ onPointerOver: (e: any) => { e.stopPropagation(); onHover(p); document.body.style.cursor = "pointer"; }, onPointerOut: () => { onHover(null); document.body.style.cursor = ""; } });
