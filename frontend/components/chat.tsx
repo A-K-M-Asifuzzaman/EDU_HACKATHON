@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { api } from "@/lib/api";
@@ -12,6 +13,15 @@ interface Source { id: string; source: string; heading: string; excerpt: string 
 interface Msg { role: "user" | "assistant"; text: string; sources?: Source[]; tools?: string[]; cost?: number; error?: string; disabled?: boolean; cached?: boolean }
 const BASE = process.env.NEXT_PUBLIC_API_BASE ?? (process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "");
 
+// page-aware suggestions shown first (answered from the same read-only tools and indexed documents)
+const CONTEXT: Record<string, { en: string[]; bn: string[] }> = {
+  "/geography/": { en: ["Find hospitals in Gazipur that list a phone number", "How does the A* routing work and how is it verified?"],
+                   bn: ["গাজীপুরে ফোন নম্বরসহ হাসপাতাল খুঁজে দাও", "এ-স্টার রুটিং কীভাবে কাজ করে এবং কীভাবে যাচাই করা হয়?"] },
+  "/evidence/": { en: ["How often does the outbreak alert miss real outbreaks?", "Why do the intervals under-cover outbreak peaks?"],
+                  bn: ["প্রাদুর্ভাব সতর্কতা কত ঘন ঘন আসল প্রাদুর্ভাব মিস করে?", "প্রাদুর্ভাবের শীর্ষে ব্যবধিগুলো কেন কম কভার করে?"] },
+  "/response/": { en: ["Which wards have the highest outbreak probability for the selected week?", "Why should risk tiers not be treated as official warning levels?"],
+                  bn: ["নির্বাচিত সপ্তাহে কোন ওয়ার্ডগুলোর প্রাদুর্ভাবের সম্ভাবনা সবচেয়ে বেশি?", "ঝুঁকির স্তরকে কেন সরকারি সতর্কতা স্তর হিসেবে ধরা উচিত নয়?"] },
+};
 const SUGGEST = {
   en: ["Why was the Poisson GLM chosen instead of LightGBM?", "What does the three-week rainfall lag mean?", "Which wards have the highest predicted outbreak probability?", "Why is the 4-week forecast more uncertain?",
     "What is the difference between MAE and RMSE?", "How reliable are the forecast intervals?", "What limitations does the dataset have?", "Why is this ward considered high risk?"],
@@ -68,7 +78,8 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
     } catch (e: any) { if (e?.name !== "AbortError") upd((m) => ({ ...m, error: "Could not reach the assistant. The rest of DengueShield is unaffected." })); }
     finally { setBusy(false); }
   }
-  const sug = SUGGEST[lang];
+  const path = usePathname() || "/";
+  const sug = Array.from(new Set([...(CONTEXT[path]?.[lang] ?? []), ...SUGGEST[lang]])).slice(0, 8);
   return (
     <div className={cls("flex flex-col", compact ? "h-full" : "h-[calc(100vh-190px)] min-h-[520px]")}>
       <div className="scroll-thin flex-1 space-y-4 overflow-y-auto pr-1" aria-live="polite">
