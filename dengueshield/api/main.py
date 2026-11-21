@@ -141,18 +141,33 @@ def availability(origin: str) -> list:
 
 
 # ------------------------------------------------------------------ system
+_PROBE = {"t": 0.0, "v": None}
+
+
+def _inference_probe():
+    """One-ward live prediction timing, cached for 5 minutes and serialised with other heavy model calls.
+    Platform health checks hit /api/health every few seconds; without this each one ran a ~100 MB prediction."""
+    if S.bundle is None or S.panel is None:
+        return None
+    if time.time() - _PROBE["t"] < 300 and _PROBE["v"] is not None:
+        return _PROBE["v"]
+    o = (S.last_week - pd.Timedelta(weeks=8)).date().isoformat()
+
+    def run():
+        t = time.perf_counter()
+        S.bundle.predict(S.panel, o, 3, wards=[S.wards.ward_id.iloc[0]])
+        return round((time.perf_counter() - t) * 1000, 1)
+    try:
+        _PROBE.update(t=time.time(), v=S._heavy(run))
+    except Exception as e:
+        S.errors["probe"] = str(e)
+    return _PROBE["v"]
+
+
 @app.get("/api/health")
 def health():
     ok = {"dataset": S.panel is not None, "bundle": S.bundle is not None, "replay": S.replay is not None, "artifacts": not [k for k in S.errors if k in S.art or k in ("profile",)]}
-    probe = None
-    if S.bundle is not None and S.panel is not None:
-        o = (S.last_week - pd.Timedelta(weeks=8)).date().isoformat()
-        t = time.perf_counter()
-        try:
-            S.bundle.predict(S.panel, o, 3, wards=[S.wards.ward_id.iloc[0]])
-            probe = round((time.perf_counter() - t) * 1000, 1)
-        except Exception as e:
-            S.errors["probe"] = str(e)
+    probe = _inference_probe()
     status = "ok" if all(ok.values()) else ("degraded" if ok["bundle"] or ok["replay"] else "down")
     return {"status": status, "components": ok, "errors": S.errors, "uptime_s": round(time.time() - STARTED), "inference_probe_ms": probe,
             "latency_ms": S.latency_ms, "openai_configured": integrations.openai_configured(), "cache_entries": len(S.cache)}
