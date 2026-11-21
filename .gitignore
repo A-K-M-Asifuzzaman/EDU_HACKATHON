@@ -19,3 +19,6 @@ frontend/.next/
 frontend/out/
 public/maplibre/
 frontend/tsconfig.tsbuildinfo
+frontend/test-results/
+frontend/playwright-report/
+frontend/public/maplibre/

@@ -26,7 +26,7 @@ export default function ControlsBar({ show = ["city", "ward", "origin", "horizon
         options={[{ value: "All", label: t("ctl.all") }, ...cities.map((c) => ({ value: c, label: c }))]} />}
       {show.includes("ward") && <Select label={t("ctl.ward")} value={sel.ward} onChange={(v) => set({ ward: v })} options={list.map((w) => ({ value: w.ward_id, label: w.ward_id }))} />}
       {show.includes("horizon") && <Segmented label={t("ctl.horizon")} value={sel.horizon} onChange={(v) => set({ horizon: Number(v) })} options={[2, 3, 4].map((h) => ({ value: h, label: `${h} ${t("ctl.weeks")}` }))} />}
-      {show.includes("origin") && (<div className="min-w-[260px] flex-1">
+      {show.includes("origin") && (<div className="w-full flex-1 basis-full sm:basis-[260px]">
         <div className="mb-1 flex items-center justify-between"><span className="eyebrow">{t("ctl.origin")}</span><span className="text-sm font-semibold text-forest">{dateFmt(sel.origin, lang)}</span></div>
         <div className="flex items-center gap-2">
           <Btn variant="ghost" aria-label="Previous week" onClick={() => setIdx(idx - 1)} className="!px-2.5">‹</Btn>
