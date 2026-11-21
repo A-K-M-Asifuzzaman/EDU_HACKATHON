@@ -123,3 +123,20 @@ def test_ensemble_weights_ignore_outer_labels():
     _, w2 = nested_blend(a2, b2, "ab")
     assert w1[w1.year == 2024].weight_A.tolist() == w2[w2.year == 2024].weight_A.tolist()
     assert w1[w1.year == 2023].weight_A.tolist() == w2[w2.year == 2023].weight_A.tolist()   # 2024 is not inner for 2023
+
+
+def test_tuning_cannot_use_benchmark_or_later_seasons(season):
+    from dengueshield.optimization import search
+    with pytest.raises(AssertionError):
+        search.run_study(None, "lgbm_poisson", COLS, "F3", 1, seasons=(2021, 2022))
+    assert max(S.TUNE) < min(S.BENCH)
+
+
+def test_search_spaces_are_bounded_and_early_stopped():
+    import optuna
+    from dengueshield.optimization import search
+    t = optuna.trial.FixedTrial({"learning_rate": 0.05, "num_leaves": 15, "max_depth": 4, "min_child_samples": 50, "reg_alpha": 0.1,
+                                 "reg_lambda": 1.0, "colsample_bytree": 0.7, "subsample": 0.8})
+    p = search.space("lgbm_poisson", t)
+    assert p["early_stopping"] is True and p["num_leaves"] <= 63
+    assert sum(n for _, n in search.PLAN) <= 100

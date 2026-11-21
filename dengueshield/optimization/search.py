@@ -77,3 +77,34 @@ def baseline_objective(panel, model: str, cols, fs_name: str, params=None, conv=
     """Same objective for an untuned reference (e.g. the GLM) so trials can be compared like for like."""
     return float(np.mean([S.score(S.predict_season(panel, conv, fs_name, cols, model, params or {}, h, y))["mae"]
                           for y in seasons for h in horizons]))
+
+
+PLAN = (("lgbm_poisson", 20), ("xgb_poisson", 20), ("cat_poisson", 15))
+
+
+def run_plan(panel, cols, fs_name="F3", plan=PLAN, extend_to=40, min_gain=0.01, cap_seconds=75 * 60) -> dict:
+    """The Stage 3 tuning budget: initial trials per family; extend to `extend_to` only if the best inner MAE beats the
+    plain Poisson GLM's inner MAE by at least `min_gain`; stop starting new studies after `cap_seconds`.
+    Resumes persisted studies, so re-running after completion does no new work."""
+    t0, cpu0 = time.time(), time.process_time()
+    glm = baseline_objective(panel, "glm_poisson", cols, fs_name)
+    log = {"glm_poisson_objective": glm, "glm_spline_objective": baseline_objective(panel, "glm_spline", cols, fs_name), "studies": {}}
+    for model, n in plan:
+        if time.time() - t0 > cap_seconds:
+            log["studies"][model] = {"skipped": "budget"}
+            continue
+        t = time.time()
+        st = run_study(panel, model, cols, fs_name, n)
+        log["studies"][model] = {"initial_trials": n, "best_initial": st.best_value, "seconds": time.time() - t}
+    for model, _ in plan:
+        s = log["studies"][model]
+        if "best_initial" in s and s["best_initial"] < glm - min_gain and time.time() - t0 < cap_seconds:
+            st = run_study(panel, model, cols, fs_name, extend_to)
+        else:
+            st = run_study(panel, model, cols, fs_name, 0) if "best_initial" in s else None
+        if st is not None:
+            s.update(trials=len(st.trials), best=st.best_value, params=st.best_params,
+                     pruned=sum(t.state.name == "PRUNED" for t in st.trials))
+    log["wall_seconds_this_call"] = time.time() - t0
+    log["cpu_seconds_this_call"] = time.process_time() - cpu0
+    return log

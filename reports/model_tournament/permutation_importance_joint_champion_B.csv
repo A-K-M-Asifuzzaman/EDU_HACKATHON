@@ -1,0 +1,73 @@
+group,year,horizon,mae_increase,ridge_alpha
+"all weather (rain, projection, climatology, regime)",2019,2,1.1845555555555558,0.0001
+calendar,2019,2,1.4461111111111113,0.0001
+ward vulnerability,2019,2,0.27766666666666673,0.0001
+rain_tl3 + its climatology twin,2019,2,0.6315555555555555,0.0001
+"all weather (rain, projection, climatology, regime)",2019,3,0.36133786848072563,0.0001
+calendar,2019,3,2.076530612244898,0.0001
+ward vulnerability,2019,3,0.2867346938775511,0.0001
+rain_tl3 + its climatology twin,2019,3,0.5786848072562357,0.0001
+"all weather (rain, projection, climatology, regime)",2019,4,0.02442129629629619,0.3
+calendar,2019,4,2.3209490740740737,0.3
+ward vulnerability,2019,4,0.18576388888888876,0.3
+rain_tl3 + its climatology twin,2019,4,0.04131944444444432,0.3
+"all weather (rain, projection, climatology, regime)",2020,2,0.9223333333333333,0.0001
+calendar,2020,2,1.2826666666666668,0.0001
+ward vulnerability,2020,2,0.2794444444444445,0.0001
+rain_tl3 + its climatology twin,2020,2,0.19922222222222222,0.0001
+"all weather (rain, projection, climatology, regime)",2020,3,0.42596371882086165,0.3
+calendar,2020,3,1.4640589569160998,0.3
+ward vulnerability,2020,3,0.24115646258503398,0.3
+rain_tl3 + its climatology twin,2020,3,-0.027324263038548773,0.3
+"all weather (rain, projection, climatology, regime)",2020,4,0.29502314814814823,0.01
+calendar,2020,4,2.4003472222222224,0.01
+ward vulnerability,2020,4,0.24826388888888898,0.01
+rain_tl3 + its climatology twin,2020,4,0.9662037037037038,0.01
+"all weather (rain, projection, climatology, regime)",2021,2,0.6886666666666666,0.0001
+calendar,2021,2,0.9282222222222222,0.0001
+ward vulnerability,2021,2,0.22777777777777777,0.0001
+rain_tl3 + its climatology twin,2021,2,0.07888888888888886,0.0001
+"all weather (rain, projection, climatology, regime)",2021,3,0.07811791383219953,0.0001
+calendar,2021,3,1.2156462585034014,0.0001
+ward vulnerability,2021,3,0.20657596371882092,0.0001
+rain_tl3 + its climatology twin,2021,3,-0.2179138321995465,0.0001
+"all weather (rain, projection, climatology, regime)",2021,4,-0.1572916666666666,0.0001
+calendar,2021,4,1.5766203703703703,0.0001
+ward vulnerability,2021,4,0.1759259259259259,0.0001
+rain_tl3 + its climatology twin,2021,4,95.62800925925926,0.0001
+"all weather (rain, projection, climatology, regime)",2022,2,1.3385555555555555,0.3
+calendar,2022,2,1.3706666666666667,0.3
+ward vulnerability,2022,2,0.3175555555555556,0.3
+rain_tl3 + its climatology twin,2022,2,0.6138888888888889,0.3
+"all weather (rain, projection, climatology, regime)",2022,3,0.7315192743764172,0.3
+calendar,2022,3,1.6048752834467122,0.3
+ward vulnerability,2022,3,0.2590702947845805,0.3
+rain_tl3 + its climatology twin,2022,3,0.046938775510204124,0.3
+"all weather (rain, projection, climatology, regime)",2022,4,0.2569444444444446,0.3
+calendar,2022,4,2.0717592592592595,0.3
+ward vulnerability,2022,4,0.2596064814814816,0.3
+rain_tl3 + its climatology twin,2022,4,0.004976851851851964,0.3
+"all weather (rain, projection, climatology, regime)",2023,2,1.462,0.01
+calendar,2023,2,1.561222222222222,0.01
+ward vulnerability,2023,2,0.4031111111111112,0.01
+rain_tl3 + its climatology twin,2023,2,0.5726666666666667,0.01
+"all weather (rain, projection, climatology, regime)",2023,3,0.7526077097505667,0.01
+calendar,2023,3,1.893877551020408,0.01
+ward vulnerability,2023,3,0.30816326530612237,0.01
+rain_tl3 + its climatology twin,2023,3,0.07301587301587298,0.01
+"all weather (rain, projection, climatology, regime)",2023,4,0.34837962962962954,0.3
+calendar,2023,4,2.186574074074074,0.3
+ward vulnerability,2023,4,0.23078703703703699,0.3
+rain_tl3 + its climatology twin,2023,4,0.00891203703703695,0.3
+"all weather (rain, projection, climatology, regime)",2024,2,0.7274509803921569,0.01
+calendar,2024,2,1.0852941176470587,0.01
+ward vulnerability,2024,2,0.2225490196078431,0.01
+rain_tl3 + its climatology twin,2024,2,0.23747276688453156,0.01
+"all weather (rain, projection, climatology, regime)",2024,3,0.1311111111111111,0.01
+calendar,2024,3,1.2436666666666667,0.01
+ward vulnerability,2024,3,0.20811111111111105,0.01
+rain_tl3 + its climatology twin,2024,3,-0.07933333333333333,0.01
+"all weather (rain, projection, climatology, regime)",2024,4,0.012358276643990992,0.01
+calendar,2024,4,1.9191609977324262,0.01
+ward vulnerability,2024,4,0.21712018140589576,0.01
+rain_tl3 + its climatology twin,2024,4,0.521201814058957,0.01

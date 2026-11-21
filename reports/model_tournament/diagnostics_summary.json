@@ -316,6 +316,29 @@
     "champion": 0.44000000000000006,
     "LightGBM Poisson (untuned)": 0.6000000000000001
   },
+  "joint_permutation_champion_B": {
+    "all weather (rain, projection, climatology, regime)": {
+      "2": 1.054,
+      "3": 0.413,
+      "4": 0.13
+    },
+    "calendar": {
+      "2": 1.279,
+      "3": 1.583,
+      "4": 2.079
+    },
+    "rain_tl3 + its climatology twin": {
+      "2": 0.389,
+      "3": 0.062,
+      "4": 16.195
+    },
+    "ward vulnerability": {
+      "2": 0.288,
+      "3": 0.252,
+      "4": 0.22
+    }
+  },
+  "ridge_stability_rule": "rejected: no gain (B 2022-24 equal; 2019-24 +0.002; A worse)",
   "glm_top_coefficients_h3": {
     "cal_org_cos1": -0.7685,
     "cal_tgt_cos1": -0.7459,
@@ -345,22 +368,22 @@
   "bundles": {
     "B": {
       "path": "models/dengueshield_B.joblib",
-      "sha256": "133d7d322c2fc52785f2a5b0b32595b8a3d089a8f5d305baf6226bd7501f5e3b",
-      "build_s": 7.574669791967608,
-      "bytes": 11028
+      "sha256": "758a3bae433878695d66eaa0ceb3a4cb995f7853bad107567e2856dae4d0283a",
+      "build_s": 7.765858666971326,
+      "bytes": 11047
     },
     "A": {
       "path": "models/dengueshield_A.joblib",
-      "sha256": "f12a558dc8ec916172c484e3e7222d27c352a9f39147805b7fe8ce61ba743940",
-      "build_s": 7.844381875009276,
-      "bytes": 10990
+      "sha256": "e81962fbbca06d160b6d98c2c09bee0660b04c8054b7fd5a2b54314bcd7e4648",
+      "build_s": 7.661896334029734,
+      "bytes": 11010
     }
   },
   "inference_benchmarks_ms": {
-    "single ward, one horizon (ms)": 127.6,
-    "all 60 wards, one horizon (ms)": 129.1,
-    "all 60 wards x 3 horizons (ms)": 379.1,
-    "explain, all wards, one horizon (ms)": 125.2,
-    "load bundle from disk (ms)": 2.1
+    "single ward, one horizon (ms)": 127.4,
+    "all 60 wards, one horizon (ms)": 127.0,
+    "all 60 wards x 3 horizons (ms)": 385.0,
+    "explain, all wards, one horizon (ms)": 126.5,
+    "load bundle from disk (ms)": 1.9
   }
 }

@@ -23,8 +23,9 @@ class GLMModel:
     """
     ALPHAS = (1e-4, 1e-2, 0.3, 3.0, 30.0)
 
-    def __init__(self, alpha=None):
+    def __init__(self, alpha=None, one_se_tol=0.0):
         self.alpha = alpha
+        self.one_se_tol = one_se_tol   # > 0: strongest alpha whose holdout MAE is within (1 + tol) x the best (stability rule)
 
     def _prep_fit(self, X: pd.DataFrame):
         A = X.to_numpy(float)
@@ -56,7 +57,11 @@ class GLMModel:
             for a in self.ALPHAS:
                 mu = PoissonRegressor(alpha=a, max_iter=3000, tol=1e-6).fit(Z, y[tr]).predict(Zv)
                 score[a] = np.mean(np.abs(poisson.ppf(0.5, np.maximum(mu, 1e-9)) - y[va]))
-            self.alpha_ = min(score, key=score.get)
+            if self.one_se_tol > 0:
+                best = min(score.values())
+                self.alpha_ = max(a for a, v in score.items() if v <= best * (1 + self.one_se_tol))
+            else:
+                self.alpha_ = min(score, key=score.get)
             self.alpha_scores = score
         else:
             self.alpha_ = self.alpha
