@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const ROUTES = ["/", "/profiling/", "/wards/", "/lab/", "/copilot/", "/evidence/", "/response/", "/climate/", "/learn/", "/provenance/"];
+const ROUTES = ["/", "/profiling/", "/wards/", "/geography/", "/lab/", "/copilot/", "/evidence/", "/response/", "/climate/", "/learn/", "/provenance/"];
 const WARD = "DNCC_Ward_19", ORIGIN = "2024-08-05";
 const IGNORE = /Failed to load resource|ERR_ABORTED|WebGL|GPU stall|tile|maptiler|WebSocket/i;
 
@@ -173,4 +173,35 @@ test("no API key or secret appears in served pages, scripts or API responses", a
   const all = seen.join("\n");
   expect(all).not.toMatch(/sk-(proj-)?[A-Za-z0-9_-]{20,}/);
   expect(all).not.toMatch(/OPENAI_API_KEY\s*=\s*sk/);
+});
+
+// ---- Geography (DGHS official boundaries). The success case uses a MOCK payload with invented attributes (a test fixture, not DGHS data).
+const GEO_FIXTURE = { type: "FeatureCollection", features: [
+  { type: "Feature", properties: { dist_name: "MockDistrict", city_name: "MockCity", ward_no: 1 }, geometry: { type: "Polygon", coordinates: [[[90.3, 23.7], [90.4, 23.7], [90.4, 23.8], [90.3, 23.7]]] } },
+  { type: "Feature", properties: { dist_name: "MockDistrict", city_name: "MockCity", ward_no: 2 }, geometry: { type: "Polygon", coordinates: [[[90.4, 23.7], [90.5, 23.7], [90.5, 23.8], [90.4, 23.7]]] } }],
+  dghs: { count: 2, pages: 1, truncated: false, max_features: 3000, cache: { cached: false, stale: false }, attribution: "MOCK attribution text", license: "MOCK licence text",
+          detected_fields: { district: { name: "dist_name" }, city: { name: "city_name" }, ward: { name: "ward_no" } } } };
+
+test("Geography: boundaries are context only and predictions stay in the abstract matrix", async ({ page }) => {
+  const errors: string[] = []; page.on("pageerror", (e) => errors.push(e.message));
+  await page.route("**/api/geo/dghs/status", (r) => r.fulfill({ json: { status: "ok", attribution: "MOCK attribution text", license: "MOCK licence text", id_mapping: { status: "unmapped", verified: false, reason: "No crosswalk." }, detected_fields: GEO_FIXTURE.dghs.detected_fields } }));
+  await page.route("**/api/geo/dghs/filters*", (r) => r.fulfill({ json: { options: { district: ["MockDistrict"], city: ["MockCity"], ward: [1, 2] }, detected_fields: GEO_FIXTURE.dghs.detected_fields } }));
+  await page.route("**/api/geo/dghs/wards*", (r) => r.fulfill({ json: GEO_FIXTURE }));
+  await page.goto("/geography/");
+  await expect(page.getByText("2 features")).toBeVisible();
+  await expect(page.getByText("MOCK attribution text").first()).toBeVisible();
+  await expect(page.getByText("not linked to forecasts").first()).toBeVisible();
+  await expect(page.getByText(/No verified crosswalk exists/)).toBeVisible();
+  await expect(page.getByRole("button", { name: /^DNCC_Ward_\d+ / }).first()).toBeVisible();      // abstract matrix of synthetic wards
+  await expect(page.getByRole("cell", { name: "MockCity" }).first()).toBeVisible();                  // attributes shown exactly as published
+  await expect(page.locator("main canvas").first()).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("Geography degrades gracefully when the DGHS GIS service is unreachable", async ({ page }) => {
+  await page.route("**/api/geo/dghs/**", (r) => r.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ status: "unavailable", error: "ConnectTimeout: simulated", id_mapping: { verified: false } }) }));
+  await page.goto("/geography/");
+  await expect(page.getByText(/Optional service unavailable/)).toBeVisible();
+  await expect(page.getByText(/Boundary data is unavailable/)).toBeVisible();
+  await expect(page.getByRole("button", { name: /^DNCC_Ward_\d+ / }).first()).toBeVisible();      // predictions unaffected
 });

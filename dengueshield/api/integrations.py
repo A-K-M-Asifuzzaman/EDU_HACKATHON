@@ -31,6 +31,16 @@ def _load_env():
 _load_env()
 
 
+def _dghs_entry() -> dict:
+    from dengueshield.api import geo as G
+    ok = G.STATE["last_ok"]
+    return {"id": "dghs_gis", "provider": "DGHS Bangladesh GIS (ArcGIS REST FeatureServer)", "purpose": "Official ward boundaries: contextual geography only",
+            "feeds_inference": False, "network": True, "status": "reachable" if ok and not G.STATE["last_err"] else ("unavailable" if G.STATE["last_err"] else "not queried yet"),
+            "last_success": ok, "last_error": G.STATE["last_err"], "update_frequency": "boundaries cached 7 days", "license": G.LICENSE,
+            "cache": ".cache/geo (disk) + memory, stale copy served if the service is down", "attribution": G.ATTRIBUTION,
+            "fallback": "boundaries hidden; the abstract ward-risk matrix is unaffected. Dataset ward IDs are never joined to official polygons (no verified mapping)."}
+
+
 def _climate_entries() -> list:
     from dengueshield.api import climate as C
     out = []
@@ -61,8 +71,6 @@ def status(store) -> dict:
          "last_success": _last_ok.get("embeddings"), "update_frequency": "index rebuilt manually (about $0.003)", "license": "OpenAI API terms", "cache": "index stored in app_data/",
          "fallback": "BM25 lexical retrieval"},
         *_climate_entries(),
-        {"id": "dghs", "provider": "DGHS (Bangladesh)", "purpose": "Official dengue dashboard / GIS boundaries", "feeds_inference": False, "network": False, "status": "not integrated",
-         "last_success": None, "update_frequency": "-", "license": "unverified", "cache": "-",
-         "fallback": "abstract ward risk matrix; the dataset's ward IDs (e.g. DNCC_Ward_01) cannot be matched to real boundaries without evidence"},
+        _dghs_entry(),
         {"id": "maplibre_osm", "provider": "MapLibre / OpenStreetMap", "purpose": "Map base layers", "feeds_inference": False, "network": True, "status": "not used",
          "last_success": None, "update_frequency": "-", "license": "ODbL (OSM)", "cache": "-", "fallback": "no ward geometry is rendered because no verified boundary exists"}]}

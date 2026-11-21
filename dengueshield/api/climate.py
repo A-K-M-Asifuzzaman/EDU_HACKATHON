@@ -47,12 +47,12 @@ def _ck(*parts) -> str:
     return hashlib.sha256(json.dumps(parts, sort_keys=True, default=str).encode()).hexdigest()[:24]
 
 
-def cached_fetch(key: str, ttl: int, fn):
+def cached_fetch(key: str, ttl: int, fn, cache_dir: Optional[Path] = None):
     """Fresh memory > fresh disk > network > stale disk (flagged). Returns (payload, meta)."""
     now = time.time()
+    path = (cache_dir or CACHE_DIR) / f"{key}.json"
     if key in MEM and now - MEM[key][0] < ttl:
         return MEM[key][1], {"cached": True, "stale": False, "age_s": int(now - MEM[key][0])}
-    path = CACHE_DIR / f"{key}.json"
     if path.exists() and now - path.stat().st_mtime < ttl:
         try:
             v = json.loads(path.read_text())
@@ -62,7 +62,7 @@ def cached_fetch(key: str, ttl: int, fn):
             pass
     try:
         v = fn()
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(v))
         MEM[key] = (now, v)
         return v, {"cached": False, "stale": False, "age_s": 0}

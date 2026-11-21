@@ -10,7 +10,7 @@ import { Icon, Logo } from "./icons";
 import { ProvChip } from "./ui";
 import { CopilotFab } from "./chat";
 
-const NAV = [["/", "nav.command", "command"], ["/profiling/", "nav.profiling", "profiling"], ["/wards/", "nav.wards", "wards"], ["/lab/", "nav.lab", "lab"], ["/copilot/", "nav.copilot", "copilot"],
+const NAV = [["/", "nav.command", "command"], ["/profiling/", "nav.profiling", "profiling"], ["/wards/", "nav.wards", "wards"], ["/geography/", "nav.geography", "geography"], ["/lab/", "nav.lab", "lab"], ["/copilot/", "nav.copilot", "copilot"],
   ["/evidence/", "nav.evidence", "evidence"], ["/response/", "nav.response", "response"], ["/climate/", "nav.climate", "climate"], ["/learn/", "nav.learn", "learn"], ["/provenance/", "nav.provenance", "provenance"]] as const;
 
 export default function Shell({ children }: { children: React.ReactNode }) {

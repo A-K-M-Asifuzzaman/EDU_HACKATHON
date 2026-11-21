@@ -14,15 +14,17 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from dengueshield.api import climate, integrations
+from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
 
 app = FastAPI(title="DengueShield AI API", version="1.0.0",
               description="Ward-level dengue forecasting (2-4 weeks ahead). Historical Replay on the organizer dataset (2016-2024); the 2025 holdout is locked.")
+app.add_middleware(GZipMiddleware, minimum_size=2000)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"],
                    allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 S = Store()
@@ -441,6 +443,37 @@ def climate_compare(city: CityName = "Dhaka", start: str = "2016-01-01", end: st
             "caveats": ["NASA POWER and Open-Meteo are model/reanalysis products at city-centre coordinates, not rain-gauge measurements, and they can disagree substantially on rainfall.",
                         "Coarse grids tend to overcount light-rain days; wet days use a >= 1 mm threshold (stated convention).",
                         "Neither real source is an input to the validated forecasting model, which was trained on the synthetic organizer weather."]}
+
+
+# ------------------------------------------------------------------ DGHS official boundaries (contextual geography; never joined to dataset ward IDs)
+GeoText = Annotated[Optional[str], Query(max_length=80)]
+
+
+@app.get("/api/geo/dghs/status")
+def geo_status():
+    """Reachability, layer metadata, detected district/city/ward fields, attribution and the (unmapped) ID-mapping status."""
+    return geo.status()
+
+
+@app.get("/api/geo/dghs/filters")
+def geo_filters(district: GeoText = None, city: GeoText = None):
+    try:
+        return geo.options({"district": district, "city": city})
+    except ValueError as e:
+        bad(str(e))
+    except Exception as e:
+        return JSONResponse({"status": "unavailable", "error": str(e)[:240], "id_mapping": geo.ID_MAPPING}, status_code=503)
+
+
+@app.get("/api/geo/dghs/wards")
+def geo_wards(district: GeoText = None, city: GeoText = None, ward: GeoText = None, simplify: Annotated[float, Query(ge=0, le=0.01)] = 0.0002):
+    """Official ward polygons as GeoJSON (paginated upstream, cached). Properties are the DGHS attributes, unchanged."""
+    try:
+        return JSONResponse(geo.geojson({"district": district, "city": city, "ward": ward}, simplify))
+    except ValueError as e:
+        bad(str(e))
+    except Exception as e:
+        return JSONResponse({"status": "unavailable", "error": str(e)[:240], "attribution": geo.ATTRIBUTION, "id_mapping": geo.ID_MAPPING}, status_code=503)
 
 
 @app.get("/api/integrations/status")

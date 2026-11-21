@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { cls, dateFmt, download, num, pct, toCsv } from "@/lib/format";
 import ControlsBar from "@/components/controls";
 import CityMap from "@/components/citymap";
+import RiskMatrix from "@/components/riskmatrix";
 import { Btn, Card, CardTitle, DataTable, EmptyState, Loading, Modal, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import { FanChart } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
@@ -26,7 +27,6 @@ export default function Wards() {
   const wards: Forecast[] = all.data?.wards ?? [];
   const filtered = wards.filter((w) => (sel.city === "All" || w.city === sel.city) && (tier === "All" || w.risk_tier === tier) && (!q || w.ward_id.toLowerCase().includes(q.toLowerCase())));
   const cityPts = useMemo(() => Object.values(wards.reduce((a: any, w) => { const c = (a[w.city] ??= { city: w.city, wards: 0, alerts: 0, p: 0, expected: 0 }); c.wards++; c.alerts += w.outbreak_alert ? 1 : 0; c.p += w.p_outbreak; c.expected += w.expected_cases; return a; }, {})).map((c: any) => ({ city: c.city, wards: c.wards, alerts: c.alerts, meanP: c.p / c.wards, expected: c.expected })), [wards]);
-  const byCity = useMemo(() => { const m: Record<string, Forecast[]> = {}; for (const w of wards) (m[w.city] ??= []).push(w); for (const c in m) m[c].sort((a, b) => a.ward_id.localeCompare(b.ward_id, undefined, { numeric: true })); return m; }, [wards]);
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : p.length >= 4 ? [...p.slice(1), id] : [...p, id]));
   const cmpOpt = useMemo(() => {
     if (!picked.length || !h2.data || !h3.data || !h4.data) return null;
@@ -48,15 +48,11 @@ export default function Wards() {
     { key: "dens", label: "Density/km²", align: "right" as const, render: (w: Forecast) => num(w.vulnerability?.population_density_sqkm, lang, 0), sort: (w: Forecast) => w.vulnerability?.population_density_sqkm ?? 0 },
   ];
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; no real ward boundaries are shown because none can be reliably matched to them." />
+    <PageHeader eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; official DGHS boundaries are on the Geography page as context only, because no verified mapping to these IDs exists." />
     <ControlsBar show={["city", "origin", "horizon", "source"]} />
     <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
       <Card><CardTitle title="Risk matrix" sub={`${sel.horizon} ${t("ctl.weeks")} · ${dateFmt(sel.origin, lang)} · click a tile for details; tick rows below to compare`} right={<div className="flex gap-1.5">{TIERS.map((x) => <span key={x} className="flex items-center gap-1 text-[11px] text-ink-3"><i className="h-2.5 w-2.5 rounded-sm" style={{ background: TIER_COLOR[x] }} />{t(`risk.${x.toLowerCase()}`)}</span>)}</div>} />
-        <Loading q={all} h={300}>{() => (<div className="space-y-3">{Object.entries(byCity).filter(([c]) => sel.city === "All" || c === sel.city).map(([city, ws]) => (<div key={city}><div className="eyebrow mb-1.5">{city}</div>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-1.5">{ws.map((w) => (<button key={w.ward_id} onClick={() => setDetail(w.ward_id)} title={`${w.ward_id}: ${w.risk_tier}, P(outbreak) ${pct(w.p_outbreak, lang)}, median ${w.median_cases} [${w.lower_90}–${w.upper_90}]`}
-            aria-label={`${w.ward_id} ${w.risk_tier} ${pct(w.p_outbreak, lang)}`} className={cls("relative rounded-lg px-1 py-2 text-center text-white transition hover:scale-105 hover:shadow-lg focus-visible:scale-105", picked.includes(w.ward_id) && "ring-2 ring-forest ring-offset-2", w.outbreak_alert && "outline outline-1 outline-white/60")} style={{ background: TIER_COLOR[w.risk_tier], opacity: 0.55 + 0.45 * w.p_outbreak }}>
-            <span className="block text-[10px] font-medium opacity-90">{w.ward_id.split("_Ward_")[1]}</span><span className="num block text-sm font-bold leading-tight">{Math.round(w.p_outbreak * 100)}</span></button>))}</div></div>))}
-          <p className="text-[11px] text-ink-3">Tile number = outbreak probability (%). Tier colour = statistical category of the median forecast. {t("risk.note")}</p></div>)}</Loading></Card>
+        <Loading q={all} h={300}>{() => <RiskMatrix wards={wards} city={sel.city} picked={picked} onOpen={setDetail} />}</Loading></Card>
       <Card><CardTitle title="City overview" sub="Alerting wards per city" />
         <CityMap points={cityPts} selected={sel.city !== "All" ? sel.city : undefined} onSelect={(c) => set({ city: c })} height={300} />
         <div className="mt-3 grid grid-cols-2 gap-2 text-[12px]">{cityPts.map((c: any) => (<button key={c.city} onClick={() => set({ city: sel.city === c.city ? "All" : c.city })} className={cls("rounded-xl border px-3 py-2 text-left hover:bg-mint-l/60", sel.city === c.city ? "border-emerald bg-mint-l" : "border-line")}><b>{c.city}</b><br /><span className="text-ink-3">{c.alerts}/{c.wards} alerts · {pct(c.meanP, lang)}</span></button>))}</div></Card>

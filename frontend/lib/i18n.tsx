@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 
 export type Lang = "en" | "bn";
 const EN = {
-  "nav.command": "Command Center", "nav.profiling": "Data Profiling Studio", "nav.wards": "Ward Risk Explorer", "nav.lab": "AI Forecast Lab", "nav.copilot": "Research Copilot",
+  "nav.command": "Command Center", "nav.profiling": "Data Profiling Studio", "nav.wards": "Ward Risk Explorer", "nav.geography": "Geography (DGHS)", "nav.lab": "AI Forecast Lab", "nav.copilot": "Research Copilot",
   "nav.evidence": "Model Evidence", "nav.response": "Response Intelligence", "nav.climate": "Climate Observatory", "nav.provenance": "System & Provenance", "nav.learn": "Learn: Aedes & rainfall",
   "brand.tagline": "Predict Earlier. Respond Smarter.", "mode.replay": "Historical Replay", "mode.replay.desc": "Retrospective demonstration on the synthetic organizer dataset (2016–2024). Not live surveillance.",
   "ctl.city": "City", "ctl.ward": "Ward", "ctl.origin": "Forecast origin", "ctl.horizon": "Horizon", "ctl.weeks": "weeks", "ctl.source": "Forecast source", "ctl.all": "All",
@@ -38,7 +38,7 @@ const EN = {
 } as const;
 type Key = keyof typeof EN;
 const BN: Partial<Record<Key, string>> = {
-  "nav.command": "কমান্ড সেন্টার", "nav.profiling": "ডেটা প্রোফাইলিং স্টুডিও", "nav.wards": "ওয়ার্ড ঝুঁকি এক্সপ্লোরার", "nav.lab": "এআই পূর্বাভাস ল্যাব", "nav.copilot": "গবেষণা কোপাইলট",
+  "nav.command": "কমান্ড সেন্টার", "nav.profiling": "ডেটা প্রোফাইলিং স্টুডিও", "nav.wards": "ওয়ার্ড ঝুঁকি এক্সপ্লোরার", "nav.geography": "ভূগোল (ডিজিএইচএস)", "nav.lab": "এআই পূর্বাভাস ল্যাব", "nav.copilot": "গবেষণা কোপাইলট",
   "nav.evidence": "মডেল প্রমাণ", "nav.response": "প্রতিক্রিয়া বুদ্ধিমত্তা", "nav.climate": "জলবায়ু পর্যবেক্ষণকেন্দ্র", "nav.provenance": "সিস্টেম ও উৎস", "nav.learn": "শিখুন: এডিস ও বৃষ্টি",
   "brand.tagline": "আগে পূর্বাভাস। দ্রুত সাড়া।", "mode.replay": "ঐতিহাসিক রিপ্লে", "mode.replay.desc": "কৃত্রিম আয়োজক ডেটাসেটে (২০১৬–২০২৪) পূর্ববর্তী সময়ের প্রদর্শন। এটি সরাসরি নজরদারি নয়।",
   "ctl.city": "শহর", "ctl.ward": "ওয়ার্ড", "ctl.origin": "পূর্বাভাসের শুরু", "ctl.horizon": "সময়সীমা", "ctl.weeks": "সপ্তাহ", "ctl.source": "পূর্বাভাসের উৎস", "ctl.all": "সব",
