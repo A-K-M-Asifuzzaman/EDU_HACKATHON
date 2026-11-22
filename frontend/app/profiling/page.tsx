@@ -26,9 +26,9 @@ export default function Profiling() {
   const metrics = useAsync((s) => api("/api/model/metrics", { ttl: 600_000, signal: s }), []);
   const [h, setH] = useState(3);
   const diag = useAsync((s) => api(`/api/model/diagnostics?horizon=${h}`, { ttl: 600_000, signal: s }), [h]);
-  const tabs = [["overview", "Overview"], ["stats", "Statistics"], ["dist", "Distributions"], ["corr", "Correlations"], ["time", "Temporal"], ["lag", "Rainfall lags"], ["feat", "Feature engineering"], ["diag", "Modeling diagnostics"]].map(([id, label]) => ({ id, label }));
+  const tabs = ["overview", "stats", "dist", "corr", "time", "lag", "feat", "diag"].map((id) => ({ id, label: t(`pg.prof.tab.${id}`) }));
   return (<>
-    <PageHeader eyebrow="Real organizer dataset · development years 2016–2024" title={t("nav.profiling")} sub="Interactive profiling computed from the organizer dataset and the committed research artifacts. Everything is precomputed; nothing is retrained in the browser. The 2025 holdout is excluded." right={<ProvChip tone="warn">2025 holdout locked</ProvChip>} />
+    <PageHeader eyebrow={t("pg.prof.eyebrow")} title={t("nav.profiling")} sub={t("pg.prof.sub")} right={<ProvChip tone="warn">{t("fresh.holdout")}</ProvChip>} />
     <Tabs tabs={tabs} value={tab} onChange={setTab} />
     {tab === "overview" && <Overview profile={profile} dist={dist} />}
     {tab === "stats" && <Stats profile={profile} dist={dist} toast={toast} />}
