@@ -3,7 +3,18 @@ import "./globals.css";
 import Providers from "@/components/providers";
 import Shell from "@/components/shell";
 
-export const metadata: Metadata = { title: "DengueShield AI — Predict Earlier. Respond Smarter.", description: "Ward-level dengue forecasting 2–4 weeks ahead: Historical Replay on the EDU AI Engineering Hackathon 2026 dataset." };
+export const metadata: Metadata = {
+  title: "DengueShield AI — Predict Earlier. Respond Smarter.",
+  description: "Ward-level dengue forecasting 2–4 weeks ahead: Historical Replay on the EDU AI Engineering Hackathon 2026 dataset.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/icon.svg",
+  },
+};
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#073b2b" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
