@@ -46,18 +46,19 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <div className="absolute inset-0 bg-forest/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
         <motion.div className="absolute inset-y-0 left-0 w-[272px]" initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", stiffness: 380, damping: 36 }}>{side}</motion.div></motion.div>)}</AnimatePresence>
       <div className="min-w-0">
-        <div className="glass sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5 sm:px-6">
+        {/* phones: the chips and buttons wrapped to two rows and the sticky bar covered ~15% of the screen; keep it to one row */}
+        <div className="glass sticky top-0 z-30 flex items-center gap-1.5 border-b border-line px-3 py-2 sm:flex-wrap sm:gap-2 sm:px-6 sm:py-2.5">
           <button className="rounded-lg p-1.5 hover:bg-mint-l lg:hidden" aria-label="Open navigation" onClick={() => setOpen(true)}><Icon name="menu" /></button>
           {/* the brand lived only in the desktop sidebar, so phones showed no logo at all */}
           <Link href="/" aria-label="DengueShield AI home" className="flex items-center gap-1.5 lg:hidden"><Logo size={26} /><span className="hidden text-[14px] font-bold leading-none tracking-tight text-navy min-[400px]:inline">DengueShield <span className="text-emerald">AI</span></span></Link>
-          <ProvChip tone="warn"><Icon name="shield" size={12} />{t("mode.replay")}</ProvChip>
-          {meta && <><ProvChip tone="info">{t("fresh.data")} {dateFmt(meta.data.last_observed_week, lang)}</ProvChip>
+          <span className="min-w-0 truncate"><ProvChip tone="warn"><Icon name="shield" size={12} />{t("mode.replay")}</ProvChip></span>
+          {meta && <><span className="hidden sm:inline-flex"><ProvChip tone="info">{t("fresh.data")} {dateFmt(meta.data.last_observed_week, lang)}</ProvChip></span>
             <span className="hidden sm:inline-flex"><ProvChip>{t("fresh.model")}: {meta.model.bundle_version ? `v${meta.model.bundle_version}` : "—"} · {meta.model.features} features</ProvChip></span></>}
           {error && <ProvChip tone="warn">{t("state.offline")}</ProvChip>}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <Palette pages={NAV} />
             <Emergency />
-            <button onClick={() => setLang(lang === "en" ? "bn" : "en")} className="rounded-xl border border-line bg-white px-3 py-1.5 text-[13px] font-semibold text-forest shadow-sm hover:bg-mint-l" aria-label="Switch language">{t("lang.switch")}</button>
+            <button onClick={() => setLang(lang === "en" ? "bn" : "en")} className="rounded-xl border border-line bg-white px-2.5 py-1.5 text-[13px] font-semibold text-forest shadow-sm hover:bg-mint-l sm:px-3" aria-label="Switch language">{t("lang.switch")}</button>
           </div>
         </div>
         <main id="main" className="mx-auto max-w-[1360px] px-4 py-6 sm:px-6">{children}</main>

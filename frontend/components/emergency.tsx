@@ -42,8 +42,8 @@ export default function Emergency() {
   const L = TXT[lang];
   useEffect(() => { setMounted(true); const on = () => setOpen(true); window.addEventListener("ds:emergency", on); return () => window.removeEventListener("ds:emergency", on); }, []);
   return (<>
-    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-coral-d px-3 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-coral focus-visible:outline-2" aria-haspopup="dialog">
-      <span aria-hidden>✚</span> {L.button}</button>
+    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-coral-d px-2.5 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-coral focus-visible:outline-2 sm:px-3" aria-haspopup="dialog" aria-label={L.button}>
+      <span aria-hidden>✚</span><span className="hidden sm:inline">{L.button}</span><span className="sm:hidden">SOS</span></button>
     {mounted && createPortal(<Modal open={open} onClose={() => setOpen(false)} title={L.title}>   {/* portal: the header's backdrop-filter would otherwise trap position:fixed */}
       <div className="space-y-4 text-sm">
         <div className="grid gap-2 sm:grid-cols-2">{L.numbers.map((n) => (<a key={n.number} href={`tel:${n.number}`} className="rounded-xl border-2 border-coral-d/30 bg-coral/5 p-3 hover:bg-coral/10">
