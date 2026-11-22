@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useI18n } from "@/lib/i18n";
 import { useSel } from "@/lib/ctx";
@@ -22,6 +22,16 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const { meta, error } = useSel();
   const [open, setOpen] = useState(false);
   const isActive = (h: string) => (h === "/" ? path === "/" : path.startsWith(h.slice(0, -1)));
+  // mobile drawer: Escape closes it, the page behind must not scroll, and it closes itself if the route changes
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => { document.body.style.overflow = prev; window.removeEventListener("keydown", onKey); };
+  }, [open]);
+  useEffect(() => setOpen(false), [path]);
   const nav = (
     <nav aria-label="Primary" className="flex flex-col gap-0.5">
       {NAV.map(([href, key, icon]) => { const a = isActive(href); return (
@@ -44,7 +54,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <aside className="sticky top-0 hidden h-screen lg:block">{side}</aside>
       <AnimatePresence>{open && (<motion.div className="fixed inset-0 z-50 lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         <div className="absolute inset-0 bg-forest/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
-        <motion.div className="absolute inset-y-0 left-0 w-[272px]" initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", stiffness: 380, damping: 36 }}>{side}</motion.div></motion.div>)}</AnimatePresence>
+        <motion.div role="dialog" aria-modal="true" aria-label="Navigation" className="absolute inset-y-0 left-0 w-[272px] overflow-y-auto" initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", stiffness: 380, damping: 36 }}>{side}</motion.div></motion.div>)}</AnimatePresence>
       <div className="min-w-0">
         {/* phones: the chips and buttons wrapped to two rows and the sticky bar covered ~15% of the screen; keep it to one row */}
         <div className="glass sticky top-0 z-30 flex items-center gap-1.5 border-b border-line px-3 py-2 sm:flex-wrap sm:gap-2 sm:px-6 sm:py-2.5">
