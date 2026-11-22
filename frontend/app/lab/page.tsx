@@ -41,7 +41,7 @@ export default function Lab() {
   }, [cmp.data, t]);
 
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.lab")} sub="Pick a ward and a forecast origin, compare the 2-, 3- and 4-week forecasts, see exactly which rainfall each one relies on, and where the uncertainty comes from." />
+    <PageHeader eyebrow={t("mode.replay")} title={t("nav.lab")} sub={t("pg.lab.sub")} />
     <ControlsBar show={["city", "ward", "origin", "horizon", "source"]} />
     <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
       <Card><CardTitle title={`${t("sec.compare")}`} sub={`${sel.ward} · ${t("fc.origin")} ${dateFmt(sel.origin, lang)}`} />
