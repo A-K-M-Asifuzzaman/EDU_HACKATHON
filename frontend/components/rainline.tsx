@@ -17,7 +17,10 @@ export default function RainTimeline({ origin, horizon, rain, clim }: { origin: 
   const xOf = (w: string) => pad + weeks.indexOf(w) * bw + bw / 2;
   const originX = pad + weeks.indexOf(origin) * bw;
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rainfall timeline around ${origin}: observed before the origin, climatology after; key rain week ${key}`} className="w-full">
+    // On phones the 860-wide drawing shrank to ~330 px and its 10 px labels became unreadable and collided; keep a readable
+    // minimum width and let the timeline scroll sideways instead.
+    <div className="scroll-thin -mx-1 overflow-x-auto px-1 pb-1">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rainfall timeline around ${origin}: observed before the origin, climatology after; key rain week ${key}`} className="w-full min-w-[640px]">
       <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff4dc" /><line x1="0" y1="0" x2="0" y2="6" stroke="#f5b544" strokeWidth="2" /></pattern></defs>
       <rect x={originX} y={14} width={W - pad - originX} height={H - 74} fill="#fff9ec" opacity={0.7} rx={10} />
       {weeks.map((w, i) => { const obs = w < origin, v = vals[i], isKey = w === key; return (
@@ -26,9 +29,12 @@ export default function RainTimeline({ origin, horizon, rain, clim }: { origin: 
           <text x={xOf(w)} y={H - 42} textAnchor="middle" fontSize="10" fill="#5b6b7b">{dateFmt(w, lang, false)}</text>
           <text x={xOf(w)} y={y(v) - 5} textAnchor="middle" fontSize="10" fill="#44566a" className="num">{num(v, lang, 0)}</text></g>); })}
       <line x1={originX} x2={originX} y1={8} y2={H - 56} stroke="#073b2b" strokeWidth={2} strokeDasharray="5 4" />
-      <text x={originX + 6} y={22} fontSize="11" fontWeight="700" fill="#073b2b">{t("fc.origin")} (t) — {t("avail.observed")} ←  |  → {lang === "bn" ? "অপর্যবেক্ষিত" : "not yet observed"}</text>
+      {/* split around the origin line so the label never runs past the right edge of the chart */}
+      <text x={originX - 6} y={22} textAnchor="end" fontSize="11" fontWeight="700" fill="#073b2b">← {t("avail.observed")}</text>
+      <text x={originX + 6} y={22} fontSize="11" fontWeight="700" fill="#073b2b">{t("fc.origin")} (t) → {lang === "bn" ? "অপর্যবেক্ষিত" : "not yet observed"}</text>
       <motion.g animate={{ x: xOf(target) }} initial={false} transition={{ type: "spring", stiffness: 140, damping: 18 }}>
         <path d={`M0 ${H - 30} l-7 -10 h14 z`} fill="#d93a42" /><text x={0} y={H - 12} textAnchor="middle" fontSize="11" fontWeight="700" fill="#b3262c">{t("fc.target")} (t+{horizon})</text></motion.g>
       <text x={xOf(key)} y={H - 26} textAnchor="middle" fontSize="10" fontWeight="700" fill="#b3262c">▲ key rain (target−3w)</text>
-    </svg>);
+    </svg>
+    </div>);
 }

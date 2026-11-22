@@ -13,11 +13,12 @@ export function FanChart({ series, markDate, height = 320, title }: { series: an
       { name: name + " lo", type: "line", data: series.map((r) => r[lo]), stack: name, symbol: "none", lineStyle: { opacity: 0 }, silent: true, tooltip: { show: false } },
       { name, type: "line", data: series.map((r) => r[hi] - r[lo]), stack: name, symbol: "none", lineStyle: { opacity: 0 }, itemStyle: { color }, areaStyle: { color, opacity: 0.6 }, silent: true, tooltip: { show: false } }];
     return {
-      grid: { left: 44, right: 18, top: 34, bottom: 62 },
-      legend: { top: 0, right: 0, itemWidth: 14, selectedMode: false, textStyle: { fontSize: 11, color: "#44566a" }, data: [t("fc.median"), t("fc.mean"), t("fc.interval80"), t("fc.interval90"), t("fc.actual")] },
+      // one scrollable legend row above the plot: the wrapping legend used to sit on top of the "cases/week" axis name on phones
+      grid: { left: 44, right: 18, top: 52, bottom: 62 },
+      legend: { type: "scroll", top: 0, left: 0, right: 0, itemWidth: 14, pageIconSize: 10, selectedMode: false, textStyle: { fontSize: 11, color: "#44566a" }, data: [t("fc.median"), t("fc.mean"), t("fc.interval80"), t("fc.interval90"), t("fc.actual")] },
       tooltip: { trigger: "axis", formatter: (ps: any[]) => { const r = series[ps[0].dataIndex]; return `<b>${r.target_date}</b><br/>${t("fc.median")}: <b>${r.median}</b> · ${t("fc.mean")}: ${r.mean.toFixed(1)}<br/>80%: ${r.lo80}–${r.hi80} · 90%: ${r.lo90}–${r.hi90}<br/>${t("fc.prob")}: ${(r.p_outbreak * 100).toFixed(0)}% (${r.tier})<br/>${r.y_true === null ? "" : `${t("fc.actual")}: <b>${r.y_true}</b>`}`; } },
       xAxis: { type: "category", data: x, boundaryGap: false, ...axisStyle, axisLabel: { ...axisStyle.axisLabel, formatter: (v: string) => v.slice(5), hideOverlap: true } },
-      yAxis: { type: "value", name: t("fc.cases"), ...axisStyle, min: 0 },
+      yAxis: { type: "value", name: t("fc.cases"), ...axisStyle, nameGap: 12, nameTextStyle: { ...axisStyle.nameTextStyle, align: "left" }, min: 0 },
       dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", fillerColor: "rgba(14,143,102,.15)" }],
       series: [
         ...band("lo90", "hi90", "#cdeadd", t("fc.interval90")), ...band("lo80", "hi80", "#7fcaa6", t("fc.interval80")),
