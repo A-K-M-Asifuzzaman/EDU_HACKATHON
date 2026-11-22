@@ -639,7 +639,7 @@ def _doc_index() -> dict:
     for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/architecture/*.md", "docs/team/*.md"):
         for f in sorted(ROOT.glob(pat)):
             if f.is_file() and f.name not in {".env", ".env.example"}:
-                out[str(f.relative_to(ROOT))] = f
+                out[f.relative_to(ROOT).as_posix()] = f
     return out
 
 

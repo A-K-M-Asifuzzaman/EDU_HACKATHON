@@ -84,7 +84,7 @@ def _chunk(text: str, src: str, max_chars=1500) -> list[dict]:
 def build_corpus() -> list[dict]:
     chunks = []
     for p in _files():
-        chunks += _chunk(p.read_text(errors="ignore"), str(p.relative_to(ROOT)))
+        chunks += _chunk(p.read_text(errors="ignore"), p.relative_to(ROOT).as_posix())
     for i, c in enumerate(chunks):
         c["id"] = f"S{i}"
     return chunks
