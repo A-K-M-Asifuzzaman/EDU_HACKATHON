@@ -36,6 +36,7 @@ const EN = {
   "copilot.disabled": "AI generation is off", "copilot.scope": "Answers are grounded in project documents and live model tools. Not medical advice.",
   "resp.title": "Response Intelligence", "resp.generic": "Generic options for officers to review", "resp.noofficial": "These are generic, evidence-informed options. They are not official government decisions and do not specify resource quantities.",
   "nf.title": "Page not found", "nf.body": "The page you asked for does not exist or has moved.", "nf.home": "Back to the Command Center",
+  "pal.button": "Search", "pal.aria": "Search pages, wards and hospitals", "pal.placeholder": "Search pages, wards (e.g. DNCC_Ward_19) or hospitals…", "pal.results": "Results", "pal.none": "No matches.", "pal.kind.Page": "Page", "pal.kind.Ward": "Ward", "pal.kind.Facility": "Facility", "pal.synthward": "synthetic forecast ward", "pal.unnamed": "Unnamed facility", "pal.help": "↑↓ to move · Enter to open · Esc to close · wards are synthetic forecast IDs; facilities are OpenStreetMap records",
 } as const;
 type Key = keyof typeof EN;
 const BN: Partial<Record<Key, string>> = {
@@ -71,6 +72,7 @@ const BN: Partial<Record<Key, string>> = {
   "copilot.disabled": "এআই উত্তর বন্ধ আছে", "copilot.scope": "উত্তর প্রকল্পের নথি ও সরাসরি মডেল টুলের ওপর ভিত্তি করে। চিকিৎসা পরামর্শ নয়।",
   "resp.title": "প্রতিক্রিয়া বুদ্ধিমত্তা", "resp.generic": "কর্মকর্তাদের পর্যালোচনার জন্য সাধারণ বিকল্প", "resp.noofficial": "এগুলো সাধারণ, প্রমাণ-ভিত্তিক বিকল্প। সরকারি সিদ্ধান্ত নয় এবং সম্পদের পরিমাণ নির্দিষ্ট করে না।",
   "nf.title": "পেজটি পাওয়া যায়নি", "nf.body": "আপনি যে পেজটি খুঁজছেন সেটি নেই বা সরিয়ে নেওয়া হয়েছে।", "nf.home": "কমান্ড সেন্টারে ফিরে যান",
+  "pal.button": "খুঁজুন", "pal.aria": "পেজ, ওয়ার্ড ও হাসপাতাল খুঁজুন", "pal.placeholder": "পেজ, ওয়ার্ড (যেমন DNCC_Ward_19) বা হাসপাতাল খুঁজুন…", "pal.results": "ফলাফল", "pal.none": "কিছু পাওয়া যায়নি।", "pal.kind.Page": "পেজ", "pal.kind.Ward": "ওয়ার্ড", "pal.kind.Facility": "স্বাস্থ্যকেন্দ্র", "pal.synthward": "কৃত্রিম পূর্বাভাস ওয়ার্ড", "pal.unnamed": "নামহীন স্বাস্থ্যকেন্দ্র", "pal.help": "↑↓ সরান · Enter খুলুন · Esc বন্ধ · ওয়ার্ডগুলো কৃত্রিম পূর্বাভাস আইডি; স্বাস্থ্যকেন্দ্রগুলো OpenStreetMap থেকে",
 };
 export type TKey = Key;
 
