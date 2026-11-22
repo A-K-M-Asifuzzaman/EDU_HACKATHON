@@ -1,3 +1,4 @@
+import { useId } from "react";
 const P: Record<string, string> = {
   command: "M3 12l9-8 9 8M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9",
   profiling: "M4 19V9m5 10V5m5 14v-7m5 7V8M3 19h18",
@@ -19,6 +20,7 @@ export function Icon({ name, size = 20, className = "" }: { name: string; size?:
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><path d={P[name] ?? P.info} /></svg>);
 }
 export function Logo({ size = 30 }: { size?: number }) {
-  return (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#9fe7c2" /><stop offset="1" stopColor="#0e8f66" /></linearGradient></defs>
-    <path d="M16 2.5l11 4v8.2c0 6.2-4.4 11.2-11 14.8C9.4 25.9 5 20.9 5 14.7V6.5l11-4z" fill="url(#lg)" /><path d="M16 8c3 3.4 4.5 5.6 4.5 8a4.5 4.5 0 01-9 0c0-2.4 1.5-4.6 4.5-8z" fill="#073b2b" opacity=".92" /></svg>);
+  const id = "lg" + useId().replace(/:/g, "");   // unique per instance: the hidden sidebar copy must not own the only gradient
+  return (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#9fe7c2" /><stop offset="1" stopColor="#0e8f66" /></linearGradient></defs>
+    <path d="M16 2.5l11 4v8.2c0 6.2-4.4 11.2-11 14.8C9.4 25.9 5 20.9 5 14.7V6.5l11-4z" fill={`url(#${id})`} /><path d="M16 8c3 3.4 4.5 5.6 4.5 8a4.5 4.5 0 01-9 0c0-2.4 1.5-4.6 4.5-8z" fill="#073b2b" opacity=".92" /></svg>);
 }
