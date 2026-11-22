@@ -587,3 +587,22 @@ flowchart LR
     build["next build + typecheck"] --> gate
     clone["fresh-clone launch smoke test"] --> gate
 ```
+
+## Climate Futures 2026–2030: exploratory scenario engine
+
+A separate seasonal model with its own metrics, labelled "Exploratory multi-year climate scenario". It never touches the 2–4-week champion bundle
+or the 2025 holdout. Backtest, calibration and model card: [climate_futures.md](docs/climate_futures.md).
+
+```mermaid
+flowchart LR
+    dev[("Development rows 2016–2024<br/>(2025 never parsed)")] --> fit["Seasonal Poisson GLM<br/>ward + harmonics + lagged weather"]
+    dev --> clim["Climatology reference"]
+    wx[("Whole historical weather years")] -->|"resample per draw<br/>× rain, + °C (bounded)"| mc
+    fit --> mc["Monte Carlo (seeded)<br/>year bootstrap + year shock + NB counts"]
+    mc --> api["/api/scenarios/run · compare · backtest<br/>cached, bounded"]
+    clim --> api
+    api --> ui["Forecast Lab: Climate Futures section"]
+```
+
+Rolling-origin backtest 2019–2024: without future weather the engine matches climatology (ward-week MAE 1.421 vs 1.431, annual error 20.6% vs 19.5%).
+With the true weather it would reach 1.098 and 8.2%, which is why outputs are conditional scenarios, not forecasts. Its bands are labelled simulation ranges.
