@@ -133,13 +133,15 @@ function resolveDoc(from: string, href: string): string {
   for (const seg of href.split("#")[0].split("/")) { if (seg === "..") parts.pop(); else if (seg && seg !== ".") parts.push(seg); }
   return parts.join("/");
 }
-export function Markdown({ children, docPath, docs, onDoc }: { children: string; docPath?: string; docs?: string[]; onDoc?: (path: string) => void }) {
+export function Markdown({ children, docPath, docs, onDoc, chat, onCite }: { children: string; docPath?: string; docs?: string[]; onDoc?: (path: string) => void; chat?: boolean; onCite?: (id: string) => void }) {
   const sectionId = (slug: string) => `doc-section-${docPath}-${slug}`;
-  return <div className="prose-md text-[13.5px] leading-relaxed"><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}
+  return <div className={cls("prose-md text-[13.5px] leading-relaxed", chat && "prose-chat")}><ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}
     components={{ h2: ({ children }) => {
       const slug = String(children).toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, "").trim().replace(/\s+/g, "-");
       return <h2 id={docPath ? sectionId(slug) : undefined} tabIndex={docPath ? -1 : undefined}>{children}</h2>;
     }, a: ({ href, children }) => {
+      const cite = href?.match(/cite-(S\d+)$/);
+      if (onCite && cite) return <button type="button" onClick={() => onCite(cite[1])} className="ds-cite" title={`Show source ${cite[1]}`}>{cite[1]}</button>;
       if (docPath && href?.startsWith("#")) {
         const id = sectionId(href.slice(1));
         return <a href={`#${id}`} onClick={(e) => {
