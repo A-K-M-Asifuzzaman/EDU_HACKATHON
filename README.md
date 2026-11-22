@@ -65,8 +65,8 @@ process serving both the API and the dashboard.
 ## Setup Guide (Windows)
 
 > [!IMPORTANT]
-> **Windows does not run the `launch.sh` bash script directly.** Follow these step-by-step
-> instructions to get the project running on Windows in under 5 minutes.
+> **Windows does not run the `launch.sh` bash script directly.** Follow these simple step-by-step
+> instructions for an easy way to install the project and run it locally.
 
 ### Prerequisites
 
