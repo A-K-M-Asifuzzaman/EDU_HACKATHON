@@ -390,7 +390,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
     <div id="doc-en" style="display: ${lang === 'bn' ? 'none' : 'block'};">
       <header class="gov-header">
         <div class="gov-seal-title">
-          <span class="sub-authority">Directorate General of Health Services · Disease Surveillance Wing</span>
+          <span class="sub-authority">DengueShield AI · research prototype, not an official publication</span>
           <h1 class="main-bulletin-title">Dengue Early Warning &amp; Situation Report</h1>
           <span class="bulletin-subtitle">Weekly Epidemiological Forecast &amp; Vector Control Advisory</span>
         </div>
@@ -404,7 +404,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
 
       <div class="security-bar">
         <span>STATUS: STATISTICAL SURVEILLANCE ADVISORY</span>
-        <span>HISTORICAL REPLAY BASELINE (2016–2024 AUDITED DATA)</span>
+        <span>HISTORICAL REPLAY (2016–2024 SYNTHETIC COMPETITION DATA)</span>
         <span>2025 HOLDOUT LOCKED</span>
       </div>
 
@@ -479,7 +479,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
         </tbody>
       </table>
 
-      <div class="sec-header">4. Standard Operating Procedures (SOP) &amp; Public Health Directives</div>
+      <div class="sec-header">4. Illustrative response options (generic examples, not official guidance)</div>
       <div class="sop-table">
         <div class="sop-row">
           <div class="sop-col-level" style="color:#991b1b;border-left:3px solid #b91c1c;">CRITICAL TIER (≥13)</div>
@@ -509,14 +509,14 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
         <div class="signoff-box">
           <div>Report Compiled by:</div>
           <div class="signoff-line"></div>
-          <strong>Disease Surveillance &amp; Vector Control Wing</strong><br>
+          <strong>DengueShield AI (automatically generated)</strong><br>
           Emergency Hotlines: <strong>999</strong> (National) · <strong>16263</strong> (DGHS Healthline)
         </div>
         <div class="signoff-box" style="text-align:right;">
-          <div>Verified &amp; Released for Administrative Action:</div>
+          <div>Reviewed by (to be completed by a responsible officer):</div>
           <div class="signoff-line" style="margin-left:auto;"></div>
-          <strong>Chief Health Officer</strong><br>
-          City Corporation Epidemiological Task Force
+          <strong>Name and role</strong><br>
+          This prototype does not issue or approve official releases
         </div>
       </div>
     </div>
@@ -525,7 +525,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
     <div id="doc-bn" style="display: ${lang === 'bn' ? 'block' : 'none'};">
       <header class="gov-header">
         <div class="gov-seal-title">
-          <span class="sub-authority">স্বাস্থ্য অধিদপ্তর · সংক্রামক ব্যাধি নিয়ন্ত্রণ ও রোগতত্ত্ব শাখা</span>
+          <span class="sub-authority">ডেঙ্গুশিল্ড এআই · গবেষণা প্রোটোটাইপ, সরকারি প্রকাশনা নয়</span>
           <h1 class="main-bulletin-title">ডেঙ্গু আগাম সতর্কতা ও পরিস্থিতি বুলেটিন</h1>
           <span class="bulletin-subtitle">সাপ্তাহিক রোগতত্ত্বীয় পূর্বাভাস ও ভেক্টর নিয়ন্ত্রণ পরামর্শ</span>
         </div>
@@ -539,7 +539,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
 
       <div class="security-bar">
         <span>স্ট্যাটাস: জনস্বাস্থ্য সংক্রান্ত পরিসংখ্যানগত পূর্বাভাস</span>
-        <span>ঐতিহাসিক রিপ্লে ভিত্তি (২০১৬–২০২৪ নিরীক্ষিত ডেটা)</span>
+        <span>ঐতিহাসিক রিপ্লে (২০১৬–২০২৪ সিন্থেটিক প্রতিযোগিতার ডেটা)</span>
         <span>২০২৫ টেস্ট ইয়ার সংরক্ষিত</span>
       </div>
 
@@ -614,7 +614,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
         </tbody>
       </table>
 
-      <div class="sec-header">৪. স্ট্যান্ডার্ড অপারেটিং প্রসিডিউর (এসওপি) ও মাঠপর্যায়ের করণীয়</div>
+      <div class="sec-header">৪. উদাহরণমূলক প্রতিক্রিয়া বিকল্প (সাধারণ উদাহরণ, সরকারি নির্দেশনা নয়)</div>
       <div class="sop-table">
         <div class="sop-row">
           <div class="sop-col-level" style="color:#991b1b;border-left:3px solid #b91c1c;">সংকটজনক স্তর (≥১৩)</div>
@@ -642,16 +642,16 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
 
       <div class="signoff-grid">
         <div class="signoff-box">
-          <div>প্রতিবেদন প্রস্তুতকারক:</div>
+          <div>ডেঙ্গুশিল্ড এআই দ্বারা স্বয়ংক্রিয়ভাবে প্রস্তুত:</div>
           <div class="signoff-line"></div>
-          <strong>ভেক্টর নিয়ন্ত্রণ ও রোগতাত্ত্বিক সেল</strong><br>
+          <strong>ডেঙ্গুশিল্ড এআই</strong><br>
           জরুরি যোগাযোগ: <strong>৯৯৯</strong> (জাতীয় সেবা) · <strong>১৬২৬৩</strong> (স্বাস্থ্য বাতায়ন)
         </div>
         <div class="signoff-box" style="text-align:right;">
-          <div>যাচাই ও প্রশাসনিক নির্দেশনায়:</div>
+          <div>পর্যালোচনায় (দায়িত্বপ্রাপ্ত কর্মকর্তা পূরণ করবেন):</div>
           <div class="signoff-line" style="margin-left:auto;"></div>
-          <strong>প্রধান স্বাস্থ্য কর্মকর্তা</strong><br>
-          সিটি কর্পোরেশন এপিডেমিওলজিক্যাল টাস্কফোর্স
+          <strong>নাম ও পদবি</strong><br>
+          এই প্রোটোটাইপ কোনো সরকারি প্রকাশ বা অনুমোদন দেয় না
         </div>
       </div>
     </div>

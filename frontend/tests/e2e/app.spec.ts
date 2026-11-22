@@ -291,16 +291,19 @@ test("command center: time-machine verdict, play control, intelligence brief and
   await page.goto("/");
   await expect(page.getByText("Time-machine verdict")).toBeVisible();
   await expect(page.getByText(/Out-of-time: forecast by a model trained only on seasons before/)).toBeVisible();
-  const dl = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download intelligence brief" }).click();
-  const file = await dl; expect(file.suggestedFilename()).toMatch(/^dengueshield_brief_\d{4}-\d{2}-\d{2}_h\d\.html$/);
-  const html = await (await import("node:fs")).promises.readFile(await file.path(), "utf8");
-  expect(html).toContain("Historical Replay"); expect(html).toContain("not medical advice"); expect(html).not.toMatch(/<script/i);
+  const popup = page.waitForEvent("popup");
+  await page.getByRole("button", { name: /Weekly situation report/ }).click();
+  const rep = await popup; await rep.waitForLoadState("domcontentloaded");
+  const html = await rep.content();
+  expect(html).toContain("HISTORICAL REPLAY"); expect(html).toContain("SYNTHETIC COMPETITION DATA");          // must never read like a live official warning
+  expect(html).toContain("not an official publication"); expect(html).toContain("not official guidance");
+  expect(html).not.toMatch(/Directorate General of Health Services|AUDITED|Chief Health Officer/);              // no impersonation of a real authority
+  await rep.close();
   await page.getByRole("button", { name: /Play time machine/ }).click();
   await expect(page.getByRole("button", { name: /Pause time machine/ })).toBeVisible();
   await page.getByRole("button", { name: /Pause time machine/ }).click();
   await page.keyboard.press("Control+k");
-  await page.getByRole("textbox", { name: "Search query" }).fill("square hospital");
+  await page.getByRole("textbox", { name: /Search pages, wards/ }).fill("square hospital");
   await expect(page.getByRole("option").filter({ hasText: "Square Hospital" }).first()).toBeVisible({ timeout: 10_000 });
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/geography\/\?facility=osm/);
