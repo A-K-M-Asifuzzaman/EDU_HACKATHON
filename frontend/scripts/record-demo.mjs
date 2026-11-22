@@ -163,11 +163,23 @@ await at("emergency", 0.45); await point(dlg.locator('a[href="tel:16263"]'));
 await at("emergency", 0.65); await point(dlg.getByText("severe abdominal pain"));
 await at("emergency", 0.92); await page.keyboard.press("Escape");
 
+// 10 Climate Futures (DEMO_FUTURES=1) replaces the resource sandbox
+if (process.env.DEMO_FUTURES === "1") {
+  await at("sandbox", 0); await click(nav("AI Forecast Lab"));
+  const cf = page.getByRole("region", { name: "Climate Futures 2026–2030" });
+  await at("sandbox", 0.1); await show(cf.getByText("Exploratory multi-year climate scenario").first(), "start");
+  await at("sandbox", 0.22); await click(cf.getByRole("radio", { name: "Wetter (+20% rain)" }).first());
+  await at("sandbox", 0.36); await point(cf.getByText(/Median cases · 2026/).first()).catch(() => {});
+  await at("sandbox", 0.5); await show(cf.getByText("Multi-year view: history and 2026–2030 scenario").first(), "start"); await point(cf.getByText("Multi-year view: history and 2026–2030 scenario").first()).catch(() => {});
+  await at("sandbox", 0.75); await show(cf.getByText("Season-ahead backtest (2019–2024)").first(), "center"); await point(cf.getByText("M0 climatology").first()).catch(() => {});
+} else {
 // 10 resource planning sandbox
 await at("sandbox", 0); await click(nav("Response Intelligence"));
 await at("sandbox", 0.15); const sb = main.getByText("Planning simulation, not a deployment recommendation.").first(); await show(sb, "start");
 await at("sandbox", 0.3); await point(main.getByText(/share of actual outbreak ward-weeks/).first()).catch(() => {});
 await at("sandbox", 0.6); await point(main.getByText("Forecast alert priority").first()).catch(() => {});
+
+}
 
 // 11 Bangla
 await at("bangla", 0); await click(page.getByRole("button", { name: "Switch language" }), 500);
