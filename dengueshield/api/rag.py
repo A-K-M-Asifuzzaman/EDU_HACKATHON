@@ -81,10 +81,19 @@ def _chunk(text: str, src: str, max_chars=1500) -> list[dict]:
     return chunks
 
 
+def _strip_front_matter(text: str) -> str:
+    """Hugging Face Spaces need a YAML header at the top of README.md; ignore it so the index is identical there and in git."""
+    if text.startswith("---\n"):
+        end = text.find("\n---\n", 4)
+        if end != -1:
+            return text[end + 5:].lstrip("\n")
+    return text
+
+
 def build_corpus() -> list[dict]:
     chunks = []
     for p in _files():
-        chunks += _chunk(p.read_text(errors="ignore"), p.relative_to(ROOT).as_posix())
+        chunks += _chunk(_strip_front_matter(p.read_text(errors="ignore")), p.relative_to(ROOT).as_posix())
     for i, c in enumerate(chunks):
         c["id"] = f"S{i}"
     return chunks
