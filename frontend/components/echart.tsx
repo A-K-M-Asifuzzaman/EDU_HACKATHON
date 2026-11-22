@@ -38,13 +38,19 @@ export function Chart({ option, height = 300, onClick, ariaLabel, className = ""
   return <div ref={el} role="img" aria-label={ariaLabel} className={className} style={{ height, width: "100%" }} />;
 }
 
+const TOOLTIP = { trigger: "axis", confine: true, backgroundColor: "rgba(255,255,255,0.97)", borderColor: "#e3e9ef", textStyle: { color: "#0d1b2a", fontSize: 12 },
+  extraCssText: "box-shadow:0 8px 24px -8px rgba(7,59,43,.25);border-radius:10px;max-width:min(320px,calc(100vw - 32px));white-space:normal;overflow-wrap:anywhere" };
+
 function withDefaults(o: any) {
+  // Merge (not replace) the page's tooltip with the defaults: a chart that passed its own `tooltip: { trigger: "axis" }`
+  // used to lose `confine`, so on phones a tapped tooltip opened half outside the screen.
+  const tooltip = o.tooltip === undefined ? TOOLTIP : Array.isArray(o.tooltip) ? o.tooltip.map((x: any) => ({ ...TOOLTIP, ...x })) : { ...TOOLTIP, ...o.tooltip };
   return {
     animation: !reduce(), animationDuration: 600, animationEasing: "cubicOut", animationDurationUpdate: 450,
     textStyle: { fontFamily: "Inter Variable, Noto Sans Bengali, system-ui, sans-serif" }, color: PALETTE,
     grid: { left: 44, right: 16, top: 28, bottom: 36, containLabel: false },
-    tooltip: { trigger: "axis", confine: true, backgroundColor: "rgba(255,255,255,0.97)", borderColor: "#e3e9ef", textStyle: { color: "#0d1b2a", fontSize: 12 }, extraCssText: "box-shadow:0 8px 24px -8px rgba(7,59,43,.25);border-radius:10px" },
     ...o,
+    tooltip,
   };
 }
 export const axisStyle = { axisLine: { lineStyle: { color: "#cfd9e2" } }, axisLabel: { color: "#5b6b7b", fontSize: 11 }, splitLine: { lineStyle: { color: "#eef2f6" } }, nameTextStyle: { color: "#7a8a9a", fontSize: 11 } };
