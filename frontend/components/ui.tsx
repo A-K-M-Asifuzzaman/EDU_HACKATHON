@@ -100,11 +100,11 @@ export function Select({ label, value, onChange, options }: { label: string; val
 export function Segmented<T extends string | number>({ label, value, onChange, options }: { label?: string; value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
   return (<div className="flex flex-col gap-1">{label && <span className="eyebrow">{label}</span>}<div role="radiogroup" aria-label={label} className="scroll-thin inline-flex max-w-full overflow-x-auto rounded-xl border border-line bg-white p-0.5 shadow-sm">
     {options.map((o) => (<button key={String(o.value)} role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}
-      className={cls("relative whitespace-nowrap rounded-[10px] px-3 py-1.5 text-[13px] font-medium transition", o.value === value ? "bg-forest text-white" : "text-ink-2 hover:bg-mint-l")}>{o.label}</button>))}</div></div>);
+      className={cls("relative shrink-0 whitespace-nowrap rounded-[10px] px-3 py-1.5 text-[13px] font-medium transition", o.value === value ? "bg-forest text-white" : "text-ink-2 hover:bg-mint-l")}>{o.label}</button>))}</div></div>);
 }
 export function Tabs({ tabs, value, onChange }: { tabs: { id: string; label: string }[]; value: string; onChange: (v: string) => void }) {
-  return (<div role="tablist" className="scroll-thin -mx-1 mb-5 flex gap-1 overflow-x-auto px-1 pb-1">{tabs.map((x) => (
-    <button key={x.id} role="tab" aria-selected={x.id === value} onClick={() => onChange(x.id)} className={cls("relative whitespace-nowrap rounded-xl px-3.5 py-2 text-[13px] font-medium transition", x.id === value ? "text-forest" : "text-ink-3 hover:text-forest")}>
+  return (<div role="tablist" className="scroll-thin -mx-1 mb-5 flex snap-x gap-1 overflow-x-auto overscroll-x-contain px-1 pb-1">{tabs.map((x) => (
+    <button key={x.id} role="tab" aria-selected={x.id === value} onClick={() => onChange(x.id)} className={cls("relative shrink-0 whitespace-nowrap rounded-xl px-3.5 py-2 text-[13px] font-medium transition", x.id === value ? "text-forest" : "text-ink-3 hover:text-forest")}>
       {x.id === value && <motion.span layoutId="tabpill" className="absolute inset-0 rounded-xl bg-mint-l ring-1 ring-mint" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}<span className="relative">{x.label}</span></button>))}</div>);
 }
 export const ProvChip = ({ children, tone = "ok" }: { children: React.ReactNode; tone?: "ok" | "warn" | "info" }) => (

@@ -73,8 +73,12 @@ h1, h2, h3 { letter-spacing: -0.012em; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
 }
 
-/* grid/flex children must be allowed to shrink, otherwise no-wrap content stretches the page on narrow screens */
-.grid > *, .flex > * { min-width: 0; }
+/* grid/flex children must be allowed to shrink, otherwise no-wrap content stretches the page on narrow screens.
+   Kept in the base layer so Tailwind utilities (min-w-*, shrink-0) can still override it; unlayered, it squeezed tab
+   buttons and labelled controls to zero width on phones and their text overlapped. */
+@layer base {
+  .grid > *, .flex > * { min-width: 0; }
+}
 main { min-width: 0; overflow-x: clip; }
 
 /* map starting-point marker */
