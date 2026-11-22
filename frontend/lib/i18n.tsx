@@ -35,6 +35,7 @@ const EN = {
   "copilot.title": "DengueShield Copilot", "copilot.placeholder": "Ask about a ward, the model, the data or its limits…", "copilot.send": "Send", "copilot.sources": "Sources", "copilot.tools": "Live data used",
   "copilot.disabled": "AI generation is off", "copilot.scope": "Answers are grounded in project documents and live model tools. Not medical advice.",
   "resp.title": "Response Intelligence", "resp.generic": "Generic options for officers to review", "resp.noofficial": "These are generic, evidence-informed options. They are not official government decisions and do not specify resource quantities.",
+  "nf.title": "Page not found", "nf.body": "The page you asked for does not exist or has moved.", "nf.home": "Back to the Command Center",
 } as const;
 type Key = keyof typeof EN;
 const BN: Partial<Record<Key, string>> = {
@@ -69,6 +70,7 @@ const BN: Partial<Record<Key, string>> = {
   "copilot.title": "ডেঙ্গুশিল্ড কোপাইলট", "copilot.placeholder": "ওয়ার্ড, মডেল, ডেটা বা সীমাবদ্ধতা নিয়ে জিজ্ঞাসা করুন…", "copilot.send": "পাঠান", "copilot.sources": "উৎস", "copilot.tools": "ব্যবহৃত সরাসরি ডেটা",
   "copilot.disabled": "এআই উত্তর বন্ধ আছে", "copilot.scope": "উত্তর প্রকল্পের নথি ও সরাসরি মডেল টুলের ওপর ভিত্তি করে। চিকিৎসা পরামর্শ নয়।",
   "resp.title": "প্রতিক্রিয়া বুদ্ধিমত্তা", "resp.generic": "কর্মকর্তাদের পর্যালোচনার জন্য সাধারণ বিকল্প", "resp.noofficial": "এগুলো সাধারণ, প্রমাণ-ভিত্তিক বিকল্প। সরকারি সিদ্ধান্ত নয় এবং সম্পদের পরিমাণ নির্দিষ্ট করে না।",
+  "nf.title": "পেজটি পাওয়া যায়নি", "nf.body": "আপনি যে পেজটি খুঁজছেন সেটি নেই বা সরিয়ে নেওয়া হয়েছে।", "nf.home": "কমান্ড সেন্টারে ফিরে যান",
 };
 export type TKey = Key;
 
