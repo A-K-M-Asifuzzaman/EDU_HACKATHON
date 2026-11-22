@@ -334,3 +334,18 @@ test("provenance document viewer opens architecture details and related document
   await expect(dlg.getByRole("heading", { name: "Model selection (Stage 3)" })).toBeVisible();
   await expect(page).toHaveURL(/\/provenance\/?$/);
 });
+
+test("climate futures: exploratory scenarios are separate, computed live, comparable and bounded", async ({ page }) => {
+  await page.goto("/lab/");
+  const sec = page.getByRole("region", { name: "Climate Futures 2026–2030" });
+  await sec.scrollIntoViewIfNeeded();
+  await expect(sec.getByText("Exploratory multi-year climate scenario")).toBeVisible();
+  await expect(sec.getByText(/Median cases · 2026/)).toBeVisible({ timeout: 20_000 });
+  await expect(sec.getByText("M0 climatology")).toBeVisible({ timeout: 20_000 });          // backtest vs baseline
+  await expect(sec.getByText(/not a demonstrated causal effect/)).toBeVisible();
+  await sec.getByRole("radio", { name: "Custom" }).click();
+  await sec.getByLabel("Rainfall multiplier").fill("1.3");
+  await expect(sec.getByText("1.30×")).toBeVisible();
+  await sec.getByLabel("Scenario year").selectOption("2030");
+  await expect(sec.getByText(/Median cases · 2030/)).toBeVisible({ timeout: 20_000 });
+});

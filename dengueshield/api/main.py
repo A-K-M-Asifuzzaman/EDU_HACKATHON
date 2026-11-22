@@ -633,6 +633,103 @@ def integrations_status():
     return integrations.status(S)
 
 
+# ------------------------------------------------------------------ exploratory multi-year climate scenarios (research engine)
+# Separate from the validated 2-4-week champion: own model, own metrics, development years 2016-2024 only.
+import functools
+import threading
+
+from dengueshield import scenarios as SC
+
+_SC_LOCK = threading.Lock()
+SC_NOTE = ("Exploratory multi-year climate scenario on synthetic competition data (2016-2024). Conditional what-if outputs under "
+           "hypothetical weather assumptions, not forecasts of real climate or dengue, and not causal effects. The 2025 holdout is never used.")
+RainM = Annotated[float, Query(ge=SC.BOUNDS["rain_mult"][0], le=SC.BOUNDS["rain_mult"][1])]
+TempO = Annotated[float, Query(ge=SC.BOUNDS["temp_offset"][0], le=SC.BOUNDS["temp_offset"][1])]
+Draws = Annotated[int, Query(ge=SC.BOUNDS["draws"][0], le=SC.BOUNDS["draws"][1])]
+SYear = Annotated[int, Query(ge=SC.BOUNDS["year"][0], le=SC.BOUNDS["year"][1])]
+
+
+@functools.lru_cache(maxsize=1)
+def _sc_engine():
+    from dengueshield.data import load_development_panel  # development rows only: the 2025 holdout is never parsed
+    return SC.Engine(SC.prepare(load_development_panel()), range(2016, 2025))
+
+
+def _sc_mask(e, city: Optional[str], ward: Optional[str]):
+    if ward:
+        if ward not in e.wards:
+            bad(f"unknown ward '{ward}'", 404)
+        return np.array([w == ward for w in e.wards])
+    if city and city != "All":
+        if city not in set(e.city):
+            bad(f"unknown city '{city}'", 404)
+        return e.city == city
+    return np.ones(e.W, bool)
+
+
+@functools.lru_cache(maxsize=256)
+def _sc_sims(rain_mult: float, temp_offset: float, year: int, draws: int, model: str):
+    with _SC_LOCK:  # seeded per year: deterministic, and scenarios share random numbers so differences are paired
+        return _sc_engine().simulate(model, draws, rain_mult, temp_offset, seed=1000 + year)
+
+
+def _sc_params(scenario: str, rain_mult: Optional[float], temp_offset: Optional[float]):
+    if scenario == "custom":
+        return round(rain_mult if rain_mult is not None else 1.0, 2), round(temp_offset if temp_offset is not None else 0.0, 1)
+    if scenario not in SC.SCENARIOS:
+        bad(f"scenario must be one of {sorted(SC.SCENARIOS) + ['custom']}")
+    return SC.SCENARIOS[scenario]
+
+
+@app.get("/api/scenarios/run")
+def scenarios_run(scenario: str = "typical", rain_mult: Optional[RainM] = None, temp_offset: Optional[TempO] = None,
+                  year: SYear = 2026, city: Optional[str] = None, ward: Optional[str] = Query(None, max_length=20), draws: Draws = 500):
+    e = _sc_engine(); rm, to = _sc_params(scenario, rain_mult, temp_offset); m = _sc_mask(e, city, ward)
+    sims = _sc_sims(rm, to, year, draws, "m1")[:, m]
+    clim = _sc_sims(1.0, 0.0, year, draws, "m0")[:, m]
+    years = {y: SC.summarize(_sc_sims(rm, to, y, draws, "m1")[:, m], [], np.array([]))["total"] for y in range(2026, 2031)}
+    hist = {int(y): int(v) for y, v in zip(e.years, e.y[:, m].sum((1, 2)))}
+    s = SC.summarize(sims, [w for w, k in zip(e.wards, m) if k], e.city[m])
+    return {"scenario": scenario, "assumptions": {"rain_mult": rm, "temp_offset_c": to, "weather": "whole historical weather years 2016-2024 resampled per draw"},
+            "year": year, "city": city or "All", "ward": ward, "draws": draws, "seed": 1000 + year, "summary": s,
+            "climatology": SC.summarize(clim, [], np.array([]))["total"], "by_year": years, "history": hist,
+            "threshold": {"definition": "historical median annual total of the selection (2016-2024)", "value": float(np.median(list(hist.values()))),
+                          "p_exceed": float((sims.sum((1, 2)) > np.median(list(hist.values()))).mean())},
+            "interval_label": "simulation ranges; retrospectively conservative at ward-week level (see backtest)", "note": SC_NOTE}
+
+
+@app.get("/api/scenarios/compare")
+def scenarios_compare(a: str = "typical", b: str = "wetter", a_rain: Optional[RainM] = None, a_temp: Optional[TempO] = None,
+                      b_rain: Optional[RainM] = None, b_temp: Optional[TempO] = None, year: SYear = 2026,
+                      city: Optional[str] = None, ward: Optional[str] = Query(None, max_length=20), draws: Draws = 500):
+    e = _sc_engine(); m = _sc_mask(e, city, ward)
+    pa, pb = _sc_params(a, a_rain, a_temp), _sc_params(b, b_rain, b_temp)
+    sa, sb = _sc_sims(*pa, year, draws, "m1")[:, m], _sc_sims(*pb, year, draws, "m1")[:, m]
+    ta, tb = sa.sum((1, 2)), sb.sum((1, 2)); d = tb - ta
+    thr = float(np.median(e.y[:, m].sum((1, 2))))
+    return {"a": {"name": a, "rain_mult": pa[0], "temp_offset_c": pa[1], **SC.summarize(sa, [], np.array([]))["total"], "weekly_median": np.median(sa.sum(1), 0).tolist(), "p_exceed": float((ta > thr).mean())},
+            "b": {"name": b, "rain_mult": pb[0], "temp_offset_c": pb[1], **SC.summarize(sb, [], np.array([]))["total"], "weekly_median": np.median(sb.sum(1), 0).tolist(), "p_exceed": float((tb > thr).mean())},
+            "difference": {"mean": float(d.mean()), "q80": [float(np.quantile(d, .1)), float(np.quantile(d, .9))],
+                           "relative_pct": float(100 * d.mean() / max(ta.mean(), 1e-9)), "share_of_draws_b_higher": float((d > 0).mean())},
+            "threshold": thr, "paired": "both scenarios use the same random draws, so the difference isolates the weather assumption",
+            "warning": "Conditional model output under hypothetical weather; not a demonstrated causal effect or a forecast of real climate change.", "note": SC_NOTE}
+
+
+@functools.lru_cache(maxsize=1)
+def _sc_backtest():
+    with _SC_LOCK:
+        return SC.backtest(_sc_engine().d, draws=300).round(4)
+
+
+@app.get("/api/scenarios/backtest")
+def scenarios_backtest():
+    bt = _sc_backtest()
+    keep = [c for c in bt.columns if "::" not in c]
+    return {"rows": bt[keep].to_dict("records"), "mean": bt.groupby("model")[keep[3:]].mean().round(4).reset_index().to_dict("records"),
+            "method": "Rolling origin: each year 2019-2024 simulated by a model fit only on 2016 to the previous year; 300 seeded draws.",
+            "note": SC_NOTE}
+
+
 # ------------------------------------------------------------------ methodology documents (allow-listed, read-only)
 def _doc_index() -> dict:
     out = {}

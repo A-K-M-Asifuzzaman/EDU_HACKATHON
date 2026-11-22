@@ -5,6 +5,7 @@ import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt } from "@/lib/format";
 import ControlsBar from "@/components/controls";
+import ClimateFutures from "@/components/futures";
 import HorizonCompare from "@/components/horizons";
 import RainTimeline from "@/components/rainline";
 import { Card, CardTitle, EmptyState, Loading, Notice, PageHeader, ProvChip, RiskBadge, useAsync } from "@/components/ui";
@@ -67,5 +68,6 @@ export default function Lab() {
     <Card className="mt-5"><CardTitle title="Why the 4-week forecast is more uncertain" sub="Calibrated 80% interval width (cases), averaged over validation seasons 2019–2024" />
       <div className="grid items-center gap-4 sm:grid-cols-[1fr_2fr]"><div className="space-y-2">{[2, 3, 4].map((h, i) => (<div key={h} className="flex items-center gap-3"><span className="num w-8 text-sm font-bold">{h}w</span><div className="h-3 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full rounded-full bg-gradient-to-r from-mint to-emerald" style={{ width: `${((widths[i] ?? 0) / 3.5) * 100}%`, transition: "width .6s" }} /></div><span className="num w-10 text-right text-sm">{widths[i]?.toFixed(1) ?? "—"}</span></div>))}</div>
         <Notice tone="warn">{t("lim.noweather")} {t("lim.peaks")} {t("lim.cover")}</Notice></div></Card>
+    <ClimateFutures />
   </>);
 }

@@ -40,8 +40,8 @@ if (process.env.DEMO_CUES) cues = { ...cues, ...JSON.parse(fs.readFileSync(proce
 for (const u of ["/api/health", "/api/forecast?ward_id=DNCC_Ward_19&origin=2024-08-05&horizon=3", "/api/decision/allocation-season?year=2024&horizon=3&teams=10", "/api/routing/status", "/api/model/diagnostics"])
   await fetch(BASE + u).catch(() => {});
 
-const W = 1600, H = 900, DSF = 1.2; // 1920x1080 frames
-const browser = await chromium.launch({ args: ["--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--autoplay-policy=no-user-gesture-required"] });
+const [W, H, DSF] = process.env.DEMO_LARGE === "0" ? [1600, 900, 1.2] : [1280, 720, 1.5]; // both give 1920x1080 frames; the default renders text 25% larger
+const browser = await chromium.launch({ headless: process.env.DEMO_HEADED !== "1", args: ["--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding", "--disable-background-timer-throttling", "--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--autoplay-policy=no-user-gesture-required"] });
 const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: DSF, geolocation: { latitude: 23.7104, longitude: 90.4074 }, permissions: ["geolocation"], locale: "en-US", timezoneId: "Asia/Dhaka" });
 // visible presenter cursor (headless has none)
 await ctx.addInitScript(() => addEventListener("DOMContentLoaded", () => {
@@ -86,7 +86,16 @@ async function show(loc, block = "center") {
   await loc.waitFor({ state: "attached", timeout: 25_000 });
   await loc.evaluate((el, block) => el.scrollIntoView({ behavior: "smooth", block }), block); await page.waitForTimeout(900);
 }
-async function point(loc, ms) { const [x, y] = await center(loc); await move(x, y, ms); }
+async function point(loc, ms) {
+  const [x, y] = await center(loc); await move(x, y, ms);
+  const b = await loc.boundingBox().catch(() => null); if (!b) return;
+  await page.evaluate(({ x, y, w, h }) => { // highlight ring around what the voice is talking about
+    const r = document.createElement("div"), p = 6;
+    r.style.cssText = `position:fixed;z-index:2147483646;left:${x - p}px;top:${y - p}px;width:${w + 2 * p}px;height:${h + 2 * p}px;border:3px solid #facc15;border-radius:10px;box-shadow:0 0 0 4px rgba(250,204,21,.25);pointer-events:none;opacity:0;transition:opacity .25s`;
+    document.documentElement.appendChild(r); requestAnimationFrame(() => (r.style.opacity = "1"));
+    setTimeout(() => (r.style.opacity = "0"), 1700); setTimeout(() => r.remove(), 2000);
+  }, { x: b.x, y: b.y, w: Math.min(b.width, 900), h: Math.min(b.height, 400) }).catch(() => {});
+}
 async function click(loc, ms) { await point(loc, ms); await page.waitForTimeout(140); await page.mouse.down(); await page.waitForTimeout(70); await page.mouse.up(); }
 async function type(loc, text) { await click(loc); await page.keyboard.type(text, { delay: 75 }); }
 const nav = (name) => page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name, exact: true });
