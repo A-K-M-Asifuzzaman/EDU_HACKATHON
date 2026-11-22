@@ -34,6 +34,7 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
   const markers = useRef<any[]>([]), originMarker = useRef<any>(null), destMarker = useRef<any>(null), anim = useRef<number>(0), anim2 = useRef<number>(0);
   const cb = useRef(p); cb.current = p;
   const [ready, setReady] = useState(false), [failed, setFailed] = useState(false);
+  const was3d = useRef(false);
 
   useImperativeHandle(ref, () => ({
     flyTo: (c, zoom = 13) => map.current?.flyTo({ center: c, zoom, pitch: cb.current.layers.buildings ? 55 : 0, duration: cb.current.reduce ? 0 : 1600, essential: true }),
@@ -116,7 +117,13 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
     vis(["fac-cluster", "fac-count", "fac-point"], p.layers.facilities);
     vis(["dghs-fill", "dghs-line"], p.layers.dghs);
     vis(["bld3d"], p.layers.buildings);
-    map.current.easeTo({ pitch: p.layers.buildings ? 55 : 0, duration: p.reduce ? 0 : 900 });
+    // only move the camera when 3D itself is switched, not when another layer changes;
+    // buildings exist from zoom 14, so switching 3D on at city zoom used to tilt the map with nothing visible
+    if (was3d.current !== p.layers.buildings) {
+      was3d.current = p.layers.buildings;
+      const z = map.current.getZoom();
+      map.current.easeTo({ pitch: p.layers.buildings ? 55 : 0, bearing: p.layers.buildings ? -17 : 0, ...(p.layers.buildings && z < 14.5 ? { zoom: 15.2 } : {}), duration: p.reduce ? 0 : 900 });
+    }
   }, [ready, p.layers, p.reduce]);
   useEffect(() => { if (ready && map.current.getLayer("fac-point")) map.current.setPaintProperty("fac-point", "circle-radius", ["case", ["==", ["get", "id"], p.selectedId ?? ""], 10, 6.5]); }, [ready, p.selectedId]);
 

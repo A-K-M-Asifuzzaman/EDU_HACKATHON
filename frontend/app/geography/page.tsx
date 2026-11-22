@@ -127,6 +127,7 @@ export default function GeoCommand() {
   const explored = useMemo(() => (insightOn && route?.insight ? { astar: route.insight.astar.explored, dijkstra: route.insight.dijkstra.explored } : null), [insightOn, route]);
   const dest: LngLat | null = route?.facility?.geometry?.coordinates ?? (tab === "nearest" ? nearest?.results?.[0]?.facility?.geometry?.coordinates : null) ?? null;
   const toggle = (k: keyof Layers) => setLayers((l) => ({ ...l, [k]: !l[k] }));
+  const toggleLayersPanel = () => setLayersOpen((o) => { if (!o) setSheet(false); return !o; });   // mobile: the bottom sheet used to cover the panel
   // city intelligence: real facility counts (OSM) beside the forecast aggregate of each city's synthetic wards (separate layers, never joined)
   const cityIntel = useMemo(() => Object.keys(JUMP).map((c) => {
     const fs = (fac.data?.features ?? []).filter((f: any) => f.properties.city === c);
@@ -216,11 +217,16 @@ export default function GeoCommand() {
         </div>
         <div className="mt-2 flex flex-wrap gap-1">{Object.keys(JUMP).map((c) => (<button key={c} onClick={() => mapRef.current?.flyTo(JUMP[c].c, JUMP[c].z)} className="rounded-lg px-2 py-1 text-[12px] font-medium text-ink-2 hover:bg-white">{c}</button>))}</div>
         <div className="mt-1 truncate text-[11px] text-ink-3">{originLabel ? <><b>Start:</b> {originLabel}</> : "Tip: click anywhere on the map to set a starting point."}</div>
+        {/* phones: the old floating Layers button sat under the bottom sheet and the map's tilt control under this dock, so 3D could not be reached */}
+        <div className="mt-2 flex gap-2 lg:hidden">
+          <button onClick={toggleLayersPanel} aria-expanded={layersOpen} className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold", layersOpen ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>Layers</button>
+          <button role="switch" aria-checked={layers.buildings} disabled={bldAvail === false} onClick={() => toggle("buildings")} title={bldAvail === false ? "3D buildings are not available on this basemap" : undefined}
+            className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-40", layers.buildings ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>{layers.buildings ? "2D view" : "3D view"}</button>
+        </div>
       </div>
 
       {/* floating layers + legend */}
-      <button onClick={() => setLayersOpen((o) => !o)} className="glass absolute bottom-10 left-3 z-10 rounded-xl px-3 py-2 text-[12px] font-semibold shadow-lg lg:hidden" aria-expanded={layersOpen}>Layers</button>
-      <div className={cls("glass absolute bottom-10 left-3 z-10 w-[260px] rounded-2xl p-3 shadow-[var(--shadow-pop)] lg:block", layersOpen ? "block mb-11 lg:mb-0" : "hidden")}>
+      <div className={cls("glass absolute bottom-[64px] left-3 z-20 w-[min(260px,calc(100%-24px))] rounded-2xl p-3 shadow-[var(--shadow-pop)] lg:bottom-10 lg:z-10 lg:block", layersOpen ? "block" : "hidden")}>
         <div className="eyebrow mb-1.5">Layers</div>
         <div className="flex flex-wrap gap-1.5">{([["facilities", "Facilities"], ["forecast", "City forecast"], ["weather", "Weather now"], ["dghs", "DGHS boundaries"], ["buildings", "3D buildings"]] as [keyof Layers, string][]).map(([k, l]) => (
           <button key={k} role="switch" aria-checked={layers[k]} disabled={k === "buildings" && bldAvail === false} onClick={() => toggle(k)} className={cls("rounded-full border px-2.5 py-1 text-[11.5px] font-medium transition disabled:opacity-40", layers[k] ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2 hover:border-teal")}>{l}</button>))}</div>
