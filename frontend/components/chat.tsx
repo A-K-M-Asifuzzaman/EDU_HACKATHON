@@ -111,9 +111,17 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
 
 export function CopilotFab() {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const { t } = useI18n();
+  // phones: the floating button sat on top of text while reading; tuck it away while scrolling down, bring it back on scroll up
+  useEffect(() => {
+    let last = window.scrollY;
+    const on = () => { const y = window.scrollY; if (Math.abs(y - last) > 8) { setHidden(y > last && y > 120 && window.innerWidth < 1024); last = y; } };
+    window.addEventListener("scroll", on, { passive: true });
+    return () => window.removeEventListener("scroll", on);
+  }, []);
   return (<>
-    <button onClick={() => setOpen(true)} aria-label={t("copilot.title")} className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-gradient-to-br from-emerald to-forest px-4 py-3 text-sm font-semibold text-white shadow-pop transition hover:scale-[1.03] active:scale-95">
+    <button onClick={() => setOpen(true)} aria-label={t("copilot.title")} className={"fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full bg-gradient-to-br from-emerald to-forest p-3 text-sm font-semibold text-white shadow-pop transition duration-300 hover:scale-[1.03] active:scale-95 sm:bottom-5 sm:right-5 sm:px-4 " + (hidden ? "pointer-events-none translate-y-24 opacity-0" : "")}>
       <Icon name="copilot" size={18} /><span className="hidden sm:inline">{t("copilot.title")}</span></button>
     <AnimatePresence>{open && (<motion.div className="fixed inset-0 z-[60]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-0 bg-forest/30 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
