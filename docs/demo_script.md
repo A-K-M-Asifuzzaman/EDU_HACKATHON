@@ -1,25 +1,37 @@
-# Three-minute demo: walkthrough and voiceover
+# Three-minute uncut demo: voice script
 
-Run `./scripts/launch.sh` beforehand and open http://127.0.0.1:8000 in a 1440 px window. Everything below uses the real application
-(Historical Replay on the synthetic organizer data), no slides. Figures quoted come from the replay table for **DNCC_Ward_19, origin
-5 Aug 2024, 3 weeks ahead**; re-check them on screen before recording, because they change if the origin or ward changes.
-Keep the Copilot question short, since each answer costs about $0.003 of OpenAI credit and needs the key in `.env`.
+The video is one continuous screen recording of the deployed site (https://dengueshield-ai.vercel.app), with no cuts and no slides.
+`frontend/scripts/record-demo.mjs` drives the browser and paces every scene to the voice.
 
-| Time | On screen | Voiceover |
+## How to record the voice
+
+- Read the 11 sections in order, in one audio file (m4a, mp3 or wav), in a quiet room.
+- **Leave a clear pause of about 2 seconds between sections** (marked ⏸). The recorder finds the sections by these pauses, shortens them to 0.7 s, and then records the screen so that each scene starts exactly when its section starts.
+- Do not pause for 1.5 seconds or longer *inside* a section.
+- Aim for a calm pace. The whole read should be **under 2 min 55 s** once the pauses are shortened. A reading of about 3:15 with the pauses still in is fine.
+- Then run `DEMO_AUDIO=/path/voice.m4a node scripts/record-demo.mjs` from `frontend/`. The output is `~/Desktop/DengueShield_demo/dengueshield_demo_final.mp4`.
+
+## Script
+
+| # | On screen (automatic) | Voice |
 |---|---|---|
-| 0:00-0:10 | New tab: the intro. Move the pointer (the mosquito dodges), click to swat; the dashboard is revealed | "This is DengueShield AI. One swat and the Command Center opens; it was loading underneath the whole time." |
-| 0:10-0:35 | **Command Center** hero. DNCC_Ward_19, origin 5 Aug 2024, 3 weeks. Point at the verdict row, then press ▶ on the scrubber for two steps and pause | "Weekly dengue forecasts for 60 wards, two to four weeks ahead, on the organizers' synthetic data, so this is a Historical Replay. This ward: median 13, 80% interval 8 to 18, outbreak probability 83%. The time machine shows what really happened: 20 cases. The alert was right, but both intervals missed, which is our documented weakness at peaks. Press play and every week is a genuine out-of-time forecast." |
-| 0:35-1:05 | **Model Evidence → Reliability center**. Point at 0.607 / 0.740, then drag the alert threshold slider | "Every number here comes from saved out-of-time predictions. Intervals are honest on average but cover only 61% of peaks at the 80% level. The alert simulator lets an officer trade recall against false alerts, and it shows the honest comparison: the deployed rule, F1 0.61, versus re-choosing the threshold on prior seasons, 0.59. Picking the best threshold in hindsight looks better, and we label it optimistic." |
-| 1:05-1:50 | **Map & Emergency Routing**: Use my location, search "Square Hospital", Route from start, toggle **A\* Algorithm Insight**, then "Nearest hospitals by road" | "914 real hospitals and clinics from OpenStreetMap. Routing is genuine A* on the directed road network: one-way streets, fastest versus shortest, and each route checked against Dijkstra. Insight mode shows why A* is faster: it explored about six times fewer nodes for the same optimal cost. Nearest hospitals are ranked by road time, and we never invent beds or doctors on duty." |
-| 1:50-2:05 | Header **Emergency help** | "On every page, even when the API is down: tap-to-call 999 and the DGHS line 16263, WHO warning signs, one tap to the nearest hospitals." |
-| 2:05-2:30 | **Response Intelligence → Resource planning sandbox**, 10 teams | "With ten field teams, risk-blind placement would have reached 15% of real outbreak ward-weeks in 2024; risk-based placement about 34%. Forecast and simple history are close, and we say so. It's a planning simulation, not a claim of prevented infections." |
-| 2:30-2:50 | **Copilot**: "How often does the outbreak alert miss real outbreaks?" | "The Copilot answers only from read-only tools over the app's own evidence, with citations, in English or Bangla." |
-| 2:50-3:00 | Command Center → **Download intelligence brief** | "And every view becomes a one-page brief with uncertainty, provenance and limitations. Thank you." |
+| 1 | Intro: the mosquito flies, one click swats it, the dashboard opens | This is DengueShield AI, running live on our deployed website. One swat, and the dashboard opens. ⏸ |
+| 2 | Pointer on Ward, Forecast origin, 3 weeks; scrolls to Weather context | An officer chooses three inputs: a ward, a forecast week, and how far ahead, two to four weeks. Here: Dhaka North ward 19, the week of 5 August 2024, three weeks ahead. The model only uses data available before that week: past case counts, temperature, humidity, and rainfall summed over the previous weeks. ⏸ |
+| 3 | Back to the ward forecast, fan chart, risk tier, time-machine verdict | The prediction: a median of 13 cases, an 80 percent interval of 8 to 18, an 83 percent chance of an outbreak, and the risk tier, Critical. This is a historical replay of the organizers' synthetic data, so we can check what really happened: 20 cases. The alert was right, but the interval missed the peak. ⏸ |
+| 4 | "What drives this forecast", then "Which rainfall does this forecast use?" | Why Critical? The driver breakdown shows the season and recent rainfall pushing risk up, plus this ward's vulnerability. The lag is explicit: the strongest weather signal is rainfall three weeks before the target week, the mosquito breeding cycle. Rain after the forecast week is never used. ⏸ |
+| 5 | Clicks 4 weeks, back to 3 weeks, then ▶ time machine | Change any input and the forecast updates. Press play, and every week is a real out-of-time forecast from a model trained only on earlier seasons. ⏸ |
+| 6 | Ward Risk Explorer: risk matrix | The ward risk matrix shows all 60 wards at once, as Low, Medium, High and Critical, so teams can target the worst wards first. ⏸ |
+| 7 | Model Evidence: validation by season, coverage at peaks (0.607) | Model Evidence shows how far to trust it. It is a ridge Poisson regression, tested season by season on years it never saw. The error is about 1.4 cases per ward per week, three weeks ahead. Intervals cover 85 percent of weeks overall, but only 61 percent at peaks, and we show that openly. ⏸ |
+| 8 | Map: Use my location, search Square Hospital, route, Dijkstra check, A\* insight, nearest hospitals | For the response, the map shows 914 real hospitals and clinics from OpenStreetMap. From Old Dhaka, I search Square Hospital and route there. This is A-star search on the real road network, with one-way streets, and every route is checked against Dijkstra: the same optimal cost. Insight mode shows A-star explores far fewer nodes. Nearest hospitals are ranked by travel time on the roads. ⏸ |
+| 9 | Emergency help dialog: 999, 16263, warning signs | Emergency help is one click away on every page: 999, the DGHS health line 16263, and the WHO warning signs. ⏸ |
+| 10 | Response Intelligence: resource planning sandbox | With ten field teams in 2024, risk-blind placement reached 15 percent of real outbreak ward-weeks. Risk-based placement reached about 34 percent. It is a planning simulation, not a promise. ⏸ |
+| 11 | Back to Command Center, switches to Bangla | And everything also works in Bangla. Thank you. |
 
-## Fallbacks if something fails live
+Figures are from the live site (DNCC_Ward_19, origin 5 Aug 2024, 3 weeks ahead, Historical Replay): median 13, 80% interval 8–18,
+P(outbreak) 0.83, Critical, observed 20; MAE 1.39 at 3 weeks (2022–2024); 80% interval coverage 0.854 overall, 0.607 at high-incidence weeks;
+2024 sandbox with 10 teams: 14.9% equal, 34.4% historical, 33.3% forecast.
 
-- No internet: skip Climate Observatory and the Copilot sentence. The forecast, evidence and profiling pages are local.
-- No OpenAI key or credit: the Copilot returns retrieval-only passages; say so and move on.
-- Map not loading (no MapTiler key): the map falls back to a blank basemap; facilities, routes and the directory still work.
-- Location permission denied: click the map to set the start point.
-- To replay the intro: open a new tab, or remove `ds.intro.seen` from session storage; add `?nointro` to skip it.
+## Fallbacks
+
+- The recorder warms the API first. If a step is late, the log lists it. Run it again; the backend is cached after the first take.
+- To run against a local launch instead: `DEMO_URL=http://127.0.0.1:8000`.

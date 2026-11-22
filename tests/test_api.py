@@ -147,7 +147,7 @@ def test_assistant_disabled_path_is_honest_and_does_not_call_openai(client, monk
 def test_rag_corpus_is_approved_documents_only_and_tools_are_strict():
     from dengueshield.api import rag
     srcs = {c["source"] for c in rag.build_corpus()}
-    assert {"docs/model_selection.md", "docs/architecture/ml-pipeline.md"} <= srcs
+    assert {"docs/model_selection.md", "ARCHITECTURE.md"} <= srcs
     assert not any(s.startswith(("data/raw", ".env")) or s.endswith(".env") for s in srcs)
     names = {t["name"] for t in rag.TOOLS}
     assert names == {"get_ward_forecast", "compare_wards", "get_risk_rankings", "get_model_metrics", "get_feature_importance", "get_data_profile", "find_health_facilities"}
@@ -236,10 +236,8 @@ def test_document_viewer_serves_architecture_and_refuses_unlisted_files(client):
     document = client.get("/api/docs/read", params={"path": "ARCHITECTURE.md"})
     assert document.status_code == 200
     overview = document.json()["text"]
-    assert overview.count("\n```mermaid\n") == 1
-    for name in ("ml-pipeline", "backend", "frontend", "geospatial", "copilot", "decision-support", "deployment-security"):
-        path = f"docs/architecture/{name}.md"
-        assert path in overview and path in paths
-        assert client.get("/api/docs/read", params={"path": path}).status_code == 200
-    for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py", "docs/architecture/../.env"):
+    assert overview.count("\n```mermaid\n") >= 20                                    # every architecture diagram lives in this one file
+    for section in ("## ML pipeline", "## Backend", "## Frontend", "## Geospatial", "## Copilot", "## Decision support", "## Launch, deployment and security"):
+        assert section in overview
+    for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py", "docs/architecture/ml-pipeline.md"):
         assert client.get("/api/docs/read", params={"path": bad}).status_code == 404

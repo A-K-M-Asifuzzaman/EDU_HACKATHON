@@ -636,7 +636,7 @@ def integrations_status():
 # ------------------------------------------------------------------ methodology documents (allow-listed, read-only)
 def _doc_index() -> dict:
     out = {}
-    for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/architecture/*.md", "docs/team/*.md"):
+    for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/team/*.md"):
         for f in sorted(ROOT.glob(pat)):
             if f.is_file() and f.name not in {".env", ".env.example"}:
                 out[f.relative_to(ROOT).as_posix()] = f

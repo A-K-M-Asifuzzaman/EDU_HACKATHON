@@ -286,7 +286,7 @@ flowchart TB
 
 </details>
 
-For the full architectural breakdown with Mermaid diagrams, see [ARCHITECTURE.md](ARCHITECTURE.md) and the seven subsystem documents in [`docs/architecture/`](docs/architecture/).
+For the full architectural breakdown with Mermaid diagrams (data flow, validation split, model selection and every subsystem), see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
 
@@ -337,7 +337,6 @@ EDU_HACKATHON/
 │   ├── model_tournament/      #   Champion selection, Optuna, calibration, diagnostics
 │   └── screenshots/           #   App screenshots (desktop, mobile)
 ├── docs/                      # Methodology and architecture documents
-│   ├── architecture/          #   7 subsystem docs (backend, frontend, ML, geospatial, etc.)
 │   ├── media/                 #   README hero banner and animated GIFs
 │   ├── screenshots/           #   Before/after UI screenshots
 │   └── *.md                   #   Validation, calibration, features, model selection, etc.

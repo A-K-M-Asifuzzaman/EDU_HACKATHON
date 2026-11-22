@@ -329,10 +329,8 @@ test("provenance document viewer opens architecture details and related document
   const dlg = page.getByRole("dialog");
   await dlg.getByRole("link", { name: "ML pipeline", exact: true }).click();
   await expect(dlg.getByRole("heading", { name: "ML pipeline: from raw data to a calibrated forecast bundle" })).toBeVisible();
-  await dlg.getByRole("link", { name: "Architecture overview" }).click();
-  await expect(dlg).toHaveAttribute("aria-label", "ARCHITECTURE.md");
-  await dlg.getByRole("link", { name: "ML pipeline", exact: true }).click();
-  await dlg.getByRole("link", { name: "model_selection.md", exact: true }).click();
+  await expect(dlg).toHaveAttribute("aria-label", "ARCHITECTURE.md");                              // all architecture is in one file
+  await dlg.getByRole("link", { name: "model_selection.md", exact: true }).first().click();
   await expect(dlg.getByRole("heading", { name: "Model selection (Stage 3)" })).toBeVisible();
   await expect(page).toHaveURL(/\/provenance\/?$/);
 });
