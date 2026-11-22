@@ -87,7 +87,7 @@ export default function GeoCommand() {
   }, []);
 
   const getRoute = useCallback(async (f: any, from: LngLat | null = origin, withInsight = insightOn) => {
-    if (!from) { toast("Set a starting point first: use your location, search a place, or click the map."); return; }
+    if (!from) { toast(t("map.needstart")); return; }
     setBusy("route"); setRouteErr(null); setTab("route"); setSheet(true);
     try {
       const r = await api(`/api/route?${qs({ from_lat: from[1], from_lon: from[0], to_facility: f.properties.id, insight: withInsight || undefined })}`, { ttl: 300_000 });
@@ -106,13 +106,13 @@ export default function GeoCommand() {
   }, []);
 
   const locate = useCallback((thenNearest = false) => {
-    if (!navigator.geolocation) { toast("Location is not available in this browser. Click the map instead."); return; }
+    if (!navigator.geolocation) { toast(t("map.nogeo")); return; }
     setBusy("locate");
     navigator.geolocation.getCurrentPosition((pos) => {
       const p: LngLat = [pos.coords.longitude, pos.coords.latitude];
       setOrigin(p); setOriginLabel(`Your location (±${Math.round(pos.coords.accuracy)} m)`); setBusy(null); mapRef.current?.flyTo(p, 14);
       if (thenNearest) findNearest(p);
-    }, (err) => { setBusy(null); toast(err.code === 1 ? "Location permission was denied. Click the map to set a starting point." : "Could not get your location. Click the map instead."); }, { enableHighAccuracy: true, timeout: 10_000 });
+    }, (err) => { setBusy(null); toast(err.code === 1 ? t("map.denied") : t("map.nofix")); }, { enableHighAccuracy: true, timeout: 10_000 });
   }, [findNearest, toast]);
 
   useEffect(() => { if (new URLSearchParams(window.location.search).get("emergency") === "1") locate(true); }, [locate]);
@@ -163,10 +163,10 @@ export default function GeoCommand() {
           {P.beds_tagged && <><dt className="text-ink-3">Beds</dt><dd>{P.beds_tagged} <span className="text-[11px] text-ink-3">(as tagged, not live)</span></dd></>}
         </dl>
         <div className="rounded-xl bg-amber/10 p-2.5 text-[11.5px] leading-snug text-ink-2"><b>Verification:</b> {P.verification}. Last edited {P.last_edited?.slice(0, 10) ?? "unknown"} · <a href={P.osm_url} target="_blank" rel="noopener noreferrer" className="underline">source record</a>. No live beds, admissions or doctors on duty: call ahead.</div>
-        <div className="flex flex-wrap gap-2 pt-0.5"><Btn onClick={() => getRoute(picked)} disabled={busy === "route"}>{busy === "route" ? "Routing…" : origin ? "Route from start" : "Set start to route"}</Btn>{P.phone?.[0] && <a href={tel(P.phone[0])} className="inline-flex items-center rounded-xl border border-line px-3 py-2 text-sm font-medium hover:bg-mint-l">Call</a>}</div>
+        <div className="flex flex-wrap gap-2 pt-0.5"><Btn onClick={() => getRoute(picked)} disabled={busy === "route"}>{busy === "route" ? t("map.routing") : origin ? t("map.routefrom") : t("map.setstart")}</Btn>{P.phone?.[0] && <a href={tel(P.phone[0])} className="inline-flex items-center rounded-xl border border-line px-3 py-2 text-sm font-medium hover:bg-mint-l">Call</a>}</div>
         <NavLinks origin={origin} dest={picked.geometry.coordinates} />
-      </div>) : <EmptyState text="Select a hospital or clinic on the map, in the search box or in the directory below." />)}
-      {tab === "route" && (routeErr ? <Notice tone="warn">{routeErr}</Notice> : busy === "route" && !route ? <p className="text-ink-3">Searching the road graph…</p> : route ? (<div className="space-y-3">
+      </div>) : <EmptyState text={t("map.empty.facility")} />)}
+      {tab === "route" && (routeErr ? <Notice tone="warn">{routeErr}</Notice> : busy === "route" && !route ? <p className="text-ink-3">{t("map.searching")}</p> : route ? (<div className="space-y-3">
         <div className="font-semibold text-navy">To {route.facility?.properties?.name ?? "destination"}</div>
         <Segmented label="Show route" value={routeMode} onChange={(v) => setRouteMode(v as any)} options={[{ value: "fastest", label: "Fastest (est.)" }, { value: "shortest", label: "Shortest" }, { value: "both", label: "Both" }]} />
         <table className="w-full text-[13px]"><thead><tr className="text-left text-[11px] uppercase text-ink-3"><th></th><th>Fastest (est.)</th><th>Shortest</th></tr></thead><tbody>
@@ -185,19 +185,19 @@ export default function GeoCommand() {
           <p>Both find the same shortest-distance route ({route.insight.cost_equal ? "costs equal ✓" : "costs differ ✗"}). Dijkstra grows outward in every direction; A* adds the straight-line distance to the hospital as a lower bound, so it explores {(route.insight.dijkstra.expanded / Math.max(1, route.insight.astar.expanded)).toFixed(1)}× fewer nodes toward the goal. The map shows an even sample of up to {route.insight.sample_cap.toLocaleString()} explored nodes each.</p></div>)}
         <NavLinks origin={route.from} dest={route.facility.geometry.coordinates} />
         <p className="text-[11px] leading-relaxed text-ink-3"><b>Estimates:</b> times assume free-flow speeds by road class ({Object.entries(route.speeds_kmh).map(([k, v]) => `${k} ${v}`).join(", ")} km/h); no traffic data. <b>Facts:</b> road geometry and one-way rules from OSM. Start snapped {route.origin.snap_m} m and destination {route.destination.snap_m} m to the nearest intersection. {route.attribution}.</p>
-      </div>) : <EmptyState text="Pick a facility and press “Route from start”." />)}
-      {tab === "nearest" && (busy === "nearest" ? <p className="text-ink-3">Searching the road network…</p> : nearest?.error ? <Notice tone="warn">{nearest.error}</Notice> : nearest?.results ? (<div className="space-y-2">
+      </div>) : <EmptyState text={t("map.empty.route")} />)}
+      {tab === "nearest" && (busy === "nearest" ? <p className="text-ink-3">{t("map.searching")}</p> : nearest?.error ? <Notice tone="warn">{nearest.error}</Notice> : nearest?.results ? (<div className="space-y-2">
         <p className="text-[11px] text-ink-3">Closest hospitals by estimated road travel time ({nearest.method}, {nearest.search_ms} ms).</p>
         {nearest.results.map((r: any, i: number) => (<div key={r.facility.properties.id} className="rounded-xl border border-line bg-white p-3">
           <div className="flex items-start justify-between gap-2"><button className="min-w-0 text-left font-semibold text-forest hover:underline" onClick={() => selectFacility(r.facility)}>{i + 1}. {r.facility.properties.name ?? "Unnamed hospital"}</button><span className="num shrink-0 whitespace-nowrap text-xs font-bold">{mins(r.est_time_s)} · {km(r.distance_m)}</span></div>
           <div className="mt-1 flex flex-wrap gap-2 text-xs">{r.facility.properties.phone?.[0] ? <a className="font-semibold text-emerald underline" href={tel(r.facility.properties.phone[0])}>📞 {r.facility.properties.phone[0]}</a> : <span className="text-ink-3">no phone in OSM</span>}<button className="underline" onClick={() => getRoute(r.facility)}>route</button><a className="underline" href={gmaps(origin, r.facility.geometry.coordinates)} target="_blank" rel="noopener noreferrer">Google Maps ↗</a></div></div>))}
         <p className="text-[11px] text-ink-3">{nearest.note}</p>
-      </div>) : <EmptyState text="Press “Nearest hospitals by road” to search from your starting point." />)}
+      </div>) : <EmptyState text={t("map.empty.nearest")} />)}
     </div>);
 
   return (<>
-    <PageHeader eyebrow="Geospatial command center" title={t("nav.geography")} sub="Real hospitals and clinics from OpenStreetMap, A* routing on the directed road network, city-level forecast and weather overlays. Forecasts stay at city level: the dataset's ward IDs cannot be placed on real wards." />
-    <Notice tone="warn"><b>Not live hospital information.</b> {fac.data?.meta?.note ?? "Facility data are community-mapped."} In an emergency call <a className="font-bold underline" href="tel:999">999</a>.</Notice>
+    <PageHeader eyebrow={t("map.eyebrow")} title={t("nav.geography")} sub={t("map.sub")} />
+    <Notice tone="warn"><b>{t("map.notlive")}</b> {lang === "bn" ? t("map.community") : fac.data?.meta?.note ?? t("map.community")} {t("map.call")} <a className="font-bold underline" href="tel:999">999</a>.</Notice>
 
     <section className="ds-map-shell relative mt-4 h-[78vh] min-h-[560px] overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-pop)] lg:h-[min(860px,calc(100vh-150px))] lg:min-h-[640px]" aria-label="Map and emergency routing workspace">
       <CommandMap ref={mapRef} height="100%" facilities={facilities} dghs={dghs.data && !(dghs.data as any).status ? dghs.data : null} cityRisk={cityRisk} weather={weather} layers={layers} origin={origin} routes={routes} selectedId={P?.id}
@@ -205,45 +205,45 @@ export default function GeoCommand() {
 
       {/* floating search dock */}
       <div className="glass absolute left-3 top-3 z-10 w-[min(440px,calc(100%-24px))] rounded-2xl p-3 shadow-[var(--shadow-pop)]">
-        <label className="sr-only" htmlFor="geo-search">Search hospitals, clinics or places</label>
-        <input id="geo-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search hospitals, clinics or places…" autoComplete="off" className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-teal" />
+        <label className="sr-only" htmlFor="geo-search">{t("map.search")}</label>
+        <input id="geo-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("map.search")} autoComplete="off" className="w-full rounded-xl border border-line bg-white px-3 py-2 text-sm shadow-sm outline-none focus:border-teal" />
         {(matches.length > 0 || places.length > 0) && (<div className="absolute inset-x-3 z-20 mt-1 overflow-hidden rounded-xl border border-line bg-white shadow-xl" role="listbox" aria-label="Search results">
           {matches.map((f: any) => (<button key={f.properties.id} role="option" aria-selected={false} onClick={() => { selectFacility(f); setQ(""); }} className="block w-full px-3 py-2 text-left text-sm hover:bg-mint-l"><b>{f.properties.name ?? "Unnamed"}</b> <span className="text-xs text-ink-3">{f.properties.kind} · {f.properties.city}</span></button>))}
           {places.map((pl: any) => (<button key={pl.id} role="option" aria-selected={false} onClick={() => { const c = pl.center as LngLat; setOrigin(c); setOriginLabel(pl.place_name); mapRef.current?.flyTo(c, 15); setQ(""); }} className="block w-full border-t border-line px-3 py-2 text-left text-sm hover:bg-mint-l">📍 {pl.place_name} <span className="text-xs text-ink-3">set as start · MapTiler</span></button>))}
         </div>)}
         <div className="mt-2 flex flex-wrap gap-2">
-          <Btn onClick={() => locate(false)} disabled={busy === "locate"} className="flex-1">{busy === "locate" ? "Locating…" : "Use my location"}</Btn>
-          <Btn variant="danger" onClick={() => (origin ? findNearest(origin) : locate(true))} className="flex-1">Nearest hospitals by road</Btn>
+          <Btn onClick={() => locate(false)} disabled={busy === "locate"} className="flex-1">{busy === "locate" ? t("map.locating") : t("map.locate")}</Btn>
+          <Btn variant="danger" onClick={() => (origin ? findNearest(origin) : locate(true))} className="flex-1">{t("map.nearest")}</Btn>
         </div>
         <div className="mt-2 flex flex-wrap gap-1">{Object.keys(JUMP).map((c) => (<button key={c} onClick={() => mapRef.current?.flyTo(JUMP[c].c, JUMP[c].z)} className="min-h-9 rounded-lg px-2.5 py-1.5 text-[12.5px] font-medium text-ink-2 hover:bg-white lg:min-h-0 lg:px-2 lg:py-1 lg:text-[12px]">{c}</button>))}</div>
-        <div className="mt-1 truncate text-[11px] text-ink-3">{originLabel ? <><b>Start:</b> {originLabel}</> : "Tip: click anywhere on the map to set a starting point."}</div>
+        <div className="mt-1 truncate text-[11px] text-ink-3">{originLabel ? <><b>{t("map.start")}:</b> {originLabel}</> : t("map.tip")}</div>
         {/* phones: the old floating Layers button sat under the bottom sheet and the map's tilt control under this dock, so 3D could not be reached */}
         <div className="mt-2 flex gap-2 lg:hidden">
-          <button onClick={toggleLayersPanel} aria-expanded={layersOpen} className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold", layersOpen ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>Layers</button>
-          <button role="switch" aria-checked={layers.buildings} disabled={bldAvail === false} onClick={() => toggle("buildings")} title={bldAvail === false ? "3D buildings are not available on this basemap" : undefined}
-            className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-40", layers.buildings ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>{layers.buildings ? "2D view" : "3D view"}</button>
+          <button onClick={toggleLayersPanel} aria-expanded={layersOpen} className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold", layersOpen ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>{t("map.layers")}</button>
+          <button role="switch" aria-checked={layers.buildings} disabled={bldAvail === false} onClick={() => toggle("buildings")} title={bldAvail === false ? t("map.no3d") : undefined}
+            className={cls("flex-1 rounded-xl border px-3 py-1.5 text-[12px] font-semibold disabled:opacity-40", layers.buildings ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2")}>{layers.buildings ? t("map.2d") : t("map.3d")}</button>
         </div>
       </div>
 
       {/* floating layers + legend */}
       <div className={cls("glass absolute bottom-[64px] left-3 z-20 w-[min(260px,calc(100%-24px))] rounded-2xl p-3 shadow-[var(--shadow-pop)] lg:bottom-10 lg:z-10 lg:block", layersOpen ? "block" : "hidden")}>
-        <div className="eyebrow mb-1.5">Layers</div>
-        <div className="flex flex-wrap gap-1.5">{([["facilities", "Facilities"], ["forecast", "City forecast"], ["weather", "Weather now"], ["dghs", "DGHS boundaries"], ["buildings", "3D buildings"]] as [keyof Layers, string][]).map(([k, l]) => (
+        <div className="eyebrow mb-1.5">{t("map.layers")}</div>
+        <div className="flex flex-wrap gap-1.5">{([["facilities", t("map.l.facilities")], ["forecast", t("map.l.forecast")], ["weather", t("map.l.weather")], ["dghs", t("map.l.dghs")], ["buildings", t("map.l.buildings")]] as [keyof Layers, string][]).map(([k, l]) => (
           <button key={k} role="switch" aria-checked={layers[k]} disabled={k === "buildings" && bldAvail === false} onClick={() => toggle(k)} className={cls("min-h-9 rounded-full border px-3 py-1.5 text-[12px] font-medium transition disabled:opacity-40 lg:min-h-0 lg:px-2.5 lg:py-1 lg:text-[11.5px]", layers[k] ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2 hover:border-teal")}>{l}</button>))}</div>
-        <div className="mt-2 flex gap-1">{(["all", "hospital", "clinic"] as const).map((v) => (<button key={v} onClick={() => setKind(v)} aria-pressed={kind === v} className={cls("min-h-9 rounded-lg px-3 py-1.5 text-[12px] lg:min-h-0 lg:px-2 lg:py-0.5 lg:text-[11.5px]", kind === v ? "bg-teal text-white" : "text-ink-2 hover:bg-white")}>{v === "all" ? t("ctl.all") : v === "hospital" ? "Hospitals" : "Clinics"}</button>))}</div>
+        <div className="mt-2 flex gap-1">{(["all", "hospital", "clinic"] as const).map((v) => (<button key={v} onClick={() => setKind(v)} aria-pressed={kind === v} className={cls("min-h-9 rounded-lg px-3 py-1.5 text-[12px] lg:min-h-0 lg:px-2 lg:py-0.5 lg:text-[11.5px]", kind === v ? "bg-teal text-white" : "text-ink-2 hover:bg-white")}>{v === "all" ? t("ctl.all") : v === "hospital" ? t("map.hospitals") : t("map.clinics")}</button>))}</div>
         <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 border-t border-line pt-2 text-[10.5px] text-ink-2">
-          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#1d4ed8]" />Hospital (OSM)</span><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#0f766e]" />Clinic (OSM)</span>
-          <span className="flex items-center gap-1.5"><i className="h-1 w-4 rounded bg-emerald" />Fastest (est.)</span><span className="flex items-center gap-1.5"><i className="w-4 border-t-2 border-dashed border-[#2563eb]" />Shortest</span>
-          <span className="col-span-2 flex items-center gap-1.5"><i className="rounded-full border-2 border-amber px-1 text-[9px] font-bold">%</i>City forecast (synthetic wards, aggregated)</span></div>
+          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#1d4ed8]" />{t("map.lg.hospital")}</span><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#0f766e]" />{t("map.lg.clinic")}</span>
+          <span className="flex items-center gap-1.5"><i className="h-1 w-4 rounded bg-emerald" />{t("map.lg.fastest")}</span><span className="flex items-center gap-1.5"><i className="w-4 border-t-2 border-dashed border-[#2563eb]" />{t("map.lg.shortest")}</span>
+          <span className="col-span-2 flex items-center gap-1.5"><i className="rounded-full border-2 border-amber px-1 text-[9px] font-bold">%</i>{t("map.lg.city")}</span></div>
         {layers.dghs && dghs.error && <p className="mt-2 text-[11px] text-coral-d">DGHS boundaries unavailable: {dghs.error.message}</p>}
-        {bldAvail === false && <p className="mt-2 text-[11px] text-ink-3">3D buildings are not available on this basemap.</p>}
+        {bldAvail === false && <p className="mt-2 text-[11px] text-ink-3">{t("map.no3d")}</p>}
       </div>
 
       {/* details: right panel on desktop, bottom sheet on mobile */}
       <aside aria-label="Facility, route and nearest-hospital details" className={cls("glass absolute z-10 flex flex-col overflow-hidden shadow-[var(--shadow-pop)] transition-[height] duration-300",
         "inset-x-0 bottom-0 rounded-t-2xl lg:inset-x-auto lg:bottom-3 lg:right-3 lg:top-3 lg:w-[380px] lg:rounded-2xl", sheet ? "h-[62%] lg:h-auto" : "h-[52px] lg:h-auto")}>
-        <button className="mx-auto mt-1.5 h-1.5 w-10 shrink-0 rounded-full bg-ink-3/40 lg:hidden" aria-label={sheet ? "Collapse details" : "Expand details"} onClick={() => setSheet((x) => !x)} />
-        <div className="flex shrink-0 border-b border-line text-sm" role="tablist">{(["facility", "route", "nearest"] as const).map((k) => (<button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); setSheet(true); }} className={cls("flex-1 px-3 py-2.5 font-medium capitalize", tab === k ? "border-b-2 border-navy text-navy" : "text-ink-3")}>{k}</button>))}</div>
+        <button className="mx-auto mt-1.5 h-1.5 w-10 shrink-0 rounded-full bg-ink-3/40 lg:hidden" aria-label={sheet ? t("map.collapse") : t("map.expand")} onClick={() => setSheet((x) => !x)} />
+        <div className="flex shrink-0 border-b border-line text-sm" role="tablist">{(["facility", "route", "nearest"] as const).map((k) => (<button key={k} role="tab" aria-selected={tab === k} onClick={() => { setTab(k); setSheet(true); }} className={cls("flex-1 px-3 py-2.5 font-medium capitalize", tab === k ? "border-b-2 border-navy text-navy" : "text-ink-3")}>{t(`map.tab.${k}`)}</button>))}</div>
         {panel}
       </aside>
     </section>
