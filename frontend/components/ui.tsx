@@ -158,12 +158,14 @@ export function Markdown({ children, docPath, docs, onDoc }: { children: string;
       return <a href={href} target="_blank" rel="noopener noreferrer nofollow" className="text-emerald-d underline">{children}</a>;
     } }}>{children}</ReactMarkdown></div>;
 }
+// first column stays visible while a wide table scrolls sideways (phones), with a soft edge shadow
+const STICKY = "sticky left-0 shadow-[6px_0_8px_-8px_rgba(11,27,46,0.35)]";
 export function DataTable<T extends Record<string, any>>({ rows, cols, onRow, maxH = 420, dense }: { rows: T[]; cols: { key: string; label: string; render?: (r: T) => React.ReactNode; align?: "right"; sort?: (r: T) => number | string }[]; onRow?: (r: T) => void; maxH?: number; dense?: boolean }) {
   const [sort, setSort] = useState<{ k: string; dir: 1 | -1 } | null>(null);
   const sorted = sort ? [...rows].sort((a, b) => { const c = cols.find((x) => x.key === sort.k)!; const f = c.sort ?? ((r: T) => r[sort.k]); const x = f(a), y = f(b); return (x > y ? 1 : x < y ? -1 : 0) * sort.dir; }) : rows;
   return (<div className="scroll-thin overflow-auto rounded-xl border border-line" style={{ maxHeight: maxH }}><table className="w-full border-collapse text-[13px]"><thead className="sticky top-0 z-10 bg-[#f1f5f9] text-left">
-    <tr>{cols.map((c) => (<th key={c.key} scope="col" aria-sort={sort?.k === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"} className={cls("whitespace-nowrap px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink-2", c.align === "right" && "text-right")}>
+    <tr>{cols.map((c, ci) => (<th key={c.key} scope="col" aria-sort={sort?.k === c.key ? (sort.dir === 1 ? "ascending" : "descending") : "none"} className={cls("whitespace-nowrap px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink-2", c.align === "right" && "text-right", ci === 0 && STICKY, ci === 0 && "z-20 bg-[#f1f5f9]")}>
       <button className="inline-flex items-center gap-1 hover:text-forest" onClick={() => setSort((s) => (s?.k === c.key ? { k: c.key, dir: (s.dir * -1) as 1 | -1 } : { k: c.key, dir: -1 }))}>{c.label}{sort?.k === c.key && <span aria-hidden>{sort.dir === 1 ? "▲" : "▼"}</span>}</button></th>))}</tr></thead>
-    <tbody>{sorted.map((r, i) => (<tr key={i} onClick={() => onRow?.(r)} className={cls("border-t border-line transition hover:bg-mint-l/60", onRow && "cursor-pointer")}>{cols.map((c) => (
-      <td key={c.key} className={cls("px-3", dense ? "py-1.5" : "py-2.5", c.align === "right" && "num text-right")}>{c.render ? c.render(r) : String(r[c.key] ?? "—")}</td>))}</tr>))}</tbody></table></div>);
+    <tbody>{sorted.map((r, i) => (<tr key={i} onClick={() => onRow?.(r)} className={cls("group border-t border-line transition hover:bg-mint-l/60", onRow && "cursor-pointer")}>{cols.map((c, ci) => (
+      <td key={c.key} className={cls("px-3", dense ? "py-1.5" : "py-2.5", c.align === "right" && "num text-right", ci === 0 && STICKY, ci === 0 && "z-[1] bg-white group-hover:bg-[#f0faf5]")}>{c.render ? c.render(r) : String(r[c.key] ?? "—")}</td>))}</tr>))}</tbody></table></div>);
 }
