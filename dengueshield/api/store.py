@@ -26,9 +26,10 @@ TIER_ORDER = {"Low": 0, "Medium": 1, "High": 2, "Critical": 3}
 STARTED = time.time()
 
 
-# Heavy model calls build a full-history feature frame (~100 MB transient). They run one at a time, and freed memory is handed back to the OS,
-# so a 512 MB host (Render free plan) never sees stacked spikes from concurrent requests.
-_HEAVY = threading.Lock()
+# Heavy model calls build a full-history feature frame (~100 MB transient). A bounded number run at once (default 4; set
+# DENGUESHIELD_HEAVY_CONCURRENCY=1 on a 512 MB host) and freed memory is handed back to the OS. A single global lock here
+# serialised every visitor's inference and starved the server under concurrent load.
+_HEAVY = threading.BoundedSemaphore(max(1, int(os.getenv("DENGUESHIELD_HEAVY_CONCURRENCY", "4"))))
 
 
 def trim_memory() -> None:

@@ -667,10 +667,10 @@ def _sc_mask(e, city: Optional[str], ward: Optional[str]):
     return np.ones(e.W, bool)
 
 
-@functools.lru_cache(maxsize=256)
+@functools.lru_cache(maxsize=24)  # raw draws are a few MB each: keep few; responses below are cached separately and are small
 def _sc_sims(rain_mult: float, temp_offset: float, year: int, draws: int, model: str):
-    with _SC_LOCK:  # seeded per year: deterministic, and scenarios share random numbers so differences are paired
-        return _sc_engine().simulate(model, draws, rain_mult, temp_offset, seed=1000 + year)
+    # seeded per year: deterministic, and scenarios share random numbers so differences are paired. No lock: the engine is read-only.
+    return _sc_engine().simulate(model, draws, rain_mult, temp_offset, seed=1000 + year).astype(np.int32)
 
 
 def _sc_params(scenario: str, rain_mult: Optional[float], temp_offset: Optional[float]):
@@ -684,7 +684,13 @@ def _sc_params(scenario: str, rain_mult: Optional[float], temp_offset: Optional[
 @app.get("/api/scenarios/run")
 def scenarios_run(scenario: str = "typical", rain_mult: Optional[RainM] = None, temp_offset: Optional[TempO] = None,
                   year: SYear = 2026, city: Optional[str] = None, ward: Optional[str] = Query(None, max_length=20), draws: Draws = 500):
-    e = _sc_engine(); rm, to = _sc_params(scenario, rain_mult, temp_offset); m = _sc_mask(e, city, ward)
+    rm, to = _sc_params(scenario, rain_mult, temp_offset)
+    return _sc_run_cached(scenario, rm, to, year, city, ward, draws)
+
+
+@functools.lru_cache(maxsize=512)
+def _sc_run_cached(scenario, rm, to, year, city, ward, draws):
+    e = _sc_engine(); m = _sc_mask(e, city, ward)
     sims = _sc_sims(rm, to, year, draws, "m1")[:, m]
     clim = _sc_sims(1.0, 0.0, year, draws, "m0")[:, m]
     years = {y: SC.summarize(_sc_sims(rm, to, y, draws, "m1")[:, m], [], np.array([]))["total"] for y in range(2026, 2031)}
@@ -702,8 +708,13 @@ def scenarios_run(scenario: str = "typical", rain_mult: Optional[RainM] = None, 
 def scenarios_compare(a: str = "typical", b: str = "wetter", a_rain: Optional[RainM] = None, a_temp: Optional[TempO] = None,
                       b_rain: Optional[RainM] = None, b_temp: Optional[TempO] = None, year: SYear = 2026,
                       city: Optional[str] = None, ward: Optional[str] = Query(None, max_length=20), draws: Draws = 500):
-    e = _sc_engine(); m = _sc_mask(e, city, ward)
     pa, pb = _sc_params(a, a_rain, a_temp), _sc_params(b, b_rain, b_temp)
+    return _sc_compare_cached(a, b, pa, pb, year, city, ward, draws)
+
+
+@functools.lru_cache(maxsize=512)
+def _sc_compare_cached(a, b, pa, pb, year, city, ward, draws):
+    e = _sc_engine(); m = _sc_mask(e, city, ward)
     sa, sb = _sc_sims(*pa, year, draws, "m1")[:, m], _sc_sims(*pb, year, draws, "m1")[:, m]
     ta, tb = sa.sum((1, 2)), sb.sum((1, 2)); d = tb - ta
     thr = float(np.median(e.y[:, m].sum((1, 2))))
@@ -717,8 +728,15 @@ def scenarios_compare(a: str = "typical", b: str = "wetter", a_rain: Optional[Ra
 
 @functools.lru_cache(maxsize=1)
 def _sc_backtest():
-    with _SC_LOCK:
+    with _SC_LOCK:  # only backtest requests wait here; computed once, in the background at startup
         return SC.backtest(_sc_engine().d, draws=300).round(4)
+
+
+@app.on_event("startup")
+def _warm_scenarios_and_threads():
+    import anyio.to_thread
+    anyio.to_thread.current_default_thread_limiter().total_tokens = 80  # slow requests must not starve quick ones
+    threading.Thread(target=lambda: (_sc_backtest(), _sc_run_cached("typical", 1.0, 0.0, 2026, "All", None, 500)), daemon=True).start()
 
 
 @app.get("/api/scenarios/backtest")
