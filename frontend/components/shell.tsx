@@ -48,6 +48,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <div className="min-w-0">
         <div className="glass sticky top-0 z-30 flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5 sm:px-6">
           <button className="rounded-lg p-1.5 hover:bg-mint-l lg:hidden" aria-label="Open navigation" onClick={() => setOpen(true)}><Icon name="menu" /></button>
+          {/* the brand lived only in the desktop sidebar, so phones showed no logo at all */}
+          <Link href="/" aria-label="DengueShield AI home" className="flex items-center gap-1.5 lg:hidden"><Logo size={26} /><span className="hidden text-[14px] font-bold leading-none tracking-tight text-navy min-[400px]:inline">DengueShield <span className="text-emerald">AI</span></span></Link>
           <ProvChip tone="warn"><Icon name="shield" size={12} />{t("mode.replay")}</ProvChip>
           {meta && <><ProvChip tone="info">{t("fresh.data")} {dateFmt(meta.data.last_observed_week, lang)}</ProvChip>
             <span className="hidden sm:inline-flex"><ProvChip>{t("fresh.model")}: {meta.model.bundle_version ? `v${meta.model.bundle_version}` : "—"} · {meta.model.features} features</ProvChip></span></>}
