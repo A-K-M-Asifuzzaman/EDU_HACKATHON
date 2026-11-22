@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 380" width="1200" height="380" role="img" aria-label="DengueShield AI — Predict Earlier. Respond Smarter.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0e2c40"/>
+      <stop offset="0.55" stop-color="#0b1e30"/>
+      <stop offset="1" stop-color="#06121e"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.15" cy="0.1" r="0.6">
+      <stop offset="0" stop-color="#16a34a" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#16a34a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="band" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#86efac" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#86efac" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </linearGradient>
+    <clipPath id="reveal">
+      <rect x="640" y="60" width="0" height="260">
+        <animate attributeName="width" values="0;500;500" keyTimes="0;0.45;1" dur="6s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <style>
+      .t { font-family: -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="380" rx="22" fill="url(#bg)"/>
+  <rect width="1200" height="380" rx="22" fill="url(#glow)"/>
+
+  <!-- subtle grid -->
+  <g stroke="#ffffff" stroke-opacity="0.04">
+    <path d="M0 76H1200M0 152H1200M0 228H1200M0 304H1200"/>
+    <path d="M150 0V380M300 0V380M450 0V380M600 0V380M750 0V380M900 0V380M1050 0V380"/>
+  </g>
+
+  <!-- shield logo -->
+  <g transform="translate(64 70)">
+    <path d="M32 0 L64 12 V36 C64 58 50 72 32 80 C14 72 0 58 0 36 V12 Z" fill="url(#shield)"/>
+    <path d="M18 40 l10 10 l19 -22" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="146" y="112" class="t" font-size="50" font-weight="800" fill="#ffffff">DengueShield <tspan fill="#4ade80">AI</tspan></text>
+  <text x="148" y="146" class="t" font-size="20" font-weight="500" fill="#94a3b8">Predict Earlier. Respond Smarter.</text>
+
+  <text x="66" y="206" class="t" font-size="17" fill="#cbd5e1">Ward-level dengue forecasts, 2–4 weeks ahead,</text>
+  <text x="66" y="231" class="t" font-size="17" fill="#cbd5e1">for 60 wards across 5 Bangladesh city corporations.</text>
+
+  <!-- stat pills -->
+  <g class="t" font-size="14" font-weight="600">
+    <g transform="translate(66 266)">
+      <rect width="118" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#86efac" stroke-opacity="0.4"/>
+      <text x="59" y="22" text-anchor="middle" fill="#86efac">MAE 1.11 · h2</text>
+    </g>
+    <g transform="translate(194 266)">
+      <rect width="128" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#86efac" stroke-opacity="0.4"/>
+      <text x="64" y="22" text-anchor="middle" fill="#86efac">914 hospitals</text>
+    </g>
+    <g transform="translate(332 266)">
+      <rect width="104" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#86efac" stroke-opacity="0.4"/>
+      <text x="52" y="22" text-anchor="middle" fill="#86efac">EN · বাংলা</text>
+    </g>
+    <g transform="translate(446 266)">
+      <rect width="118" height="34" rx="17" fill="#ffffff" fill-opacity="0.07" stroke="#86efac" stroke-opacity="0.4"/>
+      <text x="59" y="22" text-anchor="middle" fill="#86efac">11 KB model</text>
+    </g>
+  </g>
+
+  <text x="66" y="340" class="mono" font-size="12" fill="#64748b">EDU AI Engineering Hackathon 2026 · synthetic data · Historical Replay</text>
+
+  <!-- forecast chart card -->
+  <g transform="translate(620 44)">
+    <rect width="540" height="292" rx="16" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="22" y="34" class="t" font-size="13" font-weight="700" fill="#e2e8f0">Forecast with uncertainty</text>
+    <text x="22" y="52" class="t" font-size="11" fill="#64748b">weekly cases · 80% interval · observed</text>
+    <g transform="translate(400 22)">
+      <rect width="118" height="26" rx="13" fill="#dc2626" fill-opacity="0.18" stroke="#f87171" stroke-opacity="0.6"/>
+      <circle cx="16" cy="13" r="4" fill="#f87171">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.2s" repeatCount="indefinite"/>
+      </circle>
+      <text x="66" y="17.5" text-anchor="middle" class="t" font-size="11" font-weight="700" fill="#fca5a5">Outbreak alert</text>
+    </g>
+  </g>
+
+  <g clip-path="url(#reveal)">
+    <path d="M644 276 L680 270 L716 266 L752 258 L788 246 L824 222 L860 190 L896 150 L932 122 L968 132 L1004 168 L1040 204 L1076 228 L1112 244 L1140 250
+             L1140 286 L1112 280 L1076 268 L1040 252 L1004 228 L968 200 L932 186 L896 204 L860 230 L824 252 L788 268 L752 276 L716 282 L680 286 L644 290 Z"
+          fill="url(#band)"/>
+    <path d="M644 283 L680 278 L716 274 L752 267 L788 257 L824 237 L860 210 L896 177 L932 154 L968 166 L1004 198 L1040 228 L1076 248 L1112 262 L1140 268"
+          fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#f87171">
+      <circle cx="680" cy="281" r="3.5"/><circle cx="752" cy="262" r="3.5"/><circle cx="824" cy="230" r="3.5"/>
+      <circle cx="896" cy="166" r="3.5"/><circle cx="932" cy="138" r="3.5"/><circle cx="1004" cy="190" r="3.5"/>
+      <circle cx="1076" cy="252" r="3.5"/>
+    </g>
+  </g>
+
+  <!-- forecast origin marker -->
+  <g>
+    <line x1="932" y1="96" x2="932" y2="300" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="4 4" opacity="0">
+      <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.42;0.5;0.95;1" dur="6s" repeatCount="indefinite"/>
+    </line>
+    <g opacity="0">
+      <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.45;0.55;0.95;1" dur="6s" repeatCount="indefinite"/>
+      <rect x="944" y="92" width="172" height="44" rx="10" fill="#0b1e30" stroke="#fbbf24" stroke-opacity="0.6"/>
+      <text x="956" y="110" class="t" font-size="11" fill="#fcd34d" font-weight="700">3 weeks ahead</text>
+      <text x="956" y="127" class="t" font-size="11" fill="#cbd5e1">13 cases · P(outbreak) 83%</text>
+    </g>
+    <circle cx="932" cy="154" r="6" fill="#4ade80" opacity="0">
+      <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.42;0.48;0.95;1" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="6;12;6" dur="1.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- flying mosquito -->
+  <g opacity="0.9">
+    <animateMotion dur="9s" repeatCount="indefinite" path="M560 70 C 620 20, 700 120, 780 60 S 900 20, 1000 80 S 1120 40, 1180 20" rotate="auto"/>
+    <ellipse cx="0" cy="0" rx="7" ry="2.6" fill="#e2e8f0"/>
+    <ellipse cx="-2" cy="-4" rx="5" ry="2" fill="#ffffff" fill-opacity="0.55">
+      <animate attributeName="ry" values="2;0.4;2" dur="0.08s" repeatCount="indefinite"/>
+    </ellipse>
+    <line x1="7" y1="0" x2="13" y2="0" stroke="#e2e8f0" stroke-width="1"/>
+  </g>
+</svg>

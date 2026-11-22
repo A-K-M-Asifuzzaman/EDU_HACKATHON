@@ -1,37 +1,110 @@
-# 🦟 DengueShield AI
+<div align="center">
 
-> **Predict Earlier. Respond Smarter.**
+<img src="docs/media/hero.svg" alt="DengueShield AI — Predict Earlier. Respond Smarter." width="100%"/>
 
-Ward-level dengue forecasting for Bangladesh city corporations, built for the
-EDU AI Engineering Hackathon 2026 (preliminary round). The system forecasts weekly
-dengue cases and outbreak risk tiers **2, 3 and 4 weeks ahead** for each of **60 wards**
-across 5 city corporations, using only information available at the forecast origin.
+<br/>
 
----
+[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![MapLibre](https://img.shields.io/badge/MapLibre-6-396CB2?logo=maplibre&logoColor=white)
+![Bilingual](https://img.shields.io/badge/UI-English%20%7C%20বাংলা-16a34a)
+![Data](https://img.shields.io/badge/data-synthetic%20%C2%B7%202025%20sealed-f59e0b)
 
-## Table of Contents
+**Ward-level dengue forecasting for Bangladesh city corporations.**<br/>
+Weekly cases and outbreak risk tiers **2, 3 and 4 weeks ahead** for **60 wards** across **5 city corporations**,<br/>
+using only information available at the forecast origin.
 
-- [Features at a Glance](#features-at-a-glance)
-- [Quick Start (Linux / macOS)](#quick-start-linux--macos)
-- [Setup Guide (Windows)](#setup-guide-windows)
-- [Dashboard Pages](#dashboard-pages)
-- [Project Architecture](#project-architecture)
-- [Project Structure](#project-structure)
-- [Model & Science](#model--science)
-- [API Reference](#api-reference)
-- [Security & Privacy](#security--privacy)
-- [Environment Variables](#environment-variables)
-- [Testing](#testing)
-- [Deployment](#deployment)
-- [Research Notebooks](#research-notebooks)
-- [Data & Licensing](#data--licensing)
-- [AI Assistants & External APIs](#ai-assistants--external-apis-disclosure)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
+<sub>Built for the EDU AI Engineering Hackathon 2026 (preliminary round)</sub>
+
+[**🎬 Tour**](#-see-it-in-action) · [**⚡ Quick start**](#-quick-start-linux--macos) · [**🪟 Windows**](#-setup-guide-windows) · [**🧭 Pages**](#-dashboard-pages) · [**🧠 Model**](#-model--science) · [**🔌 API**](#-api-reference) · [**🔐 Security**](#-security--privacy)
+
+</div>
 
 ---
 
-## Features at a Glance
+## 🎬 See it in action
+
+<div align="center">
+
+<img src="docs/media/tour.gif" alt="Animated tour of all eleven DengueShield AI pages" width="100%"/>
+
+<sub>A full lap of the dashboard: intro → Command Center → Profiling → Wards → Map & Routing → Forecast Lab → Copilot → Evidence → Response → Climate → Learn → Provenance</sub>
+
+</div>
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/media/routing.gif" alt="A* emergency routing and nearest hospitals by road time" width="100%"/>
+      <p align="center"><b>🚑 Emergency routing</b><br/><sub>914 real OSM hospitals · A* fastest vs shortest · nearest care by road time</sub></p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/media/bilingual.gif" alt="The same page switching between English and Bangla" width="100%"/>
+      <p align="center"><b>🌐 English ↔ বাংলা</b><br/><sub>Every page, the emergency panel and search — with Bengali digits and dates</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <img src="docs/media/mobile.gif" alt="Command Center, Ward Risk and Forecast Lab scrolling on phones" width="100%"/>
+      <p align="center"><b>📱 Built for phones too</b><br/><sub>Compact header, larger touch targets, sticky table columns and a chat button that gets out of the way</sub></p>
+    </td>
+  </tr>
+</table>
+
+<details>
+<summary><b>🖼️ Screenshot gallery (click to expand)</b></summary>
+<br/>
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/after/command.png" width="100%"/><br/><sub>Command Center</sub> | <img src="docs/screenshots/after/profiling.png" width="100%"/><br/><sub>Data Profiling Studio</sub> | <img src="docs/screenshots/after/wards.png" width="100%"/><br/><sub>Ward Risk Explorer</sub> |
+| <img src="docs/screenshots/after/geography.png" width="100%"/><br/><sub>Map & Emergency Routing</sub> | <img src="docs/screenshots/after/lab.png" width="100%"/><br/><sub>AI Forecast Lab</sub> | <img src="docs/screenshots/after/copilot.png" width="100%"/><br/><sub>Research Copilot</sub> |
+| <img src="docs/screenshots/after/evidence.png" width="100%"/><br/><sub>Model Evidence</sub> | <img src="docs/screenshots/after/response.png" width="100%"/><br/><sub>Response Intelligence</sub> | <img src="docs/screenshots/after/climate.png" width="100%"/><br/><sub>Climate Observatory</sub> |
+| <img src="docs/screenshots/after/learn.png" width="100%"/><br/><sub>Learn</sub> | <img src="docs/screenshots/after/provenance.png" width="100%"/><br/><sub>System & Provenance</sub> | <img src="docs/screenshots/intro.png" width="100%"/><br/><sub>Interactive intro</sub> |
+
+More: [`docs/screenshots/`](docs/screenshots/) (desktop, tablet, mobile, before/after) and [`reports/screenshots/`](reports/screenshots/).
+The GIFs above are rebuilt from these screenshots with `python scripts/make_readme_gifs.py`.
+
+</details>
+
+---
+
+## 📑 Table of Contents
+
+- [✨ Features at a Glance](#-features-at-a-glance)
+- [⚡ Quick Start (Linux / macOS)](#-quick-start-linux--macos)
+- [🪟 Setup Guide (Windows)](#-setup-guide-windows)
+- [🧭 Dashboard Pages](#-dashboard-pages)
+- [🧱 Project Architecture](#-project-architecture)
+- [📂 Project Structure](#-project-structure)
+- [🧠 Model & Science](#-model--science)
+- [🔌 API Reference](#-api-reference)
+- [🔐 Security & Privacy](#-security--privacy)
+- [🔧 Environment Variables](#-environment-variables)
+- [🧪 Testing](#-testing)
+- [🚀 Deployment](#-deployment)
+- [📓 Research Notebooks](#-research-notebooks)
+- [📜 Data & Licensing](#-data--licensing)
+- [🤖 AI Assistants & External APIs](#-ai-assistants--external-apis-disclosure)
+- [🆕 Recent Improvements](#-recent-improvements)
+- [🩺 Troubleshooting](#-troubleshooting)
+- [🤝 Contributing](#-contributing)
+
+---
+
+## ✨ Features at a Glance
+
+<div align="center">
+
+| 60 wards | 3 horizons | 914 facilities | 53,100 | 11 KB | 2 languages |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| across 5 city corporations | 2 · 3 · 4 weeks ahead | real OSM hospitals & clinics | out-of-time replay predictions | serialized model bundle | English · বাংলা |
+
+</div>
 
 | Capability | Description |
 |---|---|
@@ -46,7 +119,7 @@ across 5 city corporations, using only information available at the forecast ori
 
 ---
 
-## Quick Start (Linux / macOS)
+## ⚡ Quick Start (Linux / macOS)
 
 **Requirements:** Python 3.12+, Node 20.9+ and npm, internet access for the first run.
 
@@ -60,9 +133,18 @@ The script creates `.venv`, installs runtime dependencies, downloads and checksu
 organizer CSV, builds the Next.js dashboard (`npm ci && npm run build`) and starts a single
 process serving both the API and the dashboard.
 
+```mermaid
+flowchart LR
+    A[git clone] --> B[launch.sh]
+    B --> C[".venv + pip install"]
+    C --> D["fetch_data.py<br/>SHA-256 verified CSV"]
+    D --> E["npm ci && npm run build"]
+    E --> F["uvicorn :8000<br/>API + dashboard"]
+```
+
 ---
 
-## Setup Guide (Windows)
+## 🪟 Setup Guide (Windows)
 
 > [!IMPORTANT]
 > **Windows does not run the `launch.sh` bash script directly.** Follow these simple step-by-step
@@ -127,35 +209,51 @@ Open your browser and go to: **http://127.0.0.1:8000**
 > - Copy `frontend/.env.example` → `frontend/.env.local` and add your `NEXT_PUBLIC_MAPTILER_KEY` for city map tiles
 > - Rebuild the frontend after adding map keys: `cd frontend && npm run build`
 
-### Fresh-clone Measurement
+### ⏱️ Fresh-clone Measurement
 
 On 22 Nov 2026, an authenticated shallow GitHub clone took about **4 s** on Apple silicon.
 With Python 3.12.6, Node 25.2.0, empty pip and npm caches, and a verified 2016–2024 fixture
 already in place, `./scripts/launch.sh` reached a healthy API and dashboard in **97 s**.
+The measurement excludes the organizer CSV download.
 
 ---
 
-## Dashboard Pages
+## 🧭 Dashboard Pages
 
 | Page | Route | Purpose |
 |---|---|---|
-| **Command Center** | `/` | Hero with the selected week's forecast, validated performance, **time machine** (▶ steps through real weekly forecasts) with verdict rows, and a downloadable **intelligence brief** |
-| **Data Profiling Studio** | `/profiling` | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
-| **Ward Risk Explorer** | `/wards` | Rank and filter all 60 wards by tier or alert |
-| **Map & Emergency Routing** | `/geography` | 914 OSM hospitals/clinics (clustered, searchable, click-to-call), A* routing (fastest vs shortest), nearest hospitals by road time, forecast and weather overlays, optional DGHS boundaries and 3D buildings |
-| **AI Forecast Lab** | `/lab` | Horizon comparison, driver contributions, uncertainty fan |
-| **Research Copilot** | `/copilot` | Chat grounded in app data and docs (OpenAI, read-only tools, citations, EN/BN) |
-| **Model Evidence** | `/evidence` | **Reliability center** (per-horizon MAE/RMSE/bias, alert recall/precision, coverage, reliability diagram) and **alert policy simulator** |
-| **Response Intelligence** | `/response` | Generic response options and **resource planning sandbox**: N teams allocated risk-blind vs by historical risk vs by forecast |
-| **Climate Observatory** | `/climate` | Real NASA POWER and Open-Meteo observations/forecast, shown separately from the synthetic organizer data |
-| **Learn** | `/learn` | Rainfall-to-cases explainer; optional lightweight 3D mosquito |
-| **System & Provenance** | `/provenance` | Versions, data checksums, integrations status, methodology documents |
+| 🏠 **Command Center** | `/` | Hero with the selected week's forecast, validated performance, **time machine** (▶ steps through real weekly forecasts) with verdict rows, and a downloadable **intelligence brief** |
+| 📊 **Data Profiling Studio** | `/profiling` | Dataset health, distributions, correlations, seasonality, rainfall-lag analysis |
+| 🏘️ **Ward Risk Explorer** | `/wards` | Rank and filter all 60 wards by tier or alert |
+| 🗺️ **Map & Emergency Routing** | `/geography` | 914 OSM hospitals/clinics (clustered, searchable, click-to-call), A* routing (fastest vs shortest), nearest hospitals by road time, forecast and weather overlays, optional DGHS boundaries and 3D buildings |
+| 🔬 **AI Forecast Lab** | `/lab` | Horizon comparison, driver contributions, uncertainty fan |
+| 🤖 **Research Copilot** | `/copilot` | Chat grounded in app data and docs (OpenAI, read-only tools, citations, EN/BN) |
+| ✅ **Model Evidence** | `/evidence` | **Reliability center** (per-horizon MAE/RMSE/bias, alert recall/precision, coverage, reliability diagram) and **alert policy simulator** |
+| 🚨 **Response Intelligence** | `/response` | Generic response options and **resource planning sandbox**: N teams allocated risk-blind vs by historical risk vs by forecast |
+| 🌦️ **Climate Observatory** | `/climate` | Real NASA POWER and Open-Meteo observations/forecast, shown separately from the synthetic organizer data |
+| 🦟 **Learn** | `/learn` | Rainfall-to-cases explainer; optional lightweight 3D mosquito |
+| 🧾 **System & Provenance** | `/provenance` | Versions, data checksums, integrations status, methodology documents |
 
 **Global features:** ⌘K / Ctrl+K search (pages, wards, hospitals), **Emergency help** button on every page (tap-to-call 999 and 16263, WHO dengue warning signs, nearest hospitals), interactive intro (swat the mosquito, skippable, respects reduced motion).
 
 ---
 
-## Project Architecture
+## 🧱 Project Architecture
+
+```mermaid
+flowchart TB
+    CSV[("Organizer CSV (synthetic)<br/>SHA-256 verified on every load")]
+    CSV -->|scripts/fetch_data.py| FP["Feature Pipeline<br/>24 features (F8) · Convention B"]
+    FP --> TR["Offline Training · notebooks 01-08<br/>Season-level CV 2019-2024<br/>Tuning on 2019-2021 · benchmark 2022-2024"]
+    TR --> BUN["Serialized Bundle (~11 KB)<br/>models/dengueshield_B.joblib<br/>+ replay.csv.gz (53,100 predictions)"]
+    FP --> API
+    BUN --> API["FastAPI Backend<br/>/api/* endpoints · LRU-cached inference"]
+    API --> UI["Next.js 16 Static Dashboard (frontend/out)<br/>React 19 · TypeScript · Tailwind 4 · ECharts 6 · MapLibre 6<br/>Served by FastAPI on the same origin (no CORS)"]
+    EXT["NASA POWER · Open-Meteo · OpenAI · DGHS GIS<br/>(optional, never model inputs)"] -.-> API
+```
+
+<details>
+<summary>Plain-text version of the diagram</summary>
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -186,11 +284,16 @@ already in place, `./scripts/launch.sh` reached a healthy API and dashboard in *
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+</details>
+
 For the full architectural breakdown with Mermaid diagrams, see [ARCHITECTURE.md](ARCHITECTURE.md) and the seven subsystem documents in [`docs/architecture/`](docs/architecture/).
 
 ---
 
-## Project Structure
+## 📂 Project Structure
+
+<details>
+<summary><b>Show the full tree</b></summary>
 
 ```
 EDU_HACKATHON/
@@ -235,13 +338,15 @@ EDU_HACKATHON/
 │   └── screenshots/           #   App screenshots (desktop, mobile)
 ├── docs/                      # Methodology and architecture documents
 │   ├── architecture/          #   7 subsystem docs (backend, frontend, ML, geospatial, etc.)
+│   ├── media/                 #   README hero banner and animated GIFs
 │   ├── screenshots/           #   Before/after UI screenshots
 │   └── *.md                   #   Validation, calibration, features, model selection, etc.
 ├── scripts/                   # Build and deployment scripts
 │   ├── launch.sh              #   One-command local launch (Linux/macOS)
 │   ├── fetch_data.py          #   Download + SHA-256 verify the organizer CSV
 │   ├── build_geodata.py       #   Build OSM facility + road graph data (offline)
-│   └── deploy_space.py        #   Deploy backend to Hugging Face Spaces
+│   ├── deploy_space.py        #   Deploy backend to Hugging Face Spaces
+│   └── make_readme_gifs.py    #   Rebuild the README GIFs from the screenshots
 ├── tests/                     # pytest test suite
 │   ├── test_api.py            #   API contract tests
 │   ├── test_routing.py        #   A* vs Dijkstra correctness
@@ -259,11 +364,13 @@ EDU_HACKATHON/
 └── ARCHITECTURE.md            # High-level architecture overview
 ```
 
+</details>
+
 ---
 
-## Model & Science
+## 🧠 Model & Science
 
-### Champion Model
+### 🏆 Champion Model
 
 **Ridge Poisson GLM** with 24 features (F8 feature set), one model per horizon.
 
@@ -274,7 +381,23 @@ EDU_HACKATHON/
 | 90% interval coverage (all weeks) | 0.911 | — | — |
 | Alert recall / precision (pooled replay) | — | 0.758 / 0.508 | — |
 
-### Why This Model
+<details>
+<summary>Both origin conventions vs the Stage 1 benchmark (MAE, validation seasons 2022-2024)</summary>
+
+| Origin convention | h = 2 | h = 3 | h = 4 |
+|---|---|---|---|
+| **Start-of-week origin (B, primary)** | 1.107 | 1.393 | 1.512 |
+| End-of-week origin (A) | 1.069 | 1.152 | 1.459 |
+| Stage 1 benchmark (end-of-week) | 1.094 | 1.213 | 1.517 |
+
+Stage 3 found no reliable accuracy gain over Stage 2. Its gains are robustness over six seasons,
+calibrated 80% / 90% intervals and an outbreak alert with recall 0.78 (precision 0.53) on the
+Stage 3 validation seasons; the pooled replay shown in the app gives 0.758 / 0.508.
+Details: [`docs/model_selection.md`](docs/model_selection.md), [`docs/calibration_and_uncertainty.md`](docs/calibration_and_uncertainty.md).
+
+</details>
+
+### 🤔 Why This Model
 
 The selection rule was fixed before the tuned and ensemble results were seen: shortlist everything
 within 0.05 MAE of the best, then take the simplest. Tuned XGBoost, LightGBM, CatBoost, hurdle
@@ -284,23 +407,41 @@ models and 9 ensembles did not beat the GLM by a meaningful margin. The GLM give
 - Additive per-driver explanations (log-rate contributions)
 - Sub-millisecond prediction, 11 KB bundle
 
-### Known Limitations
+### ⚠️ Known Limitations
 
 - Intervals **under-cover outbreak peaks** (80% coverage: 0.607, 90%: 0.740 at peaks)
 - Peaks are under-predicted by approximately 3 cases
 - The dataset is **synthetic**; nothing in the app is live surveillance
 - Risk tiers are **statistical categories** from training quantiles, not official public-health warning levels
 
-### Validation Protocol
+### 🔒 Validation Protocol
 
 Each expanding outer fold fits on earlier seasons and predicts a later full season (2019-2024).
 Interval dispersion and alert thresholds are calibrated on the two preceding validation seasons only.
 The 2025 holdout is **sealed and excluded** from fit, selection, calibration and scoring. See
 [`docs/validation_protocol.md`](docs/validation_protocol.md) and [`docs/holdout_protocol.md`](docs/holdout_protocol.md).
 
+```mermaid
+gantt
+    dateFormat YYYY
+    axisFormat %Y
+    title Benchmark folds 2022-2024 (outer folds start in 2019; each predicts a full season)
+    section Fold 2022
+    Train            :done, 2016, 2022
+    Predict 2022     :active, 2022, 2023
+    section Fold 2023
+    Train            :done, 2016, 2023
+    Predict 2023     :active, 2023, 2024
+    section Fold 2024
+    Train            :done, 2016, 2024
+    Predict 2024     :active, 2024, 2025
+    section Sealed
+    2025 holdout (never used) :crit, 2025, 2026
+```
+
 ---
 
-## API Reference
+## 🔌 API Reference
 
 The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 
@@ -319,7 +460,7 @@ The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 
 ---
 
-## Security & Privacy
+## 🔐 Security & Privacy
 
 > [!CAUTION]
 > **Never commit API keys, passwords, or secrets to the repository.** All secret files
@@ -361,7 +502,7 @@ The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 
 ---
 
-## Environment Variables
+## 🔧 Environment Variables
 
 ### Backend (`.env` in repo root — git-ignored)
 
@@ -382,7 +523,7 @@ NEXT_PUBLIC_MAP_PROVIDER=maptiler      # Optional: maptiler (default) or mapbox
 
 ---
 
-## Testing
+## 🧪 Testing
 
 ```bash
 # Backend unit tests (leakage, alignment, models, A* vs Dijkstra, decision tools, API contracts)
@@ -418,7 +559,7 @@ npx playwright test
 
 ---
 
-## Deployment
+## 🚀 Deployment
 
 ### Production Architecture
 
@@ -426,6 +567,14 @@ npx playwright test
 |---|---|---|
 | **Dashboard** | Vercel (static site) | `vercel.json`, `.vercelignore` |
 | **API** | Hugging Face Spaces (Docker) | `Dockerfile.backend`, `scripts/deploy_space.py` |
+
+```mermaid
+flowchart LR
+    U[👤 Browser] --> V[Vercel<br/>static Next.js export]
+    V -- "/api/* proxy" --> H[Hugging Face Space<br/>FastAPI · Dockerfile.backend]
+    H -.-> O[OpenAI · NASA POWER · Open-Meteo · DGHS]
+    U -.-> M[MapTiler tiles]
+```
 
 Vercel serves the static Next.js export and proxies `/api/*` to the FastAPI backend on HF Spaces.
 Detailed steps, secrets and cost controls are in [`docs/deployment.md`](docs/deployment.md).
@@ -452,7 +601,7 @@ docker build -f Dockerfile.backend -t dengueshield-api . && docker run --rm -p 7
 
 ---
 
-## Research Notebooks
+## 📓 Research Notebooks
 
 | Notebook | Purpose | Runtime |
 |---|---|---|
@@ -478,9 +627,29 @@ done
 
 Later runs take seconds because results are cached in `.cache/` (git-ignored).
 
+<details>
+<summary><b>Where every research output lives</b></summary>
+
+| Output | Location |
+|---|---|
+| Data integrity audit | `notebooks/01_data_audit.ipynb`, `docs/data_audit.md`, `reports/audit/` |
+| Exploratory analysis | `notebooks/02_eda.ipynb`, `reports/eda/` |
+| Validation and baselines | `notebooks/03_validation_and_baselines.ipynb`, `reports/baselines/`, `docs/validation_protocol.md` |
+| Feature library, availability, quality | `notebooks/04_feature_engineering.ipynb`, `docs/feature_engineering.md`, `docs/feature_definitions.md` |
+| Feature ablation tournament | `notebooks/05_feature_ablation.ipynb`, `reports/features/` |
+| Selection, importance, conventions | `notebooks/06_feature_selection.ipynb`, `docs/feature_selection_report.md`, `reports/features/selection/` |
+| Model tournament | `notebooks/07_model_tournament.ipynb`, `docs/model_selection.md`, `reports/model_tournament/` |
+| Diagnostics, intervals, alerts, risk tiers | `notebooks/08_model_diagnostics.ipynb`, `docs/calibration_and_uncertainty.md` |
+| Decision support | `docs/decision_support.md` |
+| Three-minute walkthrough | `docs/demo_script.md` |
+| Deployable bundles | `models/dengueshield_B.joblib` (primary), `models/dengueshield_A.joblib`; `docs/stage4_handoff.md` |
+| One-shot 2025 test procedure (not run) | `docs/holdout_protocol.md` |
+
+</details>
+
 ---
 
-## Data & Licensing
+## 📜 Data & Licensing
 
 ### Organizer Dataset
 
@@ -506,14 +675,19 @@ not stated in the brief.
 
 ---
 
-## AI Assistants & External APIs (Disclosure)
+## 🤖 AI Assistants & External APIs (Disclosure)
 
 ### Development Tools
 
 | Tool | Provider | Used for |
 |---|---|---|
 | Claude Code (Opus & Sonnet) | Anthropic | Development assistant: website, API, map, routing, suggestions, test writing, documentation |
+| Claude (claude.ai) | Anthropic | README redesign, animated README banner and GIFs, UI polish and Bangla translation patches |
 | Codex | OpenAI | Release audit, browser/API verification, Vercel deployment, architecture documentation |
+
+The team directed the work and set the requirements, reviewed the results, and chose the validation
+protocol and model. Reported numbers come from executed notebooks and saved artifacts, not from an
+AI model's statements, and the tests in `tests/` check them.
 
 ### Runtime External APIs (all optional)
 
@@ -527,10 +701,27 @@ not stated in the brief.
 | OpenStreetMap Overpass | Hospitals, clinics, roads | No | **Build-time only** |
 
 If any external service fails, its panel shows a status message and every other page keeps working.
+The forecasts themselves need no external service: they run locally from the committed 11 KB bundle.
 
 ---
 
-## Troubleshooting
+## 🆕 Recent Improvements
+
+<details>
+<summary><b>UI, mobile and Bangla polish (commits 07–27)</b></summary>
+
+| Area | What changed |
+|---|---|
+| 🔎 **SEO & sharing** | Every page has its own browser-tab title; Open Graph tags and a 1200×630 link-preview image for Facebook / WhatsApp |
+| 🌐 **Bangla everywhere** | 404 page, search palette, emergency panel (warning signs, 999 and 16263), map controls and tabs, and the headers of Lab, Profiling, Wards, Evidence, Response, Climate, Copilot, Provenance and Learn |
+| 📱 **Mobile** | One-line compact header with an **SOS** button, search button on phones, chat button that hides while scrolling down, 36–40 px touch targets, header chips that never wrap |
+| ♿ **Accessibility** | Mobile menu closes with Escape and locks background scroll; first table column stays pinned while scrolling sideways |
+
+</details>
+
+---
+
+## 🩺 Troubleshooting
 
 | Problem | Solution |
 |---|---|
@@ -544,29 +735,34 @@ If any external service fails, its panel shows a status message and every other 
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository and create a feature branch
 2. Install the research dependencies: `pip install -r requirements-research.txt`
 3. Run the test suite before pushing: `python -m pytest tests -q`
 4. Make sure the frontend builds cleanly: `cd frontend && npm run build`
 5. Add any new AI assistant or external API to the disclosure table above
+6. Changed the UI? Refresh the screenshots in `docs/screenshots/` and run `python scripts/make_readme_gifs.py`
 
 ---
 
-## Status
+## 📌 Status
 
-**Stage 1-3 (complete):** Data audit, EDA, leak-safe validation, 204-feature pipeline, model
-tournament, calibrated intervals, outbreak alerts, risk tiers, deployable bundles.
+| Stage | State | Scope |
+|---|:---:|---|
+| **Stage 1-3** | ✅ Complete | Data audit, EDA, leak-safe validation, 204-feature pipeline, model tournament, calibrated intervals, outbreak alerts, risk tiers, deployable bundles |
+| **Stage 4** | ✅ Complete | FastAPI + Next.js platform, Copilot, external weather hub, tests |
+| **2025 test year** | 🔒 Sealed | Not used for fit, selection, calibration or scoring |
 
-**Stage 4 (complete):** FastAPI + Next.js platform, Copilot, external weather hub, tests.
-
-The locked 2025 test year has **not** been used. The dataset is synthetic; nothing in the app
-is live surveillance, and the demo mode is labelled **Historical Replay**.
+The dataset is synthetic; nothing in the app is live surveillance, and the demo mode is labelled **Historical Replay**.
 
 ---
 
-<p align="center">
-  <strong>DengueShield AI</strong> — EDU AI Engineering Hackathon 2026<br/>
-  <em>Predict Earlier. Respond Smarter.</em>
-</p>
+<div align="center">
+
+🦟 **DengueShield AI** — EDU AI Engineering Hackathon 2026<br/>
+<em>Predict Earlier. Respond Smarter.</em>
+
+<sub>If this project helped you, consider giving it a ⭐</sub>
+
+</div>
