@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import hashlib
-import resource
+try:
+    import resource
+except ImportError:
+    resource = None
 import time
 from pathlib import Path
 
@@ -121,6 +124,8 @@ def leaderboard(res: pd.DataFrame, kind="median") -> pd.DataFrame:
 
 
 def peak_rss_mb() -> float:
+    if resource is None:
+        return 0.0
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6  # macOS reports bytes
 
 
