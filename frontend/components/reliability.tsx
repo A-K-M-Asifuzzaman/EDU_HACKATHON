@@ -68,7 +68,7 @@ function AlertSimulator({ h }: { h: number }) {
       <label className="min-w-[260px] flex-1"><span className="eyebrow mb-1 flex justify-between"><span>Alert threshold on P(outbreak)</span><b className="num text-navy">{tau.toFixed(2)}</b></span>
         <input type="range" min={0.02} max={0.98} step={0.02} value={tau} onChange={(e) => setTau(Number(e.target.value))} aria-label="Alert threshold" className="w-full accent-teal" /></label>
       <div><span className="eyebrow mb-1 block">Seasons</span><div className="flex flex-wrap gap-1">{YEARS.map((y) => (<button key={y} aria-pressed={years.includes(y)} onClick={() => setYears((ys) => (ys.includes(y) ? (ys.length > 1 ? ys.filter((x) => x !== y) : ys) : [...ys, y].sort()))}
-        className={cls("rounded-lg border px-2 py-1 text-[12px]", years.includes(y) ? "border-navy bg-navy text-white" : "border-line text-ink-3")}>{y}</button>))}</div></div>
+        className={cls("min-h-10 min-w-[52px] rounded-lg border px-3 py-2 text-[13px] sm:min-h-0 sm:min-w-0 sm:px-2 sm:py-1 sm:text-[12px]", years.includes(y) ? "border-navy bg-navy text-white" : "border-line text-ink-3")}>{y}</button>))}</div></div>
     </div>
     <Loading q={curve} h={260}>{() => (<div className="mt-4 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
       <Chart height={260} ariaLabel="Recall, precision, F1 and false-alert rate by threshold" option={{ grid: { left: 40, right: 12, top: 30, bottom: 30 }, legend: { top: 0, textStyle: { fontSize: 11 } }, tooltip: { trigger: "axis", valueFormatter: (v: any) => (v == null ? "—" : Number(v).toFixed(3)) },
