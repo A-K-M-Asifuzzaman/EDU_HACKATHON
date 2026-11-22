@@ -55,7 +55,14 @@ export default function CommandCenter() {
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Link href="/geography/" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy shadow-lg transition hover:-translate-y-0.5">Open map &amp; emergency routing →</Link>
             <Link href="/copilot/" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15">Ask the Copilot</Link>
-            <button disabled={!S} onClick={() => download(`dengueshield_brief_${sel.origin}_h${sel.horizon}.html`, buildBrief({ sel, S, f, top: ranking.data?.wards ?? [], metrics: metrics.data, coverage: cov, meta }), "text/html")} className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15 disabled:opacity-50">Download intelligence brief</button>
+            <button disabled={!S} onClick={() => {
+              const html = buildBrief({ sel, S, f, top: ranking.data?.wards ?? [], metrics: metrics.data, coverage: cov, meta });
+              const w = window.open("", "_blank");
+              if (w) { w.document.write(html); w.document.close(); }
+              else { download(`dengueshield_sitrep_${sel.origin}_h${sel.horizon}.html`, html, "text/html"); }
+            }} className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15 disabled:opacity-50">
+              <span className="text-mint">📄</span> Weekly situation report (PDF)
+            </button>
           </div>
         </div>
         <div className="glass-dark rounded-2xl p-4 sm:p-5">
