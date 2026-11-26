@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { api, qs, TIERS, TIER_COLOR, type Forecast, type Tier } from "@/lib/api";
+import { api, qs, seasonUrl, TIERS, TIER_COLOR, type Forecast, type Tier } from "@/lib/api";
 import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { cls, dateFmt, download, num, pct, toCsv } from "@/lib/format";
@@ -10,6 +10,7 @@ import RiskMatrix from "@/components/riskmatrix";
 import { Btn, Card, CardTitle, DataTable, EmptyState, Loading, Modal, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import { FanChart } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
+import { Houses } from "@/components/illustrations";
 
 export default function Wards() {
   const { sel, set, ready } = useSel();
@@ -35,7 +36,7 @@ export default function Wards() {
       xAxis: { type: "category", data: ["2w", "3w", "4w"], ...axisStyle }, yAxis: { type: "value", name: t("fc.median"), min: 0, ...axisStyle },
       series: picked.map((id) => ({ name: id, type: "bar", data: [get(h2.data, id)?.median_cases, get(h3.data, id)?.median_cases, get(h4.data, id)?.median_cases], barMaxWidth: 26, itemStyle: { borderRadius: [5, 5, 0, 0] } })) };
   }, [picked, h2.data, h3.data, h4.data, t]);
-  const series = useAsync((s) => (detail ? api(`/api/forecast/series?${qs({ ward_id: detail, horizon: sel.horizon, year: Number(sel.origin.slice(0, 4)) })}`, { signal: s }).catch(() => null) : Promise.resolve(null)), [detail, sel.horizon, sel.origin]);
+  const series = useAsync((s) => (detail ? api(seasonUrl(detail, sel.horizon, sel.origin), { signal: s }).catch(() => null) : Promise.resolve(null)), [detail, sel.horizon, sel.origin]);
   const cols = [
     { key: "pick", label: "", render: (w: Forecast) => <input type="checkbox" aria-label={`Compare ${w.ward_id}`} checked={picked.includes(w.ward_id)} onChange={() => toggle(w.ward_id)} onClick={(e) => e.stopPropagation()} className="h-4 w-4 accent-emerald" /> },
     { key: "ward_id", label: t("ctl.ward"), render: (w: Forecast) => <b>{w.ward_id}</b> }, { key: "city", label: t("ctl.city") },
@@ -48,7 +49,7 @@ export default function Wards() {
     { key: "dens", label: "Density/km²", align: "right" as const, render: (w: Forecast) => num(w.vulnerability?.population_density_sqkm, lang, 0), sort: (w: Forecast) => w.vulnerability?.population_density_sqkm ?? 0 },
   ];
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; official DGHS boundaries are on the Geography page as context only, because no verified mapping to these IDs exists." />
+    <PageHeader art={<Houses className="w-full" />} eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; official DGHS boundaries are on the Geography page as context only, because no verified mapping to these IDs exists." />
     <ControlsBar show={["city", "origin", "horizon", "source"]} />
     <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
       <Card><CardTitle title="Risk matrix" sub={`${sel.horizon} ${t("ctl.weeks")} · ${dateFmt(sel.origin, lang)} · click a tile for details; tick rows below to compare`} right={<div className="flex gap-1.5">{TIERS.map((x) => <span key={x} className="flex items-center gap-1 text-[11px] text-ink-3"><i className="h-2.5 w-2.5 rounded-sm" style={{ background: TIER_COLOR[x] }} />{t(`risk.${x.toLowerCase()}`)}</span>)}</div>} />
@@ -71,7 +72,7 @@ export default function Wards() {
     <Modal open={!!detail} onClose={() => setDetail(null)} title={detail ?? ""} wide>
       {detail && (() => { const w = wards.find((x) => x.ward_id === detail); return w ? (<div className="grid gap-4"><div className="flex flex-wrap items-center gap-3"><RiskBadge tier={w.risk_tier} size="lg" /><ProvChip tone={w.outbreak_alert ? "warn" : "ok"}>{w.outbreak_alert ? t("fc.yes") : t("fc.no")}</ProvChip>
         <span className="text-sm">{t("fc.median")} <b className="num">{w.median_cases}</b> · {t("fc.mean")} <b className="num">{num(w.expected_cases, lang, 1)}</b> · 80% {w.lower_80}–{w.upper_80} · 90% {w.lower_90}–{w.upper_90} · P {pct(w.p_outbreak, lang)}</span></div>
-        {series.data ? <FanChart series={series.data.series} markDate={w.target_date} height={280} /> : <EmptyState text="No validated replay series for this origin year." />}
+        {series.data?.series?.length ? <FanChart series={series.data.series} markDate={w.target_date} height={280} /> : <EmptyState text="No validated replay series for this origin year." />}
         <div className="flex gap-2"><Btn onClick={() => { set({ ward: w.ward_id }); setDetail(null); }}>Use in Command Center</Btn></div></div>) : null; })()}
     </Modal>
   </>);

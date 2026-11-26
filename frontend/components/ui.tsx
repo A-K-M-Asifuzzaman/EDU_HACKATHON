@@ -1,11 +1,13 @@
 "use client";
 import { animate, AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Cloud } from "./illustrations";
 import dynamic from "next/dynamic";
 import { ApiError, retryable, TIER_COLOR, TIER_TEXT, type Tier } from "@/lib/api";
 import { cls, num } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { Icon } from "./icons";
+import { useSel } from "@/lib/ctx";
 
 // ------------------------------------------------------------------ data hook: real request states (no fake progress)
 // loading → delayed (still waiting after DELAY_MS) → retrying (network, timeout or 5xx only; backoff) → ready | failed.
@@ -47,7 +49,7 @@ export function Card({ children, className = "", pad = true, as: As = "section",
 export function CardTitle({ title, sub, right }: { title: string; sub?: string; right?: React.ReactNode }) {
   return (<div className="mb-3 flex flex-wrap items-start justify-between gap-2"><div><h2 className="text-[15px] font-semibold text-ink">{title}</h2>{sub && <p className="mt-0.5 text-[12.5px] leading-snug text-ink-3">{sub}</p>}</div>{right}</div>);
 }
-export function PageHeader({ title, sub, right, eyebrow }: { title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; eyebrow?: string }) {
+export function PageHeader({ title, sub, right, eyebrow, art }: { title: React.ReactNode; sub?: React.ReactNode; right?: React.ReactNode; eyebrow?: string; art?: React.ReactNode }) {
   // Night masthead (DESIGN.md §1): a full-bleed obsidian band carries every page title; the page's working surface follows on porcelain.
   return (<header className="night relative -mt-6 mb-8 mx-[calc(50%-50vw)] overflow-hidden px-[calc(50vw-50%)]">
         <div className="relative grid gap-x-10 gap-y-3 py-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
@@ -55,7 +57,7 @@ export function PageHeader({ title, sub, right, eyebrow }: { title: React.ReactN
         {eyebrow && <div className="mb-3 text-[12.5px] font-medium text-ink-3">{eyebrow}</div>}
         <h1 className="sf-fade text-[34px] leading-[0.98] text-ink sm:text-[44px] lg:text-[52px]">{title}</h1>
         {sub && <p className="mt-3 max-w-[70ch] text-[15px] leading-relaxed text-ink-2">{sub}</p>}</div>
-      {right && <div className="relative">{right}</div>}
+      {(right || art) && <div className="relative flex items-end gap-6">{right}{art && <div className="sf-fade hidden w-[150px] shrink-0 sm:block lg:w-[190px]">{art}</div>}</div>}
     </div></header>);
 }
 export const Skeleton = ({ h = 20, w = "100%", className = "" }: { h?: number; w?: number | string; className?: string }) => <div className={cls("skeleton", className)} style={{ height: h, width: w }} aria-hidden="true" />;
@@ -66,7 +68,7 @@ export function ErrorState({ error, onRetry }: { error: Error | string; onRetry?
   return (<div role="alert" className="flex flex-col items-start gap-2 rounded-xl border border-coral/30 bg-coral/5 p-4 text-sm"><div className="flex items-center gap-2 font-medium text-coral-d"><Icon name="alert" size={18} />{t("state.error")}</div>
     <p className="text-ink-2">{msg}</p>{onRetry && <Btn variant="ghost" onClick={onRetry}>{t("state.retry")}</Btn>}</div>);
 }
-export const EmptyState = ({ text }: { text?: string }) => { const { t } = useI18n(); return <div className="grid place-items-center rounded-xl border border-dashed border-line p-8 text-sm text-ink-3">{text ?? t("state.empty")}</div>; };
+export const EmptyState = ({ text }: { text?: string }) => { const { t } = useI18n(); return <div className="flex flex-col items-center gap-3 rounded-[14px] border-2 border-dashed border-line p-6 text-center text-sm text-ink-3"><Cloud mood="thinking" rain={false} className="w-24" /><span>{text ?? t("state.empty")}</span></div>; };
 export function Notice({ tone = "info", children }: { tone?: "info" | "warn" | "ok"; children: React.ReactNode }) {
   const c = { info: "border-sky/30 bg-sky/5 text-ink-2", warn: "border-amber/50 bg-amber/10 text-ink-2", ok: "border-emerald/30 bg-mint-l text-ink-2" }[tone];
   return <div className={cls("flex gap-2 rounded-xl border p-3 text-[13px] leading-relaxed", c)}><Icon name={tone === "warn" ? "alert" : "info"} size={16} className="mt-0.5 shrink-0" /><div>{children}</div></div>;
@@ -106,11 +108,23 @@ export function RequestStatus({ q, label, dark = false }: { q: Pick<AsyncState<u
 /** Failure panel: what happened (from the real error), a retry, and somewhere useful to go that does not depend on this request. */
 export function ServiceUnavailable({ error, onRetry, label = "This data" }: { error: ApiError | Error | string; onRetry?: () => void; label?: string }) {
   const e = error instanceof ApiError ? error : new ApiError(typeof error === "string" ? error : error.message, 0, "parse");
-  return (<div role="alert" className="rounded-card border border-coral/35 bg-coral/[0.06] p-4 text-[13px]">
-    <div className="flex items-center gap-2 font-semibold text-coral-d"><Icon name="alert" size={17} />{label} is unavailable right now</div>
-    <p className="mt-1 text-ink-2">{why(e)}{e.kind === "server" || e.kind === "client" ? "" : " Other pages that do not need this request keep working."}</p>
+  const { set } = useSel();
+  // A 4xx answer is the server explaining that this selection has no such result (for example an origin outside the 2019-2024 replay).
+  // Retrying cannot help, so say so calmly and offer a selection that has one, instead of presenting it as an outage.
+  if (e.kind === "client" && e.status !== 429) {
+    const replay = /2019.{0,4}2024|replay|validation origin/i.test(e.message);
+    return (<div role="status" className="card flex flex-col items-start gap-3 p-5 text-[14px] sm:flex-row sm:items-center">
+      <Cloud mood="thinking" rain={false} className="w-20 shrink-0" />
+      <div className="min-w-0 flex-1"><div className="font-display text-[17px] font-extrabold text-ink">{label} is not available for this selection</div>
+        <p className="mt-1 text-ink-2">{e.message.charAt(0).toUpperCase() + e.message.slice(1)}{/[.!]$/.test(e.message) ? "" : "."}</p></div>
+      {replay && <button onClick={() => set({ origin: "2024-08-05" })} className="btn-ghost inline-flex min-h-11 shrink-0 items-center px-4 text-[13.5px]">Go to the August 2024 peak</button>}
+    </div>);
+  }
+  return (<div role="alert" className="card border-coral-d p-5 text-[14px]">
+    <div className="flex items-center gap-2 font-display text-[17px] font-extrabold text-coral-d"><Icon name="alert" size={18} />{label} is unavailable right now</div>
+    <p className="mt-1 text-ink-2">{why(e)}{e.kind === "server" ? "" : " Other pages that do not need this request keep working."}</p>
     <div className="mt-3 flex flex-wrap gap-2">{onRetry && <Btn variant="ghost" onClick={onRetry}>Try again</Btn>}
-      <a href="/evidence/" className="inline-flex min-h-11 items-center rounded-xl px-3 text-[13px] font-medium text-forest underline underline-offset-4 sm:min-h-9">Model evidence (saved results)</a></div></div>);
+      <a href="/evidence/" className="inline-flex min-h-11 items-center px-3 text-[13.5px] font-bold text-emerald-d underline underline-offset-4 sm:min-h-9">Model evidence (saved results)</a></div></div>);
 }
 
 export function Loading<T>({ q, children, h = 220, kind = "block", label = "Data" }: { q: AsyncState<T> | { data: T | null; error: ApiError | null; loading: boolean; reload: () => void; status?: ReqStatus; attempt?: number; stale?: boolean };
@@ -138,7 +152,7 @@ export function CountUp({ value, digits = 0, suffix = "" }: { value: number; dig
   return <span className="num">{num(v, lang, digits)}{suffix}</span>;
 }
 export function Kpi({ label, value, digits = 0, suffix, hint, tone, loading }: { label: string; value?: number | null; digits?: number; suffix?: string; hint?: string; tone?: "ok" | "warn" | "bad"; loading?: boolean }) {
-  const rule = { ok: "bg-[#2a2bd6]", warn: "bg-[#ffb020]", bad: "bg-[#f2475e]" }[tone ?? "ok"];
+  const rule = { ok: "bg-[#4a2bd0]", warn: "bg-[#ffc23d]", bad: "bg-[#f2545b]" }[tone ?? "ok"];
   return (<div className="card relative overflow-hidden px-4 pb-3.5 pt-4"><span className={cls("absolute inset-x-0 top-0 h-[5px]", rule)} aria-hidden />
     <div className="text-[12px] font-semibold text-ink-3">{label}</div>
     <div className="mt-1.5 font-display text-[30px] font-extrabold leading-none tracking-[-0.02em] text-ink">{loading || value === undefined ? <Skeleton h={28} w={90} /> : value === null ? <span className="text-ink-3">-</span> : <CountUp value={value} digits={digits} suffix={suffix} />}</div>
@@ -149,12 +163,12 @@ export function Kpi({ label, value, digits = 0, suffix, hint, tone, loading }: {
 export function RiskBadge({ tier, size = "md" }: { tier: Tier; size?: "sm" | "md" | "lg"; pulse?: boolean }) {
   const { t } = useI18n();
   const pad = { sm: "px-1.5 py-px text-[11px]", md: "px-2 py-0.5 text-[12px]", lg: "px-2.5 py-1 text-[13px]" }[size];
-  return (<span className={cls("inline-flex items-center rounded-full border-2 border-[#15153d] font-bold", pad)} style={{ background: TIER_COLOR[tier], color: TIER_TEXT[tier] }} title={t("risk.note")}>{t(`risk.${tier.toLowerCase()}`)}</span>);
+  return (<span className={cls("inline-flex items-center rounded-full border-2 border-[#1a1438] font-bold", pad)} style={{ background: TIER_COLOR[tier], color: TIER_TEXT[tier] }} title={t("risk.note")}>{t(`risk.${tier.toLowerCase()}`)}</span>);
 }
 
 // ------------------------------------------------------------------ controls
 export function Btn({ children, variant = "solid", className = "", ...p }: any) {
-  const v = { solid: "bg-ink text-canvas", ghost: "btn-ghost", dark: "bg-ink text-canvas", danger: "bg-coral-d text-white border-[3px] border-[#15153d] rounded-full shadow-[3px_3px_0_#15153d]" }[variant as string];
+  const v = { solid: "bg-ink text-canvas", ghost: "btn-ghost", dark: "bg-ink text-canvas", danger: "bg-coral-d text-white border-[3px] border-[#1a1438] rounded-full shadow-[3px_3px_0_#1a1438]" }[variant as string];
   return <button className={cls("inline-flex min-h-11 items-center justify-center gap-1.5 rounded-control px-3.5 py-2 text-[13px] font-medium transition active:translate-y-px disabled:opacity-50 sm:min-h-9", v, className)} {...p}>{children}</button>;
 }
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -172,10 +186,10 @@ export function Segmented<T extends string | number>({ label, value, onChange, o
 export function Tabs({ tabs, value, onChange }: { tabs: { id: string; label: string }[]; value: string; onChange: (v: string) => void }) {
   return (<div role="tablist" className="scroll-thin mb-6 flex snap-x gap-1.5 overflow-x-auto overscroll-x-contain pb-1">{tabs.map((x) => (
     <button key={x.id} role="tab" aria-selected={x.id === value} onClick={() => onChange(x.id)} className={cls("relative shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[14px] font-bold transition-colors", x.id === value ? "text-white" : "text-ink-3 hover:text-forest")}>
-      {x.id === value && <motion.span layoutId="tabpill" className="absolute inset-0 rounded-full border-2 border-[#15153d] bg-[#2a2bd6]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}<span className="relative">{x.label}</span></button>))}</div>);
+      {x.id === value && <motion.span layoutId="tabpill" className="absolute inset-0 rounded-full border-2 border-[#1a1438] bg-[#4a2bd0]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}<span className="relative">{x.label}</span></button>))}</div>);
 }
 export const ProvChip = ({ children, tone = "ok" }: { children: React.ReactNode; tone?: "ok" | "warn" | "info" | "neutral" }) => (
-  <span className={cls("inline-flex items-center gap-1 rounded-full border-[1.5px] px-2 py-px text-[11.5px] font-bold", tone === "ok" && "border-[#15153d] bg-[#d9f7ea] text-[#0b5d44]", tone === "warn" && "border-[#15153d] bg-[#fff1cc] text-[#6b4a00]", tone === "info" && "border-[#15153d] bg-[#dbe9ff] text-[#1c3f8f]", tone === "neutral" && "border-[#15153d] bg-[#fff] text-[#3b3e6e]")}>{children}</span>);
+  <span className={cls("inline-flex items-center gap-1 rounded-full border-[1.5px] px-2 py-px text-[11.5px] font-bold", tone === "ok" && "border-[#1a1438] bg-[#d9f7ea] text-[#0b5d44]", tone === "warn" && "border-[#1a1438] bg-[#fff1cc] text-[#6b4a00]", tone === "info" && "border-[#1a1438] bg-[#dbe9ff] text-[#1c3f8f]", tone === "neutral" && "border-[#1a1438] bg-[#fff] text-[#3d3566]")}>{children}</span>);
 
 // ------------------------------------------------------------------ toast + modal
 const ToastCtx = createContext<(m: string) => void>(() => {});

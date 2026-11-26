@@ -133,6 +133,11 @@ The script creates `.venv`, installs runtime dependencies, downloads and checksu
 organizer CSV, builds the Next.js dashboard (`npm ci && npm run build`) and starts a single
 process serving both the API and the dashboard.
 
+<p align="center"><img src="docs/media/diagrams/quickstart.svg" alt="Quick start: git clone, launch.sh, virtual environment, SHA-256 verified data download, dashboard build, then one server for API and dashboard" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart LR
     A[git clone] --> B[launch.sh]
@@ -141,6 +146,8 @@ flowchart LR
     D --> E["npm ci && npm run build"]
     E --> F["uvicorn :8000<br/>API + dashboard"]
 ```
+
+</details>
 
 ---
 
@@ -240,6 +247,11 @@ The measurement excludes the organizer CSV download.
 
 ## 🧱 Project Architecture
 
+<p align="center"><img src="docs/media/diagrams/architecture.svg" alt="Architecture: verified CSV, 24-feature pipeline, offline training with season-level cross-validation, 11 KB model bundle and replay forecasts, FastAPI backend, static Next.js dashboard; optional services are never model inputs" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart TB
     CSV[("Organizer CSV (synthetic)<br/>SHA-256 verified on every load")]
@@ -251,6 +263,8 @@ flowchart TB
     API --> UI["Next.js 16 Static Dashboard (frontend/out)<br/>React 19 · TypeScript · Tailwind 4 · ECharts 6 · MapLibre 6<br/>Served by FastAPI on the same origin (no CORS)"]
     EXT["NASA POWER · Open-Meteo · OpenAI · DGHS GIS<br/>(optional, never model inputs)"] -.-> API
 ```
+
+</details>
 
 <details>
 <summary>Plain-text version of the diagram</summary>
@@ -427,6 +441,11 @@ Interval dispersion and alert thresholds are calibrated on the two preceding val
 The 2025 holdout is **sealed and excluded** from fit, selection, calibration and scoring. See
 [`docs/validation_protocol.md`](docs/validation_protocol.md) and [`docs/holdout_protocol.md`](docs/holdout_protocol.md).
 
+<p align="center"><img src="docs/media/diagrams/validation.svg" alt="Validation: six expanding folds each predict one full season from 2019 to 2024; 2019 to 2021 tune, 2022 to 2024 benchmark; 2025 sealed" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 gantt
     dateFormat YYYY
@@ -444,6 +463,8 @@ gantt
     section Sealed
     2025 holdout (never used) :crit, 2025, 2026
 ```
+
+</details>
 
 ---
 
@@ -472,6 +493,14 @@ The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 > **Never commit API keys, passwords, or secrets to the repository.** All secret files
 > (`.env`, `.env.local`, `.env.*.local`) are git-ignored. Review the `.gitignore` before
 > making any changes to ensure secrets remain excluded.
+
+### Accounts and Roles (V4)
+
+<p align="center"><img src="docs/media/diagrams/accounts.svg" alt="Accounts and roles: Firebase sign-in, ID token as a Bearer header, server-side verification, role check, officer and administrator workflows, refusals and the audit log" width="100%"/></p>
+
+Public forecasting needs no account. Officers review model alerts and draft generic response plans; administrators grant roles and approve
+other people's plans. Firebase Authentication handles sign-in, and the FastAPI backend checks the token and the role on every protected request.
+Setup and the full list of checks: [`docs/AUTH_FIREBASE.md`](docs/AUTH_FIREBASE.md).
 
 ### Secret Management
 
@@ -574,6 +603,11 @@ npx playwright test
 | **Dashboard** | Vercel (static site) | `vercel.json`, `.vercelignore` |
 | **API** | Hugging Face Spaces (Docker) | `Dockerfile.backend`, `scripts/deploy_space.py` |
 
+<p align="center"><img src="docs/media/diagrams/deployment.svg" alt="Deployment: browser, Vercel static export proxying /api to the FastAPI backend on a Hugging Face Space; MapTiler tiles, Firebase sign-in and optional APIs" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart LR
     U[👤 Browser] --> V[Vercel<br/>static Next.js export]
@@ -581,6 +615,8 @@ flowchart LR
     H -.-> O[OpenAI · NASA POWER · Open-Meteo · DGHS]
     U -.-> M[MapTiler tiles]
 ```
+
+</details>
 
 Vercel serves the static Next.js export and proxies `/api/*` to the FastAPI backend on HF Spaces.
 Detailed steps, secrets and cost controls are in [`docs/deployment.md`](docs/deployment.md).

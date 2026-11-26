@@ -56,7 +56,7 @@ function CameraRig({ view }: { view: string }) {
 export default function Mosquito3D({ active, onHover, view, reduce, visible }: { active: Part | null; onHover: (p: Part | null) => void; view: string; reduce: boolean; visible: boolean }) {
   const [ready, setReady] = useState(false);
   return (<Canvas dpr={[1, 1.5]} frameloop={visible ? "always" : "never"} camera={{ position: VIEWS["3/4"], fov: 38 }} gl={{ antialias: true, powerPreference: "low-power" }} onCreated={() => setReady(true)} aria-label="Interactive stylised mosquito model">
-    <color attach="background" args={["#1b1c9e"]} /><ambientLight intensity={0.8} /><directionalLight position={[3, 5, 4]} intensity={1.6} /><directionalLight position={[-4, -2, -3]} intensity={0.5} color="#c9c6ff" />
+    <color attach="background" args={["#2a157f"]} /><ambientLight intensity={0.8} /><directionalLight position={[3, 5, 4]} intensity={1.6} /><directionalLight position={[-4, -2, -3]} intensity={0.5} color="#c9c6ff" />
     <Mosquito active={active} onHover={onHover} animate={!reduce && ready} /><CameraRig view={view} />
     <OrbitControls enablePan={false} enableZoom={false} autoRotate={!reduce && !active} autoRotateSpeed={0.9} minPolarAngle={0.5} maxPolarAngle={2.4} /></Canvas>);
 }

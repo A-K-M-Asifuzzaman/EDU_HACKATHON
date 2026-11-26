@@ -3,6 +3,7 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Markdown, Modal, Notice, PageHeader, ProvChip, Skeleton, useAsync } from "@/components/ui";
+import { Folder } from "@/components/illustrations";
 
 const ARCH = [["Organizer CSV (2016–2024; 2025 dropped on load)", "Feature pipeline: ward-grouped lags, climatology, calendar (fit on training years)"], ["Feature pipeline", "Serialized ridge Poisson GLM bundle (per horizon, 24 features)"], ["Bundle + calibration + tiers", "FastAPI: /api/forecast, /api/risk/wards, /api/model/*"], ["FastAPI (+ precomputed artifacts)", "Next.js dashboard (static export, served by the same process)"], ["FastAPI read-only tools + docs", "DengueShield Copilot (OpenAI Responses API, backend-only)"]];
 
@@ -15,7 +16,7 @@ export default function Provenance() {
   const [open, setOpen] = useState<string | null>(null);
   const doc = useAsync((s) => (open ? api(`/api/docs/read?path=${encodeURIComponent(open)}`, { signal: s }) : Promise.resolve(null)), [open]);
   return (<>
-    <PageHeader eyebrow="Auditability" title={t("nav.provenance")} sub="What the application is built from, what is live, what each external service is used for, and whether it feeds the forecasting model." right={<Btn variant="ghost" onClick={() => { health.reload(); integ.reload(); }}>Re-check</Btn>} />
+    <PageHeader art={<Folder className="w-full" />} eyebrow="Auditability" title={t("nav.provenance")} sub="What the application is built from, what is live, what each external service is used for, and whether it feeds the forecasting model." right={<Btn variant="ghost" onClick={() => { health.reload(); integ.reload(); }}>Re-check</Btn>} />
     <Loading q={health} h={90} kind="block" label="Service health">{(h: any) => (<div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5"><Kpi label="Status" value={h.status === "ok" ? 1 : 0} digits={0} suffix={h.status === "ok" ? " · OK" : " · " + h.status} tone={h.status === "ok" ? "ok" : "bad"} />
       <Kpi label="Inference probe (ms)" value={h.inference_probe_ms} digits={0} hint="one ward, live bundle" /><Kpi label="Cached predictions" value={h.cache_entries} /><Kpi label="Uptime (s)" value={h.uptime_s} /><Kpi label="OpenAI configured" value={h.openai_configured ? 1 : 0} suffix={h.openai_configured ? " · yes" : " · no"} tone={h.openai_configured ? "ok" : "warn"} /></div>)}</Loading>
     <div className="grid gap-5 lg:grid-cols-2">

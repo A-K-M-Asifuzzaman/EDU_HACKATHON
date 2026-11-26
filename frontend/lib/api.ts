@@ -20,7 +20,7 @@ export class ApiError extends Error {
 /** Errors worth retrying automatically: the network, a timeout or a 5xx. A 4xx (bad request) never is. */
 export const retryable = (e: unknown) => e instanceof ApiError && (e.kind === "network" || e.kind === "timeout" || e.kind === "server");
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE ?? (process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "");
+export const BASE = process.env.NEXT_PUBLIC_API_BASE ?? (process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "");
 const mem = new Map<string, { t: number; v: unknown }>();
 const inflight = new Map<string, Promise<unknown>>();
 /** Default per-request time budget. Measured: local and warm hosted responses take well under 1 s; a cold hosted start can take tens of seconds. */
@@ -78,6 +78,10 @@ export async function api<T = any>(path: string, opts: { ttl?: number; signal?: 
   });
 }
 
+/** Season series for the figure: a 2019–2024 origin reads that replay season (one request per year); any later origin gets the last
+ *  replay season followed by its own 2–4 week forecasts, marked `forward`; an earlier origin gets an empty series. */
+export const seasonUrl = (ward: string, horizon: number, origin: string) => { const y = Number(origin.slice(0, 4));
+  return `/api/forecast/series?${qs(y >= 2019 && y <= 2024 ? { ward_id: ward, horizon, year: y } : { ward_id: ward, horizon, origin })}`; };
 export const qs = (o: Record<string, string | number | boolean | undefined | null>) =>
   Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&");
 
@@ -86,7 +90,7 @@ export const addWeeks = (iso: string, n: number) => { const d = new Date(iso + "
 export const isoMonday = (iso: string) => { const d = new Date(iso + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d.toISOString().slice(0, 10); };
 export const isMonday = (iso: string) => new Date(iso + "T00:00:00Z").getUTCDay() === 1;
 
-export const TIER_COLOR: Record<Tier, string> = { Low: "#3ccb91", Medium: "#ffd34d", High: "#ff8a3d", Critical: "#f2475e" };   // DESIGN.md §2 risk tiers (MicroFire v2)
+export const TIER_COLOR: Record<Tier, string> = { Low: "#3dd598", Medium: "#ffd36e", High: "#ff9a52", Critical: "#f2545b" };   // DESIGN.md §2 risk tiers (MicroFire v2)
 export const TIERS: Tier[] = ["Low", "Medium", "High", "Critical"];
 /** Text colour that keeps WCAG AA contrast on each tier colour (white on the Medium amber was 2.2:1). */
-export const TIER_TEXT: Record<Tier, string> = { Low: "#15153d", Medium: "#15153d", High: "#15153d", Critical: "#15153d" };
+export const TIER_TEXT: Record<Tier, string> = { Low: "#1a1438", Medium: "#1a1438", High: "#1a1438", Critical: "#1a1438" };

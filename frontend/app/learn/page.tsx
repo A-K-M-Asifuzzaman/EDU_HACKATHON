@@ -5,6 +5,7 @@ import { useReducedMotion } from "motion/react";
 import { Btn, Card, CardTitle, Notice, PageHeader } from "@/components/ui";
 import RainExplainer from "@/components/rainexplainer";
 import type { Part } from "@/components/mosquito3d";
+import { Lifecycle } from "@/components/illustrations";
 
 const Mosquito3D = dynamic(() => import("@/components/mosquito3d"), { ssr: false, loading: () => <div className="grid h-full place-items-center text-sm text-mint">Loading 3D…</div> });
 const FACTS: Record<Part, { name: string; text: string }> = {
@@ -29,11 +30,11 @@ export default function Learn() {
   }, []);
   useEffect(() => { if (!box.current) return; const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.15 }); io.observe(box.current); return () => io.disconnect(); }, [load]);
   return (<>
-    <PageHeader eyebrow="Educational · conceptual" title="Learn: Aedes & rainfall" sub="Why rain today shows up as cases weeks later, and a small interactive mosquito model. Both are explanatory illustrations; neither is part of the forecasting engine." />
+    <PageHeader art={<Lifecycle className="w-full" />} eyebrow="Educational · conceptual" title="Learn: Aedes & rainfall" sub="Why rain today shows up as cases weeks later, and a small interactive mosquito model. Both are explanatory illustrations; neither is part of the forecasting engine." />
     <Card className="mb-5"><CardTitle title="From rainfall to a dengue forecast window" sub="Drag the slider to move through time" /><RainExplainer /></Card>
     <Card><CardTitle title="Interactive mosquito (stylised)" sub="Free, procedural 3D (React Three Fiber). Not an anatomical reconstruction. Hover or tap parts, or choose a view." />
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
-        <div ref={box} className="relative h-[380px] overflow-hidden rounded-[14px] border-[2.5px] border-[#15153d] bg-[#2a2bd6]">
+        <div ref={box} className="relative h-[380px] overflow-hidden rounded-[14px] border-[2.5px] border-[#1a1438] bg-[#4a2bd0]">
           {load && capable ? <Mosquito3D active={active} onHover={setActive} view={view} reduce={reduce} visible={visible} /> : (
             <div className="grid h-full place-items-center p-6 text-center"><div><svg viewBox="0 0 220 120" className="mx-auto mb-3 w-56" role="img" aria-label="Stylised mosquito illustration"><g fill="#c9c6ff" stroke="#c9c6ff"><ellipse cx="95" cy="70" rx="46" ry="12" /><circle cx="152" cy="64" r="9" /><line x1="160" y1="64" x2="205" y2="76" strokeWidth="2" /><ellipse cx="95" cy="48" rx="38" ry="9" fillOpacity="0.35" transform="rotate(-18 95 48)" />{[60, 80, 100, 118].map((x) => <line key={x} x1={x} y1="78" x2={x - 14} y2="108" strokeWidth="2" />)}</g></svg>
               <p className="mb-3 text-sm text-white/90">{capable === false ? "3D is turned off on this device (small screen, low-power or no WebGL). The forecasting dashboard does not need it." : "The 3D scene loads only when you ask for it, to keep the rest of the app fast."}</p>

@@ -43,8 +43,8 @@ export default function Palette({ pages }: { pages: readonly (readonly [string, 
   useEffect(() => setI(0), [q]);
   return (<>
     {/* phones had no way to open search (the button was desktop-only): show an icon button there */}
-    <button onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center gap-2 rounded-control border border-line p-2 text-[13px] text-ink-3 transition-colors hover:border-ink-3 sm:min-h-9 md:px-3 md:py-1.5" aria-label={t("pal.aria")}>
-      <Icon name="search" size={15} /><span className="hidden md:inline">{t("pal.button")}</span><kbd className="ml-3 hidden rounded-[3px] border border-line px-1 font-sans text-[11px] text-ink-3 md:inline">⌘K</kbd></button>
+    <button onClick={() => setOpen(true)} className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border-2 border-white/35 px-2.5 text-[13px] font-bold text-white transition-colors hover:border-white hover:bg-white/10 sm:min-h-10 xl:px-3" aria-label={t("pal.aria")}>
+      <Icon name="search" size={15} /><span className="hidden xl:inline">{t("pal.button")}</span><kbd className="ml-2 hidden rounded-[5px] border border-white/40 px-1 font-sans text-[11px] font-normal text-white/80 xl:inline">⌘K</kbd></button>
     {mounted && open && createPortal(
       <div className="fixed inset-0 z-[90] grid place-items-start justify-center bg-navy/45 p-4 pt-[12vh] backdrop-blur-sm" onClick={() => setOpen(false)}>
         <div role="dialog" aria-modal="true" aria-label={t("pal.button")} className="card w-full max-w-xl overflow-hidden p-0 shadow-[var(--shadow-pop)]" onClick={(e) => e.stopPropagation()}>

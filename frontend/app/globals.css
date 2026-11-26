@@ -7,39 +7,39 @@
 @import "@fontsource/noto-sans-bengali/700.css";
 
 @theme {
-  --color-forest: #2a2bd6;
-  --color-forest-2: #1b1c9e;
-  --color-emerald: #2a2bd6;
-  --color-emerald-d: #2021b0;
-  --color-mint: #c9ccff;
-  --color-mint-l: #e2e6ff;
-  --color-canvas: #eef1ff;
-  --color-ink: #15153d;
-  --color-ink-2: #3b3e6e;
-  --color-ink-3: #53578a;
-  --color-line: #c5cae8;
-  --color-amber: #ffb020;
+  --color-forest: #4a2bd0;
+  --color-forest-2: #2a157f;
+  --color-emerald: #4a2bd0;
+  --color-emerald-d: #4527c4;
+  --color-mint: #d9ccff;
+  --color-mint-l: #efe7ff;
+  --color-canvas: #faf6ee;
+  --color-ink: #1a1438;
+  --color-ink-2: #3d3566;
+  --color-ink-3: #5e567f;
+  --color-line: #e3d9c8;
+  --color-amber: #ffc23d;
   --color-amber-d: #7a4f00;  /* was #b9770e (3.1–3.7:1 on light backgrounds) */
-  --color-coral: #f2475e;
-  --color-coral-d: #c8243c;
-  --color-sky: #0b93b5;
-  --color-sky-d: #076b85;   /* text on light sky tints (#3b82c4 was 3.8:1 on bg-sky/10) */
-  --color-navy: #15153d;
-  --color-navy-2: #2a2d5e;
-  --color-teal: #3b3e6e;
-  --color-cyan: #53578a;
+  --color-coral: #f2545b;
+  --color-coral-d: #c2303a;
+  --color-sky: #1597c9;
+  --color-sky-d: #0d6e95;   /* text on light sky tints (#3b82c4 was 3.8:1 on bg-sky/10) */
+  --color-navy: #1a1438;
+  --color-navy-2: #2e2656;
+  --color-teal: #3d3566;
+  --color-cyan: #5e567f;
   --color-ivory: #ffffff;
-  --color-tier-low: #3ccb91;  /* was #4b45d1 (white text 4.1:1) */
-  --color-tier-medium: #ffd34d;
-  --color-tier-high: #ff8a3d;
-  --color-tier-critical: #f2475e;
+  --color-tier-low: #3dd598;  /* was #4b45d1 (white text 4.1:1) */
+  --color-tier-medium: #ffd36e;
+  --color-tier-high: #ff9a52;
+  --color-tier-critical: #f2545b;
   --font-sans: "Atkinson Hyperlegible Next Variable", "Noto Sans Bengali", system-ui, sans-serif;
   --font-display: "Bricolage Grotesque Variable", "Arial Black", "Noto Sans Bengali", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   /* Signal Atlas (V4) reference palette: obsidian, graphite, porcelain, signal violet, emergency coral */
-  --color-obsidian: #0a0d14; --color-graphite: #161c29; --color-porcelain: #f3f1ea; --color-signal: #ffb020; --color-signal-d: #2a2bd6; --color-ember: #f2475e; --color-paper-3: #e2e6ff; --color-rain: #0b93b5;
+  --color-obsidian: #0a0d14; --color-graphite: #161c29; --color-porcelain: #f3f1ea; --color-signal: #ffc23d; --color-signal-d: #4a2bd0; --color-ember: #f2545b; --color-paper-3: #efe7ff; --color-rain: #1597c9;
   --shadow-card: none;
-  --shadow-pop: 4px 4px 0 #15153d;
+  --shadow-pop: 4px 4px 0 #1a1438;
   --shadow-lift: none;
   --spacing: 0.25rem;
   /* V3.5 design tokens: use these in new code instead of arbitrary sizes (25 Nov audit found 23 ad-hoc font sizes and 5 radii) */
@@ -63,7 +63,7 @@ h1, h2.font-display, .font-display { font-weight: 800; }
 h2, h3 { letter-spacing: -0.005em; }
 html[lang="bn"] :is(h1, .font-display) { font-family: "Noto Sans Bengali", var(--font-display); letter-spacing: 0; }
 * { box-sizing: border-box; }
-::selection { background: #ffd34d; color: #15153d; }
+::selection { background: #ffd36e; color: #1a1438; }
 :focus-visible { outline: 2px solid var(--color-emerald); outline-offset: 2px; border-radius: 3px; }
 
 .glass { background: var(--color-canvas); }
@@ -77,7 +77,7 @@ html[lang="bn"] :is(h1, .font-display) { font-family: "Noto Sans Bengali", var(-
 .eyebrow { font-size: 12.5px; letter-spacing: 0.01em; color: var(--color-ink-3); font-weight: 700; }
 .scroll-thin::-webkit-scrollbar { height: 8px; width: 8px; }
 .scroll-thin::-webkit-scrollbar-thumb { background: #cfcabd; border-radius: 4px; }
-.skeleton { background: linear-gradient(90deg, #dfe3fb 25%, #eceefe 37%, #dfe3fb 63%); background-size: 400% 100%; animation: shimmer 1.6s ease infinite; border-radius: 10px; }
+.skeleton { background: linear-gradient(90deg, #ece4d5 25%, #f5efe4 37%, #ece4d5 63%); background-size: 400% 100%; animation: shimmer 1.6s ease infinite; border-radius: 10px; }
 @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(217, 58, 66, 0.45); } 100% { box-shadow: 0 0 0 10px rgba(217, 58, 66, 0); } }
 .pulse-critical { animation: pulse-ring 1.8s ease-out infinite; }
@@ -118,8 +118,8 @@ main { min-width: 0; overflow-x: clip; }
 @media (max-width: 1023px) { .ds-map-shell .maplibregl-ctrl-bottom-right, .ds-map-shell .maplibregl-ctrl-bottom-left { bottom: 52px; } }
 
 /* ---------- Copilot: chat surface and rich answers ---------- */
-.ds-chat-hero { background: radial-gradient(120% 90% at 70% 10%, #3b3cf0, #2a2bd6 45%, #1b1c9e); border: 2.5px solid #15153d; box-shadow: 5px 5px 0 #15153d; }
-.ds-chat-head { background: #2a2bd6; }
+.ds-chat-hero { background: radial-gradient(120% 90% at 70% 10%, #6a45f0, #4a2bd0 45%, #2a157f); border: 2.5px solid #1a1438; box-shadow: 5px 5px 0 #1a1438; }
+.ds-chat-head { background: #4a2bd0; }
 .ds-status-dot { width: 7px; height: 7px; border-radius: 999px; background: #a9a5ff; display: inline-block; } /* static: no 'live' pulse on replay data */
 .ds-avatar-pulse::after { content: ""; position: absolute; inset: -3px; border-radius: 18px; border: 2px solid rgba(107,102,240,.55); animation: ds-ring-soft 1.4s ease-out infinite; }
 @keyframes ds-ring-soft { from { opacity: 1; transform: scale(.92); } to { opacity: 0; transform: scale(1.15); } }
@@ -179,15 +179,15 @@ main { min-width: 0; overflow-x: clip; }
    redefined; their text uses are overridden below instead, so white-on-colour buttons keep working. ---------- */
 :root[data-theme="dim"] {
   color-scheme: dark;
-  --color-canvas: #0f1033; --color-ivory: #191b4d; --color-line: #33377a;
-  --color-ink: #eef0ff; --color-ink-2: #c9ccf2; --color-ink-3: #a6aade;
-  --color-mint-l: #23266a; --color-paper-3: #1f2260; --color-emerald: #ffd166; --color-emerald-d: #ffd166; --color-sky: #5fd0ee; --color-sky-d: #8fe3ff; --color-coral: #ff6b7d; --color-coral-d: #ff8e9c; --color-amber: #ffb020; --color-amber-d: #ffd166;
+  --color-canvas: #140f2e; --color-ivory: #1f1846; --color-line: #3a2f6e;
+  --color-ink: #f4f0ff; --color-ink-2: #cfc6f2; --color-ink-3: #a79cd6;
+  --color-mint-l: #2b2266; --color-paper-3: #2a2160; --color-emerald: #ffd36e; --color-emerald-d: #ffd36e; --color-sky: #5fd0ee; --color-sky-d: #8fe3ff; --color-coral: #ff6b7d; --color-coral-d: #ff8e9c; --color-amber: #ffc23d; --color-amber-d: #ffd36e;
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 34px -18px rgba(0, 0, 0, 0.6);
   --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px rgba(0, 0, 0, 0.3), 0 22px 44px -20px rgba(0, 0, 0, 0.65);
   --shadow-pop: 0 18px 48px -16px rgba(0, 0, 0, 0.7);
 }
 [data-theme="dim"] body { background: var(--color-canvas); }
-[data-theme="dim"] .card, [data-theme="dim"] .bg-white { background-color: #191b4d; }
+[data-theme="dim"] .card, [data-theme="dim"] .bg-white { background-color: #1f1846; }
 [data-theme="dim"] .card { border-color: var(--color-line); }
 [data-theme="dim"] :is(.bg-white\/60, .bg-white\/70, .bg-white\/80, .bg-white\/85, .bg-white\/90) { background-color: rgba(31, 43, 56, 0.88); }
 [data-theme="dim"] .glass { background: var(--color-canvas); }
@@ -199,7 +199,7 @@ main { min-width: 0; overflow-x: clip; }
 [data-theme="dim"] :is(.text-forest, .hover\:text-forest:hover) { color: #edebe4; }
 [data-theme="dim"] :is(.text-emerald-d, .text-emerald) { color: #aba8f5; }
 [data-theme="dim"] .text-amber-d { color: #f2c46b; }
-[data-theme="dim"] .text-coral-d { color: #ffc0c8; }
+[data-theme="dim"] .text-coral-d { color: #ffc6c9; }
 [data-theme="dim"] .text-sky-d { color: #8cc3f0; }
 [data-theme="dim"] .text-teal { color: var(--color-ink-2); }
 [data-theme="dim"] .bg-canvas { background-color: var(--color-canvas); }
@@ -234,37 +234,37 @@ main { min-width: 0; overflow-x: clip; }
 /* ---------- Cobalt bands (MicroFire v2): header, landing hero, page mastheads, the Command band. Tokens are redefined on the band so
    every component follows; white cards inside a band reset to the light tokens (MicroFire's white control panels on blue). ---------- */
 .night {
-  --color-canvas: #2a2bd6; --color-ivory: #ffffff; --color-paper-3: rgba(255,255,255,.12); --color-line: rgba(255,255,255,.3);
-  --color-ink: #ffffff; --color-ink-2: #e6e8ff; --color-ink-3: #c9ccff;
-  --color-emerald: #ffd166; --color-emerald-d: #ffd166; --color-mint-l: rgba(255,255,255,.14);
-  --color-sky: #8fe3ff; --color-sky-d: #b5eeff; --color-coral: #ff8a9a; --color-coral-d: #ffc0c8;
-  --color-amber: #ffb020; --color-amber-d: #ffd166; --color-forest: #ffffff; --color-navy: #ffffff;
-  background: radial-gradient(120% 90% at 70% 10%, #3b3cf0, #2a2bd6 45%, #1b1c9e); color: var(--color-ink);
+  --color-canvas: #4a2bd0; --color-ivory: #ffffff; --color-paper-3: rgba(255,255,255,.12); --color-line: rgba(255,255,255,.3);
+  --color-ink: #ffffff; --color-ink-2: #ece6ff; --color-ink-3: #d9ccff;
+  --color-emerald: #ffd36e; --color-emerald-d: #ffd36e; --color-mint-l: rgba(255,255,255,.14);
+  --color-sky: #8fe3ff; --color-sky-d: #b5eeff; --color-coral: #ff9ea3; --color-coral-d: #ffc6c9;
+  --color-amber: #ffc23d; --color-amber-d: #ffd36e; --color-forest: #ffffff; --color-navy: #ffffff;
+  background: radial-gradient(120% 90% at 70% 10%, #6a45f0, #4a2bd0 45%, #2a157f); color: var(--color-ink);
 }
-header.night { background: #2a2bd6; }
+header.night { background: #4a2bd0; }
 .night .card, .night .light-panel {
-  --color-canvas: #eef1ff; --color-ivory: #ffffff; --color-paper-3: #e2e6ff; --color-line: #c5cae8;
-  --color-ink: #15153d; --color-ink-2: #3b3e6e; --color-ink-3: #53578a;
-  --color-emerald: #2a2bd6; --color-emerald-d: #2021b0; --color-mint-l: #e2e6ff;
-  --color-sky: #0b93b5; --color-sky-d: #076b85; --color-coral: #f2475e; --color-coral-d: #c8243c;
-  --color-amber: #ffb020; --color-amber-d: #7a4f00; --color-forest: #2a2bd6; --color-navy: #15153d;
-  background: #ffffff; color: var(--color-ink); border-color: #15153d; box-shadow: 5px 5px 0 #0e0f5e;
+  --color-canvas: #faf6ee; --color-ivory: #ffffff; --color-paper-3: #efe7ff; --color-line: #e3d9c8;
+  --color-ink: #1a1438; --color-ink-2: #3d3566; --color-ink-3: #5e567f;
+  --color-emerald: #4a2bd0; --color-emerald-d: #4527c4; --color-mint-l: #efe7ff;
+  --color-sky: #1597c9; --color-sky-d: #0d6e95; --color-coral: #f2545b; --color-coral-d: #c2303a;
+  --color-amber: #ffc23d; --color-amber-d: #7a4f00; --color-forest: #4a2bd0; --color-navy: #1a1438;
+  background: #ffffff; color: var(--color-ink); border-color: #1a1438; box-shadow: 5px 5px 0 #1a0f52;
 }
-.night .bg-forest { background-color: #ffffff; color: #15153d; }
-.night .bg-forest.text-white, .night .bg-forest .text-white { color: #15153d; }
-.night .card .bg-forest, .night .light-panel .bg-forest { background-color: #2a2bd6; color: #ffffff; }
+.night .bg-forest { background-color: #ffffff; color: #1a1438; }
+.night .bg-forest.text-white, .night .bg-forest .text-white { color: #1a1438; }
+.night .card .bg-forest, .night .light-panel .bg-forest { background-color: #4a2bd0; color: #ffffff; }
 .night .card .bg-forest.text-white { color: #ffffff; }
 .night .skeleton { background: linear-gradient(90deg, rgba(255,255,255,.1) 25%, rgba(255,255,255,.2) 37%, rgba(255,255,255,.1) 63%); background-size: 400% 100%; }
-.night .card .skeleton { background: linear-gradient(90deg, #dfe3fb 25%, #eceefe 37%, #dfe3fb 63%); background-size: 400% 100%; }
-.night ::selection { background: #ffd34d; color: #15153d; }
+.night .card .skeleton { background: linear-gradient(90deg, #ece4d5 25%, #f5efe4 37%, #ece4d5 63%); background-size: 400% 100%; }
+.night ::selection { background: #ffd36e; color: #1a1438; }
 /* MicroFire buttons: ink-filled actions become the yellow pill with a navy outline and a hard shadow; press settles into the shadow */
-:is(a, button).bg-ink { background: #ffb020; color: #15153d; border: 3px solid #15153d; border-radius: 999px; box-shadow: 3px 3px 0 #15153d; font-family: var(--font-display); font-weight: 800; transition: transform .12s, box-shadow .12s; }
-:is(a, button).bg-ink:hover { background: #ffc24d; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #15153d; }
-:is(a, button).bg-ink:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #15153d; }
-.btn-ghost { background: #ffffff; color: #15153d; border: 3px solid #15153d !important; border-radius: 999px; box-shadow: 3px 3px 0 #15153d; font-family: var(--font-display); font-weight: 800; transition: transform .12s, box-shadow .12s; }
-.btn-ghost:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #15153d; }
-.btn-ghost:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #15153d; }
-[data-theme="dim"] .card { border-color: #4a4fa8; box-shadow: 4px 4px 0 #05061a; }
+:is(a, button).bg-ink { background: #ffc23d; color: #1a1438; border: 3px solid #1a1438; border-radius: 999px; box-shadow: 3px 3px 0 #1a1438; font-family: var(--font-display); font-weight: 800; transition: transform .12s, box-shadow .12s; }
+:is(a, button).bg-ink:hover { background: #ffd36e; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #1a1438; }
+:is(a, button).bg-ink:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1a1438; }
+.btn-ghost { background: #ffffff; color: #1a1438; border: 3px solid #1a1438 !important; border-radius: 999px; box-shadow: 3px 3px 0 #1a1438; font-family: var(--font-display); font-weight: 800; transition: transform .12s, box-shadow .12s; }
+.btn-ghost:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 #1a1438; }
+.btn-ghost:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #1a1438; }
+[data-theme="dim"] .card { border-color: #5a4bb0; box-shadow: 4px 4px 0 #07041a; }
 /* landing figure motion: the data draws itself in once; static under reduced motion (global rule) */
 .sf-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: sf-draw 1.8s cubic-bezier(.3,.6,.2,1) .25s forwards; }
 @keyframes sf-draw { to { stroke-dashoffset: 0; } }
@@ -276,7 +276,7 @@ html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .
 html.js .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; } }
 /* emergency stays a deep, high-contrast red on night surfaces (white text 5.6:1) */
-.night .bg-coral-d { background-color: #c8243c; }
+.night .bg-coral-d { background-color: #c2303a; }
 /* the wire: one slow marquee per page; pauses on hover/focus; still under reduced motion */
 @media (prefers-reduced-motion: no-preference) { .wire-track { animation: wire 150s linear infinite; } .wire:hover .wire-track, .wire:focus-within .wire-track { animation-play-state: paused; } }
 @keyframes wire { to { transform: translateX(-50%); } }
@@ -286,13 +286,13 @@ html.js .reveal.in { opacity: 1; transform: none; }
 [data-theme="dim"] .night :is(.card, .light-panel) :is(.text-forest, .text-emerald, .text-emerald-d, .text-navy, .text-coral-d, .text-amber-d, .text-sky-d, .text-teal) { color: revert-layer; }
 [data-theme="dim"] .night :is(.card, .light-panel) .bg-white { background-color: revert-layer; }
 /* danger fills stay deep red in every theme (white text 5.6:1) */
-[data-theme="dim"] .bg-coral-d { background-color: #c8243c; }
+[data-theme="dim"] .bg-coral-d { background-color: #c2303a; }
 /* Dim: cards inside cobalt bands become deep-navy cards too (one card material per theme) */
 [data-theme="dim"] .night :is(.card, .light-panel) {
-  --color-canvas: #0f1033; --color-ivory: #191b4d; --color-paper-3: #1f2260; --color-line: #33377a;
-  --color-ink: #eef0ff; --color-ink-2: #c9ccf2; --color-ink-3: #a6aade; --color-mint-l: #23266a;
-  --color-emerald: #ffd166; --color-emerald-d: #ffd166; --color-sky: #5fd0ee; --color-sky-d: #8fe3ff;
-  --color-coral: #ff6b7d; --color-coral-d: #ffc0c8; --color-amber: #ffb020; --color-amber-d: #ffd166; --color-forest: #ffd166;
-  background: #191b4d; border-color: #4a4fa8; box-shadow: 5px 5px 0 #05061a;
+  --color-canvas: #140f2e; --color-ivory: #1f1846; --color-paper-3: #2a2160; --color-line: #3a2f6e;
+  --color-ink: #f4f0ff; --color-ink-2: #cfc6f2; --color-ink-3: #a79cd6; --color-mint-l: #2b2266;
+  --color-emerald: #ffd36e; --color-emerald-d: #ffd36e; --color-sky: #5fd0ee; --color-sky-d: #8fe3ff;
+  --color-coral: #ff6b7d; --color-coral-d: #ffc6c9; --color-amber: #ffc23d; --color-amber-d: #ffd36e; --color-forest: #ffd36e;
+  background: #1f1846; border-color: #5a4bb0; box-shadow: 5px 5px 0 #07041a;
 }
-[data-theme="dim"] .night :is(.card, .light-panel) :is(select, input, textarea) { color: #eef0ff; }
+[data-theme="dim"] .night :is(.card, .light-panel) :is(select, input, textarea) { color: #f4f0ff; }

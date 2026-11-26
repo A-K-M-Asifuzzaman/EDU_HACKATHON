@@ -11,7 +11,7 @@
 //   06 trust    limits, sealed test year, reproducibility; then the tools index
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { api, qs, addWeeks, type Forecast } from "@/lib/api";
+import { api, qs, seasonUrl, addWeeks, type Forecast } from "@/lib/api";
 import { selQuery, srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, num } from "@/lib/format";
@@ -22,16 +22,17 @@ import { RainRisk } from "@/components/rain-risk";
 import Reveal from "@/components/reveal";
 import WardWire from "@/components/ward-wire";
 import RiskField from "@/components/risk-field";
+import { Cloud, Folder, Houses, Magnifier, MapPin, ShieldChart, Skyline } from "@/components/illustrations";
 
 const FacilityMap = dynamic(() => import("@/components/facility-map"), { ssr: false, loading: () => <div className="skeleton h-[320px]" /> });
 const ModelStrip = dynamic(() => import("@/components/model-strip"), { ssr: false, loading: () => <div className="skeleton h-[240px]" /> });
 const RainField = dynamic(() => import("@/components/rain-field"), { ssr: false });
 const H = [2, 3, 4] as const;
 
-function Chapter({ n, id, title, children, className = "" }: { n: string; id: string; title: string; children?: React.ReactNode; className?: string }) {
+function Chapter({ n, id, title, children, className = "", art }: { n: string; id: string; title: string; children?: React.ReactNode; className?: string; art?: React.ReactNode }) {
   return (<div className={className}>
-    <div className="flex items-center gap-4"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-[2.5px] border-[#15153d] bg-[#ffb020] font-display text-[16px] font-extrabold text-[#15153d] shadow-[3px_3px_0_#15153d]">{n}</span><span className="h-[2.5px] flex-1 rounded bg-ink/15" aria-hidden /></div>
-    <h2 id={id} className="mt-5 font-display text-[36px] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink sm:text-[52px]">{title}</h2>
+    <div className="flex items-center gap-4"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-[2.5px] border-[#1a1438] bg-[#ffc23d] font-display text-[16px] font-extrabold text-[#1a1438] shadow-[3px_3px_0_#1a1438]">{n}</span><span className="h-[2.5px] flex-1 rounded bg-ink/15" aria-hidden /></div>
+    <div className="mt-5 flex items-end justify-between gap-4"><h2 id={id} className="font-display text-[36px] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink sm:text-[52px]">{title}</h2>{art && <div className="hidden w-[104px] shrink-0 sm:block">{art}</div>}</div>
     {children}</div>);
 }
 
@@ -64,9 +65,10 @@ export default function Landing() {
   const fc = useAsync((s) => api(`/api/forecast?${qs({ ward_id: sel.ward, ...base })}`, { signal: s }), [sel.ward, sel.origin, sel.horizon, sel.source, ready]);
   const f: Forecast | undefined = fc.data?.forecast;
   const year = Number((f?.target_date ?? sel.origin).slice(0, 4));
-  const inReplay = year >= 2019 && year <= 2024;
-  const series = useAsync((s) => (inReplay ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
-  const rain = useAsync((s) => (inReplay ? api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: `${year}-01-01`, end: `${year}-12-31`, metric: "rainfall_mm" })}`, { signal: s, ttl: 600_000 }) : Promise.resolve(null)), [sel.ward, year, ready]);
+  const sUrl = seasonUrl(sel.ward, sel.horizon, sel.origin);
+  const series = useAsync((s) => api(sUrl, { signal: s }), [sUrl, ready]);
+  const season: number = series.data?.season ?? year;                    // a forward origin shows the last replay season, then its own forecast
+  const rain = useAsync((s) => (season >= 2019 ? api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: `${season}-01-01`, end: `${season}-12-31`, metric: "rainfall_mm" })}`, { signal: s, ttl: 600_000 }) : Promise.resolve(null)), [sel.ward, season, ready]);
   const near = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -10), end: sel.origin, metric: "rainfall_mm" })}`, { signal: s, ttl: 600_000 }), [sel.ward, sel.origin, ready]);
   const cmp = useAsync((s) => api(`/api/forecast/compare?${qs({ ward_id: sel.ward, origin: sel.origin, source: srcParam(sel) })}`, { signal: s }), [sel.ward, sel.origin, sel.source, ready]);
   const wards = useAsync((s) => api(`/api/risk/wards?${qs(base)}`, { signal: s }), [sel.origin, sel.horizon, sel.source, ready]);
@@ -91,10 +93,11 @@ export default function Landing() {
     {/* ================================================================== hero */}
     <section aria-labelledby="land-title" className="night relative overflow-hidden">
       <div className="absolute inset-0 [mask-image:linear-gradient(180deg,#000_55%,transparent)]"><RainField mm={issueRain?.rainfall_mm ?? null} /></div>
-      <div className="relative mx-auto max-w-[1320px] px-4 pb-14 sm:px-8 sm:pb-20">
+      <Skyline className="pointer-events-none absolute inset-x-0 bottom-0 h-[90px] w-full sm:h-[140px]" />
+      <div className="relative mx-auto max-w-[1320px] px-4 pb-28 sm:px-8 sm:pb-40">
         <p className="border-b border-line py-4 text-[12.5px] text-ink-3">{t("land.eyebrow")}</p>
         <div className="grid gap-x-12 gap-y-7 pt-7 sm:pt-12 lg:grid-cols-12">
-          <h1 id="land-title" className="sf-fade text-[38px] leading-[0.94] tracking-[-0.03em] text-ink sm:text-[68px] lg:col-span-12 xl:text-[92px]">{t("land.h1a")} <em className="block not-italic text-[#ffd166]">{t("land.h1b")}</em></h1>
+          <h1 id="land-title" className="sf-fade text-[38px] leading-[0.94] tracking-[-0.03em] text-ink sm:text-[68px] lg:col-span-12 xl:text-[92px]">{t("land.h1a")} <em className="block not-italic text-[#ffd36e]">{t("land.h1b")}</em></h1>
           <div className="sf-fade [animation-delay:.15s] lg:col-span-8 lg:col-start-5 lg:row-start-2"><ForecastPreview fc={fc} canon={canon.data} visual={instrument} /></div>
           <div className="flex flex-col lg:col-span-4 lg:row-start-2">
             <p className="max-w-[38ch] text-[17px] leading-relaxed text-ink-2 sm:text-[19px]">{t("land.lead")}</p>
@@ -118,7 +121,7 @@ export default function Landing() {
     <div className="mx-auto max-w-[1320px] px-4 sm:px-8">
       {/* ---------------------------------------------------------------- 01 the rain signal */}
       <Reveal as="section" aria-labelledby="ch-rain" className="mt-20 grid gap-10 sm:mt-28 lg:grid-cols-12 lg:gap-12">
-        <Chapter n="01" id="ch-rain" title="The rain signal" className="lg:col-span-5">
+        <Chapter n="01" id="ch-rain" title="The rain signal" className="lg:col-span-5" art={<Cloud className="w-full" />}>
           <div className="mt-5 max-w-[50ch] space-y-3 text-[15.5px] leading-relaxed text-ink-2">
             <p>Mosquitoes need standing water and a few weeks to breed, so rain shows up in case counts later. The model reads rainfall two, three and four weeks before the target week, and the third week counts most.</p>
             <p>When a forecast is issued, some of those weeks have not happened yet. For them it uses the typical rainfall for that time of year, never the rain that actually fell.</p>
@@ -128,20 +131,20 @@ export default function Landing() {
         <figure className="card m-0 p-5 sm:p-6 lg:col-span-7 lg:mt-16">
           <LagDiagram h={sel.horizon} />
           <div className="mt-4 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">Forecast horizon
-            {H.map((h) => <button key={h} onClick={() => set({ horizon: h })} aria-pressed={sel.horizon === h} className={"min-h-11 rounded-full border-2 px-4 text-[13.5px] font-bold transition-colors sm:min-h-9 " + (sel.horizon === h ? "border-[#15153d] bg-[#2a2bd6] text-white" : "border-[#15153d] bg-ivory text-ink-2 hover:bg-mint-l")}>{h} weeks</button>)}</div>
+            {H.map((h) => <button key={h} onClick={() => set({ horizon: h })} aria-pressed={sel.horizon === h} className={"min-h-11 rounded-full border-2 px-4 text-[13.5px] font-bold transition-colors sm:min-h-9 " + (sel.horizon === h ? "border-[#1a1438] bg-[#4a2bd0] text-white" : "border-[#1a1438] bg-ivory text-ink-2 hover:bg-mint-l")}>{h} weeks</button>)}</div>
         </figure>
       </Reveal>
 
       {/* ---------------------------------------------------------------- 02 the forecast window */}
       <Reveal as="section" aria-labelledby="ch-window" className="mt-24 sm:mt-32">
-        <Chapter n="02" id="ch-window" title="The forecast window">
+        <Chapter n="02" id="ch-window" title="The forecast window" art={<ShieldChart className="w-full" />}>
           <p className="mt-4 max-w-[64ch] text-[15.5px] leading-relaxed text-ink-2">A whole season for one ward, each week forecast {sel.horizon} weeks before it happened by a model that had never seen that season. Move along it to read any week; select one to make it the forecast above.</p>
         </Chapter>
         <div className="card mt-8 p-4 sm:p-6">
-          {!inReplay ? <p className="max-w-[68ch] text-[13.5px] text-ink-2">The validated replay covers forecasts for 2019 to 2024. For later weeks only the forecast above is shown.</p>
+          {series.data && !series.data.series?.length ? <p className="max-w-[68ch] text-[13.5px] text-ink-2">Replayed forecasts start with 2019 origins. For earlier weeks only the forecast above is shown.</p>
             : series.data?.series && target ? (<SeasonFigure rows={series.data.series} rain={rain.data?.rows} origin={f!.origin_date} target={target} horizon={sel.horizon}
               threshold={f?.outbreak_threshold} onPick={(o) => set({ origin: o })}
-              caption={<><b className="font-semibold text-ink-2">Fig. 1.</b> {sel.ward}, {year} season, every forecast made {sel.horizon} weeks ahead by a model trained only on earlier seasons. Shaded: the 80% and 90% ranges; line: the median; dots: reported cases, hollow once they fall after the issue date. Rain after the issue date had not fallen when the forecast was made and was never used.</>} />)
+              caption={<><b className="font-semibold text-ink-2">Fig. 1.</b> {sel.ward}, {season} season, every forecast made {sel.horizon} weeks ahead by a model trained only on earlier seasons. Shaded: the 80% and 90% ranges; line: the median; dots: reported cases, hollow once they fall after the issue date. Rain after the issue date had not fallen when the forecast was made and was never used.</>} />)
             : series.status === "failed" ? <p className="text-[13.5px] text-ink-2" role="alert">The season figure is unavailable right now. The forecast above is unaffected.</p>
             : <div aria-busy="true"><div className="skeleton h-[380px]" /><RequestStatus q={series} label="Season figure" /></div>}
         </div>
@@ -150,9 +153,9 @@ export default function Landing() {
       {/* ---------------------------------------------------------------- 03 the model's evidence */}
       <Reveal as="section" aria-labelledby="ch-evidence" className="night mx-[calc(50%-50vw)] mt-24 px-[calc(50vw-50%)] py-16 sm:mt-32 sm:py-24">
         <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
-          <Chapter n="03" id="ch-evidence" title="The model's evidence" className="lg:col-span-5">
+          <Chapter n="03" id="ch-evidence" title="The model's evidence" className="lg:col-span-5" art={<Magnifier className="w-full" />}>
             <div className="mt-7">
-              <div className="num font-display text-[120px] leading-[0.82] tracking-[-0.035em] text-[#ff9aa8] sm:text-[168px]">{hz ? Math.round(hz.coverage.peaks["80"] * 100) : "…"}<span className="text-[0.42em] tracking-normal">%</span></div>
+              <div className="num font-display text-[120px] leading-[0.82] tracking-[-0.035em] text-[#ffa3a8] sm:text-[168px]">{hz ? Math.round(hz.coverage.peaks["80"] * 100) : "…"}<span className="text-[0.42em] tracking-normal">%</span></div>
               <p className="mt-5 max-w-[36ch] text-[16px] leading-relaxed text-ink-2">of outbreak-peak weeks fell inside the 80% range at {sel.horizon} weeks ahead, against {hz ? Math.round(hz.coverage.all["80"] * 100) : "…"}% of all weeks. Peaks are where the model is weakest, and every forecast page says so.</p>
             </div>
           </Chapter>
@@ -181,7 +184,7 @@ export default function Landing() {
 
       {/* ---------------------------------------------------------------- 04 from risk to response */}
       <Reveal as="section" aria-labelledby="ch-response" className="mt-24 grid gap-x-12 gap-y-8 sm:mt-32 lg:grid-cols-12">
-        <Chapter n="04" id="ch-response" title="From risk to response" className="lg:col-span-4">
+        <Chapter n="04" id="ch-response" title="From risk to response" className="lg:col-span-4" art={<Houses className="w-full" />}>
           <p className="mt-5 max-w-[40ch] text-[15.5px] leading-relaxed text-ink-2">The same forecast for every synthetic ward, ranked, so a health office can see where to look first. Response planning stays generic: options and a review queue, never quantities or orders.</p>
           <div className="mt-7 flex items-baseline gap-4"><span className="num font-display text-[64px] leading-none text-ink">{W60.length ? alerts : "…"}</span><span className="text-[14px] leading-snug text-ink-3">of {W60.length || 60} wards on outbreak alert for the week of {target ? dateFmt(target, lang) : "…"}</span></div>
           <Link href={`/response/${q}`} className="btn-ghost mt-6 inline-flex min-h-11 items-center px-5 text-[14px]">Open Response Intelligence</Link>
@@ -193,7 +196,7 @@ export default function Landing() {
       {/* ---------------------------------------------------------------- 05 geospatial navigation */}
       <Reveal as="section" aria-labelledby="ch-geo" className="mt-24 grid gap-x-12 gap-y-8 sm:mt-32 lg:grid-cols-12">
         <div className="card p-5 sm:p-6 lg:order-2 lg:col-span-7"><FacilityMap /></div>
-        <Chapter n="05" id="ch-geo" title="Geospatial navigation" className="lg:order-1 lg:col-span-5">
+        <Chapter n="05" id="ch-geo" title="Geospatial navigation" className="lg:order-1 lg:col-span-5" art={<MapPin className="w-full" />}>
           <dl className="mt-7 grid grid-cols-3 gap-4 border-y border-line py-4">
             <div className="flex flex-col-reverse justify-end"><dt className="mt-1 text-[12px] text-ink-3">facilities mapped</dt><dd className="num font-display text-[32px] leading-none text-ink">{fac ? num(fac.count, lang) : "…"}</dd></div>
             <div className="flex flex-col-reverse justify-end"><dt className="mt-1 text-[12px] text-ink-3">km of road, one-way rules kept</dt><dd className="num font-display text-[32px] leading-none text-ink">{roadKm ? num(Math.round(roadKm), lang) : "…"}</dd></div>
@@ -206,7 +209,7 @@ export default function Landing() {
 
       {/* ---------------------------------------------------------------- 06 scientific trust */}
       <Reveal as="section" aria-labelledby="ch-trust" className="night mx-[calc(50%-50vw)] mt-24 px-[calc(50vw-50%)] py-16 sm:mt-32 sm:py-24">
-        <Chapter n="06" id="ch-trust" title="Scientific trust" />
+        <Chapter n="06" id="ch-trust" title="Scientific trust" art={<Folder className="w-full" />} />
         <dl className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {[["Not live surveillance", "Every number replays the organizers' synthetic data for 2019 to 2024. The 60 wards are synthetic and cannot be placed on real ward boundaries, so maps stay at city level."],
             ["Not medical advice", "Nothing here is advice for a patient. In an emergency call 999 or open Emergency help at the top of every page."],

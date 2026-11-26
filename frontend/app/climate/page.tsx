@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { monthName, num } from "@/lib/format";
 import { Card, CardTitle, ChartSkeleton, DataTable, ErrorState, Kpi, Notice, PageHeader, ProvChip, RequestStatus, Segmented, Select, Skeleton, useAsync } from "@/components/ui";
 import { Chart, axisStyle } from "@/components/echart";
+import { SunCloud } from "@/components/illustrations";
 
 const SRC_COLOR = { nasa_power: "#0b5cad", open_meteo: "#e8782f", organizer: "#8d99ae" } as const;
 const SRC_NAME = { nasa_power: "NASA POWER", open_meteo: "Open-Meteo", organizer: "Organizer (synthetic)" } as const;
@@ -54,7 +55,7 @@ export default function Climate() {
   const annual = ok(cur) ? cur.annual_rain : [];
 
   return (<>
-    <PageHeader eyebrow="Real-world climate · kept separate from the synthetic training data" title={t("nav.climate")} sub="NASA POWER and Open-Meteo observations at city-centre coordinates, compared with the synthetic organizer weather the model was trained on. None of these real observations is an input to any forecast." right={<ProvChip tone="info">Real observations ≠ model inputs</ProvChip>} />
+    <PageHeader art={<SunCloud className="w-full" />} eyebrow="Real-world climate · kept separate from the synthetic training data" title={t("nav.climate")} sub="NASA POWER and Open-Meteo observations at city-centre coordinates, compared with the synthetic organizer weather the model was trained on. None of these real observations is an input to any forecast." right={<ProvChip tone="info">Real observations ≠ model inputs</ProvChip>} />
     <div className="card mb-5 flex flex-wrap items-end gap-4 p-4">
       <Select label={t("ctl.city")} value={city} onChange={setCity} options={["Dhaka", "Chattogram", "Gazipur", "Narayanganj"].map((c) => ({ value: c, label: c }))} />
       <Select label="Period" value={range} onChange={setRange} options={[["2016-2024", "2016–2024 (model development years)"], ["2022-2024", "2022–2024"], ["2019-2021", "2019–2021"], ["2010-2015", "2010–2015 (before the dataset)"]].map(([v, l]) => ({ value: v, label: l }))} />

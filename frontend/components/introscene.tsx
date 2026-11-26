@@ -53,9 +53,9 @@ function Flyer({ s }: { s: React.MutableRefObject<FlightState> }) {
 export default function IntroScene({ state }: { state: React.MutableRefObject<FlightState> }) {
   return (<Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 8], fov: 40 }} gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }} style={{ position: "absolute", inset: 0 }}>
     <fog attach="fog" args={["#1d1fa8", 9, 18]} />
-    <hemisphereLight args={["#ffffff", "#1b1c9e", 0.45]} />
+    <hemisphereLight args={["#ffffff", "#2a157f", 0.45]} />
     <directionalLight position={[3, 6, 6]} intensity={3.0} color="#fff1dc" />
-    <directionalLight position={[-4, 2, -6]} intensity={2.4} color="#ffd166" />
+    <directionalLight position={[-4, 2, -6]} intensity={2.4} color="#ffd36e" />
     <pointLight position={[-3, -2, 3]} intensity={5} distance={14} color="#5aa6d6" />
     <Flyer s={state} />
   </Canvas>);

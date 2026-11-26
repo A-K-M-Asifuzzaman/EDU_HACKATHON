@@ -129,3 +129,36 @@ test.describe("V4 map resilience", () => {
     await expect(page.getByRole("option").first()).toBeVisible();                             // facility search still works
   });
 });
+
+test.describe("V4 accounts on Firebase (configured; no account is signed in)", () => {
+  test("sign-in offers email, password and Google, and explains who needs an account", async ({ page }) => {
+    await page.goto("/signin/?nointro");
+    await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+    await expect(page.getByText("Every public page works without signing in.")).toBeVisible();
+  });
+
+  test("workspaces ask for sign-in and the API refuses requests without a Firebase token", async ({ page }) => {
+    for (const path of ["/officer/?nointro", "/admin/?nointro"]) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { name: "Sign in to continue" })).toBeVisible({ timeout: 20_000 });
+    }
+    for (const api of ["/api/ops/alerts?origin=2024-08-05&horizon=3", "/api/ops/plans", "/api/admin/users", "/api/admin/audit", "/api/auth/me"]) {
+      expect((await page.request.get(api)).status()).toBe(401);
+    }
+    expect((await page.request.get("/api/ops/plans", { headers: { Authorization: "Bearer forged.token.value" } })).status()).toBe(401);
+    expect((await (await page.request.get("/api/auth/config")).json()).configured).toBe(true);
+  });
+
+  test("the header offers Sign in and the public site keeps working without an account", async ({ page }) => {
+    await page.goto("/command/?nointro");
+    await expect(page.getByTestId("answer-card")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible({ timeout: 20_000 });
+    const nav = page.getByRole("navigation", { name: "Primary" });                                // officer page listed under Respond,
+    await nav.getByRole("button", { name: /^Respond/ }).click();                                    // administration only for admins
+    await expect(nav.getByRole("link", { name: /Officer workspace/ })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Administration/ })).toHaveCount(0);
+  });
+});

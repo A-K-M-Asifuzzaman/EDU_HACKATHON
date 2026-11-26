@@ -11,6 +11,7 @@ import RiskMatrix from "@/components/riskmatrix";
 import { CITY_POS } from "@/components/citymap";
 import { ActionProgress, Btn, Card, CardTitle, DataTable, EmptyState, Loading, Notice, PageHeader, ProvChip, Segmented, useAsync, useToast } from "@/components/ui";
 import type { CityOverlay, Layers, LngLat, MapHandle, WeatherPt } from "@/components/commandmap";
+import { MapPin } from "@/components/illustrations";
 
 const CommandMap = dynamic(() => import("@/components/commandmap"), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-canvas" /> });
 const KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY;
@@ -218,7 +219,7 @@ export default function GeoCommand() {
     </div>);
 
   return (<>
-    <PageHeader eyebrow={t("map.eyebrow")} title={t("nav.geography")} sub={<span className="hidden sm:inline">{t("map.sub")}</span>} />
+    <PageHeader art={<MapPin className="w-full" />} eyebrow={t("map.eyebrow")} title={t("nav.geography")} sub={<span className="hidden sm:inline">{t("map.sub")}</span>} />
     {/* phones: the full notice and intro pushed the map ~520 px down; keep the warning visible in one line, details one tap away */}
     <details className="-mt-3 rounded-xl border border-amber/50 bg-amber/10 px-3 py-2 text-[13px] text-ink sm:hidden">
       <summary className="cursor-pointer font-semibold text-amber-d">⚠ {t("map.notlive")} Call before travelling.</summary>

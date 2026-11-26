@@ -5,7 +5,7 @@
 // Hand-built SVG so every label is typeset deliberately; pointer and arrow keys read any week; Enter or a click selects it.
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export type SeriesRow = { origin_date: string; target_date: string; y_true: number | null; median: number; lo80: number; hi80: number; lo90: number; hi90: number; p_outbreak: number; thr_q90?: number };
+export type SeriesRow = { origin_date: string; target_date: string; y_true: number | null; median: number; lo80: number; hi80: number; lo90: number; hi90: number; p_outbreak: number; thr_q90?: number; forward?: boolean };
 type Rain = { date: string; rainfall_mm: number | null };
 
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -109,7 +109,8 @@ export function SeasonFigure({ rows, rain, origin, target, horizon, threshold, o
         {hv && <line x1={X(hv.target_date)} x2={X(hv.target_date)} y1={m.t} y2={R0 + HR} stroke="var(--color-ink-2)" strokeDasharray="2 3" />}
       </svg>}
     </div>
-    {caption && <figcaption className="mt-3 max-w-[68ch] text-[12.5px] leading-relaxed text-ink-3">{caption}</figcaption>}
+    {(caption || rows.some((r) => r.forward)) && <figcaption className="mt-3 max-w-[68ch] text-[12.5px] leading-relaxed text-ink-3">{caption}
+      {rows.some((r) => r.forward) && <> After the issue line: this forecast&apos;s own range 2, 3 and 4 weeks ahead. 2025 cases are locked, so none are shown as reported.</>}</figcaption>}
     <details className="mt-2 text-[12.5px] text-ink-2"><summary className="cursor-pointer text-ink-3 hover:text-ink">Show the figure's data as a table</summary>
       <div className="scroll-thin mt-2 max-h-[280px] overflow-auto border-t border-line"><table className="num w-full text-left text-[12px]">
         <thead className="sticky top-0 bg-canvas text-ink-3"><tr><th className="py-1 pr-3 font-semibold">Week of</th><th className="pr-3 font-semibold">Issued</th><th className="pr-3 text-right font-semibold">Median</th><th className="pr-3 text-right font-semibold">80% range</th><th className="pr-3 text-right font-semibold">90% range</th><th className="text-right font-semibold">Observed</th></tr></thead>

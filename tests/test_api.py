@@ -57,6 +57,17 @@ def test_replay_forecasts_are_out_of_time_and_never_expose_2025(client):
     assert f["source"] == "bundle" and f["actual_cases"] is None and f["target_date"] == "2025-01-20"
 
 
+def test_series_by_origin_adds_the_forward_forecast_without_2025_observations(client):
+    d = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2025-01-06").json()
+    fwd = [r for r in d["series"] if r.get("forward")]
+    assert d["season"] == 2024 and [r["target_date"] for r in fwd] == ["2025-01-20", "2025-01-27", "2025-02-03"]
+    assert all(r["y_true"] is None and r["lo90"] <= r["median"] <= r["hi90"] for r in fwd)
+    assert max(r["target_date"] for r in d["series"] if not r.get("forward")) <= "2024-12-31"
+    same = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2022-08-01").json()["series"]
+    assert same == client.get(f"/api/forecast/series?ward_id={W}&horizon=3&year=2022").json()["series"]
+    assert client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2017-08-07").json()["series"] == []
+
+
 def test_requests_beyond_the_record_or_invalid_are_refused(client):
     r = client.get(f"/api/forecast?ward_id={W}&origin=2025-02-03&horizon=2")
     assert r.status_code == 422 and "refused" in r.json()["detail"]

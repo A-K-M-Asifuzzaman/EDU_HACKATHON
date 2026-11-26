@@ -33,7 +33,7 @@ app.add_middleware(GZipMiddleware, minimum_size=2000)
 from dengueshield.api.guard import BodyLimit  # noqa: E402
 app.add_middleware(BodyLimit, paths=("/api/assistant/chat",))
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"],
-                   allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+                   allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Authorization"])
 S = Store()
 H = Annotated[int, Query(ge=2, le=4, description="forecast horizon in weeks (2, 3 or 4)")]
 @app.middleware("http")
@@ -269,15 +269,28 @@ def forecast_compare(ward_id: str, origin: str, source: Optional[Literal["replay
 
 
 @app.get("/api/forecast/series")
-def forecast_series(ward_id: str, horizon: H = 3, year: Optional[int] = Query(None, ge=2019, le=2024)):
-    """Out-of-time Historical Replay: median, mean, intervals and observed cases per target week (validation seasons 2019-2024)."""
+def forecast_series(ward_id: str, horizon: H = 3, year: Optional[int] = Query(None, ge=2019, le=2024), origin: Optional[str] = None):
+    """Out-of-time Historical Replay: median, mean, intervals and observed cases per target week (validation seasons 2019-2024).
+    With `origin` instead of `year`: that origin's replay season; after the last replay season, that season followed by the origin's
+    own 2-4 week forward forecasts (`forward: true`, observed cases locked); before the first season, an empty series."""
     ward_check(ward_id), need("replay")
     r = S.replay[(S.replay.ward_id == ward_id) & (S.replay.horizon == horizon)]
+    ahead: list = []
+    if origin and not year:
+        origin_check(origin)
+        first, last = int(S.replay.year.min()), int(S.replay.year.max())
+        year = min(int(origin[:4]), last)
+        if int(origin[:4]) > last:
+            ahead = [{"origin_date": f["origin_date"], "target_date": f["target_date"], "horizon": f["horizon"], "y_true": None, "mean": f["expected_cases"], "median": f["median_cases"],
+                      "lo80": f["lower_80"], "hi80": f["upper_80"], "lo90": f["lower_90"], "hi90": f["upper_90"], "p_outbreak": f["p_outbreak"], "tier": f.get("risk_tier"), "forward": True}
+                     for f in forecast_compare(ward_id, origin)["forecasts"] if not f.get("error")]
+        elif year < first:
+            r = r.iloc[0:0]
     if year:
         r = r[r.year == year]
     r = r.sort_values("target_date")
-    return {"ward_id": ward_id, "horizon": horizon, "convention": "B_start_of_week",
-            "note": "Each season was predicted by a model trained only on earlier seasons; calibration used the two preceding seasons.", "series": records(r.drop(columns=["city"]))}
+    return {"ward_id": ward_id, "horizon": horizon, "season": year, "convention": "B_start_of_week",
+            "note": "Each season was predicted by a model trained only on earlier seasons; calibration used the two preceding seasons.", "series": records(r.drop(columns=["city"])) + ahead}
 
 
 @app.get("/api/risk/wards")
@@ -885,6 +898,12 @@ async def assistant_chat(req: ChatRequest, request: Request):
 def assistant_status():
     from dengueshield.api import rag
     return rag.status()
+
+
+# ------------------------------------------------------------------ accounts, roles and officer workflows (V4); public routes above stay anonymous
+from dengueshield.api import auth as _auth, ops as _ops  # noqa: E402
+app.include_router(_auth.router)
+app.include_router(_ops.router)
 
 
 # ------------------------------------------------------------------ static frontend (built Next.js export)

@@ -7,6 +7,7 @@ import { Card, CardTitle, DataTable, Kpi, Loading, Notice, PageHeader, ProvChip,
 import { Chart, PALETTE, axisStyle } from "@/components/echart";
 import ReliabilityCenter from "@/components/reliability";
 import ModelCompare from "@/components/model-compare";
+import { Magnifier } from "@/components/illustrations";
 
 const NAMES: Record<string, string> = { glm_poisson: "Ridge Poisson GLM", glm_spline: "Spline Poisson GLM", glm_tweedie: "Tweedie GLM", glm_nb: "Negative-binomial GLM", glm_poisson_nbdisp: "Poisson GLM + NB dispersion", lgbm_poisson: "LightGBM Poisson", lgbm_tweedie: "LightGBM Tweedie", lgbm_l1: "LightGBM L1", xgb_poisson: "XGBoost Poisson", cat_poisson: "CatBoost Poisson", hurdle_lgbm: "Hurdle (LightGBM)" };
 const nm = (r: any) => (NAMES[r.model] ?? r.model.replace("ens_", "Ensemble ")) + (r.tag === "tuned" ? " (tuned)" : "") + ` · ${r.fs}`;
@@ -22,7 +23,7 @@ export default function Evidence() {
   const [win, setWin] = useState("bench_2022_2024");
   const tabs = [["reliab", "Reliability center"], ["compare", "Model comparison"], ["choice", "Why this model"], ["board", "Tournament"], ["seasons", "Seasons & baselines"], ["unc", "Uncertainty & alerts"], ["imp", "Importance"], ["limits", "Limitations"]].map(([id, label]) => ({ id, label }));
   return (<>
-    <PageHeader eyebrow="Source: committed Stage 1–3 research reports" title={t("nav.evidence")} sub="Why the ridge Poisson GLM is deployed, how it was validated, and where it falls short. All numbers come from the committed reports and are served by the API." right={<ProvChip tone="warn">2025 holdout locked</ProvChip>} />
+    <PageHeader art={<Magnifier className="w-full" />} eyebrow="Source: committed Stage 1–3 research reports" title={t("nav.evidence")} sub="Why the ridge Poisson GLM is deployed, how it was validated, and where it falls short. All numbers come from the committed reports and are served by the API." right={<ProvChip tone="warn">2025 holdout locked</ProvChip>} />
     {/* status legend: every number on this page belongs to one of these, and they are never mixed silently */}
     <div className="mb-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-5" aria-label="How to read the evidence">
       {([["ok", "Deployed champion", "Ridge Poisson GLM, 24 features: what the app serves"], ["warn", "Validation used for model selection", "Seasons 2022–2024: not a blind test"],

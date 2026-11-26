@@ -5,6 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { download, monthName, num, toCsv } from "@/lib/format";
 import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, PageHeader, ProvChip, Segmented, Select, Tabs, useAsync, useToast } from "@/components/ui";
 import { Chart, PALETTE, axisStyle } from "@/components/echart";
+import { Database } from "@/components/illustrations";
 
 const NUMERIC = ["population_density_sqkm", "water_logging_risk_index", "sanitation_score", "avg_temp_c", "max_temp_c", "min_temp_c", "rainfall_mm", "relative_humidity_pct", "dengue_cases"];
 const heat = (xs: string[], ys: string[], data: any[], min: number, max: number, fmt = (v: number) => v.toFixed(2), colors = ["#2a6f9e", "#f7f9fb", "#d93a42"]) => ({
@@ -28,7 +29,7 @@ export default function Profiling() {
   const diag = useAsync((s) => api(`/api/model/diagnostics?horizon=${h}`, { ttl: 600_000, signal: s }), [h]);
   const tabs = ["overview", "stats", "dist", "corr", "time", "lag", "feat", "diag"].map((id) => ({ id, label: t(`pg.prof.tab.${id}`) }));
   return (<>
-    <PageHeader eyebrow={t("pg.prof.eyebrow")} title={t("nav.profiling")} sub={t("pg.prof.sub")} right={<ProvChip tone="warn">{t("fresh.holdout")}</ProvChip>} />
+    <PageHeader art={<Database className="w-full" />} eyebrow={t("pg.prof.eyebrow")} title={t("nav.profiling")} sub={t("pg.prof.sub")} right={<ProvChip tone="warn">{t("fresh.holdout")}</ProvChip>} />
     <Tabs tabs={tabs} value={tab} onChange={setTab} />
     {tab === "overview" && <Overview profile={profile} dist={dist} />}
     {tab === "stats" && <Stats profile={profile} dist={dist} toast={toast} />}

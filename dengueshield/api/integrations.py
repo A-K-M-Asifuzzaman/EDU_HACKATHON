@@ -24,7 +24,7 @@ def _load_env():
         for line in open(p):
             if line.startswith("OPENAI_API_KEY="):
                 os.environ["OPENAI_API_KEY"] = line.split("=", 1)[1].strip()
-            elif "=" in line and line.split("=", 1)[0] in ("OPENAI_MODEL", "OPENAI_EMBED_MODEL", "OPENAI_BUDGET_USD"):
+            elif "=" in line and line.split("=", 1)[0] in ("OPENAI_MODEL", "OPENAI_EMBED_MODEL", "OPENAI_BUDGET_USD", "FIREBASE_PROJECT_ID"):
                 os.environ.setdefault(*[x.strip() for x in line.split("=", 1)])
 
 

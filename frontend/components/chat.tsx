@@ -174,8 +174,8 @@ export function CopilotLauncher() {
   useFocusTrap(drawer, open, close);
   if ((usePathname() || "").startsWith("/copilot")) return null;      // the full Copilot is already on this page
   return (<>
-    <button onClick={() => setOpen(true)} aria-label={t("copilot.title")} aria-haspopup="dialog" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-control border border-line px-2.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-3 sm:min-h-9 sm:min-w-0 sm:px-3">
-      <Icon name="copilot" size={17} /><span className="hidden md:inline">Copilot</span></button>
+    <button onClick={() => setOpen(true)} aria-label={t("copilot.title")} aria-haspopup="dialog" className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border-2 border-white/35 px-2.5 text-[13px] font-bold text-white transition-colors hover:border-white hover:bg-white/10 sm:min-h-10 xl:px-3">
+      <Icon name="copilot" size={17} /><span className="hidden xl:inline">Copilot</span></button>
     <AnimatePresence>{open && (<motion.div className="fixed inset-0 z-[60]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-0 bg-forest/30 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
       <motion.aside ref={drawer} tabIndex={-1} role="dialog" aria-modal="true" aria-label={t("copilot.title")} className="absolute inset-y-0 right-0 flex w-full max-w-[500px] flex-col bg-canvas shadow-pop outline-none" initial={{ x: 480 }} animate={{ x: 0 }} exit={{ x: 480 }} transition={{ type: "spring", stiffness: 360, damping: 36 }}>

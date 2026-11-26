@@ -98,7 +98,7 @@ test("API outage shows an error state with retry and the shell keeps working", a
   await page.route("**/api/metadata", (r) => r.abort());
   await page.goto("/command/");
   await expect(page.getByRole("alert").first()).toContainText(/Cannot reach|unreachable/i);
-  await page.getByRole("navigation", { name: "Primary" }).getByRole("button", { name: /^Forecast/ }).click();     // V4 shell: grouped menus still open
+  await page.getByRole("navigation", { name: "Primary" }).getByRole("button", { name: /^Evidence/ }).click();     // V4 shell: grouped panels still open
   await expect(page.getByRole("link", { name: /Data Profiling Studio/ })).toBeVisible();
 });
 
@@ -517,15 +517,22 @@ test.describe("V3.5 landing", () => {
     await expect(footer).toContainText("Not affiliated with or endorsed by DGHS");
   });
 
-  test("navigation: Overview and Command Center are separate, grouped entries", async ({ page }) => {
+  test("navigation: four task groups; the context bar lists the current group's pages", async ({ page }) => {
     await page.goto("/command/?nointro");
-    const section = page.getByRole("navigation", { name: "Section" });                            // V4 context bar: pages of the current group
+    const section = page.getByRole("navigation", { name: "Section" });                            // context bar: pages of the current group
     await expect(section.getByRole("link", { name: "Command Center" })).toHaveAttribute("aria-current", "page");
-    await section.getByRole("link", { name: "Overview" }).click();
-    await expect(page).toHaveURL(/127\.0\.0\.1:\d+\/(\?|$)/);
+    await expect(section.getByRole("link", { name: "Ward Risk Explorer" })).toBeVisible();
     const nav = page.getByRole("navigation", { name: "Primary" });
-    await nav.getByRole("button", { name: /^Command/ }).click();
-    await expect(nav.getByRole("link", { name: /Command Center/ })).toBeVisible();
+    for (const g of ["Forecast", "Respond", "Evidence", "Learn"]) await expect(nav.getByRole("button", { name: new RegExp(`^${g}`) })).toBeVisible();
+    await nav.getByRole("button", { name: /^Learn/ }).click();
+    await nav.getByRole("link", { name: /^Overview/ }).click();                                    // the tile, not "Start with Overview"
+    await expect(page).toHaveURL(/127\.0\.0\.1:\d+\/(\?|$)/);
+  });
+
+  test("a forward origin (2025) shows the last replay season and its own forecast range, with no 2025 cases", async ({ page }) => {
+    await page.goto("/lab/?ward=DNCC_Ward_19&origin=2025-01-06&horizon=3&nointro");
+    await expect(page.getByText(/this forecast's own range 2, 3 and 4 weeks ahead/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/Replayed forecasts exist for origins/)).toHaveCount(0);
   });
 });
 
@@ -554,7 +561,7 @@ test.describe("V3.5 keyboard and dialogs", () => {
     await expect(drawer).toBeHidden();
     await expect(opener).toBeFocused();
     await page.goto("/response/?nointro");
-    await page.getByRole("table").first().getByRole("row").nth(1).click({ timeout: 20_000 });
+    await page.getByRole("table").first().getByRole("row").filter({ hasText: /_Ward_/ }).first().click({ timeout: 20_000 });   // wait for real ward rows, not a skeleton
     const dlg = page.getByRole("dialog");
     await expect(dlg).toContainText("Nothing here is sent to anyone");
     await expect(dlg.getByRole("link", { name: /Open in Command Center/ })).toHaveAttribute("href", /\/command\/\?ward=/);
@@ -570,7 +577,7 @@ test.describe("V3.5 colour modes", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await page.getByRole("button", { name: /Colour mode: Light/ }).click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dim");
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(15, 16, 51)");   // MicroFire deep navy, not black
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(20, 15, 46)");   // Royal Monsoon deep aubergine, not black
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dim");                                        // remembered, applied before paint
     await page.getByRole("button", { name: /Colour mode: Dim/ }).click();

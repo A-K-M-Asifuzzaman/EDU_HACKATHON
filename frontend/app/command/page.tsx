@@ -4,7 +4,7 @@
 // drives the forecast, the known limitations and one recommended next step. Every number comes from the API.
 import Link from "next/link";
 import { useMemo } from "react";
-import { api, qs, addWeeks, TIERS, type Forecast } from "@/lib/api";
+import { api, qs, seasonUrl, addWeeks, TIERS, type Forecast } from "@/lib/api";
 import { useSel, srcParam, selQuery } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, num, pct } from "@/lib/format";
@@ -17,6 +17,7 @@ import { SeasonFigure } from "@/components/season-figure";
 import RiskField from "@/components/risk-field";
 import Reveal from "@/components/reveal";
 import { Icon } from "@/components/icons";
+import { ShieldChart } from "@/components/illustrations";
 
 function Section({ id, title, sub, right, children }: { id: string; title: string; sub?: React.ReactNode; right?: React.ReactNode; children: React.ReactNode }) {
   return (<Reveal as="section" aria-labelledby={id} className="mt-14 sm:mt-20">
@@ -35,7 +36,9 @@ export default function CommandCenter() {
   const fc = useAsync((s) => api(`/api/forecast?${qs({ ward_id: sel.ward, ...base })}`, { signal: s }), [sel.ward, sel.origin, sel.horizon, sel.source, ready]);
   const cmp = useAsync((s) => api(`/api/forecast/compare?${qs({ ward_id: sel.ward, origin: sel.origin, source: src })}`, { signal: s }), [sel.ward, sel.origin, sel.source, ready]);
   const year = Number(sel.origin.slice(0, 4));
-  const series = useAsync((s) => (year >= 2019 && year <= 2024 ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
+  const sUrl = seasonUrl(sel.ward, sel.horizon, sel.origin);
+  const series = useAsync((s) => api(sUrl, { signal: s }), [sUrl, ready]);
+  const season: number = series.data?.season ?? year;
   const rain = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -26), end: addWeeks(sel.origin, 0), metric: "rainfall_mm" })}`, { signal: s }), [sel.ward, sel.origin, ready]);
   const metrics = useAsync((s) => api("/api/model/metrics", { signal: s, ttl: 3_600_000 }), []);
   const calib = useAsync((s) => api("/api/model/calibration", { signal: s, ttl: 3_600_000 }), []);
@@ -71,7 +74,8 @@ export default function CommandCenter() {
             <h1 className="sf-fade mt-1 text-[40px] leading-[0.96] text-ink sm:text-[60px]">{t("nav.command")}</h1>
             <p className="mt-2 hidden max-w-[70ch] text-[14.5px] leading-relaxed text-ink-2 sm:block">{S ? <>Week of <b className="font-semibold text-ink">{dateFmt(S.target_date, lang)}</b>, forecast made {dateFmt(S.origin, lang)}, {sel.horizon} weeks ahead: <b className="num font-semibold text-ink">{num(S.median_cases_total, lang)}</b> cases expected across {S.wards} synthetic wards, <b className="num font-semibold text-coral-d">{S.alerts}</b> on outbreak alert. {S.source === "replay" ? "Validated out-of-time replay." : ""}</> : <span className="skeleton inline-block h-4 w-96 align-middle" />}</p>
           </div>
-          <div className="hidden flex-wrap gap-2 sm:flex">{/* phones: these follow the instrument, so the forecast stays in the first screen */}
+          <div className="hidden flex-wrap items-end gap-3 sm:flex">{/* phones: these follow the instrument, so the forecast stays in the first screen */}
+            <ShieldChart className="mr-2 hidden w-[120px] xl:block" />
             <Btn variant="ghost" disabled={!S || !f} title={!S || !f ? "Available once the forecast and ward ranking have loaded" : undefined} onClick={sitrep}><Icon name="download" size={16} />Weekly situation report</Btn>
             <Link href={`/lab/${q}`} className="inline-flex min-h-11 items-center gap-1.5 bg-ink px-4 py-2 text-[13.5px] text-canvas sm:min-h-9">Explain this forecast</Link>
           </div>
@@ -98,11 +102,11 @@ export default function CommandCenter() {
     {summary.error && <div className="mt-6"><ErrorState error={summary.error} onRetry={summary.reload} /></div>}
 
     {/* ================================================================ the season */}
-    <Section id="cc-season" title="The season so far" sub={`${sel.ward}, every week of ${year} forecast ${sel.horizon} weeks ahead by a model trained only on earlier seasons. Select a week to make it the forecast above.`}>
-      {year >= 2019 && year <= 2024 ? (series.data?.series && f ? <SeasonFigure rows={series.data.series} rain={rain.data?.rows} origin={f.origin_date} target={f.target_date} horizon={sel.horizon} threshold={f.outbreak_threshold} onPick={(o) => set({ origin: o })} />
+    <Section id="cc-season" title="The season so far" sub={`${sel.ward}, every week of ${season} forecast ${sel.horizon} weeks ahead by a model trained only on earlier seasons. Select a week to make it the forecast above.`}>
+      {!(series.data && !series.data.series?.length) ? (series.data?.series && f ? <SeasonFigure rows={series.data.series} rain={rain.data?.rows} origin={f.origin_date} target={f.target_date} horizon={sel.horizon} threshold={f.outbreak_threshold} onPick={(o) => set({ origin: o })} />
         : series.status === "failed" && series.error ? <ServiceUnavailable error={series.error} onRetry={series.reload} label="The season timeline" />
         : <div aria-busy="true"><div className="skeleton h-[380px]" /><RequestStatus q={series} label="Season timeline" /></div>)
-        : <EmptyState text="The validated replay covers origins 2019 to 2024. For later origins only the forecast above is shown." />}
+        : <EmptyState text="Replayed forecasts start with 2019 origins. For earlier origins only the forecast above is shown." />}
     </Section>
 
     {/* ================================================================ all wards */}

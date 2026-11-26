@@ -11,6 +11,7 @@ import { Btn, Card, CardTitle, DataTable, Loading, Modal, Notice, PageHeader, Pr
 import Link from "next/link";
 import { selQuery } from "@/lib/ctx";
 import { TIERS } from "@/lib/api";
+import { Clipboard } from "@/components/illustrations";
 
 const OPTIONS = [
   { title: "Source reduction in high-risk wards", body: "Community clean-up drives for containers and drains where waterlogging risk is high; review drainage maintenance schedules.", when: "Rising rainfall signal and High/Critical tier" },
@@ -48,7 +49,7 @@ export default function Response() {
   const wards = tierF === "All" ? allWards : allWards.filter((w) => w.risk_tier === tierF);
   const wq = (w: Forecast) => selQuery({ ...sel, ward: w.ward_id });
   return (<>
-    <PageHeader eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, and review generic options. Quantities, budgets and operational decisions are deliberately not computed here." />
+    <PageHeader art={<Clipboard className="w-full" />} eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, and review generic options. Quantities, budgets and operational decisions are deliberately not computed here." />
     <ControlsBar show={["origin", "horizon", "source"]} />
     <Notice tone="warn">{t("resp.noofficial")} {t("disc.official")}</Notice>
     {/* long page on phones: jump straight to each part of the workflow */}

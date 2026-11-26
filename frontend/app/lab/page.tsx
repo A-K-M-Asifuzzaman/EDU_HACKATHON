@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from "react";
-import { api, qs, addWeeks } from "@/lib/api";
+import { api, qs, addWeeks, seasonUrl } from "@/lib/api";
 import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt } from "@/lib/format";
@@ -12,16 +12,19 @@ import RainfallWhatIf from "@/components/rain-what-if";
 import { Card, CardTitle, EmptyState, Loading, Notice, PageHeader, ProvChip, RiskBadge, useAsync } from "@/components/ui";
 import { DriverBars, FanChart } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
+import { Flask } from "@/components/illustrations";
+import { SeasonFigure } from "@/components/season-figure";
 
 export default function Lab() {
-  const { sel, ready } = useSel();
+  const { sel, ready, set } = useSel();
   const { t, lang } = useI18n();
   const src = srcParam(sel);
   const cmp = useAsync((s) => api(`/api/forecast/compare?${qs({ ward_id: sel.ward, origin: sel.origin, source: src })}`, { signal: s }), [sel.ward, sel.origin, sel.source, ready]);
   const fc = useAsync((s) => api(`/api/forecast?${qs({ ward_id: sel.ward, origin: sel.origin, horizon: sel.horizon, source: src })}`, { signal: s }), [sel.ward, sel.origin, sel.horizon, sel.source, ready]);
   const rain = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -10), end: addWeeks(sel.origin, 0), metric: "rainfall_mm" })}`, { signal: s }), [sel.ward, sel.origin, ready]);
   const year = Number(sel.origin.slice(0, 4));
-  const series = useAsync((s) => (year >= 2019 && year <= 2024 ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
+  const sUrl = seasonUrl(sel.ward, sel.horizon, sel.origin);
+  const series = useAsync((s) => api(sUrl, { signal: s }), [sUrl, ready]);
   const cal = useAsync((s) => api("/api/model/calibration", { ttl: 300_000, signal: s }), [ready]);
   const rainMap = useMemo(() => Object.fromEntries((rain.data?.rows ?? []).map((r: any) => [r.date, r.rainfall_mm])), [rain.data]);
   const widths = useMemo(() => {
@@ -43,7 +46,7 @@ export default function Lab() {
   }, [cmp.data, t]);
 
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.lab")} sub={t("pg.lab.sub")} />
+    <PageHeader art={<Flask className="w-full" />} eyebrow={t("mode.replay")} title={t("nav.lab")} sub={t("pg.lab.sub")} />
     <ControlsBar show={["city", "ward", "origin", "horizon", "source"]} />
     <div className="grid gap-5 lg:grid-cols-[1fr_1.15fr]">
       <Card><CardTitle title={`${t("sec.compare")}`} sub={`${sel.ward} · ${t("fc.origin")} ${dateFmt(sel.origin, lang)}`} />
@@ -61,8 +64,11 @@ export default function Lab() {
     <RainfallWhatIf />
 
     <div className="mt-5 grid gap-5 lg:grid-cols-2">
-      <Card><CardTitle title={t("sec.fan")} sub={`${sel.horizon} ${t("ctl.weeks")} · ${year}`} />
-        {series.data ? <FanChart series={series.data.series} markDate={fc.data?.forecast.target_date} height={300} /> : <EmptyState text="Validated replay covers 2019–2024 origins." />}</Card>
+      <Card><CardTitle title={t("sec.fan")} sub={`${sel.horizon} ${t("ctl.weeks")} · ${series.data?.season ?? year}${series.data?.series?.some((r: any) => r.forward) ? " season, then this forecast" : ""}`} />
+        {year < 2019 ? (<div className="flex flex-col items-start gap-3"><EmptyState text={`Replayed forecasts start with 2019 origins. The selected origin (${sel.origin}) is earlier, so only the single forecast above is available.`} />
+            <button onClick={() => set({ origin: "2024-08-05" })} className="btn-ghost inline-flex min-h-11 items-center px-4 text-[13.5px]">Go to the August 2024 peak</button></div>)
+          : <Loading q={series} h={300} kind="chart" label="Season replay">{(d: any) => d?.series?.length ? <SeasonFigure rows={d.series} rain={rain.data?.rows} origin={sel.origin} target={fc.data?.forecast?.target_date ?? sel.origin} horizon={sel.horizon} threshold={fc.data?.forecast?.outbreak_threshold} onPick={(o) => set({ origin: o })} />
+              : <EmptyState text="No replayed forecasts were saved for this ward and season." />}</Loading>}</Card>
       <Card><CardTitle title={t("sec.drivers")} sub={t("drv.note")} />
         <Loading q={fc} h={190} kind="chart" label="Forecast drivers">{(d: any) => d.drivers?.log_rate_contributions ? <DriverBars contrib={d.drivers.log_rate_contributions} height={190} /> : <EmptyState />}</Loading>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink-3">{fc.data && <><RiskBadge tier={fc.data.forecast.risk_tier} size="sm" /><span>{fc.data.forecast.source === "replay" ? t("fc.out_of_sample") : fc.data.forecast.in_sample ? t("fc.in_sample") : "forward forecast"}</span></>}</div></Card>
