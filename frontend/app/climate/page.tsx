@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { api, qs, ApiError } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { monthName, num } from "@/lib/format";
-import { Card, CardTitle, DataTable, ErrorState, Kpi, Notice, PageHeader, ProvChip, Segmented, Select, Skeleton, useAsync } from "@/components/ui";
+import { Card, CardTitle, ChartSkeleton, DataTable, ErrorState, Kpi, Notice, PageHeader, ProvChip, RequestStatus, Segmented, Select, Skeleton, useAsync } from "@/components/ui";
 import { Chart, axisStyle } from "@/components/echart";
 
 const SRC_COLOR = { nasa_power: "#0b5cad", open_meteo: "#e8782f", organizer: "#8d99ae" } as const;
@@ -66,12 +66,12 @@ export default function Climate() {
 
     <div className="mb-5 grid gap-5 lg:grid-cols-[1fr_1.4fr]">
       <Card><CardTitle title={`Now in ${city}`} sub="Open-Meteo current conditions and 7-day outlook (real; not used by the dengue model)" right={now.data?.status === "ok" && <ProvChip tone="ok">live</ProvChip>} />
-        {!now.data ? <Skeleton h={190} /> : now.data.status !== "ok" ? <Notice tone="warn">{now.data.error ?? "Open-Meteo unavailable."}</Notice> : (<>
+        {!now.data ? <><Skeleton h={190} /><RequestStatus q={now} label="Current conditions" /></> : now.data.status !== "ok" ? <Notice tone="warn">{now.data.error ?? "Open-Meteo unavailable."}</Notice> : (<>
           <div className="mb-3 grid grid-cols-3 gap-2"><Kpi label="Temp °C" value={now.data.current.temperature_c} digits={1} /><Kpi label="Humidity %" value={now.data.current.relative_humidity_pct} /><Kpi label="Rain mm" value={now.data.current.precipitation_mm} digits={1} /></div>
           <Chart height={150} ariaLabel="7-day forecast rainfall and temperature" option={{ grid: { left: 40, right: 36, top: 22, bottom: 24 }, tooltip: { trigger: "axis" }, legend: { top: 0, textStyle: { fontSize: 10 } }, xAxis: { type: "category", data: now.data.forecast_7d.map((d: any) => d.date.slice(5)), ...axisStyle }, yAxis: [{ type: "value", ...axisStyle }, { type: "value", ...axisStyle, splitLine: { show: false } }], series: [{ name: "Rain mm", type: "bar", data: now.data.forecast_7d.map((d: any) => d.rain_mm), itemStyle: { color: "#e8782f" } }, { name: "Temp °C", type: "line", yAxisIndex: 1, data: now.data.forecast_7d.map((d: any) => d.temp_c), color: "#d93a42" }] }} />
           <p className="mt-1 text-[11px] text-ink-3">Observed at {now.data.current.observed_at} (local). Weather data by Open-Meteo.com · CC BY 4.0.</p></>)}</Card>
       <Card><CardTitle title={`${label}: seasonal comparison of three sources`} sub={`Monthly climatology, ${range}. Real sources disagree with each other and with the synthetic organizer weather.`} />
-        {!C ? <Skeleton h={290} /> : <Chart option={climOpt} height={290} ariaLabel={`Monthly ${label} by source`} />}</Card>
+        {!C ? <><ChartSkeleton h={290} /><RequestStatus q={compare} label="Climate comparison" /></> : <Chart option={climOpt} height={290} ariaLabel={`Monthly ${label} by source`} />}</Card>
     </div>
 
     <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -81,7 +81,7 @@ export default function Climate() {
       <Kpi label="Days analysed" value={ok(cur) ? cur.n_days : undefined} hint={ok(cur) ? `${cur.range.start} → ${cur.range.end}` : ""} loading={!cur} />
     </div>
 
-    {!cur ? <Skeleton h={300} /> : !ok(cur) ? <ErrorState error={cur.error ?? "unavailable"} /> : (<div className="grid gap-5">
+    {!cur ? <><ChartSkeleton h={300} /><RequestStatus q={prov === "nasa_power" ? nasa : om} label="Daily observations" /></> : !ok(cur) ? <ErrorState error={cur.error ?? "unavailable"} /> : (<div className="grid gap-5">
       <Card><CardTitle title={`Weekly weather, ${SRC_NAME[prov]}`} sub="Complete Monday–Sunday weeks (the organizer's weekly grid). Zoom with the slider." right={<ProvChip tone="info">{SRC_NAME[prov]}</ProvChip>} /><Chart option={weeklyOpt} height={320} ariaLabel="Weekly rainfall, temperature and humidity" /></Card>
       <div className="grid gap-5 lg:grid-cols-2"><Card><CardTitle title={`${label} by month and year`} sub={`${SRC_NAME[prov]} · ${unit}`} /><Chart option={monthlyHeat} height={340} ariaLabel="Month by year heatmap" /></Card>
         <Card><CardTitle title="Annual rainfall" sub={`${SRC_NAME[prov]} · mm`} /><Chart height={340} ariaLabel="Annual rainfall" option={{ grid: { left: 54, right: 16, top: 16, bottom: 30 }, tooltip: { trigger: "axis" }, xAxis: { type: "category", data: annual.map((a: any) => a.year), ...axisStyle }, yAxis: { type: "value", name: "mm", ...axisStyle }, series: [{ type: "bar", data: annual.map((a: any) => a.rain_mm), itemStyle: { color: SRC_COLOR[prov], borderRadius: [4, 4, 0, 0] }, label: { show: true, position: "top", fontSize: 10, formatter: (p: any) => Math.round(p.value) } }] }} /></Card></div>

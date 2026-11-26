@@ -1,0 +1,45 @@
+{
+ "counts": {
+  "stage3_base_model_variants": 11,
+  "stage3_tuned_variants": 3,
+  "stage3_ensembles": 9,
+  "stage3_algorithm_libraries": [
+   "statsmodels/scikit-learn GLMs",
+   "LightGBM",
+   "XGBoost",
+   "CatBoost"
+  ],
+  "stage3_leaderboard_rows": 134,
+  "stage3_scored_cells": 1479,
+  "v3_new_model_variants": 5,
+  "v3_baselines_rerun": 5,
+  "hyperparameter_trials": 120,
+  "hyperparameter_trials_by_model": {
+   "cat_poisson": 40,
+   "lgbm_poisson": 40,
+   "xgb_poisson": 40
+  },
+  "stage2_feature_configurations": 102,
+  "stage2_feature_models": [
+   "glm",
+   "lgbm"
+  ],
+  "comparison_rows": 656
+ },
+ "provenance_sha256_16": {
+  "model_tournament/scores_all_cells.csv": "cc25be22dfe41fb7",
+  "model_tournament/leaderboard_all.csv": "17b07c690d6f1fb3",
+  "model_tournament/optuna_summary.csv": "c3ce2650ebc5c985",
+  "features/leaderboard_full.csv": "a58d5e421b001e51",
+  "baselines/metrics_summary.csv": "6679ab71a9fc330e",
+  "model_comparison/r2_cells_from_cache.csv": "9d801d13369600d6",
+  "model_comparison/benchmark_cells.csv": "e8413a07dc91f32a",
+  "model_comparison/model_sizes.csv": "45bf5cc52965241b"
+ },
+ "diagnostics": {
+  "knn": "chosen k at the grid edge (80) in 30 of 36 fits; grid kept fixed",
+  "mlp": "23.1% of predictions were negative and clipped to 0 (MAE before clipping reported); optimiser hit its iteration cap in 20 of 36 fits",
+  "ridge_ls": "29.2% of predictions were negative and clipped to 0 (MAE before clipping reported)"
+ },
+ "r2_cells_matched_from_cache": 1155
+}

@@ -1,0 +1,778 @@
+{
+ "replay_sha256": "1f91c3178ce174a01df8ed7f0deada4b74158b78b87121c8a202ca6781815f8e",
+ "reproduces_saved_results_exactly": true,
+ "deterministic_across_runs": true,
+ "by_horizon": {
+  "2": {
+   "seasons": [
+    {
+     "season": 2021,
+     "used_for_original_selection": false,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.689,
+      "candidate": 0.74
+     },
+     "saved_peak80": {
+      "baseline": 0.689,
+      "candidate": 0.74
+     },
+     "independent_interval_score": {
+      "baseline": 4.71,
+      "candidate": 4.576
+     },
+     "n_eval_rows": 3000,
+     "n_eval_peak_weeks": 177,
+     "n_eval_positive_weeks": 1318,
+     "n_calibration_rows_by_bin": [
+      3129,
+      881,
+      483,
+      998,
+      509
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      35,
+      307,
+      412
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.962,
+      0.927,
+      0.814,
+      0.805,
+      0.902
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.962,
+      0.927,
+      0.735,
+      0.739,
+      0.78
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1610,
+      371,
+      317,
+      570,
+      132
+     ]
+    },
+    {
+     "season": 2022,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.591,
+      "candidate": 0.632
+     },
+     "saved_peak80": {
+      "baseline": 0.591,
+      "candidate": 0.632
+     },
+     "independent_interval_score": {
+      "baseline": 6.066,
+      "candidate": 5.999
+     },
+     "n_eval_rows": 3000,
+     "n_eval_peak_weeks": 506,
+     "n_eval_positive_weeks": 1352,
+     "n_calibration_rows_by_bin": [
+      3082,
+      891,
+      585,
+      1160,
+      282
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      16,
+      221,
+      179
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.981,
+      0.931,
+      0.733,
+      0.773,
+      0.689
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.981,
+      0.931,
+      0.727,
+      0.733,
+      0.684
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1509,
+      436,
+      176,
+      651,
+      228
+     ]
+    },
+    {
+     "season": 2023,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.691,
+      "candidate": 0.795
+     },
+     "saved_peak80": {
+      "baseline": 0.691,
+      "candidate": 0.795
+     },
+     "independent_interval_score": {
+      "baseline": 5.471,
+      "candidate": 5.259
+     },
+     "n_eval_rows": 3000,
+     "n_eval_peak_weeks": 482,
+     "n_eval_positive_weeks": 1361,
+     "n_calibration_rows_by_bin": [
+      3119,
+      807,
+      493,
+      1221,
+      360
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      28,
+      388,
+      267
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.965,
+      0.919,
+      0.891,
+      0.841,
+      0.828
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.965,
+      0.919,
+      0.813,
+      0.761,
+      0.717
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1580,
+      357,
+      284,
+      447,
+      332
+     ]
+    },
+    {
+     "season": 2024,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.692,
+      "candidate": 0.79
+     },
+     "saved_peak80": {
+      "baseline": 0.692,
+      "candidate": 0.79
+     },
+     "independent_interval_score": {
+      "baseline": 4.115,
+      "candidate": 4.046
+     },
+     "n_eval_rows": 3060,
+     "n_eval_peak_weeks": 195,
+     "n_eval_positive_weeks": 1264,
+     "n_calibration_rows_by_bin": [
+      3089,
+      793,
+      460,
+      1098,
+      560
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      24,
+      477,
+      487
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.979,
+      0.937,
+      0.836,
+      0.845,
+      0.836
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.979,
+      0.937,
+      0.785,
+      0.781,
+      0.743
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1649,
+      445,
+      293,
+      521,
+      152
+     ]
+    }
+   ],
+   "peak80_season_mean": {
+    "baseline": 0.666,
+    "candidate": 0.739
+   },
+   "peak80_pooled_rows_2021_2024": {
+    "baseline": 0.654,
+    "candidate": 0.726,
+    "n_peak_weeks": 1360
+   },
+   "peak80_gain_by_season": [
+    0.051,
+    0.041,
+    0.104,
+    0.098
+   ],
+   "peak80_gain_pooled_ward_bootstrap_95ci": [
+    0.058,
+    0.088
+   ],
+   "positive80_pooled": {
+    "baseline": 0.77,
+    "candidate": 0.816
+   },
+   "all80_pooled": {
+    "baseline": 0.891,
+    "candidate": 0.913
+   },
+   "width80_pooled": {
+    "baseline": 2.82,
+    "candidate": 3.24
+   },
+   "independent_matches_saved": true,
+   "audit_rule_per_bin_within_5pts": false
+  },
+  "3": {
+   "seasons": [
+    {
+     "season": 2021,
+     "used_for_original_selection": false,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.774,
+      "candidate": 0.876
+     },
+     "saved_peak80": {
+      "baseline": 0.774,
+      "candidate": 0.876
+     },
+     "independent_interval_score": {
+      "baseline": 6.753,
+      "candidate": 5.978
+     },
+     "n_eval_rows": 2940,
+     "n_eval_peak_weeks": 177,
+     "n_eval_positive_weeks": 1318,
+     "n_calibration_rows_by_bin": [
+      2969,
+      919,
+      458,
+      1010,
+      524
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      5,
+      37,
+      366,
+      346
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.969,
+      0.947,
+      0.702,
+      0.83,
+      0.778
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.969,
+      0.947,
+      0.602,
+      0.59,
+      0.54
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1438,
+      490,
+      191,
+      519,
+      302
+     ]
+    },
+    {
+     "season": 2022,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.488,
+      "candidate": 0.607
+     },
+     "saved_peak80": {
+      "baseline": 0.488,
+      "candidate": 0.607
+     },
+     "independent_interval_score": {
+      "baseline": 8.288,
+      "candidate": 7.607
+     },
+     "n_eval_rows": 2940,
+     "n_eval_peak_weeks": 506,
+     "n_eval_positive_weeks": 1352,
+     "n_calibration_rows_by_bin": [
+      2862,
+      987,
+      399,
+      1130,
+      502
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      18,
+      185,
+      213
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.981,
+      0.877,
+      0.624,
+      0.774,
+      0.849
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.981,
+      0.877,
+      0.528,
+      0.652,
+      0.714
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1440,
+      446,
+      197,
+      672,
+      185
+     ]
+    },
+    {
+     "season": 2023,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.579,
+      "candidate": 0.784
+     },
+     "saved_peak80": {
+      "baseline": 0.579,
+      "candidate": 0.784
+     },
+     "independent_interval_score": {
+      "baseline": 6.974,
+      "candidate": 6.285
+     },
+     "n_eval_rows": 2940,
+     "n_eval_peak_weeks": 482,
+     "n_eval_positive_weeks": 1359,
+     "n_calibration_rows_by_bin": [
+      2878,
+      936,
+      388,
+      1191,
+      487
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      1,
+      64,
+      357,
+      261
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.971,
+      0.941,
+      0.963,
+      0.831,
+      0.806
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.971,
+      0.941,
+      0.758,
+      0.685,
+      0.581
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1468,
+      437,
+      219,
+      496,
+      320
+     ]
+    },
+    {
+     "season": 2024,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.574,
+      "candidate": 0.79
+     },
+     "saved_peak80": {
+      "baseline": 0.574,
+      "candidate": 0.79
+     },
+     "independent_interval_score": {
+      "baseline": 5.963,
+      "candidate": 5.365
+     },
+     "n_eval_rows": 3000,
+     "n_eval_peak_weeks": 195,
+     "n_eval_positive_weeks": 1264,
+     "n_calibration_rows_by_bin": [
+      2908,
+      883,
+      416,
+      1168,
+      505
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      1,
+      64,
+      524,
+      399
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.969,
+      0.954,
+      0.952,
+      0.864,
+      0.7
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.969,
+      0.954,
+      0.778,
+      0.688,
+      0.473
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1518,
+      495,
+      207,
+      560,
+      220
+     ]
+    }
+   ],
+   "peak80_season_mean": {
+    "baseline": 0.604,
+    "candidate": 0.764
+   },
+   "peak80_pooled_rows_2021_2024": {
+    "baseline": 0.57,
+    "candidate": 0.731,
+    "n_peak_weeks": 1360
+   },
+   "peak80_gain_by_season": [
+    0.102,
+    0.119,
+    0.205,
+    0.216
+   ],
+   "peak80_gain_pooled_ward_bootstrap_95ci": [
+    0.142,
+    0.181
+   ],
+   "positive80_pooled": {
+    "baseline": 0.685,
+    "candidate": 0.813
+   },
+   "all80_pooled": {
+    "baseline": 0.849,
+    "candidate": 0.91
+   },
+   "width80_pooled": {
+    "baseline": 2.99,
+    "candidate": 4.18
+   },
+   "independent_matches_saved": true,
+   "audit_rule_per_bin_within_5pts": false
+  },
+  "4": {
+   "seasons": [
+    {
+     "season": 2021,
+     "used_for_original_selection": false,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.712,
+      "candidate": 0.887
+     },
+     "saved_peak80": {
+      "baseline": 0.712,
+      "candidate": 0.887
+     },
+     "independent_interval_score": {
+      "baseline": 9.794,
+      "candidate": 7.503
+     },
+     "n_eval_rows": 2880,
+     "n_eval_peak_weeks": 177,
+     "n_eval_positive_weeks": 1317,
+     "n_calibration_rows_by_bin": [
+      2855,
+      904,
+      477,
+      1057,
+      467
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      14,
+      45,
+      427,
+      268
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.969,
+      0.955,
+      0.743,
+      0.855,
+      0.663
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.969,
+      0.955,
+      0.593,
+      0.503,
+      0.337
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1373,
+      463,
+      214,
+      352,
+      478
+     ]
+    },
+    {
+     "season": 2022,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.48,
+      "candidate": 0.642
+     },
+     "saved_peak80": {
+      "baseline": 0.48,
+      "candidate": 0.642
+     },
+     "independent_interval_score": {
+      "baseline": 9.45,
+      "candidate": 8.882
+     },
+     "n_eval_rows": 2880,
+     "n_eval_peak_weeks": 506,
+     "n_eval_positive_weeks": 1352,
+     "n_calibration_rows_by_bin": [
+      2857,
+      850,
+      450,
+      796,
+      807
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      0,
+      21,
+      111,
+      284
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.982,
+      0.828,
+      0.615,
+      0.814,
+      0.958
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.982,
+      0.828,
+      0.471,
+      0.669,
+      0.709
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1356,
+      493,
+      244,
+      574,
+      213
+     ]
+    },
+    {
+     "season": 2023,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.427,
+      "candidate": 0.687
+     },
+     "saved_peak80": {
+      "baseline": 0.427,
+      "candidate": 0.687
+     },
+     "independent_interval_score": {
+      "baseline": 8.522,
+      "candidate": 7.348
+     },
+     "n_eval_rows": 2880,
+     "n_eval_peak_weeks": 422,
+     "n_eval_positive_weeks": 1357,
+     "n_calibration_rows_by_bin": [
+      2729,
+      956,
+      458,
+      926,
+      691
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      12,
+      95,
+      280,
+      296
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.983,
+      0.921,
+      0.968,
+      0.806,
+      0.815
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.983,
+      0.921,
+      0.706,
+      0.587,
+      0.592
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1357,
+      471,
+      221,
+      598,
+      233
+     ]
+    },
+    {
+     "season": 2024,
+     "used_for_original_selection": true,
+     "alphas_match_saved": true,
+     "independent_peak80": {
+      "baseline": 0.81,
+      "candidate": 0.944
+     },
+     "saved_peak80": {
+      "baseline": 0.81,
+      "candidate": 0.944
+     },
+     "independent_interval_score": {
+      "baseline": 6.164,
+      "candidate": 5.587
+     },
+     "n_eval_rows": 2940,
+     "n_eval_peak_weeks": 195,
+     "n_eval_positive_weeks": 1262,
+     "n_calibration_rows_by_bin": [
+      2713,
+      964,
+      465,
+      1172,
+      446
+     ],
+     "n_calibration_peaks_by_bin": [
+      0,
+      12,
+      91,
+      479,
+      346
+     ],
+     "candidate_80_coverage_by_mu_bin": [
+      0.961,
+      0.965,
+      0.968,
+      0.873,
+      0.781
+     ],
+     "baseline_80_coverage_by_mu_bin": [
+      0.961,
+      0.965,
+      0.806,
+      0.637,
+      0.574
+     ],
+     "n_eval_rows_by_mu_bin": [
+      1430,
+      487,
+      216,
+      488,
+      319
+     ]
+    }
+   ],
+   "peak80_season_mean": {
+    "baseline": 0.607,
+    "candidate": 0.79
+   },
+   "peak80_pooled_rows_2021_2024": {
+    "baseline": 0.544,
+    "candidate": 0.735,
+    "n_peak_weeks": 1300
+   },
+   "peak80_gain_by_season": [
+    0.175,
+    0.162,
+    0.26,
+    0.134
+   ],
+   "peak80_gain_pooled_ward_bootstrap_95ci": [
+    0.171,
+    0.214
+   ],
+   "positive80_pooled": {
+    "baseline": 0.645,
+    "candidate": 0.807
+   },
+   "all80_pooled": {
+    "baseline": 0.825,
+    "candidate": 0.906
+   },
+   "width80_pooled": {
+    "baseline": 3.25,
+    "candidate": 4.74
+   },
+   "independent_matches_saved": true,
+   "audit_rule_per_bin_within_5pts": false
+  }
+ }
+}

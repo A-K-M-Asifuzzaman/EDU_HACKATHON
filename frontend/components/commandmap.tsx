@@ -13,7 +13,7 @@ export interface CityOverlay { city: string; lon: number; lat: number; meanP: nu
 export interface WeatherPt { city: string; lon: number; lat: number; label: string; title: string }
 export interface Layers { facilities: boolean; dghs: boolean; forecast: boolean; weather: boolean; buildings: boolean }
 export interface MapHandle { flyTo: (c: LngLat, zoom?: number) => void; fit: (coords: LngLat[]) => void }
-const riskColour = (p: number) => (p > 0.75 ? "#d93a42" : p > 0.5 ? "#e8782f" : p > 0.25 ? "#e0a526" : "#0e8f66");
+const riskColour = (p: number) => (p > 0.75 ? "#d93a42" : p > 0.5 ? "#e8782f" : p > 0.25 ? "#e0a526" : "#0b7a57");   // Low = #0b7a57 so white text passes 4.5:1
 
 function arrowImage(): ImageData {
   const c = document.createElement("canvas"); c.width = c.height = 32;
@@ -33,7 +33,8 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
   const el = useRef<HTMLDivElement>(null), map = useRef<any>(null), lib = useRef<any>(null);
   const markers = useRef<any[]>([]), originMarker = useRef<any>(null), destMarker = useRef<any>(null), anim = useRef<number>(0), anim2 = useRef<number>(0);
   const cb = useRef(p); cb.current = p;
-  const [ready, setReady] = useState(false), [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false), [failed, setFailed] = useState(false), [slow, setSlow] = useState(false), [tileErr, setTileErr] = useState(false);
+  useEffect(() => { if (ready) return; const id = setTimeout(() => setSlow(true), 8000); return () => clearTimeout(id); }, [ready]);
   const was3d = useRef(false);
 
   useImperativeHandle(ref, () => ({
@@ -58,7 +59,7 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
         mp.addControl(new L.NavigationControl({ visualizePitch: true }), "top-right");
         mp.addControl(new L.FullscreenControl(), "top-right");
         mp.addControl(new L.ScaleControl({ unit: "metric" }), "bottom-left");
-        mp.on("error", (e: any) => { if (e?.error?.status === 401 || e?.error?.status === 403) mp.setStyle(BLANK); });
+        mp.on("error", (e: any) => { if (e?.error?.status === 401 || e?.error?.status === 403) mp.setStyle(BLANK); else if (e?.tile || e?.sourceId) setTileErr(true); });
         mp.on("load", () => {
           if (dead) return;
           mp.addImage("route-arrow", arrowImage(), { pixelRatio: 2 });
@@ -77,14 +78,14 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
           }
           cb.current.onBuildings?.(bld);
           // A* insight: sampled exploration fronts (Dijkstra faint amber, A* cyan), drawn beneath the routes
-          for (const [k, col, op] of [["expl-d", "#e0a526", 0.35], ["expl-a", "#22b8d6", 0.75]] as const) {
+          for (const [k, col, op] of [["expl-d", "#e0a526", 0.35], ["expl-a", "#8985ff", 0.75]] as const) {
             mp.addSource(k, { type: "geojson", data: EMPTY });
             mp.addLayer({ id: k, type: "circle", source: k, paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 1.6, 15, 3.2], "circle-color": col, "circle-opacity": op } });
           }
           for (const k of ["shortest", "fastest"]) mp.addSource(`route-${k}`, { type: "geojson", data: EMPTY });
           mp.addLayer({ id: "route-shortest", type: "line", source: "route-shortest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#2563eb", "line-width": 4, "line-dasharray": [1.4, 1.1], "line-opacity": 0.9 } });
           mp.addLayer({ id: "route-fastest-casing", type: "line", source: "route-fastest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-width": 9 } });
-          mp.addLayer({ id: "route-fastest", type: "line", source: "route-fastest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#0e8f66", "line-width": 5.5 } });
+          mp.addLayer({ id: "route-fastest", type: "line", source: "route-fastest", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#3b3a8c", "line-width": 5.5 } });
           mp.addLayer({ id: "route-arrows", type: "symbol", source: "route-fastest", layout: { "symbol-placement": "line", "symbol-spacing": 70, "icon-image": "route-arrow", "icon-size": 0.55, "icon-allow-overlap": true, "icon-rotation-alignment": "map" } });
           mp.addLayer({ id: "route-arrows-s", type: "symbol", source: "route-shortest", layout: { "symbol-placement": "line", "symbol-spacing": 70, "icon-image": "route-arrow", "icon-size": 0.5, "icon-allow-overlap": true, "icon-rotation-alignment": "map", visibility: "none" } });
           mp.addSource("fac", { type: "geojson", data: EMPTY, cluster: true, clusterRadius: 44, clusterMaxZoom: 15 });
@@ -137,16 +138,16 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
       const d = document.createElement("div"); const col = riskColour(c.meanP);
       d.setAttribute("role", "img"); d.setAttribute("aria-label", `${c.city} forecast: ${c.alerts} of ${c.wards} synthetic wards alerting, mean outbreak probability ${Math.round(c.meanP * 100)}%`);
       d.title = `${c.city} (city-level aggregate of synthetic wards): ${c.alerts}/${c.wards} alerts · mean P(outbreak) ${Math.round(c.meanP * 100)}% · expected ${c.expected.toFixed(0)} cases`;
-      d.style.cssText = `display:flex;align-items:center;gap:6px;padding:4px 9px 4px 5px;border-radius:999px;background:#fff;border:2px solid ${col};font:600 11px Inter,sans-serif;color:#0d1b2a;box-shadow:0 0 0 5px ${col}26,0 6px 16px rgba(7,59,43,.25);white-space:nowrap;transition:border-color .6s,box-shadow .6s`;
+      d.style.cssText = `display:flex;align-items:center;gap:6px;padding:4px 9px 4px 5px;border-radius:999px;background:#fff;border:2px solid ${col};font:600 11px Inter,sans-serif;color:#0d1b2a;box-shadow:0 0 0 5px ${col}26,0 6px 16px rgba(10,13,20,.25);white-space:nowrap;transition:border-color .6s,box-shadow .6s`;
       const dot = document.createElement("span");
-      dot.style.cssText = `display:grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:${col};color:#fff;font:700 11px Inter,sans-serif;transition:background .6s`;
+      dot.style.cssText = `display:grid;place-items:center;min-width:20px;height:20px;border-radius:999px;background:${col};color:${["#e0a526", "#e8782f"].includes(col) ? "#1b1300" : "#fff"};font:700 11px Inter,sans-serif;transition:background .6s`;
       dot.textContent = `${Math.round(c.meanP * 100)}%`; dot.style.padding = "0 4px";
       d.append(dot, document.createTextNode(`${c.city} · ${c.alerts}/${c.wards} alerts`));
       add([c.lon, c.lat], d);
     }
     if (p.layers.weather) for (const w of p.weather) {
       const d = document.createElement("div"); d.title = w.title;
-      d.style.cssText = "transform:translateY(-34px);padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.92);border:1px solid #cfe0d8;font:600 11px Inter,sans-serif;color:#073b2b;box-shadow:0 4px 12px rgba(0,0,0,.12);white-space:nowrap";
+      d.style.cssText = "transform:translateY(-34px);padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.92);border:1px solid #cfe0d8;font:600 11px Inter,sans-serif;color:#2f2e72;box-shadow:0 4px 12px rgba(0,0,0,.12);white-space:nowrap";
       d.textContent = w.label;
       add([w.lon, w.lat], d);
     }
@@ -208,7 +209,8 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
   return (<div className="relative overflow-hidden rounded-xl border border-line" style={{ height: p.height ?? 560 }} role="region" aria-label="Interactive map of hospitals, clinics and routes">
     <div ref={el} className={cls("h-full w-full", failed && "opacity-0")} />
     {failed && <div className="absolute inset-0 grid place-items-center bg-canvas p-6 text-center text-sm text-ink-3">The map could not start (WebGL unavailable). The facility directory and route details below still work.</div>}
-    {!ready && !failed && <div className="pointer-events-none absolute inset-0 grid place-items-center bg-canvas/60 text-sm text-ink-3">Loading map…</div>}
+    {!ready && !failed && <div role="status" className="pointer-events-none absolute inset-0 grid place-items-center bg-canvas/70"><div className="rounded-control border border-line bg-white/95 px-4 py-3 font-mono text-[12px] text-ink-2 shadow-sm"><span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-signal-d motion-reduce:animate-none" aria-hidden />{slow ? "The map is taking longer than usual to start…" : "Loading map…"}</div></div>}
+    {ready && tileErr && <div role="status" className="pointer-events-none absolute left-3 top-3 z-10 max-w-[280px] rounded-control border border-amber/50 bg-white/95 px-3 py-2 text-[12px] text-ink-2 shadow-sm">Some basemap tiles did not load. Facilities, routes and risk overlays still work.</div>}
   </div>);
 });
 export default CommandMap;

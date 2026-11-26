@@ -26,12 +26,12 @@ export default function ResourceSandbox() {
         <input type="range" min={1} max={30} value={teams} onChange={(e) => setTeams(Number(e.target.value))} aria-label="Teams available" className="w-full accent-teal" /></label>
       <p className="text-[12px] text-ink-3">Origin {dateFmt(sel.origin, lang)}, {sel.horizon} weeks ahead (change it with the controls above). Rules: <b>equal</b> spreads teams round-robin across cities without risk information; <b>historical</b> picks wards with the highest mean weekly cases observed before the origin; <b>forecast</b> picks the highest calibrated outbreak probability.</p>
     </div>
-    <Loading q={one} h={200}>{() => (<div className="mt-4 grid gap-3 lg:grid-cols-3">{(["equal", "historical", "forecast"] as const).map((k) => { const s = a.strategies[k]; return (
+    <Loading q={one} h={200} kind="block" label="Allocation strategies">{() => (<div className="mt-4 grid gap-3 lg:grid-cols-3">{(["equal", "historical", "forecast"] as const).map((k) => { const s = a.strategies[k]; return (
       <div key={k} className="rounded-xl border border-line p-3">
         <div className="flex items-center gap-2 font-semibold text-navy"><i className="h-2.5 w-2.5 rounded-full" style={{ background: NAMES[k][1] }} />{NAMES[k][0]}</div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-[12px]"><div><div className="text-ink-3">Outbreak wards reached</div><b className="num text-[18px]">{s.outbreak_wards_covered}</b><span className="text-ink-3"> / {a.actual_outbreak_wards}</span></div>
           <div><div className="text-ink-3">Actual cases in chosen wards</div><b className="num text-[18px]">{s.actual_cases_covered}</b><span className="text-ink-3"> / {a.actual_cases}</span></div></div>
-        <div className="mt-2 flex flex-wrap gap-1">{s.wards.map((w: any) => <span key={w.ward_id} title={`${w.ward_id}: P(outbreak) ${w.p_outbreak}, historical mean ${w.hist_mean}, actual ${w.actual}`} className={`rounded-md px-1.5 py-0.5 text-[10.5px] ${w.outbreak ? "bg-coral/15 font-semibold text-coral-d" : "bg-canvas text-ink-2"}`}>{w.ward_id.replace("_Ward_", " ")}</span>)}</div>
+        <div className="mt-2 flex flex-wrap gap-1">{s.wards.map((w: any) => <span key={w.ward_id} title={`${w.ward_id}: P(outbreak) ${w.p_outbreak}, historical mean ${w.hist_mean}, actual ${w.actual}`} className={`rounded-md px-1.5 py-0.5 text-[11px] ${w.outbreak ? "bg-coral/15 font-semibold text-coral-d" : "bg-canvas text-ink-2"}`}>{w.ward_id.replace("_Ward_", " ")}</span>)}</div>
       </div>); })}</div>)}</Loading>
     {one.error && <p className="mt-2 text-[12px] text-ink-3">Choose a validation origin (2019–2024) to evaluate allocations retrospectively.</p>}
     {a && <p className="mt-2 text-[11px] text-ink-3">Target week {dateFmt(a.target_date, lang)}: {a.actual_outbreak_wards} of {a.wards} wards had an outbreak week (actual ≥ training q90). Red chips mark wards that turned out to be outbreak wards.</p>}

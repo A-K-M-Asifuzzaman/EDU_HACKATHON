@@ -12,7 +12,7 @@ export default function HorizonCompare({ ward, origin }: { ward?: string; origin
   const { t, lang } = useI18n();
   const w = ward ?? sel.ward, o = origin ?? sel.origin;
   const q = useAsync((s) => api(`/api/forecast/compare?${qs({ ward_id: w, origin: o, source: srcParam(sel) })}`, { signal: s }), [w, o, sel.source, ready]);
-  return (<Loading q={q} h={190}>{(d: any) => (<div className="grid gap-2">{d.forecasts.map((f: any, i: number) => f.error ? (
+  return (<Loading q={q} h={190} kind="block" label="Horizon forecasts">{(d: any) => (<div className="grid gap-2">{d.forecasts.map((f: any, i: number) => f.error ? (
     <div key={f.horizon} className="rounded-xl border border-amber/40 bg-amber/10 p-3 text-xs text-ink-2"><b>{f.horizon}w</b>: {f.error}</div>) : (
     <motion.button key={f.horizon} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} onClick={() => set({ horizon: f.horizon })} aria-pressed={f.horizon === sel.horizon}
       className={"grid grid-cols-[44px_1fr_auto] items-center gap-3 rounded-xl border p-3 text-left transition hover:bg-mint-l/60 " + (f.horizon === sel.horizon ? "border-emerald bg-mint-l" : "border-line bg-white")}>

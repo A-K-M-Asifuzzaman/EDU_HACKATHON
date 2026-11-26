@@ -42,7 +42,7 @@ export default function Emergency() {
   const L = TXT[lang];
   useEffect(() => { setMounted(true); const on = () => setOpen(true); window.addEventListener("ds:emergency", on); return () => window.removeEventListener("ds:emergency", on); }, []);
   return (<>
-    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1.5 rounded-xl bg-coral-d px-2.5 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-coral focus-visible:outline-2 sm:px-3" aria-haspopup="dialog" aria-label={L.button}>
+    <button onClick={() => setOpen(true)} className="inline-flex min-h-11 items-center gap-1.5 rounded-control bg-coral-d px-2.5 text-[13px] font-semibold text-white hover:brightness-110 focus-visible:outline-2 sm:min-h-9 sm:px-3" aria-haspopup="dialog" aria-label={L.button}>
       <span aria-hidden>✚</span><span className="hidden sm:inline">{L.button}</span><span className="sm:hidden">SOS</span></button>
     {mounted && createPortal(<Modal open={open} onClose={() => setOpen(false)} title={L.title}>   {/* portal: the header's backdrop-filter would otherwise trap position:fixed */}
       <div className="space-y-4 text-sm">

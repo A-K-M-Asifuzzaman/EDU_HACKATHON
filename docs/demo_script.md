@@ -27,6 +27,8 @@ The video is one continuous screen recording of the deployed site (https://dengu
 | 10 | AI Forecast Lab: Climate Futures, Wetter scenario, multi-year view, backtest | Climate Futures explores wetter, drier or warmer years up to 2030. Backtests show no skill beyond climatology, so these are labelled what-if scenarios, not forecasts. ⏸ |
 | 11 | Back to Command Center, switches to Bangla | And everything also works in Bangla. Thank you. |
 
+Note (V3): the recorded voiceover quotes the earlier cell-mean figure (61% at peaks); the pooled figure is 57% (`app_data/metrics_canonical.json`).
+
 Figures are from the live site (DNCC_Ward_19, origin 5 Aug 2024, 3 weeks ahead, Historical Replay): median 13, 80% interval 8–18,
 P(outbreak) 0.83, Critical, observed 20; MAE 1.39 at 3 weeks (2022–2024); 80% interval coverage 0.854 overall, 0.607 at high-incidence weeks;
 2024 sandbox with 10 teams: 14.9% equal, 34.4% historical, 33.3% forecast.

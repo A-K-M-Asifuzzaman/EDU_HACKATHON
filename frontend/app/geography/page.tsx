@@ -9,7 +9,7 @@ import { cls, dateFmt } from "@/lib/format";
 import ControlsBar from "@/components/controls";
 import RiskMatrix from "@/components/riskmatrix";
 import { CITY_POS } from "@/components/citymap";
-import { Btn, Card, CardTitle, DataTable, EmptyState, Loading, Notice, PageHeader, ProvChip, Segmented, useAsync, useToast } from "@/components/ui";
+import { ActionProgress, Btn, Card, CardTitle, DataTable, EmptyState, Loading, Notice, PageHeader, ProvChip, Segmented, useAsync, useToast } from "@/components/ui";
 import type { CityOverlay, Layers, LngLat, MapHandle, WeatherPt } from "@/components/commandmap";
 
 const CommandMap = dynamic(() => import("@/components/commandmap"), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-canvas" /> });
@@ -29,6 +29,9 @@ function NavLinks({ origin, dest }: { origin: LngLat | null; dest: LngLat }) {
     <a href={osmDir(origin, dest)} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-line bg-white px-2.5 py-1.5 font-medium hover:border-teal">OpenStreetMap directions ↗</a></div>);
 }
 
+const CATEGORY_LABEL: Record<string, string> = { hospital_general: "General hospital", hospital_specialist: "Specialist hospital", clinic_general: "General clinic",
+  clinic_specialist: "Specialist clinic", diagnostic: "Diagnostic centre", veterinary: "Veterinary", "tagged emergency=no": "tagged emergency=no" };
+
 export default function GeoCommand() {
   const { t, lang } = useI18n();
   const { sel, set, ready } = useSel();
@@ -46,6 +49,9 @@ export default function GeoCommand() {
   const [routeMode, setRouteMode] = useState<"fastest" | "shortest" | "both">("both");
   const [insightOn, setInsightOn] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const pending = useRef<AbortController | null>(null);   // one route/nearest request at a time; a newer click or Cancel aborts the older one
+  const startPending = () => { pending.current?.abort(); return (pending.current = new AbortController()); };
+  const cancelPending = () => { pending.current?.abort(); pending.current = null; setBusy(null); };
   const [nearest, setNearest] = useState<any | null>(null);
   const [q, setQ] = useState("");
   const [places, setPlaces] = useState<any[]>([]);
@@ -88,21 +94,24 @@ export default function GeoCommand() {
 
   const getRoute = useCallback(async (f: any, from: LngLat | null = origin, withInsight = insightOn) => {
     if (!from) { toast(t("map.needstart")); return; }
+    const ac = startPending();
     setBusy("route"); setRouteErr(null); setTab("route"); setSheet(true);
     try {
-      const r = await api(`/api/route?${qs({ from_lat: from[1], from_lon: from[0], to_facility: f.properties.id, insight: withInsight || undefined })}`, { ttl: 300_000 });
+      const r = await api(`/api/route?${qs({ from_lat: from[1], from_lon: from[0], to_facility: f.properties.id, insight: withInsight || undefined })}`, { ttl: 300_000, signal: ac.signal });
+      if (ac.signal.aborted) return;
       setRoute({ ...r, from }); mapRef.current?.fit(r.routes.fastest.geometry.coordinates);
-    } catch (e: any) { setRoute(null); setRouteErr(e instanceof ApiError ? e.message : "Routing failed."); }
-    finally { setBusy(null); }
+    } catch (e: any) { if (ac.signal.aborted) return; setRoute(null); setRouteErr(e instanceof ApiError ? e.message : "Routing failed."); }
+    finally { if (pending.current === ac) { pending.current = null; setBusy(null); } }
   }, [origin, insightOn, toast]);
 
   const toggleInsight = () => { const on = !insightOn; setInsightOn(on); if (on && route?.facility && !route.insight) getRoute(route.facility, route.from, true); };
 
   const findNearest = useCallback(async (from: LngLat) => {
+    const ac = startPending();
     setBusy("nearest"); setTab("nearest"); setNearest(null); setRoute(null); setSheet(true);
-    try { const r = await api(`/api/emergency/nearest?${qs({ lat: from[1], lon: from[0], k: 5 })}`, { ttl: 60_000 }); setNearest(r); if (r.results?.[0]) mapRef.current?.fit(r.results[0].geometry.coordinates); }
-    catch (e: any) { setNearest({ error: e instanceof ApiError ? e.message : "Search failed." }); }
-    finally { setBusy(null); }
+    try { const r = await api(`/api/emergency/nearest?${qs({ lat: from[1], lon: from[0], k: 5 })}`, { ttl: 60_000, signal: ac.signal }); if (ac.signal.aborted) return; setNearest(r); if (r.results?.[0]) mapRef.current?.fit(r.results[0].geometry.coordinates); }
+    catch (e: any) { if (ac.signal.aborted) return; setNearest({ error: e instanceof ApiError ? e.message : "Search failed." }); }
+    finally { if (pending.current === ac) { pending.current = null; setBusy(null); } }
   }, []);
 
   const locate = useCallback((thenNearest = false) => {
@@ -123,6 +132,16 @@ export default function GeoCommand() {
   }, [fac.data, selectFacility]);
 
   const onPick = useCallback((p: LngLat) => { setOrigin(p); setOriginLabel(`Map point ${p[1].toFixed(4)}, ${p[0].toFixed(4)}`); }, []);
+  const NearestRow = ({ r, i }: { r: any; i?: number }) => {
+    const p = r.facility.properties;
+    return (<div className="rounded-xl border border-line bg-white p-3">
+      <div className="flex items-start justify-between gap-2"><button className="min-w-0 text-left font-semibold text-forest hover:underline" onClick={() => selectFacility(r.facility)}>{i !== undefined ? `${i + 1}. ` : ""}{p.name ?? "Unnamed facility"}</button>
+        <span className="num shrink-0 whitespace-nowrap text-xs font-bold">≈ {mins(r.est_time_s)} · {km(r.distance_m)} <span className="font-normal text-ink-3">est.</span></span></div>
+      <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px]">
+        <span className="rounded-full bg-mint-l px-2 py-0.5 font-medium text-emerald-d">{CATEGORY_LABEL[p.category] ?? p.kind}</span>
+        <span className={cls("rounded-full px-2 py-0.5 font-medium", p.emergency_status === "tagged_yes" ? "bg-coral/10 text-coral-d" : "bg-canvas text-ink-2")}>{p.emergency_status === "tagged_yes" ? "Emergency: tagged in OSM, unverified (call first)" : "Emergency: unknown (call first)"}</span></div>
+      <div className="mt-1.5 flex flex-wrap gap-2 text-xs">{p.phone?.[0] ? <a className="font-semibold text-emerald underline" href={tel(p.phone[0])}>📞 {p.phone[0]}</a> : <span className="text-ink-3">no phone in OSM</span>}<button className="underline" onClick={() => getRoute(r.facility)}>route</button><a className="underline" href={gmaps(origin, r.facility.geometry.coordinates)} target="_blank" rel="noopener noreferrer">Google Maps ↗</a></div></div>);
+  };
   const routes = useMemo(() => (route ? { fastest: route.routes.fastest.geometry.coordinates, shortest: route.routes.shortest.geometry.coordinates } : nearest?.results?.[0] && tab === "nearest" ? { fastest: nearest.results[0].geometry.coordinates } : {}), [route, nearest, tab]);
   const explored = useMemo(() => (insightOn && route?.insight ? { astar: route.insight.astar.explored, dijkstra: route.insight.dijkstra.explored } : null), [insightOn, route]);
   const dest: LngLat | null = route?.facility?.geometry?.coordinates ?? (tab === "nearest" ? nearest?.results?.[0]?.facility?.geometry?.coordinates : null) ?? null;
@@ -151,7 +170,7 @@ export default function GeoCommand() {
   const dirRows = useMemo(() => (facilities?.features ?? []).filter((f: any) => !q.trim() || [f.properties.name, f.properties.name_bn, f.properties.address].some((v: any) => v && String(v).toLowerCase().includes(q.trim().toLowerCase()))), [facilities, q]);
 
   const panel = (
-    <div className="flex-1 overflow-y-auto p-4 text-sm">
+    <div className="flex-1 overflow-y-auto p-4 text-sm" tabIndex={0} role="region" aria-label="Map details panel">
       {tab === "facility" && (P ? (<div className="space-y-2.5">
         <div><div className="text-[17px] font-bold leading-snug text-navy">{P.name ?? "Unnamed facility"}</div>{P.name_bn && <div lang="bn" className="text-ink-3">{P.name_bn}</div>}<div className="mt-1.5 flex flex-wrap gap-1.5"><ProvChip>{P.kind}</ProvChip><ProvChip>{P.city}</ProvChip>{P.operator_type && <ProvChip>{P.operator_type}</ProvChip>}</div></div>
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-[13px]">
@@ -166,7 +185,7 @@ export default function GeoCommand() {
         <div className="flex flex-wrap gap-2 pt-0.5"><Btn onClick={() => getRoute(picked)} disabled={busy === "route"}>{busy === "route" ? t("map.routing") : origin ? t("map.routefrom") : t("map.setstart")}</Btn>{P.phone?.[0] && <a href={tel(P.phone[0])} className="inline-flex items-center rounded-xl border border-line px-3 py-2 text-sm font-medium hover:bg-mint-l">Call</a>}</div>
         <NavLinks origin={origin} dest={picked.geometry.coordinates} />
       </div>) : <EmptyState text={t("map.empty.facility")} />)}
-      {tab === "route" && (routeErr ? <Notice tone="warn">{routeErr}</Notice> : busy === "route" && !route ? <p className="text-ink-3">{t("map.searching")}</p> : route ? (<div className="space-y-3">
+      {tab === "route" && (routeErr ? <Notice tone="warn">{routeErr}</Notice> : busy === "route" && !route ? <ActionProgress label="Finding the fastest and shortest road routes…" onCancel={cancelPending} slowText="Route search runs on the server's road graph. You can cancel and pick another facility." /> : route ? (<div className="space-y-3">
         <div className="font-semibold text-navy">To {route.facility?.properties?.name ?? "destination"}</div>
         <Segmented label="Show route" value={routeMode} onChange={(v) => setRouteMode(v as any)} options={[{ value: "fastest", label: "Fastest (est.)" }, { value: "shortest", label: "Shortest" }, { value: "both", label: "Both" }]} />
         <table className="w-full text-[13px]"><thead><tr className="text-left text-[11px] uppercase text-ink-3"><th></th><th>Fastest (est.)</th><th>Shortest</th></tr></thead><tbody>
@@ -180,24 +199,31 @@ export default function GeoCommand() {
         <button role="switch" aria-checked={insightOn} onClick={toggleInsight} className={cls("flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-[13px] font-medium", insightOn ? "border-cyan bg-cyan/10" : "border-line hover:border-teal")}>
           <span>A* Algorithm Insight</span><span className={cls("rounded-full px-2 py-0.5 text-[11px]", insightOn ? "bg-cyan text-white" : "bg-canvas text-ink-3")}>{insightOn ? (busy === "route" ? "loading" : "on") : "off"}</span></button>
         {insightOn && route.insight && (<div className="space-y-1.5 rounded-xl bg-navy p-3 text-[12px] leading-relaxed text-white/80">
-          <div className="flex gap-3"><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#22b8d6]" />A*: <b className="num text-white">{route.insight.astar.expanded.toLocaleString()}</b> nodes, {route.insight.astar.ms} ms</span></div>
+          <div className="flex gap-3"><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#8985ff]" />A*: <b className="num text-white">{route.insight.astar.expanded.toLocaleString()}</b> nodes, {route.insight.astar.ms} ms</span></div>
           <div className="flex gap-3"><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#e0a526]" />Dijkstra: <b className="num text-white">{route.insight.dijkstra.expanded.toLocaleString()}</b> nodes, {route.insight.dijkstra.ms} ms</span></div>
           <p>Both find the same shortest-distance route ({route.insight.cost_equal ? "costs equal ✓" : "costs differ ✗"}). Dijkstra grows outward in every direction; A* adds the straight-line distance to the hospital as a lower bound, so it explores {(route.insight.dijkstra.expanded / Math.max(1, route.insight.astar.expanded)).toFixed(1)}× fewer nodes toward the goal. The map shows an even sample of up to {route.insight.sample_cap.toLocaleString()} explored nodes each.</p></div>)}
         <NavLinks origin={route.from} dest={route.facility.geometry.coordinates} />
         <p className="text-[11px] leading-relaxed text-ink-3"><b>Estimates:</b> times assume free-flow speeds by road class ({Object.entries(route.speeds_kmh).map(([k, v]) => `${k} ${v}`).join(", ")} km/h); no traffic data. <b>Facts:</b> road geometry and one-way rules from OSM. Start snapped {route.origin.snap_m} m and destination {route.destination.snap_m} m to the nearest intersection. {route.attribution}.</p>
       </div>) : <EmptyState text={t("map.empty.route")} />)}
-      {tab === "nearest" && (busy === "nearest" ? <p className="text-ink-3">{t("map.searching")}</p> : nearest?.error ? <Notice tone="warn">{nearest.error}</Notice> : nearest?.results ? (<div className="space-y-2">
-        <p className="text-[11px] text-ink-3">Closest hospitals by estimated road travel time ({nearest.method}, {nearest.search_ms} ms).</p>
-        {nearest.results.map((r: any, i: number) => (<div key={r.facility.properties.id} className="rounded-xl border border-line bg-white p-3">
-          <div className="flex items-start justify-between gap-2"><button className="min-w-0 text-left font-semibold text-forest hover:underline" onClick={() => selectFacility(r.facility)}>{i + 1}. {r.facility.properties.name ?? "Unnamed hospital"}</button><span className="num shrink-0 whitespace-nowrap text-xs font-bold">{mins(r.est_time_s)} · {km(r.distance_m)}</span></div>
-          <div className="mt-1 flex flex-wrap gap-2 text-xs">{r.facility.properties.phone?.[0] ? <a className="font-semibold text-emerald underline" href={tel(r.facility.properties.phone[0])}>📞 {r.facility.properties.phone[0]}</a> : <span className="text-ink-3">no phone in OSM</span>}<button className="underline" onClick={() => getRoute(r.facility)}>route</button><a className="underline" href={gmaps(origin, r.facility.geometry.coordinates)} target="_blank" rel="noopener noreferrer">Google Maps ↗</a></div></div>))}
+      {tab === "nearest" && (busy === "nearest" ? <ActionProgress label={t("map.searching")} onCancel={cancelPending} slowText="Searching the road graph from your start point. You can cancel and try again." /> : nearest?.error ? <Notice tone="warn">{nearest.error}</Notice> : nearest?.results ? (<div className="space-y-2">
+        {nearest.emergency_tagged?.length > 0 && (<div className="rounded-xl border border-coral/30 bg-coral/5 p-2.5">
+          <div className="eyebrow mb-1.5 text-coral-d">Tagged emergency department (OpenStreetMap emergency=yes; community tag, not verified)</div>
+          {nearest.emergency_tagged.map((r: any) => <NearestRow key={"t" + r.facility.properties.id} r={r} />)}</div>)}
+        <p className="text-[11px] text-ink-3">General hospitals by estimated road travel time: free-flow speeds, no traffic ({nearest.method}, {nearest.search_ms} ms).</p>
+        {nearest.results.map((r: any, i: number) => <NearestRow key={r.facility.properties.id} r={r} i={i} />)}
+        {nearest.eligibility && <p className="text-[11px] leading-relaxed text-ink-3">{nearest.eligibility}{nearest.excluded_counts && Object.keys(nearest.excluded_counts).length > 0 &&
+          <> Left out here: {Object.entries(nearest.excluded_counts).map(([k, v]) => `${v} ${CATEGORY_LABEL[k] ?? k}`).join(", ")}.</>}</p>}
         <p className="text-[11px] text-ink-3">{nearest.note}</p>
       </div>) : <EmptyState text={t("map.empty.nearest")} />)}
     </div>);
 
   return (<>
-    <PageHeader eyebrow={t("map.eyebrow")} title={t("nav.geography")} sub={t("map.sub")} />
-    <Notice tone="warn"><b>{t("map.notlive")}</b> {lang === "bn" ? t("map.community") : fac.data?.meta?.note ?? t("map.community")} {t("map.call")} <a className="font-bold underline" href="tel:999">999</a>.</Notice>
+    <PageHeader eyebrow={t("map.eyebrow")} title={t("nav.geography")} sub={<span className="hidden sm:inline">{t("map.sub")}</span>} />
+    {/* phones: the full notice and intro pushed the map ~520 px down; keep the warning visible in one line, details one tap away */}
+    <details className="-mt-3 rounded-xl border border-amber/50 bg-amber/10 px-3 py-2 text-[13px] text-ink sm:hidden">
+      <summary className="cursor-pointer font-semibold text-amber-d">⚠ {t("map.notlive")} Call before travelling.</summary>
+      <p className="mt-1.5 text-ink-2">In an emergency call <a className="font-bold underline" href="tel:999">999</a>. {lang === "bn" ? t("map.community") : fac.data?.meta?.note ?? t("map.community")} {t("map.call")}</p><p className="mt-1 text-ink-2">{t("map.sub")}</p></details>
+    <div className="hidden sm:block"><Notice tone="warn"><b>{t("map.notlive")}</b> {lang === "bn" ? t("map.community") : fac.data?.meta?.note ?? t("map.community")} {t("map.call")} <a className="font-bold underline" href="tel:999">999</a>.</Notice></div>
 
     <section className="ds-map-shell relative mt-4 h-[78vh] min-h-[560px] overflow-hidden rounded-[22px] border border-line shadow-[var(--shadow-pop)] lg:h-[min(860px,calc(100vh-150px))] lg:min-h-[640px]" aria-label="Map and emergency routing workspace">
       <CommandMap ref={mapRef} height="100%" facilities={facilities} dghs={dghs.data && !(dghs.data as any).status ? dghs.data : null} cityRisk={cityRisk} weather={weather} layers={layers} origin={origin} routes={routes} selectedId={P?.id}
@@ -231,10 +257,10 @@ export default function GeoCommand() {
         <div className="flex flex-wrap gap-1.5">{([["facilities", t("map.l.facilities")], ["forecast", t("map.l.forecast")], ["weather", t("map.l.weather")], ["dghs", t("map.l.dghs")], ["buildings", t("map.l.buildings")]] as [keyof Layers, string][]).map(([k, l]) => (
           <button key={k} role="switch" aria-checked={layers[k]} disabled={k === "buildings" && bldAvail === false} onClick={() => toggle(k)} className={cls("min-h-9 rounded-full border px-3 py-1.5 text-[12px] font-medium transition disabled:opacity-40 lg:min-h-0 lg:px-2.5 lg:py-1 lg:text-[11.5px]", layers[k] ? "border-navy bg-navy text-white" : "border-line bg-white text-ink-2 hover:border-teal")}>{l}</button>))}</div>
         <div className="mt-2 flex gap-1">{(["all", "hospital", "clinic"] as const).map((v) => (<button key={v} onClick={() => setKind(v)} aria-pressed={kind === v} className={cls("min-h-9 rounded-lg px-3 py-1.5 text-[12px] lg:min-h-0 lg:px-2 lg:py-0.5 lg:text-[11.5px]", kind === v ? "bg-teal text-white" : "text-ink-2 hover:bg-white")}>{v === "all" ? t("ctl.all") : v === "hospital" ? t("map.hospitals") : t("map.clinics")}</button>))}</div>
-        <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 border-t border-line pt-2 text-[10.5px] text-ink-2">
+        <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 border-t border-line pt-2 text-[11px] text-ink-2">
           <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#1d4ed8]" />{t("map.lg.hospital")}</span><span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#0f766e]" />{t("map.lg.clinic")}</span>
           <span className="flex items-center gap-1.5"><i className="h-1 w-4 rounded bg-emerald" />{t("map.lg.fastest")}</span><span className="flex items-center gap-1.5"><i className="w-4 border-t-2 border-dashed border-[#2563eb]" />{t("map.lg.shortest")}</span>
-          <span className="col-span-2 flex items-center gap-1.5"><i className="rounded-full border-2 border-amber px-1 text-[9px] font-bold">%</i>{t("map.lg.city")}</span></div>
+          <span className="col-span-2 flex items-center gap-1.5"><i className="rounded-full border-2 border-amber px-1 text-[11px] font-bold">%</i>{t("map.lg.city")}</span></div>
         {layers.dghs && dghs.error && <p className="mt-2 text-[11px] text-coral-d">DGHS boundaries unavailable: {dghs.error.message}</p>}
         {bldAvail === false && <p className="mt-2 text-[11px] text-ink-3">{t("map.no3d")}</p>}
       </div>
@@ -253,19 +279,19 @@ export default function GeoCommand() {
       <button key={c.city} onClick={() => { mapRef.current?.flyTo(JUMP[c.city].c, JUMP[c.city].z); window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); }} className="card card-hover p-4 text-left">
         <div className="flex items-baseline justify-between"><span className="text-[15px] font-semibold text-navy">{c.city}</span>{c.wx && <span className="text-[11px] text-ink-3">{c.wx}</span>}</div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-[12px]">
-          <div className="rounded-lg bg-canvas p-2"><div className="text-[10.5px] uppercase tracking-wide text-ink-3">Facilities · OSM</div><b className="num text-[17px] text-navy">{c.hospitals + c.clinics}</b><div className="text-[11px] text-ink-3">{c.hospitals} hospitals · {c.clinics} clinics</div><div className="text-[11px] text-ink-3">{c.phone} with phone · {c.emergency} emergency-tagged</div></div>
-          <div className="rounded-lg bg-canvas p-2"><div className="text-[10.5px] uppercase tracking-wide text-ink-3">Forecast · synthetic</div><b className="num text-[17px] text-navy">{c.wards ? `${c.alerts}/${c.wards}` : "—"}</b><div className="text-[11px] text-ink-3">wards on alert</div>{c.meanP != null && <div className="text-[11px] text-ink-3">mean P(outbreak) {Math.round(c.meanP * 100)}%</div>}</div></div>
+          <div className="rounded-lg bg-canvas p-2"><div className="text-[11px] uppercase tracking-wide text-ink-3">Facilities · OSM</div><b className="num text-[17px] text-navy">{c.hospitals + c.clinics}</b><div className="text-[11px] text-ink-3">{c.hospitals} hospitals · {c.clinics} clinics</div><div className="text-[11px] text-ink-3">{c.phone} with phone · {c.emergency} emergency-tagged</div></div>
+          <div className="rounded-lg bg-canvas p-2"><div className="text-[11px] uppercase tracking-wide text-ink-3">Forecast · synthetic</div><b className="num text-[17px] text-navy">{c.wards ? `${c.alerts}/${c.wards}` : "—"}</b><div className="text-[11px] text-ink-3">wards on alert</div>{c.meanP != null && <div className="text-[11px] text-ink-3">mean P(outbreak) {Math.round(c.meanP * 100)}%</div>}</div></div>
       </button>))}</div>
     <p className="mt-2 text-[11px] text-ink-3">City intelligence pairs two independent layers: real OpenStreetMap facilities and the forecast aggregated over the dataset's synthetic wards for that city. They are shown side by side, never joined.</p>
 
     <div className="mt-5 grid gap-5 xl:grid-cols-[1.3fr_1fr]">
       <Card><CardTitle title={`Facility directory (${dirRows.length})`} sub="OpenStreetMap hospitals and clinics in the four covered cities. Click a name to show it on the map." />
-        <Loading q={fac} h={200}>{() => dirRows.length ? <DataTable rows={dirRows} cols={dirCols} maxH={380} dense /> : <EmptyState />}</Loading>
+        <Loading q={fac} h={200} kind="table" label="Facility directory">{() => dirRows.length ? <DataTable rows={dirRows} cols={dirCols} maxH={380} dense /> : <EmptyState />}</Loading>
         <p className="mt-2 text-[11px] text-ink-3">{fac.data?.meta?.attribution}. Data as of {Object.values(fac.data?.meta?.osm_timestamps ?? {})[0] as string ?? "unknown"}. No doctor rosters, bed availability or admission status exist in these sources.</p></Card>
       <Card><CardTitle title="Predictions: abstract ward-risk matrix" sub={`${sel.horizon} ${t("ctl.weeks")} · ${dateFmt(sel.origin, lang)} · synthetic ward IDs, no map position`} />
         <label className="mb-2 flex items-center gap-2 text-sm"><span className="eyebrow">Calendar</span><input type="date" aria-label="Forecast origin date" min="2019-01-07" max="2025-01-06" value={sel.origin} onChange={(e) => e.target.value && set({ origin: isoMonday(e.target.value) })} className="rounded-lg border border-line px-2 py-1" /><span className="text-[11px] text-ink-3">snaps to Monday</span></label>
         <ControlsBar show={["horizon"]} />
-        <div className="mt-3"><Loading q={risk} h={240}>{() => <RiskMatrix wards={wards} />}</Loading></div></Card>
+        <div className="mt-3"><Loading q={risk} h={240} kind="chart" label="Ward risk matrix">{() => <RiskMatrix wards={wards} />}</Loading></div></Card>
     </div>
 
     <Card className="mt-5"><CardTitle title="Routing engine diagnostics" sub="Directed, weighted OpenStreetMap road graphs; A* checked against Dijkstra" />

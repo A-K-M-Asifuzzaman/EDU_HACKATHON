@@ -8,6 +8,7 @@ import ControlsBar from "@/components/controls";
 import ClimateFutures from "@/components/futures";
 import HorizonCompare from "@/components/horizons";
 import RainTimeline from "@/components/rainline";
+import RainfallWhatIf from "@/components/rain-what-if";
 import { Card, CardTitle, EmptyState, Loading, Notice, PageHeader, ProvChip, RiskBadge, useAsync } from "@/components/ui";
 import { DriverBars, FanChart } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
@@ -33,9 +34,9 @@ export default function Lab() {
     return { grid: { left: 50, right: 20, top: 30, bottom: 40 }, tooltip: { trigger: "item", formatter: (p: any) => { const x = f[p.dataIndex]; return x ? `<b>${x.horizon} ${t("ctl.weeks")}</b> → ${x.target_date}<br/>${t("fc.median")} ${x.median_cases} · ${t("fc.mean")} ${x.expected_cases.toFixed(1)}<br/>80%: ${x.lower_80}–${x.upper_80} · 90%: ${x.lower_90}–${x.upper_90}${x.actual_cases !== null ? `<br/>${t("fc.actual")}: ${x.actual_cases}` : ""}` : ""; } },
       xAxis: { type: "category", data: f.map((x: any) => `${x.horizon}w\n${x.target_date.slice(5)}`), ...axisStyle }, yAxis: { type: "value", name: t("fc.cases"), min: 0, max: Math.ceil(Math.max(5, ...f.map((x: any) => Math.max(x.upper_90, x.actual_cases ?? 0))) * 1.12), ...axisStyle },
       series: [{ type: "custom", renderItem: (_: any, api: any) => { const i = api.value(0); const c = api.coord([i, 0]); const yy = (v: number) => api.coord([i, v])[1]; const x = c[0]; const w = api.size([1, 0])[0] * 0.18;
-        return { type: "group", children: [{ type: "line", shape: { x1: x, y1: yy(api.value(1)), x2: x, y2: yy(api.value(4)) }, style: { stroke: "#9fe7c2", lineWidth: 10, lineCap: "round" } },
-          { type: "line", shape: { x1: x, y1: yy(api.value(2)), x2: x, y2: yy(api.value(3)) }, style: { stroke: "#0e8f66", lineWidth: 10, lineCap: "round" } },
-          { type: "circle", shape: { cx: x, cy: yy(api.value(5)), r: 7 }, style: { fill: "#073b2b", stroke: "#fff", lineWidth: 2 } },
+        return { type: "group", children: [{ type: "line", shape: { x1: x, y1: yy(api.value(1)), x2: x, y2: yy(api.value(4)) }, style: { stroke: "#c9c6ff", lineWidth: 10, lineCap: "round" } },
+          { type: "line", shape: { x1: x, y1: yy(api.value(2)), x2: x, y2: yy(api.value(3)) }, style: { stroke: "#3b3a8c", lineWidth: 10, lineCap: "round" } },
+          { type: "circle", shape: { cx: x, cy: yy(api.value(5)), r: 7 }, style: { fill: "#2f2e72", stroke: "#fff", lineWidth: 2 } },
           { type: "path", shape: { pathData: "M0 -7 L7 0 L0 7 L-7 0 Z", x: x + w, y: yy(api.value(6)) }, style: { fill: "#3b82c4", stroke: "#fff", lineWidth: 1.5 } },
           ...(api.value(7) >= 0 ? [{ type: "circle", shape: { cx: x - w, cy: yy(api.value(7)), r: 5 }, style: { fill: "#ea575b", stroke: "#fff", lineWidth: 2 } }] : [])] }; },
         data: f.map((x: any, i: number) => [i, x.lower_90, x.lower_80, x.upper_80, x.upper_90, x.median_cases, x.expected_cases, x.actual_cases ?? -1]), z: 5 }] };
@@ -49,19 +50,21 @@ export default function Lab() {
         <HorizonCompare />
         <div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px] text-ink-3"><span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-forest" />{t("fc.median")}</span><span><i className="mr-1 inline-block h-2.5 w-2.5 rotate-45 bg-sky" />{t("fc.mean")}</span><span><i className="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-coral" />{t("fc.actual")}</span></div></Card>
       <Card><CardTitle title="Forecast ranges by horizon" sub="Wider bars = more uncertainty (dark = 80% interval, light = 90%)" />
-        <Loading q={cmp} h={300}>{() => <Chart option={rangeOpt} height={300} ariaLabel="Median, mean and prediction intervals for horizons 2, 3 and 4 weeks" />}</Loading></Card>
+        <Loading q={cmp} h={300} kind="chart" label="Horizon comparison">{() => <Chart option={rangeOpt} height={300} ariaLabel="Median, mean and prediction intervals for horizons 2, 3 and 4 weeks" />}</Loading></Card>
     </div>
 
     <Card className="mt-5"><CardTitle title={t("avail.title")} sub={`${t("avail.key")} ${lang === "bn" ? "" : "Rainfall after the origin is never used."}`} right={<ProvChip tone="info">{sel.horizon} {t("ctl.weeks")}</ProvChip>} />
-      <Loading q={rain} h={250}>{(r: any) => <RainTimeline origin={sel.origin} horizon={sel.horizon} rain={rainMap} clim={r.climatology_by_iso_week} />}</Loading>
+      <Loading q={rain} h={250} kind="chart" label="Rainfall timeline">{(r: any) => <RainTimeline origin={sel.origin} horizon={sel.horizon} rain={rainMap} clim={r.climatology_by_iso_week} />}</Loading>
       <div className="mt-2 grid gap-2 sm:grid-cols-3">{(cmp.data?.availability ?? []).map((a: any) => (<div key={a.horizon} className={"rounded-xl border p-3 text-[12.5px] " + (a.horizon === sel.horizon ? "border-emerald bg-mint-l" : "border-line")}><b>{a.horizon}w</b>: {dateFmt(a.key_rain_week, lang)} — {a.observed_at_origin ? <span className="text-emerald-d">{t("avail.observed")}</span> : <span className="text-amber-d">{t("avail.projected")}</span>}</div>))}</div>
       <p className="mt-3 text-xs text-ink-3">Under convention B the forecast is issued on the Monday labelling week t, so week t is not yet observed. Hatched weeks are shown as past-year climatology; the model uses a projection of the same kind there. Real future rainfall would only be a what-if input, and none is used here.</p></Card>
+
+    <RainfallWhatIf />
 
     <div className="mt-5 grid gap-5 lg:grid-cols-2">
       <Card><CardTitle title={t("sec.fan")} sub={`${sel.horizon} ${t("ctl.weeks")} · ${year}`} />
         {series.data ? <FanChart series={series.data.series} markDate={fc.data?.forecast.target_date} height={300} /> : <EmptyState text="Validated replay covers 2019–2024 origins." />}</Card>
       <Card><CardTitle title={t("sec.drivers")} sub={t("drv.note")} />
-        <Loading q={fc} h={190}>{(d: any) => d.drivers?.log_rate_contributions ? <DriverBars contrib={d.drivers.log_rate_contributions} height={190} /> : <EmptyState />}</Loading>
+        <Loading q={fc} h={190} kind="chart" label="Forecast drivers">{(d: any) => d.drivers?.log_rate_contributions ? <DriverBars contrib={d.drivers.log_rate_contributions} height={190} /> : <EmptyState />}</Loading>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-ink-3">{fc.data && <><RiskBadge tier={fc.data.forecast.risk_tier} size="sm" /><span>{fc.data.forecast.source === "replay" ? t("fc.out_of_sample") : fc.data.forecast.in_sample ? t("fc.in_sample") : "forward forecast"}</span></>}</div></Card>
     </div>
 

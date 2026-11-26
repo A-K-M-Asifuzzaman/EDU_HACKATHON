@@ -10,6 +10,47 @@ const f2 = (x: any) => (x == null ? "—" : Number(x).toFixed(2));
 const f3 = (x: any) => (x == null ? "—" : Number(x).toFixed(3));
 const YEARS = [2019, 2020, 2021, 2022, 2023, 2024];
 
+function ResearchCard() {
+  const r = useAsync((s) => api("/api/research/v3", { signal: s, ttl: 600_000 }), []);
+  return (<Card><CardTitle title="V3 research: interval calibration and alert calibration (not deployed)"
+      sub="Pre-registered experiments on saved out-of-time predictions; seasons 2021–2024, each calibrated only on the two preceding seasons. Production intervals and the alert rule are unchanged." />
+    <Loading q={r} h={140} kind="block" label="Reliability summary">{(d: any) => (<>
+      <DataTable dense rows={Object.entries(d.e1_summary ?? {}).map(([h, v]: any) => ({ h, ...v }))} cols={[
+        { key: "h", label: "Horizon", render: (x: any) => `${x.h} weeks` },
+        { key: "verdict", label: "Pre-registered rule", render: (x: any) => <b className={x.verdict === "PASS" ? "text-emerald-d" : "text-coral-d"}>{x.verdict} ({x.seasons_passing}/4)</b> },
+        { key: "peaks", label: "80% cov. at peaks", align: "right", render: (x: any) => `${f3(x.baseline_peaks)} → ${f3(x.candidate_peaks)}` },
+        { key: "pos", label: "80% cov. positive weeks below peak", align: "right", render: (x: any) => `${f3(x.baseline_positive_below_peak)} → ${f3(x.candidate_positive_below_peak)}` },
+        { key: "width", label: "Mean width (cases)", align: "right", render: (x: any) => `${f2(x.baseline_width)} → ${f2(x.candidate_width)}` },
+        { key: "is", label: "Interval score (lower better)", align: "right", render: (x: any) => `${f2(x.baseline_interval_score)} → ${f2(x.candidate_interval_score)}` }]} />
+      <p className="mt-2 text-[12px] leading-relaxed text-ink-2"><b>E1 (magnitude-dependent dispersion):</b> intervals calibrated separately by predicted size raise coverage at positive and peak weeks (4 weeks: 0.61 → 0.79 at peaks, mean of four seasons),
+        but remain below 80% at peaks for 2 weeks and over-cover all weeks overall (0.91 against a nominal 0.80). They are wider, yet the interval score, which charges for both width and misses, improves in every season.
+        Status: exploratory validation only, no independent test; verdict <b>insufficient evidence to promote</b>. The deployed intervals are unchanged.
+        <b> E4 (isotonic recalibration of the outbreak probability):</b> {Object.values(d.e4_alert?.by_horizon ?? {}).every((x: any) => x.verdict === "FAIL") ? "did not beat the deployed probabilities (Brier score lower in at most 1 of 4 seasons); the deployed alert stays." : "see results file."}</p>
+      <p className="mt-1 text-[11px] text-ink-3">Seasons 2022–2024 were also used for the original model selection. Protocol: {d.preregistration}. 2025 is sealed.</p>
+      {d.e1_verification && <E1BinChart v={d.e1_verification} />}</>)}</Loading></Card>);
+}
+
+/** Coverage by predicted size: where the deployed intervals fall short and what E1 changes. Research only, clearly labelled. */
+function E1BinChart({ v }: { v: any }) {
+  const [h, setH] = useState("4");
+  const b = v.coverage_by_mu_bin?.[h], x = v.by_horizon?.[h];
+  if (!b) return null;
+  const opt = { grid: { left: 44, right: 12, top: 34, bottom: 52 }, legend: { top: 0, left: 0, textStyle: { fontSize: 11 } },
+    tooltip: { trigger: "axis", valueFormatter: (val: number) => `${Math.round(val * 100)}%` },
+    xAxis: { type: "category", data: b.bins.map((s: string, i: number) => `${s}\n(n=${b.n[i].toLocaleString()})`), name: "predicted cases (median bin)", nameLocation: "middle", nameGap: 36, ...axisStyle },
+    yAxis: { type: "value", min: 0, max: 1, axisLabel: { ...axisStyle.axisLabel, formatter: (val: number) => `${Math.round(val * 100)}%` }, splitLine: axisStyle.splitLine },
+    series: [{ name: "Deployed intervals", type: "bar", data: b.baseline, itemStyle: { color: "#1d5d96", borderRadius: [4, 4, 0, 0] }, label: { show: true, position: "top", fontSize: 10, formatter: (p: any) => Math.round(p.value * 100) },
+      markLine: { symbol: "none", silent: true, lineStyle: { type: "dashed", color: "#5f6f7f" }, label: { formatter: "80% target", position: "insideEndTop", fontSize: 10, color: "#3f5064" }, data: [{ yAxis: 0.8 }] } },
+      { name: "E1 candidate (research, not deployed)", type: "bar", data: b.candidate, itemStyle: { color: "#b0620a", borderRadius: [4, 4, 0, 0] }, label: { show: true, position: "top", fontSize: 10, formatter: (p: any) => Math.round(p.value * 100) } }] };
+  return (<div className="mt-5 border-t border-line pt-4">
+    <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><div><h3 className="text-sm font-semibold text-navy">80% coverage by forecast size, pooled 2021–2024</h3>
+      <p className="text-[11.5px] text-ink-3">Exploratory validation, not an independent test. Verdict: <b>{v.recommendation}</b>.</p></div>
+      <Segmented label="Horizon" value={h} onChange={setH} options={["2", "3", "4"].map((k) => ({ value: k, label: `${k} weeks` }))} /></div>
+    <Chart option={opt} height={260} ariaLabel={`80% interval coverage by predicted size at ${h} weeks: deployed ${b.baseline.map((c: number) => Math.round(c * 100)).join(", ")} percent; E1 candidate ${b.candidate.map((c: number) => Math.round(c * 100)).join(", ")} percent`} />
+    {x && <p className="mt-1 text-[11.5px] text-ink-2">Peak weeks, pooled: {Math.round(x.peak80_pooled_rows_2021_2024.baseline * 100)}% → {Math.round(x.peak80_pooled_rows_2021_2024.candidate * 100)}% (gain 95% ward-bootstrap {Math.round(x.peak80_gain_pooled_ward_bootstrap_95ci[0] * 100)}–{Math.round(x.peak80_gain_pooled_ward_bootstrap_95ci[1] * 100)} points). All weeks: {Math.round(x.all80_pooled.baseline * 100)}% → {Math.round(x.all80_pooled.candidate * 100)}% (over the 80% target). Mean width {x.width80_pooled.baseline} → {x.width80_pooled.candidate} cases.</p>}
+  </div>);
+}
+
 export default function ReliabilityCenter() {
   const [h, setH] = useState(3);
   const diag = useAsync((s) => api(`/api/model/diagnostics?horizon=${h}`, { signal: s, ttl: 600_000 }), [h]);
@@ -19,7 +60,7 @@ export default function ReliabilityCenter() {
   return (<div className="grid gap-5">
     <div className="flex flex-wrap items-end gap-3"><Segmented label="Forecast horizon" value={h} onChange={(v) => setH(Number(v))} options={[2, 3, 4].map((x) => ({ value: x, label: `${x} weeks` }))} />
       <p className="max-w-2xl text-[12px] text-ink-3">Every number below comes from saved out-of-time predictions: each season 2019–2024 was forecast by a model trained only on earlier seasons, with calibration and alert thresholds learned on the two previous seasons. The 2025 test year is locked. Nothing is refitted here.</p></div>
-    <Loading q={diag} h={120}>{() => (<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <Loading q={diag} h={120} kind="block" label="Diagnostics">{() => (<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       <Kpi label={`MAE · ${h} weeks`} value={d.mae} digits={2} hint="cases per ward-week" />
       <Kpi label="RMSE" value={d.rmse} digits={2} hint={`bias ${f2(d.bias)}`} />
       <Kpi label="Alert recall" value={d.alert.recall * 100} digits={1} suffix="%" tone="warn" hint={`precision ${(d.alert.precision * 100).toFixed(1)}%`} />
@@ -31,7 +72,7 @@ export default function ReliabilityCenter() {
     </div>)}</Loading>
     <div className="grid gap-5 lg:grid-cols-2">
       <Card><CardTitle title="Coverage by incidence severity" sub="The known weakness: intervals are honest on average and optimistic at outbreak peaks" />
-        <Loading q={cal} h={160}>{() => (<table className="w-full text-[13px]"><thead><tr className="text-left text-[11px] uppercase text-ink-3"><th className="py-1">Weeks</th><th>80% nominal</th><th>90% nominal</th><th>Width 80% / 90%</th></tr></thead><tbody>
+        <Loading q={cal} h={160} kind="table" label="Calibration table">{() => (<table className="w-full text-[13px]"><thead><tr className="text-left text-[11px] uppercase text-ink-3"><th className="py-1">Weeks</th><th>80% nominal</th><th>90% nominal</th><th>Width 80% / 90%</th></tr></thead><tbody>
           <tr className="border-t border-line"><td className="py-1.5">All weeks</td><td className="num">{f3(nb[80]?.coverage)}</td><td className="num">{f3(nb[90]?.coverage)}</td><td className="num">{f2(nb[80]?.width)} / {f2(nb[90]?.width)}</td></tr>
           <tr className="border-t border-line bg-coral/5"><td className="py-1.5 font-semibold">High-incidence (≥ q90)</td><td className="num font-bold text-coral-d">{f3(nb[80]?.coverage_high)}</td><td className="num font-bold text-coral-d">{f3(nb[90]?.coverage_high)}</td><td className="num">{f2(nb[80]?.width_high)} / {f2(nb[90]?.width_high)}</td></tr>
           <tr className="border-t border-line"><td className="py-1.5">Zero-case weeks</td><td className="num">{f3(nb[80]?.coverage_zero)}</td><td className="num">{f3(nb[90]?.coverage_zero)}</td><td /></tr>
@@ -43,14 +84,15 @@ export default function ReliabilityCenter() {
       </Card>
       <Card><CardTitle title="Validation by season" sub={`Out-of-time MAE per season, ${h} weeks ahead (2019–2021 robustness, 2022–2024 benchmark)`} />
         {d && <Chart height={220} ariaLabel="MAE by validation season" option={{ grid: { left: 40, right: 10, top: 20, bottom: 28 }, tooltip: { trigger: "axis" }, xAxis: { type: "category", data: d.by_season.map((r: any) => r.year), ...axisStyle }, yAxis: { type: "value", name: "MAE", ...axisStyle },
-          series: [{ type: "bar", data: d.by_season.map((r: any) => ({ value: r.mae, itemStyle: { color: r.year >= 2022 ? "#0b1b2e" : "#7a8a9a", borderRadius: [4, 4, 0, 0] } })), label: { show: true, position: "top", fontSize: 10, formatter: (p: any) => p.value.toFixed(2) } }] }} />}
+          series: [{ type: "bar", data: d.by_season.map((r: any) => ({ value: r.mae, itemStyle: { color: r.year >= 2022 ? "#0a0d14" : "#7a8a9a", borderRadius: [4, 4, 0, 0] } })), label: { show: true, position: "top", fontSize: 10, formatter: (p: any) => p.value.toFixed(2) } }] }} />}
         <CardTitle title="Is the outbreak probability calibrated?" sub="Predicted P(outbreak) vs observed outbreak share, binned (reliability diagram)" />
         {d && <Chart height={200} ariaLabel="Reliability diagram" option={{ grid: { left: 40, right: 10, top: 10, bottom: 34 }, tooltip: { trigger: "item", formatter: (p: any) => `predicted ${f3(p.value[0])}<br/>observed ${f3(p.value[1])}<br/>n = ${p.data.n}` },
           xAxis: { type: "value", min: 0, max: 1, name: "predicted", nameLocation: "middle", nameGap: 22, ...axisStyle }, yAxis: { type: "value", min: 0, max: 1, ...axisStyle },
-          series: [{ type: "line", data: [[0, 0], [1, 1]], symbol: "none", lineStyle: { type: "dashed", color: "#9aa7b4" }, silent: true }, { type: "scatter", data: d.reliability.map((r: any) => ({ value: [r.predicted, r.observed], n: r.n })), symbolSize: (v: any, p: any) => Math.max(6, Math.min(22, Math.sqrt(p.data.n) / 5)), itemStyle: { color: "#2bb5cf" } }] }} />}
+          series: [{ type: "line", data: [[0, 0], [1, 1]], symbol: "none", lineStyle: { type: "dashed", color: "#9aa7b4" }, silent: true }, { type: "scatter", data: d.reliability.map((r: any) => ({ value: [r.predicted, r.observed], n: r.n })), symbolSize: (v: any, p: any) => Math.max(6, Math.min(22, Math.sqrt(p.data.n) / 5)), itemStyle: { color: "#8985ff" } }] }} />}
       </Card>
     </div>
     <AlertSimulator h={h} />
+    <ResearchCard />
   </div>);
 }
 
@@ -70,10 +112,10 @@ function AlertSimulator({ h }: { h: number }) {
       <div><span className="eyebrow mb-1 block">Seasons</span><div className="flex flex-wrap gap-1">{YEARS.map((y) => (<button key={y} aria-pressed={years.includes(y)} onClick={() => setYears((ys) => (ys.includes(y) ? (ys.length > 1 ? ys.filter((x) => x !== y) : ys) : [...ys, y].sort()))}
         className={cls("min-h-10 min-w-[52px] rounded-lg border px-3 py-2 text-[13px] sm:min-h-0 sm:min-w-0 sm:px-2 sm:py-1 sm:text-[12px]", years.includes(y) ? "border-navy bg-navy text-white" : "border-line text-ink-3")}>{y}</button>))}</div></div>
     </div>
-    <Loading q={curve} h={260}>{() => (<div className="mt-4 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+    <Loading q={curve} h={260} kind="chart" label="Reliability curve">{() => (<div className="mt-4 grid gap-5 lg:grid-cols-[1.2fr_1fr]">
       <Chart height={260} ariaLabel="Recall, precision, F1 and false-alert rate by threshold" option={{ grid: { left: 40, right: 12, top: 30, bottom: 30 }, legend: { top: 0, textStyle: { fontSize: 11 } }, tooltip: { trigger: "axis", valueFormatter: (v: any) => (v == null ? "—" : Number(v).toFixed(3)) },
         xAxis: { type: "category", data: c.curve.map((r: any) => r.threshold.toFixed(2)), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, interval: 5 } }, yAxis: { type: "value", min: 0, max: 1, ...axisStyle },
-        series: [["Recall", "recall", "#0f8b80"], ["Precision", "precision", "#0b1b2e"], ["F1", "f1", "#2bb5cf"], ["False-alert rate", "false_alert_rate", "#b3262c"]].map(([n, k, col], i) => ({ name: n, type: "line", symbol: "none", data: c.curve.map((r: any) => r[k]), lineStyle: { color: col, width: 2 }, itemStyle: { color: col },
+        series: [["Recall", "recall", "#0f8b80"], ["Precision", "precision", "#0a0d14"], ["F1", "f1", "#8985ff"], ["False-alert rate", "false_alert_rate", "#b3262c"]].map(([n, k, col], i) => ({ name: n, type: "line", symbol: "none", data: c.curve.map((r: any) => r[k]), lineStyle: { color: col, width: 2 }, itemStyle: { color: col },
           ...(i === 0 ? { markLine: { symbol: "none", silent: true, lineStyle: { color: "#e0a526", width: 2 }, label: { show: false }, data: [{ xAxis: tau.toFixed(2) }] } } : {}) })) }} />
       <div className="grid grid-cols-2 gap-2 text-[13px]">{at && [["True alerts", at.tp], ["False alerts", at.fp], ["Missed outbreaks", at.fn], ["Flagged ward-weeks", at.flagged], ["Recall", pct(at.recall)], ["Precision", pct(at.precision)], ["F1", f3(at.f1)], ["False-alert rate", pct(at.false_alert_rate)]].map(([k, v]) => (
         <div key={k as string} className="rounded-xl border border-line p-2.5"><div className="text-[11px] text-ink-3">{k}</div><div className="num text-[18px] font-bold text-navy">{typeof v === "number" ? v.toLocaleString() : v}</div></div>))}

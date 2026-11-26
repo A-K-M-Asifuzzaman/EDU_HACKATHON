@@ -1,0 +1,23 @@
+model,size_bytes,measured_on
+glm_poisson,2457.0,"season 2024, h=3, convention B, F8"
+glm_poisson_nbdisp,2484.0,"season 2024, h=3, convention B, F8"
+glm_spline,3259.0,"season 2024, h=3, convention B, F8"
+glm_nb,2730.0,"season 2024, h=3, convention B, F8"
+glm_tweedie,2353.0,"season 2024, h=3, convention B, F8"
+lgbm_poisson,371107.0,"season 2024, h=3, convention B, F8"
+lgbm_tweedie,370898.0,"season 2024, h=3, convention B, F8"
+lgbm_l1,315442.0,"season 2024, h=3, convention B, F8"
+xgb_poisson,479285.0,"season 2024, h=3, convention B, F8 (fitted estimator inside the wrapper)"
+cat_poisson,207840.0,"season 2024, h=3, convention B, F8"
+hurdle_lgbm,738006.0,"season 2024, h=3, convention B, F8"
+rf,65567357.0,"season 2024, h=3, convention B, F8"
+extra_trees,101809001.0,"season 2024, h=3, convention B, F8"
+ridge_ls,2148.0,"season 2024, h=3, convention B, F8"
+knn,4958051.0,"season 2024, h=3, convention B, F8"
+mlp,55527.0,"season 2024, h=3, convention B, F8"
+global_mean,,no fitted object (lookup rule)
+ward_mean,,no fitted object (lookup rule)
+seasonal_avg,,no fitted object (lookup rule)
+last_known,,no fitted object (lookup rule)
+moving_avg_4,,no fitted object (lookup rule)
+"deployed bundle (3 horizons, GLM + calibration)",11047.0,models/dengueshield_B.joblib

@@ -286,7 +286,7 @@ flowchart TB
 
 </details>
 
-For the full architectural breakdown with Mermaid diagrams (data flow, validation split, model selection and every subsystem), see [ARCHITECTURE.md](ARCHITECTURE.md).
+Architecture: a concise overview in [ARCHITECTURE.md](ARCHITECTURE.md) (data flow, validation split, model selection, cost controls) and the complete technical reference with every diagram in [docs/architecture/COMPLETE_ARCHITECTURE.md](docs/architecture/COMPLETE_ARCHITECTURE.md).
 
 ---
 
@@ -398,6 +398,11 @@ Details: [`docs/model_selection.md`](docs/model_selection.md), [`docs/calibratio
 
 ### 🤔 Why This Model
 
+**Full model comparison:** [`reports/MODEL_COMPARISON.md`](reports/MODEL_COMPARISON.md) and the machine-readable
+[`reports/MODEL_COMPARISON.csv`](reports/MODEL_COMPARISON.csv): 28 model variants (23 from the Stage 3 tournament + 5 classical benchmarks
+added in V3) and 5 baselines on identical season folds, with MAE, RMSE, R², peak-week error, outbreak alerts, cost and selection status. It is
+also explorable in the app (Model Evidence → Model comparison).
+
 The selection rule was fixed before the tuned and ensemble results were seen: shortlist everything
 within 0.05 MAE of the best, then take the simplest. Tuned XGBoost, LightGBM, CatBoost, hurdle
 models and 9 ensembles did not beat the GLM by a meaningful margin. The GLM gives:
@@ -408,8 +413,10 @@ models and 9 ensembles did not beat the GLM by a meaningful margin. The GLM give
 
 ### ⚠️ Known Limitations
 
-- Intervals **under-cover outbreak peaks** (80% coverage: 0.607, 90%: 0.740 at peaks)
-- Peaks are under-predicted by approximately 3 cases
+- Intervals **under-cover outbreak peaks**: pooled over all out-of-time weeks (2019–2024), 80% intervals cover 0.57 and 90% intervals 0.71 of
+  peak weeks, against 0.85 / 0.91 overall (earlier documents quoted 0.607 / 0.740, an unweighted mean over season × horizon cells).
+- Peaks are under-predicted 77% of the time, by about 3.7 cases on average (pooled). One canonical source: `app_data/metrics_canonical.json`.
+- The 2022–2024 MAE figures come from seasons also used to choose the model: they are validation results, not a blind test. 2025 is sealed.
 - The dataset is **synthetic**; nothing in the app is live surveillance
 - Risk tiers are **statistical categories** from training quantiles, not official public-health warning levels
 

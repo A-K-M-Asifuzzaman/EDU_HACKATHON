@@ -1,158 +1,235 @@
 "use client";
+// Landing page, night edition: "Monsoon Intelligence" (DESIGN.md). Every visual is real output or real data:
+//   hero        rain atmosphere scaled to the observed rainfall of the selected ward and week; the rain → risk instrument
+//               (/api/weather/historical, /api/forecast/series, /api/forecast/compare) inside the live readout (/api/forecast)
+//   the wire    all 60 synthetic wards for the week (/api/risk/wards)
+//   01 rain     which rain weeks the model reads, per horizon
+//   02 window   the whole season of out-of-time forecasts with the issue line
+//   03 evidence the honest weakness in one number, the reliability table and every model configuration compared
+//   04 response the 60 wards as an abstract risk field
+//   05 navigation every hospital and clinic routed to (/api/facilities)
+//   06 trust    limits, sealed test year, reproducibility; then the tools index
 import Link from "next/link";
-import { useMemo } from "react";
-import { motion } from "motion/react";
-import { api, qs, addWeeks, TIERS, type Forecast } from "@/lib/api";
-import { useSel, srcParam } from "@/lib/ctx";
+import dynamic from "next/dynamic";
+import { api, qs, addWeeks, type Forecast } from "@/lib/api";
+import { selQuery, srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
-import { dateFmt, download, num, pct } from "@/lib/format";
-import { buildBrief } from "@/lib/brief";
-import ControlsBar from "@/components/controls";
-import { Card, CardTitle, EmptyState, ErrorState, Kpi, Loading, Notice, ProvChip, RiskBadge, Skeleton, useAsync } from "@/components/ui";
-import { DriverBars, FanChart, Gauge, TierBar } from "@/components/charts";
-import { Chart, axisStyle } from "@/components/echart";
-import HorizonCompare from "@/components/horizons";
+import { dateFmt, num } from "@/lib/format";
+import { RequestStatus, useAsync } from "@/components/ui";
+import { ForecastPreview } from "@/components/forecast-preview";
+import { SeasonFigure } from "@/components/season-figure";
+import { RainRisk } from "@/components/rain-risk";
+import Reveal from "@/components/reveal";
+import WardWire from "@/components/ward-wire";
+import RiskField from "@/components/risk-field";
 
-export default function CommandCenter() {
-  const { sel, set, ready, error, reload, meta } = useSel();
+const FacilityMap = dynamic(() => import("@/components/facility-map"), { ssr: false, loading: () => <div className="skeleton h-[320px]" /> });
+const ModelStrip = dynamic(() => import("@/components/model-strip"), { ssr: false, loading: () => <div className="skeleton h-[240px]" /> });
+const RainField = dynamic(() => import("@/components/rain-field"), { ssr: false });
+const H = [2, 3, 4] as const;
+
+function Chapter({ n, id, title, children, className = "" }: { n: string; id: string; title: string; children?: React.ReactNode; className?: string }) {
+  return (<div className={className}>
+    <div className="flex items-center gap-4"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border-[2.5px] border-[#15153d] bg-[#ffb020] font-display text-[16px] font-extrabold text-[#15153d] shadow-[3px_3px_0_#15153d]">{n}</span><span className="h-[2.5px] flex-1 rounded bg-ink/15" aria-hidden /></div>
+    <h2 id={id} className="mt-5 font-display text-[36px] font-extrabold leading-[0.98] tracking-[-0.025em] text-ink sm:text-[52px]">{title}</h2>
+    {children}</div>);
+}
+
+/** Which rain weeks the model reads for a given horizon: weeks 2, 3 and 4 before the target; weeks not yet fallen use typical rain. */
+function LagDiagram({ h }: { h: number }) {
+  const weeks = [-6, -5, -4, -3, -2, -1, 0], W = 560, cw = W / weeks.length, latest = -h - 1, issue = weeks.indexOf(-h);
+  return (<svg viewBox={`0 0 ${W} 132`} className="w-full" role="img" aria-label={`At ${h} weeks ahead, rain ${[2, 3, 4].filter((l) => -l <= latest).map((l) => `${l} weeks`).join(" and ") || "no week"} before the target is observed when the forecast is issued; ${[2, 3, 4].filter((l) => -l > latest).map((l) => `${l} weeks`).join(" and ") || "none"} use typical rain for that week.`}>
+    {weeks.map((w, i) => { const lag = -w, inWin = lag >= 2 && lag <= 4, obs = w <= latest, x = i * cw + 4; return (<g key={w}>
+      <rect x={x} y={40} width={cw - 8} height={48} rx="3" fill={inWin ? (obs ? "var(--color-sky)" : "transparent") : "var(--color-paper-3)"} stroke={inWin ? "var(--color-sky)" : "none"} strokeWidth="1.5" strokeDasharray={inWin && !obs ? "5 3" : undefined} style={{ transition: "fill .35s" }} />
+      <text x={x + (cw - 8) / 2} y={69} fontSize="13" textAnchor="middle" fontWeight="600" fill={inWin && obs ? "#0b0e15" : "var(--color-ink-2)"}>{w === 0 ? "target" : `${lag} wk`}</text></g>); })}
+    {issue >= 0 && <g style={{ transform: `translateX(${issue * cw}px)`, transition: "transform .45s cubic-bezier(.2,.7,.2,1)" }}><line x1={0} x2={0} y1={26} y2={100} stroke="var(--color-ink)" /><text x={-6} y={22} fontSize="12.5" textAnchor="end" fill="var(--color-ink)" fontWeight="600">issued</text></g>}
+    <text x="4" y="120" fontSize="12.5" fill="var(--color-ink-3)">Solid: rain already observed. Dashed: typical rain for that week. Grey: not read.</text>
+  </svg>);
+}
+
+/** 80% coverage on a 0-100% strip: all weeks and outbreak peaks against the 80% target tick. No filled track. */
+function CoverageStrip({ all, peaks }: { all: number; peaks: number }) {
+  const x = (v: number) => 6 + v * 148;
+  return (<svg viewBox="0 0 160 26" className="h-[26px] w-[160px]" aria-hidden>
+    <line x1={6} x2={154} y1={13} y2={13} stroke="var(--color-line)" /><line x1={x(0.8)} x2={x(0.8)} y1={4} y2={22} stroke="var(--color-ink-3)" strokeDasharray="2 2" />
+    <circle cx={x(peaks)} cy={13} r="5" fill="var(--color-coral)" /><circle cx={x(all)} cy={13} r="5" fill="var(--color-ink)" />
+  </svg>);
+}
+
+export default function Landing() {
+  const { sel, set, meta, ready } = useSel();
   const { t, lang } = useI18n();
-  const src = srcParam(sel);
-  const base = { origin: sel.origin, horizon: sel.horizon, source: src };
-  const summary = useAsync((s) => api(`/api/reports/summary?${qs(base)}`, { signal: s }), [sel.origin, sel.horizon, sel.source, ready]);
-  const ranking = useAsync((s) => api(`/api/risk/wards?${qs({ ...base, limit: 10 })}`, { signal: s }), [sel.origin, sel.horizon, sel.source, ready]);
+  const q = selQuery(sel);
+  const base = { origin: sel.origin, horizon: sel.horizon, source: srcParam(sel) };
   const fc = useAsync((s) => api(`/api/forecast?${qs({ ward_id: sel.ward, ...base })}`, { signal: s }), [sel.ward, sel.origin, sel.horizon, sel.source, ready]);
-  const year = Number(sel.origin.slice(0, 4));
-  const series = useAsync((s) => (year >= 2019 && year <= 2024 ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
-  const rain = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -26), end: addWeeks(sel.origin, 0), metric: "rainfall_mm" })}`, { signal: s }), [sel.ward, sel.origin, ready]);
-  const metrics = useAsync((s) => api("/api/model/metrics", { signal: s, ttl: 3_600_000 }), []);
-  const calib = useAsync((s) => api("/api/model/calibration", { signal: s, ttl: 3_600_000 }), []);
-  const cov = useMemo(() => {
-    const ic = calib.data?.interval_coverage ?? []; const g = (lvl: number) => ic.find((r: any) => r.method === "nb_coverage" && r.level === lvl);
-    return g(0.8) ? { c80: g(0.8).coverage, c90: g(0.9)?.coverage, h80: g(0.8).coverage_high } : null;
-  }, [calib.data]);
   const f: Forecast | undefined = fc.data?.forecast;
-  const S = summary.data;
-  const tierCounts = S?.tier_counts ?? {};
-  const rainOpt = useMemo(() => {
-    const r = rain.data; if (!r) return {};
-    const clim = r.climatology_by_iso_week;
-    const wk = (d: string) => { const dt = new Date(d + "T00:00:00Z"); const t0 = new Date(Date.UTC(dt.getUTCFullYear(), 0, 4)); return Math.min(52, Math.ceil(((+dt - +t0) / 86400000 + t0.getUTCDay() + 1) / 7)); };
-    return { grid: { left: 44, right: 16, top: 24, bottom: 30 }, legend: { top: 0, right: 0, textStyle: { fontSize: 11 } },
-      xAxis: { type: "category", data: r.rows.map((x: any) => x.date.slice(5)), ...axisStyle, axisLabel: { ...axisStyle.axisLabel, hideOverlap: true } }, yAxis: { type: "value", name: "mm/week", ...axisStyle },
-      series: [{ name: "Rainfall (organizer weather)", type: "bar", data: r.rows.map((x: any) => x.rainfall_mm), itemStyle: { color: "#3b82c4", borderRadius: [3, 3, 0, 0] } },
-        { name: "Typical for the week (2016–2024)", type: "line", data: r.rows.map((x: any) => clim[String(wk(x.date))] ?? null), symbol: "none", lineStyle: { color: "#f5b544", width: 2, type: "dashed" } }] };
-  }, [rain.data]);
+  const year = Number((f?.target_date ?? sel.origin).slice(0, 4));
+  const inReplay = year >= 2019 && year <= 2024;
+  const series = useAsync((s) => (inReplay ? api(`/api/forecast/series?${qs({ ward_id: sel.ward, horizon: sel.horizon, year })}`, { signal: s }) : Promise.resolve(null)), [sel.ward, sel.horizon, year, ready]);
+  const rain = useAsync((s) => (inReplay ? api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: `${year}-01-01`, end: `${year}-12-31`, metric: "rainfall_mm" })}`, { signal: s, ttl: 600_000 }) : Promise.resolve(null)), [sel.ward, year, ready]);
+  const near = useAsync((s) => api(`/api/weather/historical?${qs({ ward_id: sel.ward, start: addWeeks(sel.origin, -10), end: sel.origin, metric: "rainfall_mm" })}`, { signal: s, ttl: 600_000 }), [sel.ward, sel.origin, ready]);
+  const cmp = useAsync((s) => api(`/api/forecast/compare?${qs({ ward_id: sel.ward, origin: sel.origin, source: srcParam(sel) })}`, { signal: s }), [sel.ward, sel.origin, sel.source, ready]);
+  const wards = useAsync((s) => api(`/api/risk/wards?${qs(base)}`, { signal: s }), [sel.origin, sel.horizon, sel.source, ready]);
+  const canon = useAsync((s) => api("/api/model/canonical-metrics", { signal: s, ttl: 3_600_000 }), []);
+  const routing = useAsync((s) => api("/api/routing/status", { signal: s, ttl: 3_600_000 }), []);
+  const C = canon.data?.regimes;
+  const hz = C?.out_of_time_2019_2024?.by_horizon?.[String(sel.horizon)];
+  const R = routing.data, fac = R?.manifest?.facilities, bench = R?.benchmark;
+  const roadKm = R ? Object.values(R.manifest?.areas ?? {}).reduce((a: number, x: any) => a + (x.total_road_km ?? 0), 0) : null;
+  const target = f?.target_date;
+  const nearRows: any[] = near.data?.rows ?? [];
+  const issueRain = nearRows.length ? nearRows[nearRows.length - 1] : null;
+  const W60: Forecast[] = wards.data?.wards ?? [];
+  const alerts = W60.filter((w) => w.outbreak_alert).length;
 
-  return (<>
-    <section className="hero-surface relative mb-5 overflow-hidden rounded-[22px] p-6 shadow-[var(--shadow-pop)] sm:p-8" aria-labelledby="cc-title">
-      <div className="pointer-events-none absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)", backgroundSize: "44px 44px", maskImage: "radial-gradient(ellipse at 70% 30%, #000 0%, transparent 70%)" }} />
-      <div className="relative grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <div>
-          <div className="mb-3 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-mint/85"><span className="rounded-full bg-white/10 px-2.5 py-1 ring-1 ring-white/15">{t("mode.replay")}</span><span className="rounded-full bg-white/10 px-2.5 py-1 ring-1 ring-white/15">2025 holdout locked</span></div>
-          <h1 id="cc-title" className="text-[30px] font-bold leading-tight tracking-[-0.025em] sm:text-[38px]">{t("nav.command")}</h1>
-          <p className="mt-1 text-[19px] font-semibold leading-snug sm:text-[23px]"><span className="text-gradient">Forecast dengue 2–4 weeks ahead.</span> Route people to care.</p>
-          <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-white/75">{S ? <>For the week of <b className="text-white">{dateFmt(S.target_date, lang)}</b> (forecast made {dateFmt(S.origin, lang)}, {sel.horizon} weeks ahead), the model expects <b className="text-white">{num(S.median_cases_total, lang)}</b> cases across {S.wards} synthetic wards, with <b className="text-white">{S.alerts}</b> wards on outbreak alert. {S.source === "replay" ? "Validated out-of-time replay." : "Deployed model, recomputed on demand."}</> : t("mode.replay.desc")}</p>
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            <Link href="/geography/" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13.5px] font-semibold text-navy shadow-lg transition hover:-translate-y-0.5">Open map &amp; emergency routing →</Link>
-            <Link href="/copilot/" className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15">Ask the Copilot</Link>
-            <button disabled={!S} onClick={() => {
-              const html = buildBrief({ sel, S, f, top: ranking.data?.wards ?? [], metrics: metrics.data, coverage: cov, meta });
-              const w = window.open("", "_blank");
-              if (w) { w.document.write(html); w.document.close(); }
-              else { download(`dengueshield_sitrep_${sel.origin}_h${sel.horizon}.html`, html, "text/html"); }
-            }} className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5 text-[13.5px] font-semibold text-white ring-1 ring-white/20 transition hover:bg-white/15 disabled:opacity-50">
-              <span className="text-mint">📄</span> Weekly situation report (PDF)
-            </button>
-          </div>
-        </div>
-        <div className="glass-dark rounded-2xl p-4 sm:p-5">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-mint/80">Validated performance · out-of-time 2022–2024</div>
-          <div className="mt-3 grid grid-cols-3 gap-2">{[2, 3, 4].map((h) => { const m = metrics.data?.champion?.validation?.B?.[h]?.bench_2022_2024; return (<div key={h} className="rounded-xl bg-white/6 p-3 ring-1 ring-white/10"><div className="text-[11px] text-white/60">{h}-week MAE</div><div className="num mt-0.5 text-[24px] font-bold">{m ? m.mae.toFixed(2) : "…"}</div><div className="text-[10.5px] text-white/50">cases / week</div></div>); })}</div>
-          <div className="mt-3 space-y-1.5 text-[12.5px] text-white/75">
-            <div className="flex justify-between"><span>80% / 90% interval coverage</span><b className="num text-white">{cov ? `${cov.c80.toFixed(2)} / ${cov.c90?.toFixed(2)}` : "…"}</b></div>
-            <div className="flex justify-between"><span>80% coverage at outbreak peaks</span><b className="num text-amber">{cov ? cov.h80.toFixed(2) : "…"}</b></div>
-            <p className="pt-1 text-[11px] leading-snug text-white/55">Peaks are under-predicted by about 3 cases; intervals are honest on average and optimistic at peaks. Model: ridge Poisson GLM, 24 features.</p>
+  const instrument = cmp.data?.forecasts && near.data ? (
+    <RainRisk origin={sel.origin} horizon={sel.horizon} fcs={cmp.data.forecasts.filter((x: any) => !x.error)} rain={nearRows} clim={near.data.climatology_by_iso_week}
+      cases={series.data?.series ?? []} onHorizon={(h) => set({ horizon: h })} />)
+    : cmp.status === "failed" ? null : <div className="skeleton h-[250px] sm:h-[290px]" aria-hidden />;
+
+  return (<div>
+    {/* ================================================================== hero */}
+    <section aria-labelledby="land-title" className="night relative overflow-hidden">
+      <div className="absolute inset-0 [mask-image:linear-gradient(180deg,#000_55%,transparent)]"><RainField mm={issueRain?.rainfall_mm ?? null} /></div>
+      <div className="relative mx-auto max-w-[1320px] px-4 pb-14 sm:px-8 sm:pb-20">
+        <p className="border-b border-line py-4 text-[12.5px] text-ink-3">{t("land.eyebrow")}</p>
+        <div className="grid gap-x-12 gap-y-7 pt-7 sm:pt-12 lg:grid-cols-12">
+          <h1 id="land-title" className="sf-fade text-[38px] leading-[0.94] tracking-[-0.03em] text-ink sm:text-[68px] lg:col-span-12 xl:text-[92px]">{t("land.h1a")} <em className="block not-italic text-[#ffd166]">{t("land.h1b")}</em></h1>
+          <div className="sf-fade [animation-delay:.15s] lg:col-span-8 lg:col-start-5 lg:row-start-2"><ForecastPreview fc={fc} canon={canon.data} visual={instrument} /></div>
+          <div className="flex flex-col lg:col-span-4 lg:row-start-2">
+            <p className="max-w-[38ch] text-[17px] leading-relaxed text-ink-2 sm:text-[19px]">{t("land.lead")}</p>
+            <div className="mt-6 hidden flex-wrap items-center gap-x-5 gap-y-3 sm:flex">
+              <Link href={`/command/${q}`} className="inline-flex min-h-12 items-center bg-ink px-6 text-[15.5px] text-canvas">{t("land.cta.command")}</Link>
+              <Link href="/evidence/" className="btn-ghost inline-flex min-h-12 items-center px-5 text-[15px]">{t("land.cta.evidence")}</Link>
+            </div>
+            <dl className="mt-10 grid grid-cols-3 gap-4 border-t border-line pt-5 lg:mt-12 lg:grid-cols-1 lg:gap-0 lg:divide-y lg:divide-line lg:border-t lg:pt-0">
+              {[["60", "synthetic wards forecast every week"], [hz ? hz.mae.toFixed(2) : "…", `cases typical error at ${sel.horizon} weeks, out-of-time`], [bench ? `${bench.equal_costs}/${bench.pairs}` : "…", "test routes where A* matched Dijkstra"]].map(([v, l]) => (
+                <div key={l} className="flex flex-col-reverse lg:flex-row-reverse lg:items-baseline lg:justify-end lg:gap-4 lg:py-3.5"><dt className="mt-1 text-[12.5px] leading-snug text-ink-3 lg:mt-0">{l}</dt><dd className="num font-display text-[30px] leading-none text-ink lg:w-[150px] lg:shrink-0 lg:text-[34px]">{v}</dd></div>))}
+            </dl>
+            {issueRain && <p className="mt-6 text-[12px] leading-relaxed text-ink-3 lg:mt-auto lg:pt-6">The rain behind this page is drawn from data: its density follows the {Math.round(issueRain.rainfall_mm)} mm observed in {sel.ward} in the week of {dateFmt(issueRain.date, lang)}.</p>}
           </div>
         </div>
       </div>
     </section>
-    {error && <div className="mb-4"><ErrorState error={error} onRetry={reload} /></div>}
-    <ControlsBar />
-    {S && <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-3"><ProvChip tone={S.source === "replay" ? "ok" : "warn"}>{S.source === "replay" ? t("src.replay") : t("src.bundle")}</ProvChip>
-      <span>{t("fc.origin")}: <b className="text-ink">{dateFmt(S.origin, lang)}</b> → {t("fc.target")}: <b className="text-ink">{dateFmt(S.target_date, lang)}</b></span>
-      {S.source === "bundle" && Number(S.target_date.slice(0, 4)) <= 2024 && <ProvChip tone="warn">{t("fc.in_sample")}</ProvChip>}</div>}
-    {summary.error && <div className="mb-4"><ErrorState error={summary.error} onRetry={summary.reload} /></div>}
 
-    <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
-      <Kpi label={t("kpi.expected")} value={S?.expected_cases_total} digits={0} hint={`${S?.wards ?? 60} ${t("kpi.wards")}`} loading={!S} />
-      <Kpi label={t("kpi.median")} value={S?.median_cases_total} hint={t("fc.median")} loading={!S} />
-      <Kpi label={t("kpi.alerts")} value={S?.alerts} tone={S && S.alerts > 15 ? "bad" : "warn"} hint={`/ ${S?.wards ?? 60} ${t("kpi.wards")}`} loading={!S} />
-      <Kpi label={t("kpi.prob")} value={S ? S.mean_p_outbreak * 100 : undefined} digits={0} suffix="%" tone="warn" loading={!S} />
-      <Kpi label={t("kpi.actual")} value={S?.actual_cases_total ?? undefined} tone="ok" hint={S?.actual_cases_total == null ? "—" : "replay only"} loading={!S} />
+    {/* ================================================================== the wire */}
+    <WardWire wards={W60} q={q} />
+
+    <div className="mx-auto max-w-[1320px] px-4 sm:px-8">
+      {/* ---------------------------------------------------------------- 01 the rain signal */}
+      <Reveal as="section" aria-labelledby="ch-rain" className="mt-20 grid gap-10 sm:mt-28 lg:grid-cols-12 lg:gap-12">
+        <Chapter n="01" id="ch-rain" title="The rain signal" className="lg:col-span-5">
+          <div className="mt-5 max-w-[50ch] space-y-3 text-[15.5px] leading-relaxed text-ink-2">
+            <p>Mosquitoes need standing water and a few weeks to breed, so rain shows up in case counts later. The model reads rainfall two, three and four weeks before the target week, and the third week counts most.</p>
+            <p>When a forecast is issued, some of those weeks have not happened yet. For them it uses the typical rainfall for that time of year, never the rain that actually fell.</p>
+            <p>It also uses the season and each ward's vulnerability (drainage, density, sanitation). It does not use recent case counts.</p>
+          </div>
+        </Chapter>
+        <figure className="card m-0 p-5 sm:p-6 lg:col-span-7 lg:mt-16">
+          <LagDiagram h={sel.horizon} />
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">Forecast horizon
+            {H.map((h) => <button key={h} onClick={() => set({ horizon: h })} aria-pressed={sel.horizon === h} className={"min-h-11 rounded-full border-2 px-4 text-[13.5px] font-bold transition-colors sm:min-h-9 " + (sel.horizon === h ? "border-[#15153d] bg-[#2a2bd6] text-white" : "border-[#15153d] bg-ivory text-ink-2 hover:bg-mint-l")}>{h} weeks</button>)}</div>
+        </figure>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- 02 the forecast window */}
+      <Reveal as="section" aria-labelledby="ch-window" className="mt-24 sm:mt-32">
+        <Chapter n="02" id="ch-window" title="The forecast window">
+          <p className="mt-4 max-w-[64ch] text-[15.5px] leading-relaxed text-ink-2">A whole season for one ward, each week forecast {sel.horizon} weeks before it happened by a model that had never seen that season. Move along it to read any week; select one to make it the forecast above.</p>
+        </Chapter>
+        <div className="card mt-8 p-4 sm:p-6">
+          {!inReplay ? <p className="max-w-[68ch] text-[13.5px] text-ink-2">The validated replay covers forecasts for 2019 to 2024. For later weeks only the forecast above is shown.</p>
+            : series.data?.series && target ? (<SeasonFigure rows={series.data.series} rain={rain.data?.rows} origin={f!.origin_date} target={target} horizon={sel.horizon}
+              threshold={f?.outbreak_threshold} onPick={(o) => set({ origin: o })}
+              caption={<><b className="font-semibold text-ink-2">Fig. 1.</b> {sel.ward}, {year} season, every forecast made {sel.horizon} weeks ahead by a model trained only on earlier seasons. Shaded: the 80% and 90% ranges; line: the median; dots: reported cases, hollow once they fall after the issue date. Rain after the issue date had not fallen when the forecast was made and was never used.</>} />)
+            : series.status === "failed" ? <p className="text-[13.5px] text-ink-2" role="alert">The season figure is unavailable right now. The forecast above is unaffected.</p>
+            : <div aria-busy="true"><div className="skeleton h-[380px]" /><RequestStatus q={series} label="Season figure" /></div>}
+        </div>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- 03 the model's evidence */}
+      <Reveal as="section" aria-labelledby="ch-evidence" className="night mx-[calc(50%-50vw)] mt-24 px-[calc(50vw-50%)] py-16 sm:mt-32 sm:py-24">
+        <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
+          <Chapter n="03" id="ch-evidence" title="The model's evidence" className="lg:col-span-5">
+            <div className="mt-7">
+              <div className="num font-display text-[120px] leading-[0.82] tracking-[-0.035em] text-[#ff9aa8] sm:text-[168px]">{hz ? Math.round(hz.coverage.peaks["80"] * 100) : "…"}<span className="text-[0.42em] tracking-normal">%</span></div>
+              <p className="mt-5 max-w-[36ch] text-[16px] leading-relaxed text-ink-2">of outbreak-peak weeks fell inside the 80% range at {sel.horizon} weeks ahead, against {hz ? Math.round(hz.coverage.all["80"] * 100) : "…"}% of all weeks. Peaks are where the model is weakest, and every forecast page says so.</p>
+            </div>
+          </Chapter>
+          <div className="lg:col-span-7 lg:pt-16">
+            <p className="max-w-[62ch] text-[15.5px] leading-relaxed text-ink-2">Every forecast from 2019 to 2024 was made by a model trained only on earlier seasons, then compared with what happened.</p>
+            <div className="card scroll-thin mt-6 overflow-x-auto p-4 sm:p-5" tabIndex={0} aria-label="Reliability by horizon, scrollable">
+              <table className="num w-full min-w-[600px] text-left text-[14px]">
+                <thead><tr className="border-b border-ink text-[12px] text-ink-3"><th className="py-2 pr-4 font-semibold">Horizon</th><th className="py-2 pr-4 text-right font-semibold">Typical error</th><th className="py-2 pr-4 text-right font-semibold">80% range held</th><th className="py-2 pr-4 text-right font-semibold">at outbreak peaks</th><th className="py-2 pr-4 font-semibold">Against the 80% target</th><th className="py-2 text-right font-semibold">Peaks under-predicted</th></tr></thead>
+                <tbody>{C ? H.map((h) => { const r = C.out_of_time_2019_2024.by_horizon[String(h)]; return (
+                  <tr key={h} onClick={() => set({ horizon: h })} className={"cursor-pointer border-b border-line transition-colors hover:bg-mint-l " + (sel.horizon === h ? "bg-paper-3" : "")}><td className="whitespace-nowrap py-3.5 pr-4 font-medium text-ink">{h} weeks</td><td className="pr-4 text-right">{r.mae.toFixed(2)} cases</td>
+                    <td className="pr-4 text-right">{Math.round(r.coverage.all["80"] * 100)}%</td><td className="pr-4 text-right text-coral-d">{Math.round(r.coverage.peaks["80"] * 100)}%</td>
+                    <td className="pr-4"><CoverageStrip all={r.coverage.all["80"]} peaks={r.coverage.peaks["80"]} /></td><td className="text-right">{Math.round(r.peaks.under_share * 100)}%</td></tr>); })
+                  : H.map((h) => <tr key={h} className="border-b border-line"><td colSpan={6} className="py-3.5"><div className="skeleton h-4" /></td></tr>)}</tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-ink-3">Pooled over all ward-weeks. Light dot: all weeks; red dot: outbreak-peak weeks; dashed tick: the 80% target. Seasons 2022 to 2024 also guided the choice of model, so these are validation figures, not a blind test.</p>
+            {canon.status === "failed" && <p role="alert" className="mt-2 text-[13px] text-coral-d">Reliability figures are unavailable right now. <Link href="/evidence/" className="underline">Model Evidence</Link> has the saved results.</p>}
+          </div>
+        </div>
+        <div className="card mt-14 p-5 sm:p-7">
+          <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3"><h3 className="font-display text-[26px] font-extrabold tracking-[-0.02em] text-ink sm:text-[32px]">Every model we tried</h3>
+            <Link href="/evidence/" className="btn-ghost inline-flex min-h-11 items-center px-5 text-[14px]">Open the Model Comparison Explorer</Link></div>
+          <ModelStrip />
+        </div>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- 04 from risk to response */}
+      <Reveal as="section" aria-labelledby="ch-response" className="mt-24 grid gap-x-12 gap-y-8 sm:mt-32 lg:grid-cols-12">
+        <Chapter n="04" id="ch-response" title="From risk to response" className="lg:col-span-4">
+          <p className="mt-5 max-w-[40ch] text-[15.5px] leading-relaxed text-ink-2">The same forecast for every synthetic ward, ranked, so a health office can see where to look first. Response planning stays generic: options and a review queue, never quantities or orders.</p>
+          <div className="mt-7 flex items-baseline gap-4"><span className="num font-display text-[64px] leading-none text-ink">{W60.length ? alerts : "…"}</span><span className="text-[14px] leading-snug text-ink-3">of {W60.length || 60} wards on outbreak alert for the week of {target ? dateFmt(target, lang) : "…"}</span></div>
+          <Link href={`/response/${q}`} className="btn-ghost mt-6 inline-flex min-h-11 items-center px-5 text-[14px]">Open Response Intelligence</Link>
+        </Chapter>
+        <div className="card p-5 sm:p-6 lg:col-span-8 lg:mt-16">{W60.length ? <RiskField wards={W60} selected={sel.ward} onPick={(w) => set({ ward: w, city: "All" })} />
+          : wards.status === "failed" ? <p role="alert" className="text-[13.5px] text-ink-2">The ward ranking is unavailable right now.</p> : <div aria-busy="true"><div className="skeleton h-[260px]" /><RequestStatus q={wards} label="Ward ranking" /></div>}</div>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- 05 geospatial navigation */}
+      <Reveal as="section" aria-labelledby="ch-geo" className="mt-24 grid gap-x-12 gap-y-8 sm:mt-32 lg:grid-cols-12">
+        <div className="card p-5 sm:p-6 lg:order-2 lg:col-span-7"><FacilityMap /></div>
+        <Chapter n="05" id="ch-geo" title="Geospatial navigation" className="lg:order-1 lg:col-span-5">
+          <dl className="mt-7 grid grid-cols-3 gap-4 border-y border-line py-4">
+            <div className="flex flex-col-reverse justify-end"><dt className="mt-1 text-[12px] text-ink-3">facilities mapped</dt><dd className="num font-display text-[32px] leading-none text-ink">{fac ? num(fac.count, lang) : "…"}</dd></div>
+            <div className="flex flex-col-reverse justify-end"><dt className="mt-1 text-[12px] text-ink-3">km of road, one-way rules kept</dt><dd className="num font-display text-[32px] leading-none text-ink">{roadKm ? num(Math.round(roadKm), lang) : "…"}</dd></div>
+            <div className="flex flex-col-reverse justify-end"><dt className="mt-1 text-[12px] text-ink-3">routes where A* matched Dijkstra</dt><dd className="num font-display text-[32px] leading-none text-ink">{bench ? `${bench.equal_costs}/${bench.pairs}` : "…"}</dd></div>
+          </dl>
+          <p className="mt-5 text-[15.5px] leading-relaxed text-ink-2">Hospitals, clinics and roads come from OpenStreetMap; routes run on the directed road network. Emergency search lists general hospitals only and marks an emergency tag as unverified. There is no live traffic, bed or doctor data, so call before travelling.</p>
+          <Link href="/geography/" className="btn-ghost mt-5 inline-flex min-h-11 items-center px-5 text-[14px]">Open the map and routing</Link>
+        </Chapter>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- 06 scientific trust */}
+      <Reveal as="section" aria-labelledby="ch-trust" className="night mx-[calc(50%-50vw)] mt-24 px-[calc(50vw-50%)] py-16 sm:mt-32 sm:py-24">
+        <Chapter n="06" id="ch-trust" title="Scientific trust" />
+        <dl className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {[["Not live surveillance", "Every number replays the organizers' synthetic data for 2019 to 2024. The 60 wards are synthetic and cannot be placed on real ward boundaries, so maps stay at city level."],
+            ["Not medical advice", "Nothing here is advice for a patient. In an emergency call 999 or open Emergency help at the top of every page."],
+            ["Outbreak peaks", "Peaks are usually under-predicted and the 80% range is too narrow there. A peak-aware interval method (E1) is a research candidate and is not deployed."],
+            ["The 2025 test year", "Sealed. It has never been read, trained on or shown."],
+            ["Reproducibility", `Dataset SHA-256 ${meta?.data?.dataset_sha256?.slice(0, 12) ?? "…"}, model bundle ${meta?.model?.bundle_sha256?.slice(0, 12) ?? "…"}. One command rebuilds and serves everything, and automated tests check the reported numbers.`],
+            ["Your data", "No accounts and no tracking cookies. A location you share is used only to compute routes."]].map(([k, v]) => (
+            <div key={k} className="card p-5"><dt className="font-display text-[21px] font-extrabold tracking-[-0.01em] text-ink">{k}</dt><dd className="mt-1.5 max-w-[52ch] text-[14.5px] leading-relaxed text-ink-2">{v}</dd></div>))}
+        </dl>
+      </Reveal>
+
+      {/* ---------------------------------------------------------------- tools */}
+      <Reveal as="section" aria-labelledby="land-tools" className="mb-24 mt-24 sm:mb-32 sm:mt-32">
+        <h2 id="land-tools" className="font-display text-[34px] font-extrabold tracking-[-0.025em] text-ink sm:text-[46px]">Tools</h2>
+        <ul className="mt-6 grid gap-x-12 md:grid-cols-2">
+          {[[t("nav.command"), "One ward's forecast, how reliable it is and the next step.", `/command/${q}`], [t("nav.lab"), "Horizons, rainfall lags, drivers, the rainfall what-if and Climate Futures.", `/lab/${q}`],
+            [t("nav.wards"), "All 60 synthetic wards ranked by outbreak probability.", `/wards/${q}`], [t("nav.response"), "Alerts to review, generic response options and a resource sandbox.", `/response/${q}`],
+            [t("nav.geography"), "General hospitals by road from a real location.", "/geography/"], [t("nav.evidence"), "Validation, model comparison, calibration and provenance.", "/evidence/"]].map(([name, d, href]) => (
+            <li key={href} className="border-t border-line"><Link href={href} className="group flex min-h-11 items-baseline justify-between gap-4 py-5">
+              <span><span className="block font-display text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-ink transition-colors group-hover:text-emerald-d">{name}</span><span className="mt-1 block text-[14px] text-ink-3">{d}</span></span>
+              <span aria-hidden className="text-[20px] text-ink-3 transition-transform group-hover:translate-x-1 group-hover:text-emerald-d">→</span></Link></li>))}
+        </ul>
+      </Reveal>
     </div>
-
-    {f && <Card className="mb-5"><div className="grid items-center gap-4 sm:grid-cols-[auto_1fr_auto]">
-      <div className="min-w-[150px]"><Gauge value={f.p_outbreak} tier={f.risk_tier} height={130} /></div>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-4"><div><div className="eyebrow">{t("fc.median")}</div><div className="num text-2xl font-bold text-forest">{f.median_cases}</div></div>
-        <div><div className="eyebrow">{t("fc.mean")}</div><div className="num text-2xl font-bold text-forest">{num(f.expected_cases, lang, 1)}</div></div>
-        <div><div className="eyebrow">{t("fc.interval80")} / 90%</div><div className="num text-base font-semibold">{f.lower_80}–{f.upper_80} / {f.lower_90}–{f.upper_90}</div></div>
-        <div><div className="eyebrow">{t("fc.threshold")}</div><div className="num text-base font-semibold">≥ {f.outbreak_threshold} {t("fc.cases")}</div></div></div>
-      <div className="flex flex-col items-start gap-2 sm:items-end"><RiskBadge tier={f.risk_tier} size="lg" pulse /><ProvChip tone={f.outbreak_alert ? "warn" : "ok"}>{f.outbreak_alert ? t("fc.yes") : t("fc.no")}</ProvChip>
-        {f.actual_cases !== null && <span className="text-xs text-ink-3">{t("fc.actual")}: <b className="num text-coral-d">{f.actual_cases}</b></span>}</div></div>
-      {f.actual_cases !== null && (() => {   // time-machine verdict: what actually happened (target weeks up to 2024 only; 2025 is locked)
-        const y = f.actual_cases as number, err = y - f.median_cases, in80 = y >= f.lower_80 && y <= f.upper_80, in90 = y >= f.lower_90 && y <= f.upper_90, out = f.outbreak_threshold != null && y >= f.outbreak_threshold;
-        const call = f.outbreak_alert ? (out ? ["Correct alert", "text-emerald-d"] : ["False alert", "text-amber-d"]) : out ? ["Missed outbreak", "text-coral-d"] : ["Correctly quiet", "text-emerald-d"];
-        return (<div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-xl border border-line bg-canvas/70 px-4 py-2.5 text-[13px]">
-          <span className="eyebrow">Time-machine verdict</span>
-          <span>Error (actual − median): <b className={`num ${Math.abs(err) <= 2 ? "text-emerald-d" : "text-coral-d"}`}>{err > 0 ? "+" : ""}{err}</b> cases</span>
-          <span>80% interval: <b className={in80 ? "text-emerald-d" : "text-coral-d"}>{in80 ? "covered ✓" : "missed ✗"}</b></span>
-          <span>90% interval: <b className={in90 ? "text-emerald-d" : "text-coral-d"}>{in90 ? "covered ✓" : "missed ✗"}</b></span>
-          <span>Alert: <b className={call[1]}>{call[0]}</b></span>
-          <span className="text-[11.5px] text-ink-3">{S?.source === "replay" ? `Out-of-time: forecast by a model trained only on seasons before ${f.target_date.slice(0, 4)}.` : "In-sample: the deployed model saw this period in training."}</span></div>);
-      })()}</Card>}
-
-    <div className="grid gap-5 xl:grid-cols-[1.55fr_1fr]">
-      <Card>
-        <CardTitle title={`${t("sec.fan")} — ${sel.ward}`} sub={`${sel.horizon} ${t("ctl.weeks")} · ${t("fresh.convention")}`} right={f && <RiskBadge tier={f.risk_tier} pulse />} />
-        {series.data ? <FanChart series={series.data.series} markDate={f?.target_date} /> : series.loading ? <Skeleton h={320} /> : <EmptyState text="The validated replay covers origins 2019–2024. For later origins only the live forecast point is shown." />}
-        {fc.data && <p className="mt-2 text-xs text-ink-3">{fc.data.forecast.source === "replay" ? t("src.replay.desc") : t("src.bundle.desc")}</p>}
-      </Card>
-      <Card>
-        <CardTitle title={t("sec.compare")} sub={`${sel.ward} · ${dateFmt(sel.origin, lang)}`} />
-        <HorizonCompare />
-        <Link href="/lab/" className="mt-3 inline-block text-[13px] font-medium text-emerald-d underline underline-offset-4">{t("nav.lab")} →</Link>
-      </Card>
-
-      <Card className="xl:col-span-1">
-        <CardTitle title={t("sec.ranking")} sub={t("risk.note")} right={<Link href="/wards/" className="text-[13px] font-medium text-emerald-d underline underline-offset-4">{t("nav.wards")} →</Link>} />
-        <Loading q={ranking} h={380}>{(d: any) => (<ol className="space-y-1.5">{d.wards.map((w: Forecast, i: number) => (
-          <motion.li key={w.ward_id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}>
-            <button onClick={() => set({ ward: w.ward_id, city: "All" })} aria-pressed={w.ward_id === sel.ward} className={"grid w-full grid-cols-[22px_1fr_auto] items-center gap-3 rounded-xl border px-3 py-2 text-left transition hover:bg-mint-l/70 " + (w.ward_id === sel.ward ? "border-emerald bg-mint-l" : "border-line bg-white")}>
-              <span className="num text-xs text-ink-3">{i + 1}</span>
-              <span><span className="text-[13px] font-semibold text-ink">{w.ward_id}</span> <span className="text-xs text-ink-3">· {w.city}</span>
-                <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-line"><motion.span className="block h-full rounded-full" style={{ background: "linear-gradient(90deg,#9fe7c2,#d93a42)" }} initial={{ width: 0 }} animate={{ width: `${w.p_outbreak * 100}%` }} /></span></span>
-              <span className="text-right"><span className="num block text-sm font-bold">{pct(w.p_outbreak, lang)}</span><span className="num block text-[11px] text-ink-3">{w.median_cases} [{w.lower_90}–{w.upper_90}]</span></span></button></motion.li>))}</ol>)}</Loading>
-      </Card>
-
-      <div className="grid gap-5">
-        <Card><CardTitle title={t("sec.distribution")} sub={`${S?.wards ?? 60} ${t("kpi.wards")} · ${t("risk.note")}`} />
-          {S ? <TierBar counts={tierCounts} /> : <Skeleton h={200} />}
-          <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-[11.5px] text-ink-3">{TIERS.map((x) => <span key={x}><b style={{ color: "#44566a" }}>{t(`risk.${x.toLowerCase()}`)}</b>: {t(`risk.${x.toLowerCase()}.desc`)}</span>)}</div></Card>
-        <Card><CardTitle title={t("sec.drivers")} sub={t("drv.note")} />
-          <Loading q={fc} h={150}>{(d: any) => d.drivers?.log_rate_contributions ? <DriverBars contrib={d.drivers.log_rate_contributions} /> : <EmptyState text="Drivers unavailable for this selection." />}</Loading></Card>
-      </div>
-
-      <Card><CardTitle title={t("sec.weather")} sub={`${sel.ward} · 26 weeks before the origin · organizer (synthetic) weather`} />
-        <Loading q={rain} h={230}>{() => <Chart option={rainOpt} height={230} ariaLabel="Weekly rainfall before the forecast origin" />}</Loading></Card>
-      <Card><CardTitle title={t("avail.title")} sub={t("avail.key")} />
-        <Loading q={fc} h={180}>{(d: any) => (<ul className="space-y-2">{d.availability.map((a: any) => (<li key={a.horizon} className={"flex items-start gap-3 rounded-xl border p-3 text-[13px] " + (a.horizon === sel.horizon ? "border-emerald bg-mint-l" : "border-line")}>
-          <span className="num mt-0.5 rounded-lg bg-forest px-2 py-0.5 text-xs font-bold text-white">{a.horizon}w</span>
-          <span><b>{dateFmt(a.key_rain_week, lang)}</b> — {a.observed_at_origin ? <span className="text-emerald-d">{t("avail.observed")}</span> : <span className="text-amber-d">{t("avail.projected")}</span>}</span></li>))}</ul>)}</Loading></Card>
-    </div>
-
-    <Card className="mt-5"><CardTitle title={t("sec.limits")} />
-      <ul className="grid gap-2 text-[13px] text-ink-2 md:grid-cols-2"><li className="flex gap-2"><span className="text-coral">●</span>{t("lim.peaks")}</li><li className="flex gap-2"><span className="text-coral">●</span>{t("lim.cover")}</li>
-        <li className="flex gap-2"><span className="text-amber">●</span>{t("lim.noweather")}</li><li className="flex gap-2"><span className="text-amber">●</span>{t("lim.synthetic")}</li></ul>
-      <p className="mt-3 text-xs text-ink-3">{t("disc.official")} · {meta?.model?.name} · bundle {meta?.model?.bundle_sha256?.slice(0, 10)} · data SHA-256 {meta?.data?.dataset_sha256?.slice(0, 10)}</p></Card>
-  </>);
+  </div>);
 }

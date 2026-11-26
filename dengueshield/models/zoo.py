@@ -286,6 +286,10 @@ REGISTRY = {
     "lgbm_quantile": lambda **k: LGBMCount("quantile", **{"alpha": 0.5, **k}),
     "severity_clf": lambda **k: SeverityClassifier(**k),
 }
+# V3 classical benchmarks (research only): Random Forest, Extra Trees, ridge least squares, k-NN, small MLP
+from dengueshield.models.classical import NEW_MODELS, ClassicalRegressor  # noqa: E402
+
+REGISTRY.update({k: (lambda kind: (lambda **_: ClassicalRegressor(kind)))(k) for k in NEW_MODELS})
 
 
 def make(name: str, **params):

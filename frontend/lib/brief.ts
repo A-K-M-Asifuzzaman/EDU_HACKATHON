@@ -126,7 +126,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
       border: none;
       transition: all 0.15s ease;
     }
-    .btn-tb-primary { background: #0e8f66; color: #ffffff; }
+    .btn-tb-primary { background: #4b45d1; color: #ffffff; }
     .btn-tb-primary:hover { background: #0b7352; }
     .btn-tb-lang { background: #334155; color: #ffffff; }
     .btn-tb-lang:hover { background: #475569; }
@@ -174,7 +174,7 @@ export function buildBrief(d: { sel: any; S: any; f: any; top: any[]; metrics: a
     }
     .bulletin-subtitle {
       font-size: 11px;
-      color: #0e8f66;
+      color: #4b45d1;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;

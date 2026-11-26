@@ -49,6 +49,7 @@ class Ctx:
     clag: int            # case availability lag (weeks); >= wlag in practice
     stats: FittedStats
     rain_est: str = "regime"  # how unobserved rain is projected: regime | clim | zero
+    proj_scale: float = 1.0   # hypothetical what-if multiplier on PROJECTED (not yet observed) rain; 1.0 = deployed behaviour
     out: list = field(default_factory=list)
     _cache: dict = field(default_factory=dict)
 
@@ -169,6 +170,8 @@ def _aligned(c: Ctx, var_raw: np.ndarray, name: str, ks, family: str, sub: str, 
                 base = np.where(nn >= 3, cond, ps["mean"])
             elif name == "rain" and mode == "zero":
                 base = np.zeros_like(base)
+            if name == "rain" and c.proj_scale != 1.0:
+                base = base * c.proj_scale
             val, obs, cls = base, np.zeros(var_raw.shape), 4
         res[k] = (val, obs)
         c.add(f"{name}_tl{k}", val, family, sub, cls, f"{name} at target-date minus {k} weeks (observed if available, else estimate [{mode}])")

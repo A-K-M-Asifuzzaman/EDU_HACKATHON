@@ -30,4 +30,4 @@ RUN python scripts/fetch_data.py
 ENV PYTHONUNBUFFERED=1
 EXPOSE 10000
 # --proxy-headers so the per-client Copilot rate limit sees the visitor's IP, not the platform proxy's.
-CMD ["sh", "-c", "exec python -m uvicorn dengueshield.api.main:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "exec python -m uvicorn dengueshield.api.main:app --host 0.0.0.0 --port ${PORT:-10000} --no-proxy-headers"]

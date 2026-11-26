@@ -214,8 +214,20 @@ def area_for(lat: float, lon: float) -> str:
     raise RoutingError("this location is outside the mapped routing areas (Greater Dhaka and Chattogram)")
 
 
+_CLASSIFIED: dict = {}
+
+
 def facilities() -> dict:
-    return _load("facilities.geojson") or {"type": "FeatureCollection", "features": []}
+    """Facilities with derived classification fields (care, category, specialist_reason, emergency_status) added to each record.
+    The original OpenStreetMap fields are kept unchanged; classification is recomputed from them (see facility_class.py)."""
+    raw = _load("facilities.geojson") or {"type": "FeatureCollection", "features": []}
+    key = id(raw)
+    if _CLASSIFIED.get("key") != key:
+        from dengueshield.facility_class import classify
+        for f in raw["features"]:
+            f["properties"].update(classify(f["properties"]))
+        _CLASSIFIED.update(key=key)
+    return raw
 
 
 def _route_summary(G: Graph, res: dict, s: int, weight: str) -> dict:
@@ -256,17 +268,12 @@ def route(from_lat: float, from_lon: float, to_lat: float, to_lon: float, verify
     return out
 
 
-def nearest_facilities(lat: float, lon: float, k: int = 5, kind: str | None = "hospital") -> dict:
-    area = area_for(lat, lon)
-    G = graph(area)
-    s, ds = G.snap(lat, lon)
+def _nearest(G: Graph, s: int, feats: list, k: int) -> tuple[list, float]:
     targets: dict[int, list] = {}
-    for f in facilities()["features"]:
-        p = f["properties"]
-        if p.get("area") == area and (kind is None or p["kind"] == kind) and p.get("snap_m", 1e9) <= 300:
-            targets.setdefault(p["graph_node"], []).append(f)
+    for f in feats:
+        targets.setdefault(f["properties"]["graph_node"], []).append(f)
     t0 = time.perf_counter()
-    hits = G.nearest_targets(s, targets, k, "time")
+    hits = G.nearest_targets(s, targets, k, "time") if targets else []
     ms = (time.perf_counter() - t0) * 1000
     items = []
     for v, cost, edges in hits:
@@ -274,7 +281,40 @@ def nearest_facilities(lat: float, lon: float, k: int = 5, kind: str | None = "h
         for f in targets[v]:
             items.append({"facility": f, "est_time_s": round(secs, 1), "distance_m": round(length, 1),
                           "geometry": {"type": "LineString", "coordinates": G.geometry(edges, s)}})
-    return {"area": area, "origin": {"snap_m": round(ds, 1)}, "results": items[:k], "search_ms": round(ms, 1), "method": "multi-target Dijkstra on estimated travel time"}
+    return items[:k], ms
+
+
+def nearest_facilities(lat: float, lon: float, k: int = 5, kind: str | None = "hospital", purpose: str = "general") -> dict:
+    """Nearest facilities by estimated road travel time (multi-target Dijkstra on the directed road graph).
+
+    purpose="emergency": human-care hospitals that are general, or any human facility tagged emergency=yes in OpenStreetMap;
+    veterinary, diagnostic-only and specialist facilities, and facilities tagged emergency=no, are left out. The separate
+    `emergency_tagged` list gives the nearest facilities explicitly tagged emergency=yes. A missing tag means UNKNOWN.
+    purpose="general": every human-care facility of the requested kind (veterinary always excluded)."""
+    from dengueshield.facility_class import emergency_eligible
+    area = area_for(lat, lon)
+    G = graph(area)
+    s, ds = G.snap(lat, lon)
+    local = [f for f in facilities()["features"] if f["properties"].get("area") == area and f["properties"].get("snap_m", 1e9) <= 300]
+    human = [f for f in local if f["properties"].get("care") == "human"]
+    if purpose == "emergency":
+        pool = [f for f in human if emergency_eligible(f["properties"], f["properties"]["kind"])]
+    else:
+        pool = [f for f in human if kind is None or f["properties"]["kind"] == kind]
+    items, ms = _nearest(G, s, pool, k)
+    tagged, ms2 = _nearest(G, s, [f for f in human if f["properties"].get("emergency_status") == "tagged_yes"
+                                  and emergency_eligible(f["properties"], f["properties"]["kind"])], min(3, k))
+    excluded = {}
+    if purpose == "emergency":
+        for f in local:
+            p = f["properties"]
+            if f not in pool:
+                why = ("veterinary" if p.get("care") == "veterinary" else "tagged emergency=no" if p.get("emergency_status") == "tagged_no"
+                       else p.get("category", "other"))
+                excluded[why] = excluded.get(why, 0) + 1
+    return {"area": area, "purpose": purpose, "origin": {"snap_m": round(ds, 1)}, "results": items, "emergency_tagged": tagged,
+            "excluded_counts": excluded, "candidates": len(pool), "search_ms": round(ms + ms2, 1),
+            "method": "multi-target Dijkstra on estimated travel time"}
 
 
 def benchmark(pairs_per_area: int = 100, seed: int = 2026) -> dict:

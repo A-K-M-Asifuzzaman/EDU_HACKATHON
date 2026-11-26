@@ -52,7 +52,7 @@ export default function Wards() {
     <ControlsBar show={["city", "origin", "horizon", "source"]} />
     <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
       <Card><CardTitle title="Risk matrix" sub={`${sel.horizon} ${t("ctl.weeks")} · ${dateFmt(sel.origin, lang)} · click a tile for details; tick rows below to compare`} right={<div className="flex gap-1.5">{TIERS.map((x) => <span key={x} className="flex items-center gap-1 text-[11px] text-ink-3"><i className="h-2.5 w-2.5 rounded-sm" style={{ background: TIER_COLOR[x] }} />{t(`risk.${x.toLowerCase()}`)}</span>)}</div>} />
-        <Loading q={all} h={300}>{() => <RiskMatrix wards={wards} city={sel.city} picked={picked} onOpen={setDetail} />}</Loading></Card>
+        <Loading q={all} h={300} kind="chart" label="Ward risk matrix">{() => <RiskMatrix wards={wards} city={sel.city} picked={picked} onOpen={setDetail} />}</Loading></Card>
       <Card><CardTitle title="City overview" sub="Alerting wards per city" />
         <CityMap points={cityPts} selected={sel.city !== "All" ? sel.city : undefined} onSelect={(c) => set({ city: c })} height={300} />
         <div className="mt-3 grid grid-cols-2 gap-2 text-[12px]">{cityPts.map((c: any) => (<button key={c.city} onClick={() => set({ city: sel.city === c.city ? "All" : c.city })} className={cls("rounded-xl border px-3 py-2 text-left hover:bg-mint-l/60", sel.city === c.city ? "border-emerald bg-mint-l" : "border-line")}><b>{c.city}</b><br /><span className="text-ink-3">{c.alerts}/{c.wards} alerts · {pct(c.meanP, lang)}</span></button>))}</div></Card>
