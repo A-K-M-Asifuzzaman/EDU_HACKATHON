@@ -487,6 +487,8 @@ The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 
 ---
 
+Team, responsibilities and how contributions are recorded: `CONTRIBUTORS.md`. Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
+
 ## 🔐 Security & Privacy
 
 > [!CAUTION]
