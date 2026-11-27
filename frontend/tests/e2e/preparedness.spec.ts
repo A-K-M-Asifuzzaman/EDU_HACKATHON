@@ -2,7 +2,6 @@
 import { expect, test } from "./fixtures";
 
 const PAGE = "/response/?origin=2024-08-05&horizon=3&nointro";
-const PAGE_DN = "/response/?origin=2024-08-05&horizon=3&city=Dhaka%20North&nointro";   // city from the shared scenario URL
 const DEMO = "/api/preparedness/plan?origin=2024-08-05&service=p80&city=Dhaka%20North&shock=2&non_dengue=105&dengue_now=100&closed=0&surge=100&saline=60&kits=60&lead=10&los=5&los_other=6&crews=20";
 
 test.describe("Hospital preparedness", () => {
@@ -16,17 +15,27 @@ test.describe("Hospital preparedness", () => {
     await expect(box.getByTestId("prep-scenario-id")).toHaveText(api.scenario_id, { timeout: 60_000 });
     await expect(answers).toContainText(`${c.peak_needed} need / ${c.capacity} beds`);
     await expect(answers).toContainText(`${c.saline_required} saline`);
-    await expect(answers).toContainText(`${r.referred} referrals`);
+    await expect(answers).toContainText(`${r.referred_28d} referrals`);
+    await expect(answers).toContainText("28-day plan");
     await expect(answers).toContainText(c.status);
     expect(r.referred + r.bed_gap_after_referral).toBe(r.bed_gap_worst_day);
     for (const t of api.states.response.network.transfers) await expect(box.getByRole("cell", { name: t.from_name }).first()).toBeVisible();
     await expect(box.getByText("Live outbreak detection unavailable.")).toBeVisible();
+    const te = api.states.response.network.time_expanded;
+    expect(te.available && Object.values(te.checks).every(Boolean)).toBe(true);
+    await expect(box.getByTestId("te-evidence")).toContainText(`${te.unresolved_without_referral} without referrals, ${te.unresolved} with this plan (${te.referred} referred)`);
+    await expect(box.getByTestId("stockout-countdown")).toContainText(`day ${c.first_saline_stockout_day}`);
+    const ic = api.states.response.inventory_compare;
+    await expect(box.getByRole("cell", { name: String(ic.saline.redistribution_and_procurement), exact: true }).first()).toBeVisible();
+    await box.getByRole("button", { name: "Play 28 days" }).click();
+    await expect(box.getByRole("heading", { name: /Hospital bed boards on day \d+/ })).toBeVisible();
     await expect(box.getByText(/fictional planning hospitals/i).first()).toBeVisible();
   });
 
   test("a shock changes demand but never the forecast; resetting restores the baseline", async ({ page }) => {
-    await page.goto(PAGE_DN);
+    await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await box.getByLabel("Planning area").selectOption("Dhaka North");              // immediately, before the URL scenario is restored
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     const id0 = await box.getByTestId("prep-scenario-id").textContent({ timeout: 60_000 });
     await box.getByRole("group", { name: "Outbreak shock" }).getByRole("button", { name: "+200%" }).click();
@@ -40,8 +49,9 @@ test.describe("Hospital preparedness", () => {
   });
 
   test("real hospitals show unknown capacity and only bundled phone numbers", async ({ page }) => {
-    await page.goto(PAGE_DN);
+    await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await box.getByLabel("Planning area").selectOption("Dhaka North");              // immediately, before the URL scenario is restored
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     await box.getByRole("button", { name: /Search from the Dhaka North centre/ }).click();
     const tiers = box.getByTestId("real-tiers");
@@ -54,11 +64,31 @@ test.describe("Hospital preparedness", () => {
   test("the brief downloads carry the scenario id shown on screen", async ({ page }) => {
     await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await expect(box.getByTestId("prep-scenario-id")).toBeVisible({ timeout: 60_000 });
+    const id0 = await box.getByTestId("prep-scenario-id").textContent();
     await box.getByRole("button", { name: "Mentor demonstration" }).click();
+    await expect(box.getByTestId("prep-scenario-id")).not.toHaveText(id0!, { timeout: 60_000 });
     const id = await box.getByTestId("prep-scenario-id").textContent({ timeout: 60_000 });
     const href = await box.getByRole("link", { name: "Download the preparation brief as CSV" }).getAttribute("href");
     const csv = await (await page.request.get(href!)).text();
     expect(csv).toContain(id!);
+  });
+
+  test("a city chosen before the shared scenario finishes restoring is kept, and reaches the URL", async ({ page }) => {
+    await page.goto(PAGE);
+    const sel = page.locator("#prepare").getByLabel("Planning area");
+    await sel.selectOption("Dhaka North");                                       // ~50 ms after load; the restore lands later
+    await page.waitForTimeout(1500);
+    await expect(sel).toHaveValue("Dhaka North");
+    await expect(page).toHaveURL(/city=Dhaka(\+|%20)North/);
+    await page.goto(PAGE + "&city=Gazipur");                                     // a deep link still restores normally
+    await expect(page.locator("#prepare").getByLabel("Planning area")).toHaveValue("Gazipur", { timeout: 30_000 });
+  });
+
+  test("the geography directory keeps real hospitals separate from the planning network", async ({ page }) => {
+    await page.goto("/geography/?nointro");
+    await expect(page.getByTestId("directory-modes")).toContainText("fictional planning network");
+    await expect(page.getByTestId("directory-modes")).toContainText("never attached to these facilities");
   });
 
   for (const width of [360, 390]) {

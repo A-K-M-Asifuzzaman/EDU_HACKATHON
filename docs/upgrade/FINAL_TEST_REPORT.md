@@ -1,19 +1,20 @@
-# Final test report (championship sprint)
+# Final test report (closure sprint)
 
-Development laptop (macOS), 27 Nov 2026, branch `upgrade/championship-engine-v2`. Local API on port 8300 from this worktree,
-`FIREBASE_PROJECT_ID=demo-dengueshield-e2e`, frontend built with the CI placeholder environment. Retries off for every browser run.
+Development laptop (macOS), 27 Nov 2026, branch `upgrade/championship-engine-v2`. Browser runs with retries off, frontend built with the
+CI placeholder environment, local API with `FIREBASE_PROJECT_ID=demo-dengueshield-e2e`.
 
-| Suite | Result | Notes |
+| Gate | Result | Notes |
 |---|---|---|
-| `tests/test_preparedness.py` (new) | 17 passed | occupancy, inventory, alerts, LP vs max-flow, provenance, API contract |
-| Python, full | 646 passed, 9 failed in the run with the onsite venv; the 9 then passed in the right environment | 6 need research libraries (`xgboost`, `catboost`, `optuna`, `yaml`): 34 passed with the research venv; 1 build-stamp test compared a commit made during the run: passed on rerun; 1 weather test fails whenever a fresh weather cache exists: `tests/test_offline.py` 10 passed with an empty `DENGUESHIELD_CACHE`; auth tests need `google-auth`: 13 passed with the onsite venv |
-| Browser, full (`frontend/tests/e2e`) | 139 passed, 1 skipped, 1 failed | the failure was the new cursor test against a build made before the cursor existed |
-| Browser after rebuild | 40 passed (cursor, scenario, preparedness, ops-engine, v4) + 31 passed (landing, every route, axe light and Dim) | includes Codex's scenario test, fixed by renaming the preparedness reset button |
-| Offline kill-switch (macOS sandbox, loopback only) | 28 of 28 results identical, offline browser test passed, 0 outbound attempts | [OFFLINE_VERIFICATION.md](OFFLINE_VERIFICATION.md) |
+| Python, full (runtime venv, empty weather cache, without `test_models.py`) | 628 passed, 1 failed | the failure is `test_deploy_config` needing `yaml`, absent from that venv; it passed in the research venv |
+| Python, research venv (`test_models.py`, `test_deploy_config.py`) | 34 passed | needs xgboost, catboost, optuna, yaml |
+| Browser, full | 142 passed, 1 skipped, 0 failed | after the last UI fix, `preparedness.spec.ts` re-run: 8 passed |
+| Preparedness unit tests | 22 passed | after the referral-consistency fix |
+| Offline kill-switch (macOS sandbox, loopback only) | 28/28 identical, offline browser test passed, 0 outbound attempts | |
+| Fresh clone (`--depth 1` of the pushed branch at `12dda5f`) | `scripts/setup.sh` completed; 266 tests passed (preparedness, offline, overflow, allocation); `launch_offline.sh`: 28/28 identical to that clone's online baseline; Response 200; offline readiness `artifacts_ok: true` | the fresh clone downloaded and checksum-verified the datasets |
+| GitHub CI | see PROGRESS_CHECKPOINT.md for the final run id | earlier runs on this branch: 45999833899 (`a7f37b9`) all four jobs green, 140 browser tests passed |
 
-Fixed during the run: a duplicate "Reset scenario" button name (now "Reset preparedness"); two preparedness tests that changed the city
-before the shared scenario URL finished restoring (they now open Dhaka North by URL). Known behaviour, not changed: a city chosen in the
-first moment after page load can be overwritten when the shared scenario restores from the URL.
+Fixed in this sprint: the shared-scenario restore race (an edit made in the first ~300 ms was overwritten; now re-applied, with a test);
+the executive tile, status-after-response and text brief used the peak-day referral count while the 28-day plan said otherwise (now the
+28-day plan everywhere, the peak-day plan labelled as a cross-check).
 
-Not run here: GitHub CI on this branch (dispatched after the final push; see the run link in the PR), a fresh-clone setup, a physical
-Wi-Fi-off run on the judging laptop.
+Not run: physical Wi-Fi-off on the judging laptop; a screen-reader pass (automated axe only).

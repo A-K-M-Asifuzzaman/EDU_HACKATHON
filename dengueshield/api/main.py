@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import hmac
 import math
@@ -1225,13 +1226,20 @@ EMERGENCY = {"numbers": [
                       "intro": "Seek medical care immediately if any of these warning signs appear, usually 24-48 hours after the fever goes down:",
                       "signs": ["severe abdominal pain", "persistent vomiting", "rapid breathing", "bleeding gums or nose", "fatigue or restlessness",
                                 "blood in vomit or stool", "being very thirsty", "pale and cold skin", "feeling weak"]},
-    "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999."}
+    "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999.",
+    "checked": {"date": "2026-11-27", "note": "999: toll-free, 24 h, run by Bangladesh Police, connects police, fire service and ambulance (national press and the "
+                "ITU WSIS project record). 16263: DGHS national health call centre (DGHS and WHO SEARO material); press reports have questioned its funding "
+                "continuity, so call 999 if it does not answer. No other ambulance number is published by this app.",
+                "sources": ["https://www.itu.int/net4/wsis/stocktaking/Prizes/2025/Details/15149061210000000",
+                            "https://www.dhakatribune.com/bangladesh/412748/national-emergency-service-999-receives-over-72.36",
+                            "https://seaextranet.searo.who.int/meetings/TMwrshp/Shared%20Documents/Presentations/Plenary%20IV%20Telemedicine%20and%20digital%20health%20tools%20for%20COVID-19%20and%20beyond/SEAR%20TLM%20workshop-7-9%20Feb%202023-%20Plenary%20IV%20-%20Bangladesh.pdf",
+                            "https://en.prothomalo.com/bangladesh/gdmucoatn3"]}}
 
 
 # ------------------------------------------------------------------ hospital preparedness and emergency surge (mentor scope)
 PREP_CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"]
 PREP_PROVENANCE = [
-    {"what": "Weekly dengue cases, weeks 2-4", "source": "organizer_synthetic + model_estimate", "note": "origin-safe forecast of the organizer's synthetic dataset at the chosen service level"},
+    {"what": "Weekly dengue cases, weeks 2-4", "source": "organizer_synthetic + model_estimate", "note": "origin-safe forecast of the organizer's SYNTHETIC dataset (not real surveillance). City totals sum ward-level values at the chosen service level; a sum of ward upper bounds is not a calibrated joint city-level bound"},
     {"what": "Week 1 cases", "source": "model_estimate (scenario-derived)", "note": "midpoint of the observed week 0 and forecast week 2; the model has no 1-week horizon"},
     {"what": "Saline, kit and bed multipliers per case", "source": "organizer_synthetic", "note": "the organizer's aggregate resource rules"},
     {"what": "Planning hospitals, beds, occupancy, stock, deliveries, lead times", "source": "synthetic_demo", "note": "fictional facilities; not real hospitals"},
@@ -1276,18 +1284,30 @@ def _prep_compact(state: dict) -> dict:
              for d in range(prep.DAYS)]
     out = []
     for h in state["hospitals"]:
-        x = {k: v for k, v in h.items() if k not in ("daily", "daily_needed")}
+        x = {k: v for k, v in h.items() if k not in ("daily", "daily_needed", "dengue_arrivals", "fixed_census")}
+        x["occ"] = [[r["other"], r["dengue"], h["daily_needed"][i]] for i, r in enumerate(h["daily"])]
         x["inventory"] = {r: {k: v for k, v in inv.items() if k != "rows"} for r, inv in h["inventory"].items()}
         out.append(x)
-    return {"hospitals": out, "network": state["network"], "summary": state["summary"], "checks": state["checks"], "daily": daily}
+    res = {"hospitals": out, "network": state["network"], "summary": state["summary"], "checks": state["checks"], "daily": daily}
+    if "inventory_compare" in state:
+        res["inventory_compare"] = state["inventory_compare"]
+    return res
+
+
+def _prep_referrals(summary: dict) -> tuple[int, int, str]:
+    """(patients referred, patients still without a bed, basis): the 28-day program when it passed its checks, else the peak-day plan."""
+    if summary.get("unresolved_28d") is not None:
+        return summary["referred_28d"], summary["unresolved_28d"], "28-day plan"
+    return summary["referred"], summary["bed_gap_after_referral"], "peak-day plan"
 
 
 def _prep_after(summary: dict) -> str:
-    if summary["bed_gap_after_referral"] > 0:
+    referred, unresolved, _ = _prep_referrals(summary)
+    if unresolved > 0:
         return "Emergency Surge"
     if summary["saline_unmet"] or summary["kits_unmet"]:
         return "Critical"
-    return "Warning" if summary["referred"] else "Normal"
+    return "Warning" if referred else "Normal"
 
 
 def preparedness_compute(origin: str, service: str, city: str, source: Optional[str], sc: "prep.Scenario", crews: int) -> dict:
@@ -1311,26 +1331,32 @@ def preparedness_compute(origin: str, service: str, city: str, source: Optional[
                 shares.append(0.0 if not t.get("baseline") else min(0.9, t["prevented"] / t["baseline"]))
             scen = prep.replace(sc, prevented_share=(0.0, *shares))
             iv_note = {"crews": crews, "prevented_share_weeks_2_4": [round(x, 4) for x in shares],
-                       "basis": "Stage 3 simulator, moderate assumed effect; an assumption, not a measured reduction"}
+                       "basis": "Stage 3 simulator, moderate assumed effect: a simulated scenario, not an observed or causal effect"}
         fx, rules = prep.load_fixture(), alloc_rules()
         base = prep.plan_state(fx, weekly, prep.Scenario(prevented_share=scen.prevented_share), rules, False)
         crisis = prep.plan_state(fx, weekly, scen, rules, False)
         resp = prep.plan_state(fx, weekly, scen, rules, True)
         resp["summary"]["status_after_response"] = _prep_after(resp["summary"])
         acts = prep.actions(base, crisis, resp)
-        sid = prep.scenario_id({**params, "fixture_version": fx["version"]})
+        # the id covers every input: settings, fixture, dataset and model bundle (a changed input gives a new id)
+        sid = prep.scenario_id({**params, "fixture_version": fx["version"], "fixture_sha": hashlib.sha256(prep.FIXTURE.read_bytes()).hexdigest()[:16],
+                                "data_sha": getattr(S, "data_sha", None), "bundle_sha": getattr(S, "bundle_sha", None)})
         return {"scenario_id": sid, "origin": origin, "service": service, "service_label": alloc.SERVICE_LABEL.get(service, service) if hasattr(alloc, "SERVICE_LABEL") else service,
                 "city": city, "cities": cities, "weekly_cases": weekly, "forecast": meta, "inputs": params, "intervention": iv_note,
                 "states": {"baseline": _prep_compact(base), "crisis": _prep_compact(crisis), "response": _prep_compact(resp)},
                 "actions": acts, "signals": {c: _prep_signal(c, origin) for c in cities},
                 "detection_note": "Live outbreak detection unavailable. Historical replay and hypothetical outbreak stress testing are available.",
                 "provenance": PREP_PROVENANCE, "fixture_label": fx["label"], "fixture_basis": fx["generated_from"], "unknown": PREP_UNKNOWN,
-                "assumptions": ["Weekly admissions = round(cases x admission rate); the default rate is the organizer's bed multiplier per case.",
+                "assumptions": ["All case numbers come from the organizer's synthetic competition dataset (2016-2024; 2025 sealed). Nothing is live surveillance.",
+                                "City cases at the upper 80% or 90% level are sums of ward-level upper bounds. That sum is not a calibrated joint city-level bound: treat it as a conservative planning level, not a guarantee.",
+                                "Week 1 is scenario-derived (midpoint of observed week 0 and forecast week 2); the model is validated only for 2-4 weeks.",
+                                "Weekly admissions = round(cases x admission rate); the default rate is the organizer's bed multiplier per case.",
                                 "Each admitted patient stays exactly the length of stay; existing patients leave evenly over their stay.",
                                 "Routine admissions stop at the protected reserve; patients who cannot be admitted are counted as unresolved, never as occupying a bed.",
                                 "Saline and kit demand = the organizer's multipliers x the hospital's share of all cases; stock never goes negative; deliveries count only from their arrival day.",
                                 "Reorder point = demand during the lead time + safety stock. Order-by day = first safety-stock breach - lead time.",
-                                "Referral plan: maximum patients placed at the network's worst day (LP, checked by max-flow), then same-city receivers first.",
+                                "Referral plan: a 28-day integer program (other-illness patients keep their beds; referred patients occupy the receiver for their whole stay; fewest unresolved first, then same-city receivers), re-simulated day by day. The peak-day plan (LP checked by max-flow) is kept as a cross-check and fallback.",
+                                "Emergency redistribution: on day 1 a hospital gives only stock that keeps it above its own safety stock on every day; units arrive the next day and help only unmet days after arrival (transport LP, re-simulated).",
                                 "Planning rules, not clinical triage or official warning levels. No dosage or treatment instructions."],
                 "disclaimer": DISCLAIMER}
 
@@ -1396,8 +1422,12 @@ def preparedness_brief(origin: str, format: Literal["html", "csv", "txt", "json"
             ("Protected reserve", c["reserve"]), ("Peak patients needing a bed", c["peak_needed"]), ("Extra beds to keep the reserve", c["extra_beds_to_protect_reserve"]),
             ("First reserve breach", wk(c["first_reserve_breach_week"])), ("First bed shortage", wk(c["first_shortage_week"])),
             ("Saline to procure", c["saline_required"]), ("Diagnostic kits to procure", c["kits_required"]), ("First saline stockout", wk(c["first_saline_stockout_week"])),
-            ("Referrals in the planning network", r["referred"]), ("Bed gap after response", r["bed_gap_after_referral"]),
-            ("Saline still unmet after orders", r["saline_unmet"]), ("Status: crisis / after response", f"{c['status']} / {r['status_after_response']}"),
+            ("Peak-day referrals / bed gap after (cross-check)", f"{r['referred']} / {r['bed_gap_after_referral']}"),
+            ("28-day referral plan", "not available" if r.get("referred_28d") is None else f"{r['referred_28d']} referred, {r['unresolved_28d']} still without a bed"),
+            *[(f"{lab} unmet: no action / procurement only / redistribution + procurement",
+               f"{ic[res]['no_action']} / {ic[res]['procurement_only']} / {ic[res]['redistribution_and_procurement']}")
+              for ic in [d["states"]["response"].get("inventory_compare") or {}] if ic for res, lab in (("saline", "Saline"), ("kits", "Kits"))],
+            ("Saline still unmet after response", r["saline_unmet"]), ("Status: crisis / after response", f"{c['status']} / {r['status_after_response']}"),
             ("Intervention", "none" if not d["intervention"] else f"{crews} crews, assumed effect"),
             ("Emergency contacts", "999 (National Emergency Service, ambulance), 16263 (DGHS Shasthya Batayon)"),
             ("Data", "Planning hospitals are fictional (synthetic_demo). Real facility capacity and availability are unknown.")]
@@ -1411,7 +1441,7 @@ def preparedness_brief(origin: str, format: Literal["html", "csv", "txt", "json"
         return Response("\n".join(lines) + "\n", media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{name}.csv"', "X-Scenario-Id": d["scenario_id"]})
     if format == "txt":
         txt = (f"DengueShield preparedness {d['scenario_id']} ({city}, forecast {origin}): status {c['status']}; prepare {c['extra_beds_to_protect_reserve']} beds before "
-               f"{wk(c['first_reserve_breach_week'])}; order {c['saline_required']} saline, {c['kits_required']} kits; referrals {r['referred']}, gap after {r['bed_gap_after_referral']}. "
+               f"{wk(c['first_reserve_breach_week'])}; need {c['saline_required']} saline, {c['kits_required']} kits (incl. redistribution); {_prep_referrals(r)[2]}: referrals {_prep_referrals(r)[0]}, without a bed {_prep_referrals(r)[1]}. "
                "Fictional planning hospitals; not an order. Emergency 999.")
         return Response(txt, media_type="text/plain; charset=utf-8", headers={"X-Scenario-Id": d["scenario_id"]})
     tr = "".join(f"<tr><th>{_h.escape(str(k))}</th><td>{_h.escape(str(v))}</td></tr>" for k, v in rows)
@@ -1452,7 +1482,7 @@ def preparedness_referrals(lat: Lat, lon: Lon):
                                       "straight_line_km": round(km, 1), "est_time_s": None, "osm_url": p.get("osm_url"),
                                       "coordinates": f["geometry"]["coordinates"], "capacity": PREP_UNKNOWN["capacity"], "availability": PREP_UNKNOWN["availability"],
                                       "route_note": "No bundled road route between regions; straight-line distance only."})
-    return {"area": near["area"], "home_city": home, "tiers": tiers, "emergency": EMERGENCY["numbers"],
+    return {"area": near["area"], "home_city": home, "tiers": tiers, "emergency": EMERGENCY["numbers"], "emergency_checked": EMERGENCY["checked"],
             "rules": ["Tiers by estimated road time: nearby <= 15 min, wider city <= 30 min, then the rest of the district, then neighbouring districts.",
                       "Missing availability is unknown, never 'full'. Do not bypass nearby emergency stabilization for a distant hospital.",
                       "Inter-facility transfers need clinical coordination and the receiving hospital's confirmation."],
