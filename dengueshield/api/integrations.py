@@ -15,7 +15,8 @@ _last_err: dict = {}
 
 
 def openai_configured() -> bool:
-    return bool(os.environ.get("OPENAI_API_KEY"))
+    from dengueshield import offline
+    return bool(os.environ.get("OPENAI_API_KEY")) and not offline.active()       # offline mode: Copilot falls back to local retrieval
 
 
 def _load_env():

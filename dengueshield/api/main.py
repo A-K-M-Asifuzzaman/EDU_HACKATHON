@@ -29,6 +29,9 @@ from dengueshield import intervention as iv
 from dengueshield import dispatch as dsp
 from dengueshield.onsite_data import ONSITE_SHA256 as ONSITE_SHA256_, load_onsite_development_panel
 from dengueshield.api import climate, geo, integrations
+from dengueshield import offline as offline_mode
+if offline_mode.requested():                       # scripts/launch_offline.sh: loopback only, every other connection refused and recorded
+    offline_mode.enable()
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
 
@@ -182,6 +185,16 @@ def health():
     status = "ok" if all(ok.values()) else ("degraded" if ok["bundle"] or ok["replay"] else "down")
     return {"status": status, "components": ok, "errors": S.errors, "uptime_s": round(time.time() - STARTED), "inference_probe_ms": probe,
             "latency_ms": S.latency_ms, "openai_configured": integrations.openai_configured(), "cache_entries": len(S.cache)}
+
+
+@app.get("/api/system/offline")
+def system_offline():
+    """Offline readiness: mode, local artifacts, external assets in the built dashboard, service states and blocked outbound attempts."""
+    arts, _ = S.cache.get_or(("offline_artifacts",), lambda: offline_mode.check_artifacts())
+    return {"offline_mode": offline_mode.active(), "artifacts_ok": all(a["ok"] for a in arts), "artifacts": arts,
+            "external_assets": offline_mode.external_assets(), "services": offline_mode.SERVICES_OFFLINE if offline_mode.active() else None,
+            "blocked_attempts": list(offline_mode.BLOCKED), "blocked_count": len(offline_mode.BLOCKED),
+            "note": "Offline mode is set by scripts/launch_offline.sh (DENGUESHIELD_OFFLINE=1). Blocked attempts come from optional services only."}
 
 
 @app.get("/api/metadata")
