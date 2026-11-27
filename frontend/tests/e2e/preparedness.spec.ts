@@ -2,6 +2,7 @@
 import { expect, test } from "./fixtures";
 
 const PAGE = "/response/?origin=2024-08-05&horizon=3&nointro";
+const PAGE_DN = "/response/?origin=2024-08-05&horizon=3&city=Dhaka%20North&nointro";   // city from the shared scenario URL
 const DEMO = "/api/preparedness/plan?origin=2024-08-05&service=p80&city=Dhaka%20North&shock=2&non_dengue=105&dengue_now=100&closed=0&surge=100&saline=60&kits=60&lead=10&los=5&los_other=6&crews=20";
 
 test.describe("Hospital preparedness", () => {
@@ -24,10 +25,8 @@ test.describe("Hospital preparedness", () => {
   });
 
   test("a shock changes demand but never the forecast; resetting restores the baseline", async ({ page }) => {
-    await page.goto(PAGE);
+    await page.goto(PAGE_DN);
     const box = page.locator("#prepare");
-    await expect(box.getByTestId("prep-scenario-id")).toBeVisible({ timeout: 60_000 });   // the URL scenario is restored first
-    await box.getByLabel("Planning area").selectOption("Dhaka North");
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     const id0 = await box.getByTestId("prep-scenario-id").textContent({ timeout: 60_000 });
     await box.getByRole("group", { name: "Outbreak shock" }).getByRole("button", { name: "+200%" }).click();
@@ -36,15 +35,13 @@ test.describe("Hospital preparedness", () => {
     const b = await (await page.request.get("/api/preparedness/plan?origin=2024-08-05&city=Dhaka%20North&shock=3")).json();
     expect(b.weekly_cases).toEqual(a.weekly_cases);
     expect(b.states.crisis.summary.peak_needed).toBeGreaterThan(a.states.crisis.summary.peak_needed);
-    await box.getByRole("button", { name: "Reset scenario" }).click();
+    await box.getByRole("button", { name: "Reset preparedness" }).click();
     await expect(box.getByTestId("prep-scenario-id")).toHaveText(id0!, { timeout: 60_000 });
   });
 
   test("real hospitals show unknown capacity and only bundled phone numbers", async ({ page }) => {
-    await page.goto(PAGE);
+    await page.goto(PAGE_DN);
     const box = page.locator("#prepare");
-    await expect(box.getByTestId("prep-scenario-id")).toBeVisible({ timeout: 60_000 });   // the URL scenario is restored first
-    await box.getByLabel("Planning area").selectOption("Dhaka North");
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     await box.getByRole("button", { name: /Search from the Dhaka North centre/ }).click();
     const tiers = box.getByTestId("real-tiers");

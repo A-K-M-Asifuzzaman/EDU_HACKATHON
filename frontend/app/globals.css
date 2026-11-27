@@ -356,3 +356,6 @@ dialog.ops-sheet::backdrop { background: rgba(5, 6, 12, 0.5); }
   overflow: auto;
   --ops-top: 0px !important;
 }
+/* optional mosquito cursor: wings beat only while it flies (the attribute is cleared at rest), never under reduced motion */
+.ds-mosquito[data-moving="1"] .ds-wings { animation: ds-flap 60ms linear infinite alternate; transform-origin: 16px 14px; }
+@keyframes ds-flap { to { transform: scaleY(0.35); } }

@@ -50,7 +50,7 @@ export default function HospitalPreparedness({ shared }: { shared: PlanShared })
         <p className="mt-1.5 max-w-[72ch] text-[13.5px] leading-relaxed text-ink-2">If an outbreak comes, what should hospitals prepare? Beds that are already partly full of other patients, saline, diagnostic kits, referrals and contacts, week by week. The hospitals here are fictional planning hospitals; the forecast is real.</p></div>
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={demo} aria-pressed={isDemo} className="ops-chip !border-[#ffd36e] !text-[#ffd36e] aria-pressed:!bg-[#ffd36e] aria-pressed:!text-[#0e0f1a]">Mentor demonstration</button>
-        <button type="button" onClick={() => setC(DEFAULTS)} className="ops-chip">Reset scenario</button></div>
+        <button type="button" onClick={() => setC(DEFAULTS)} className="ops-chip">Reset preparedness</button></div>
     </div>
 
     {blocked ? <div className="mt-4">{notice}</div> : (<>
