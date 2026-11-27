@@ -2,7 +2,6 @@
 import { expect, test } from "./fixtures";
 
 const PAGE = "/response/?origin=2024-08-05&horizon=3&nointro";
-const PAGE_DN = "/response/?origin=2024-08-05&horizon=3&city=Dhaka%20North&nointro";   // city from the shared scenario URL
 const DEMO = "/api/preparedness/plan?origin=2024-08-05&service=p80&city=Dhaka%20North&shock=2&non_dengue=105&dengue_now=100&closed=0&surge=100&saline=60&kits=60&lead=10&los=5&los_other=6&crews=20";
 
 test.describe("Hospital preparedness", () => {
@@ -25,8 +24,9 @@ test.describe("Hospital preparedness", () => {
   });
 
   test("a shock changes demand but never the forecast; resetting restores the baseline", async ({ page }) => {
-    await page.goto(PAGE_DN);
+    await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await box.getByLabel("Planning area").selectOption("Dhaka North");              // immediately, before the URL scenario is restored
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     const id0 = await box.getByTestId("prep-scenario-id").textContent({ timeout: 60_000 });
     await box.getByRole("group", { name: "Outbreak shock" }).getByRole("button", { name: "+200%" }).click();
@@ -40,8 +40,9 @@ test.describe("Hospital preparedness", () => {
   });
 
   test("real hospitals show unknown capacity and only bundled phone numbers", async ({ page }) => {
-    await page.goto(PAGE_DN);
+    await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await box.getByLabel("Planning area").selectOption("Dhaka North");              // immediately, before the URL scenario is restored
     await expect(box.getByRole("button", { name: /Search from the Dhaka North centre/ })).toBeVisible({ timeout: 60_000 });
     await box.getByRole("button", { name: /Search from the Dhaka North centre/ }).click();
     const tiers = box.getByTestId("real-tiers");
@@ -59,6 +60,17 @@ test.describe("Hospital preparedness", () => {
     const href = await box.getByRole("link", { name: "Download the preparation brief as CSV" }).getAttribute("href");
     const csv = await (await page.request.get(href!)).text();
     expect(csv).toContain(id!);
+  });
+
+  test("a city chosen before the shared scenario finishes restoring is kept, and reaches the URL", async ({ page }) => {
+    await page.goto(PAGE);
+    const sel = page.locator("#prepare").getByLabel("Planning area");
+    await sel.selectOption("Dhaka North");                                       // ~50 ms after load; the restore lands later
+    await page.waitForTimeout(1500);
+    await expect(sel).toHaveValue("Dhaka North");
+    await expect(page).toHaveURL(/city=Dhaka(\+|%20)North/);
+    await page.goto(PAGE + "&city=Gazipur");                                     // a deep link still restores normally
+    await expect(page.locator("#prepare").getByLabel("Planning area")).toHaveValue("Gazipur", { timeout: 30_000 });
   });
 
   for (const width of [360, 390]) {

@@ -26,14 +26,21 @@ export function usePlanState() {
   const [revision, setRevision] = useState(0);
   const selection = useRef(sel);
   useEffect(() => { selection.current = sel; }, [sel]);
+  // Edits made before the URL scenario is restored (controls are usable ~50 ms after load, the restore runs once the API metadata
+  // arrives) are queued and re-applied on top of the restored scenario, so the user's latest action always wins.
+  const restoredOnce = useRef(false);
+  const pending = useRef<{ city?: string; plan: [keyof PlanSettings, SetStateAction<any>][] }>({ plan: [] });
   useEffect(() => {
     if (!ready) return;
     const read = () => {
       if (!/^\/response\/?$/.test(window.location.pathname)) return;
       const state = readScenario(new URLSearchParams(window.location.search), wards, selection.current);
+      const early = restoredOnce.current ? { plan: [] } : pending.current;
+      restoredOnce.current = true;
+      pending.current = { plan: [] };
       restore.current = true;
-      set(state.sel);
-      setPlan(state.plan);
+      set(early.city ? { ...state.sel, city: early.city, ward: wardInScope(wards, early.city, state.sel.ward) } : state.sel);
+      setPlan(early.plan.reduce<PlanSettings>((p, [k, a]) => ({ ...p, [k]: typeof a === "function" ? (a as (v: any) => any)(p[k]) : a }), state.plan));
       setUnsupported(state.unsupported);
       setLoaded(true);
       setRevision(n => n + 1);
@@ -58,9 +65,12 @@ export function usePlanState() {
     restore.current = false;
   }, [readyScenario, currentUrl, sel, plan, revision]);
 
-  const field = <K extends keyof PlanSettings>(key: K) => (action: SetStateAction<PlanSettings[K]>) =>
+  const field = <K extends keyof PlanSettings>(key: K) => (action: SetStateAction<PlanSettings[K]>) => {
+    if (!restoredOnce.current) pending.current.plan.push([key, action]);
     setPlan(p => ({ ...p, [key]: typeof action === "function" ? (action as (v: PlanSettings[K]) => PlanSettings[K])(p[key]) : action }));
+  };
   const setCity = (city: string) => {
+    if (!restoredOnce.current) pending.current.city = city;
     set({ city, ward: wardInScope(wards, city, sel.ward) });
     if (city !== "All") field("manual")(assign => Object.fromEntries(Object.entries(assign).filter(([id]) => wards.some(w => w.ward_id === id && w.city === city))));
   };
