@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import { referenceYear } from "@/components/season-figure";
 import { api, qs, seasonUrl, TIERS, TIER_COLOR, type Forecast, type Tier } from "@/lib/api";
 import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
@@ -72,7 +73,8 @@ export default function Wards() {
     <Modal open={!!detail} onClose={() => setDetail(null)} title={detail ?? ""} wide>
       {detail && (() => { const w = wards.find((x) => x.ward_id === detail); return w ? (<div className="grid gap-4"><div className="flex flex-wrap items-center gap-3"><RiskBadge tier={w.risk_tier} size="lg" /><ProvChip tone={w.outbreak_alert ? "warn" : "ok"}>{w.outbreak_alert ? t("fc.yes") : t("fc.no")}</ProvChip>
         <span className="text-sm">{t("fc.median")} <b className="num">{w.median_cases}</b> · {t("fc.mean")} <b className="num">{num(w.expected_cases, lang, 1)}</b> · 80% {w.lower_80}–{w.upper_80} · 90% {w.lower_90}–{w.upper_90} · P {pct(w.p_outbreak, lang)}</span></div>
-        {series.data?.series?.length ? <FanChart series={series.data.series} markDate={w.target_date} height={280} /> : <EmptyState text="No validated replay series for this origin year." />}
+        {series.data?.series?.length ? <>{referenceYear(series.data.series, sel.origin) && <p data-testid="reference-label" className="rounded-full border-2 border-ink bg-[#fff2cc] px-3 py-1 text-[12.5px] font-semibold text-[#4a3200]">{referenceYear(series.data.series, sel.origin)} reference data: replayed forecasts and reported {referenceYear(series.data.series, sel.origin)} cases. {sel.origin.slice(0, 4)} outcomes are locked and never shown.</p>}
+          <FanChart series={series.data.series} markDate={w.target_date} height={280} /></> : <EmptyState text="No validated replay series for this origin year." />}
         <div className="flex gap-2"><Btn onClick={() => { set({ ward: w.ward_id }); setDetail(null); }}>Use in Command Center</Btn></div></div>) : null; })()}
     </Modal>
   </>);

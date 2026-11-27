@@ -271,21 +271,23 @@ def forecast_compare(ward_id: str, origin: str, source: Optional[Literal["replay
 @app.get("/api/forecast/series")
 def forecast_series(ward_id: str, horizon: H = 3, year: Optional[int] = Query(None, ge=2019, le=2024), origin: Optional[str] = None):
     """Out-of-time Historical Replay: median, mean, intervals and observed cases per target week (validation seasons 2019-2024).
-    With `origin` instead of `year`: that origin's replay season; after the last replay season, that season followed by the origin's
-    own 2-4 week forward forecasts (`forward: true`, observed cases locked); before the first season, an empty series."""
+    With `origin` (alone or with `year`): after the last replay season, that season is followed by the origin's own 2-4 week forward
+    forecasts (`forward: true`, observed cases locked); without `year`, the origin picks its season, and an origin before the first
+    season gives an empty series."""
     ward_check(ward_id), need("replay")
     r = S.replay[(S.replay.ward_id == ward_id) & (S.replay.horizon == horizon)]
     ahead: list = []
-    if origin and not year:
+    if origin:
         origin_check(origin)
-        first, last = int(S.replay.year.min()), int(S.replay.year.max())
-        year = min(int(origin[:4]), last)
-        if int(origin[:4]) > last:
+        first, last, oy = int(S.replay.year.min()), int(S.replay.year.max()), int(origin[:4])
+        if year is None:
+            year = min(oy, last)
+            if oy < first:
+                r = r.iloc[0:0]
+        if oy > last and year == last:
             ahead = [{"origin_date": f["origin_date"], "target_date": f["target_date"], "horizon": f["horizon"], "y_true": None, "mean": f["expected_cases"], "median": f["median_cases"],
                       "lo80": f["lower_80"], "hi80": f["upper_80"], "lo90": f["lower_90"], "hi90": f["upper_90"], "p_outbreak": f["p_outbreak"], "tier": f.get("risk_tier"), "forward": True}
                      for f in forecast_compare(ward_id, origin)["forecasts"] if not f.get("error")]
-        elif year < first:
-            r = r.iloc[0:0]
     if year:
         r = r[r.year == year]
     r = r.sort_values("target_date")

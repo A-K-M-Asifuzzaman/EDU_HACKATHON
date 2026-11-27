@@ -4,7 +4,7 @@
 
 <br/>
 
-[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml)
+[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
@@ -124,7 +124,7 @@ The GIFs above are rebuilt from these screenshots with `python scripts/make_read
 **Requirements:** Python 3.12+, Node 20.9+ and npm, internet access for the first run.
 
 ```bash
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git && cd EDU_HACKATHON_FINAL
 ./scripts/launch.sh            # http://127.0.0.1:8000
 # PORT=8100 ./scripts/launch.sh  # if 8000 is busy
 ```
@@ -169,8 +169,8 @@ flowchart LR
 ### Step 1 — Clone the Repository
 
 ```powershell
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git
-cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git
+cd EDU_HACKATHON_FINAL
 ```
 
 ### Step 2 — Download the Dataset
@@ -310,7 +310,7 @@ Architecture: a concise overview in [ARCHITECTURE.md](ARCHITECTURE.md) (data flo
 <summary><b>Show the full tree</b></summary>
 
 ```
-EDU_HACKATHON/
+EDU_HACKATHON_FINAL/
 ├── dengueshield/              # Python library (the core engine)
 │   ├── api/                   #   FastAPI app: main.py, store.py, schemas.py, climate.py,
 │   │                          #     geo.py, integrations.py, rag.py (Copilot)

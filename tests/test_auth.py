@@ -64,6 +64,20 @@ def test_garbage_token_is_rejected(tmp_path, monkeypatch):
     assert TestClient(app).get("/api/auth/me", headers=as_("not.a.jwt")).status_code == 401
 
 
+def test_malformed_tokens_are_refused_without_contacting_google(tmp_path, monkeypatch):
+    import base64
+    monkeypatch.setenv("DS_AUTH_DB", str(tmp_path / "m.db")); monkeypatch.setenv("FIREBASE_PROJECT_ID", PID)
+    def no_network():
+        raise AssertionError("key fetch attempted for a malformed token")
+    monkeypatch.setattr(auth, "_google_certs", no_network)
+    c = TestClient(app)
+    for tok in ["forged.token.value", "not-a-jwt", "a.b", "..", "eyJhbGciOiJub25lIn0.e30.", "x" * 3000]:
+        assert c.get("/api/ops/plans", headers=as_(tok)).status_code == 401, tok
+    head = base64.urlsafe_b64encode(json.dumps({"alg": "RS256", "kid": "k1"}).encode()).decode().rstrip("=")
+    monkeypatch.setattr(auth, "_google_certs", lambda: {})                       # well-formed but unsigned by Google: full verification, still 401
+    assert c.get("/api/ops/plans", headers=as_(f"{head}.e30.c2ln")).status_code == 401
+
+
 def test_role_matrix_is_enforced_on_the_server(env):
     c = TestClient(app)
     cases = [(f"/api/ops/alerts?origin={ORIGIN}&horizon={H}", {None: 401, "reader": 403, "officer": 200, "admin": 200}),

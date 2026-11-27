@@ -81,7 +81,7 @@ export async function api<T = any>(path: string, opts: { ttl?: number; signal?: 
 /** Season series for the figure: a 2019–2024 origin reads that replay season (one request per year); any later origin gets the last
  *  replay season followed by its own 2–4 week forecasts, marked `forward`; an earlier origin gets an empty series. */
 export const seasonUrl = (ward: string, horizon: number, origin: string) => { const y = Number(origin.slice(0, 4));
-  return `/api/forecast/series?${qs(y >= 2019 && y <= 2024 ? { ward_id: ward, horizon, year: y } : { ward_id: ward, horizon, origin })}`; };
+  return `/api/forecast/series?${qs(y >= 2019 && y <= 2024 ? { ward_id: ward, horizon, year: y } : y > 2024 ? { ward_id: ward, horizon, year: 2024, origin } : { ward_id: ward, horizon, origin })}`; };
 export const qs = (o: Record<string, string | number | boolean | undefined | null>) =>
   Object.entries(o).filter(([, v]) => v !== undefined && v !== null && v !== "").map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&");
 

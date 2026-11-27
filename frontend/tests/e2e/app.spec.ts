@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 const ROUTES = ["/", "/command/", "/profiling/", "/wards/", "/geography/", "/lab/", "/copilot/", "/evidence/", "/response/", "/climate/", "/learn/", "/provenance/"];
 const WARD = "DNCC_Ward_19", ORIGIN = "2024-08-05";
@@ -533,6 +533,10 @@ test.describe("V3.5 landing", () => {
     await page.goto("/lab/?ward=DNCC_Ward_19&origin=2025-01-06&horizon=3&nointro");
     await expect(page.getByText(/this forecast's own range 2, 3 and 4 weeks ahead/)).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Replayed forecasts exist for origins/)).toHaveCount(0);
+    await expect(page.getByTestId("reference-label")).toContainText("2024 reference data");                // labelled as 2024 reference data
+    await expect(page.getByTestId("reference-label")).toContainText("2025 outcomes are locked and never shown");
+    await page.goto("/command/?ward=DNCC_Ward_19&origin=2025-01-06&horizon=3&nointro");
+    await expect(page.getByTestId("reference-label")).toContainText("2024 reference data", { timeout: 20_000 });
   });
 });
 

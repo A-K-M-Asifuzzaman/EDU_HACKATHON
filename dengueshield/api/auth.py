@@ -91,12 +91,27 @@ def _google_certs() -> dict:
     return _certs["keys"]
 
 
+def _well_formed(token: str) -> bool:
+    """A Firebase ID token is a three-part JWT whose header names RS256 and a key id. Anything else is refused without contacting Google."""
+    import base64
+    parts = token.split(".")
+    if len(parts) != 3 or not all(parts):
+        return False
+    try:
+        head = json.loads(base64.urlsafe_b64decode(parts[0] + "=" * (-len(parts[0]) % 4)))
+    except (ValueError, TypeError):
+        return False
+    return isinstance(head, dict) and head.get("alg") == "RS256" and isinstance(head.get("kid"), str) and 0 < len(head["kid"]) <= 128
+
+
 def verify_token(token: str) -> dict:
     """Verify a Firebase ID token; return its claims or raise 401/503. Uses google-auth's JWT verification (signature, exp, aud)."""
     pid = project_id()
     if not pid:
         raise HTTPException(503, "Accounts are not configured on this deployment.")
     from google.auth import exceptions as gexc, jwt as gjwt
+    if not _well_formed(token):                       # refuse malformed tokens before any network call (no key fetch on their behalf)
+        raise HTTPException(401, "Your sign-in has expired or is not valid. Sign in again.")
     try:
         claims = gjwt.decode(token, certs=_google_certs(), audience=pid)
     except (ValueError, gexc.GoogleAuthError):

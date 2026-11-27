@@ -14,6 +14,12 @@ const short = (d: string) => { const t = new Date(ms(d)); return `${t.getUTCDate
 const WEEK = 7 * 864e5;
 const nice = (v: number) => { const s = v <= 12 ? 4 : v <= 30 ? 10 : v <= 60 ? 20 : 50; return { top: Math.ceil(v / s) * s, step: s }; };
 
+/** The year whose reported cases are shown when the selected origin is later than every reported case (a forward forecast), else null. */
+export function referenceYear(rows: { target_date: string; y_true: number | null }[], origin: string): string | null {
+  const last = rows.reduce((m, r) => (r.y_true != null && r.target_date > m ? r.target_date : m), "");
+  return last && origin.slice(0, 4) > last.slice(0, 4) ? last.slice(0, 4) : null;
+}
+
 export function useWidth<T extends HTMLElement>() {
   const ref = useRef<T>(null); const [w, setW] = useState(0);
   useEffect(() => { const el = ref.current; if (!el) return; const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width))); ro.observe(el); return () => ro.disconnect(); }, []);
@@ -50,15 +56,19 @@ export function SeasonFigure({ rows, rain, origin, target, horizon, threshold, o
   const read = hv ?? S;
   const nearest = (px: number) => { let b = 0, bd = Infinity; view.forEach((r, i) => { const d = Math.abs(X(r.target_date) - px); if (d < bd) { bd = d; b = i; } }); return b; };
   const labelRight = xs != null && xs < (W || 320) - 190;
+  const refYear = referenceYear(rows, origin), selYear = origin.slice(0, 4);
+  const wk = (d: string) => refYear ? `${short(d)} ${d.slice(0, 4)}` : short(d);       // years spelled out whenever two years share the axis
 
   return (<figure className="m-0">
+    {refYear && <p data-testid="reference-label" className="mb-2 inline-flex flex-wrap items-center gap-x-1.5 rounded-full border-2 border-ink bg-[#fff2cc] px-3 py-1 text-[12.5px] font-semibold text-[#4a3200]">
+      <span aria-hidden>●</span>{refYear} reference data: replayed forecasts and reported {refYear} cases. {selYear} outcomes are locked and never shown.</p>}
     <p className="mb-1 min-h-[20px] text-[12.5px] text-ink-2" aria-live="polite">
-      {read && <><b className="font-semibold text-ink">Week of {short(read.target_date)}</b>: forecast {read.median} cases (80% range {read.lo80}-{read.hi80})
-        {read.y_true != null && <>, observed {read.y_true}</>}{rainAt(read.target_date) != null && <>, rain {Math.round(rainAt(read.target_date)!)} mm</>}
+      {read && <><b className="font-semibold text-ink">Week of {wk(read.target_date)}</b>: forecast {read.median} cases (80% range {read.lo80}-{read.hi80})
+        {read.y_true != null && <>, {refYear ? `reported in ${refYear}` : "observed"} {read.y_true}</>}{rainAt(read.target_date) != null && <>, rain {Math.round(rainAt(read.target_date)!)} mm</>}
         {hv && hv !== S && onPick && <span className="text-ink-3">. Select to see this forecast.</span>}</>}</p>
     <div ref={box} className="relative w-full select-none">
       {W > 0 && <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} role="group" tabIndex={0} className="block cursor-crosshair outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-emerald)]"
-        aria-label={`Season ${year}, ${horizon} weeks ahead: weekly forecasts with 80 and 90 percent ranges, observed cases and weekly rainfall. Use the arrow keys to read a week and Enter to select it.`}
+        aria-label={`${refYear ? `${refYear} reference season shown for a ${selYear} forecast; ${selYear} outcomes are not shown. ` : `Season ${year}, `}${horizon} weeks ahead: weekly forecasts with 80 and 90 percent ranges, observed cases and weekly rainfall. Use the arrow keys to read a week and Enter to select it.`}
         onPointerMove={(e) => setHover(nearest(e.clientX - (e.currentTarget.getBoundingClientRect().left)))} onPointerLeave={() => setHover(null)}
         onClick={(e) => { const i = nearest(e.clientX - e.currentTarget.getBoundingClientRect().left); onPick?.(view[i].origin_date); }}
         onKeyDown={(e) => {
@@ -95,7 +105,9 @@ export function SeasonFigure({ rows, rain, origin, target, horizon, threshold, o
         {/* the issue line */}
         <g style={{ transform: `translateX(${xi}px)`, transition: "transform .35s cubic-bezier(.2,.7,.2,1)" }}>
           <line x1={0} x2={0} y1={m.t - 6} y2={R0 + HR} stroke="var(--color-ink)" strokeWidth="1" />
-          <text x={-4} y={m.t - 14} textAnchor="end" fontSize="11.5" fill="var(--color-ink)" fontWeight="600">issued {short(origin)}</text>
+          <text x={-4} y={m.t - 14} textAnchor="end" fontSize="11.5" fill="var(--color-ink)" fontWeight="600">issued {wk(origin)}</text>
+          {refYear && !narrow && <><text x={-6} y={m.t + 14} textAnchor="end" fontSize="11.5" fill="var(--color-ink-2)" fontWeight="600">← {refYear} reference</text>
+            <text x={6} y={m.t + 14} fontSize="11.5" fill="var(--color-ink-2)" fontWeight="600">{selYear}: forecast only →</text></>}
         </g>
         {/* rainfall on the same time axis */}
         <text x={m.l} y={R0 - 8} fontSize="11.5" fill="var(--color-ink-3)">Weekly rainfall, mm</text>
@@ -109,8 +121,8 @@ export function SeasonFigure({ rows, rain, origin, target, horizon, threshold, o
         {hv && <line x1={X(hv.target_date)} x2={X(hv.target_date)} y1={m.t} y2={R0 + HR} stroke="var(--color-ink-2)" strokeDasharray="2 3" />}
       </svg>}
     </div>
-    {(caption || rows.some((r) => r.forward)) && <figcaption className="mt-3 max-w-[68ch] text-[12.5px] leading-relaxed text-ink-3">{caption}
-      {rows.some((r) => r.forward) && <> After the issue line: this forecast&apos;s own range 2, 3 and 4 weeks ahead. 2025 cases are locked, so none are shown as reported.</>}</figcaption>}
+    {(caption || refYear) && <figcaption className="mt-3 max-w-[68ch] text-[12.5px] leading-relaxed text-ink-3">{caption}
+      {refYear && <> Before the issue line: {refYear} reference data, shown for context, not {selYear} outcomes.{rows.some((r) => r.forward) && <> After it: this forecast&apos;s own range 2, 3 and 4 weeks ahead.</>} {selYear} cases are locked, so none are shown as reported.</>}</figcaption>}
     <details className="mt-2 text-[12.5px] text-ink-2"><summary className="cursor-pointer text-ink-3 hover:text-ink">Show the figure's data as a table</summary>
       <div className="scroll-thin mt-2 max-h-[280px] overflow-auto border-t border-line"><table className="num w-full text-left text-[12px]">
         <thead className="sticky top-0 bg-canvas text-ink-3"><tr><th className="py-1 pr-3 font-semibold">Week of</th><th className="pr-3 font-semibold">Issued</th><th className="pr-3 text-right font-semibold">Median</th><th className="pr-3 text-right font-semibold">80% range</th><th className="pr-3 text-right font-semibold">90% range</th><th className="text-right font-semibold">Observed</th></tr></thead>

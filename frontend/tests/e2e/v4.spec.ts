@@ -1,6 +1,6 @@
 // V4 loading system and chaos tests: real latency, server errors, offline, rapid switching, cancellation and map tile failure.
 // Every assertion checks a state the user can actually see; nothing is faked on the page.
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 const FC = /\/api\/forecast\?/;                       // the single-forecast endpoint (not /series)
 const CMD = "/command/?ward=DNCC_Ward_19&origin=2024-08-05&horizon=3&nointro";
@@ -21,10 +21,16 @@ test.describe("V4 latency", () => {
   for (const w of [360, 390, 430, 768, 1440]) {
     test(`landing at ${w}px: a slow forecast shows its status inside the preview and the page never scrolls sideways`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: 860 });
-      await page.route(FC, async (r) => { await sleep(3500); await r.continue().catch(() => {}); });
+      // The status appears after 2.5 s without an answer. Hold the response until it has been seen, then release it, so the check never
+      // depends on how fast the page loads (a fixed 3.5 s delay left a 1 s window that a busy CI runner could miss).
+      let release!: () => void; const held = new Promise<void>((r) => { release = r; });
+      await page.route(FC, async (r) => { await Promise.race([held, sleep(30_000)]); await r.continue().catch(() => {}); });
       await page.goto("/?nointro");
-      await expect(page.getByTestId("forecast-preview").getByText(/Forecast: taking longer than usual/)).toBeVisible();
+      await expect(page.getByTestId("forecast-preview").getByText(/Forecast: taking longer than usual/)).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByTestId("preview-median")).toHaveCount(0);                          // still waiting: no number is shown early
+      release();
       await expect(page.getByTestId("preview-median")).toBeVisible({ timeout: 25_000 });
+      await expect(page.getByTestId("forecast-preview").getByText(/Forecast: taking longer than usual/)).toHaveCount(0);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(w);
     });
   }
@@ -131,9 +137,16 @@ test.describe("V4 map resilience", () => {
 });
 
 test.describe("V4 accounts on Firebase (configured; no account is signed in)", () => {
+  // Needs a Firebase project on both sides: NEXT_PUBLIC_FIREBASE_* at build time and FIREBASE_PROJECT_ID for the API. CI uses the
+  // offline demo project "demo-dengueshield-e2e" (placeholder values, no network calls until someone signs in; see .github/workflows/ci.yml).
+  test.beforeEach(async ({ page }) => {
+    expect((await (await page.request.get("/api/auth/config")).json()).configured, "API started without FIREBASE_PROJECT_ID").toBe(true);
+  });
   test("sign-in offers email, password and Google, and explains who needs an account", async ({ page }) => {
     await page.goto("/signin/?nointro");
-    await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: /Welcome back|Accounts are not set up here yet/ })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Accounts are not set up here yet"), "dashboard built without NEXT_PUBLIC_FIREBASE_*").toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.getByLabel("Password")).toBeVisible();
     await expect(page.getByRole("button", { name: "Continue with Google" })).toBeVisible();

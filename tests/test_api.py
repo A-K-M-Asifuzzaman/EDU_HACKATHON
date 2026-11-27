@@ -63,6 +63,8 @@ def test_series_by_origin_adds_the_forward_forecast_without_2025_observations(cl
     assert d["season"] == 2024 and [r["target_date"] for r in fwd] == ["2025-01-20", "2025-01-27", "2025-02-03"]
     assert all(r["y_true"] is None and r["lo90"] <= r["median"] <= r["hi90"] for r in fwd)
     assert max(r["target_date"] for r in d["series"] if not r.get("forward")) <= "2024-12-31"
+    both = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&year=2024&origin=2025-01-06").json()   # what the dashboard sends
+    assert both["series"] == d["series"] and both["season"] == 2024
     same = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2022-08-01").json()["series"]
     assert same == client.get(f"/api/forecast/series?ward_id={W}&horizon=3&year=2022").json()["series"]
     assert client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2017-08-07").json()["series"] == []
