@@ -12,6 +12,7 @@ import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBa
 import { CITIES, DEFAULT_PLAN, planParams, readScenario, scenarioSearch, wardInScope, type PlanSettings, type Service } from "@/lib/plan-scenario";
 import { provenance, PROV_TEXT } from "@/lib/provenance";
 import AllocationFlow from "./allocation-flow";
+import AllocationComparison from "./allocation-comparison";
 
 export const LAST_ORIGIN = "2024-12-30";
 export { CITIES, type Service };
@@ -203,6 +204,8 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
       <details className="mt-4 rounded-xl border border-line p-4 text-[13px] text-ink-2"><summary className="cursor-pointer font-semibold text-ink">How the allocation works</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">{d.assumptions.map((a: string) => <li key={a}>{a}</li>)}</ul>
         <p className="mt-2">Demand multipliers: saline {d.multipliers.saline_bags_needed.toFixed(4)}, kits {d.multipliers.diagnostic_kits_needed.toFixed(4)}, beds {d.multipliers.hospital_beds_required.toFixed(4)} per forecast case. Within each city the remaining stock fills wards in priority order, which maximises the priority-weighted supply for the given floor (checked against an exact solver in the tests).</p></details>
-    </div>)}</Live></>)}
+    </div>)}</Live>
+    <AllocationComparison query={query} city={city} />
+    </>)}
   </Card>);
 }

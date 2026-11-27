@@ -743,6 +743,58 @@ def allocation_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(Non
     return v
 
 
+@app.get("/api/allocation/uncertainty")
+def allocation_uncertainty(
+    origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
+    service: Literal["median", "p80", "p90"] = "p80", stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6,
+    risk_weight: Annotated[float, Query(ge=0.0, le=1.0)] = 0.7, floor: Annotated[float, Query(ge=0.0, le=0.5)] = 0.25,
+    source: Optional[Literal["replay", "bundle"]] = None,
+    resource: Literal["saline_bags_needed", "diagnostic_kits_needed", "hospital_beds_required"] = "saline_bags_needed",
+    reserve_pct: Annotated[int, Query(ge=0, le=30)] = 0,
+    supply_units: Annotated[Optional[int], Query(ge=0, le=100_000)] = None,
+):
+    """Compare matched-budget policies over complete historical residual weeks. The active plan is untouched."""
+    from dengueshield import allocation_uncertainty as uncertainty
+
+    if supply_units is not None and not city:
+        bad("Select one city before setting an exact supply quantity.")
+    need("replay")
+    fc, source = decision_forecast(origin, horizon, source, city)
+    settings = alloc.Settings(service=service, stock=round(stock, 4), alpha=round(risk_weight, 4), floor_share=round(floor, 4))
+    key = ("allocation_uncertainty", origin, horizon, source, city, settings, resource, reserve_pct, supply_units)
+
+    def compute():
+        rules = alloc_rules()
+        wards = alloc.plan(fc, S.wards, rules, settings)["wards"].sort_values("ward_id", ignore_index=True)
+        keys = wards.ward_id.tolist()
+        joint, history, weeks = uncertainty.joint_cases(S.replay, origin, horizon, keys, wards.median_cases.to_numpy())
+        demand = alloc.demand(joint, rules[resource])
+        pools = []
+        for pool, g in wards.groupby("city", sort=True):
+            indices = g.index.to_numpy()
+            nominal = g[f"{resource}_demand"].to_numpy()
+            supply = alloc.pool_supply(settings.stock, int(nominal.sum())) if supply_units is None else supply_units
+            results = uncertainty.compare_pool(
+                g.ward_id.tolist(), nominal, demand[:, indices], supply, reserve_pct, settings.floor_share,
+                g.population_density_sqkm.to_numpy(), history[indices], g.p_outbreak.to_numpy(), g.priority.to_numpy(),
+            )
+            pools.append({"city": pool, **results})
+        return {"origin": origin, "horizon": horizon, "source": source, "resource": resource, "service": service,
+                "reserve_pct": reserve_pct, "tail_confidence": uncertainty.CONFIDENCE, "prior_replay_weeks": weeks,
+                "cities": pools,
+                "assumptions": ["Each scenario shifts the current median by a complete ward residual vector from prior seasons.",
+                                "Historical weeks are within two ISO weeks of the forecast origin. No future outcomes are used.",
+                                "All policies share the same city stock, reserve, ward ceilings and fairness floors.",
+                                "The tail objective is assessed on these planning scenarios. It is not validated forecast coverage."],
+                "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(key, compute)
+    except ValueError as exc:
+        bad(str(exc))
+    return v
+
+
 # ------------------------------------------------------------------ hospital surge and cross-ward overflow (Phase 2 onsite, Problem 2)
 SURGE_ASSUMPTIONS = [
     "Projected bed demand is the same number Supply allocation uses: floor(0.2984 x forecast cases + 0.5) at the chosen service level.",

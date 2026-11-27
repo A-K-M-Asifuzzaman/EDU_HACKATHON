@@ -29,6 +29,7 @@ CALLS = [
     ("dispatch PDF, ward", f"/api/dispatch/document?{Q}&kind=ward&ward=DSCC_Ward_04&format=pdf&capacity_pct=120&crews=40"),
     ("dispatch HTML, city summary", f"/api/dispatch/document?{Q}&kind=city&brief_city=Chattogram&format=html&capacity_pct=120&crews=40"),
     ("dispatch PDF, wards needing attention", f"/api/dispatch/document?{Q}&kind=wards&brief_city=Chattogram&format=pdf&capacity_pct=120&crews=40"),
+    ("allocation comparison, Gazipur", f"/api/allocation/uncertainty?{Q}&city=Gazipur&reserve_pct=10"),
 ]
 
 
@@ -38,7 +39,11 @@ def fetch(base: str, path: str):
         body, ctype = r.read(), r.headers.get("content-type", "")
     ms = round((time.perf_counter() - t) * 1000, 1)
     if "json" in ctype:
-        body = json.dumps(json.loads(body), sort_keys=True, separators=(",", ":")).encode()
+        data = json.loads(body)
+        if path.startswith("/api/allocation/uncertainty?"):
+            for pool in data["cities"]:
+                pool["solver"].pop("runtime_ms")
+        body = json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(body).hexdigest(), ms
 
 
