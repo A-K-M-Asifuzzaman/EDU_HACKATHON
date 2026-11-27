@@ -319,6 +319,8 @@ def referral_time_expanded(plans: list[dict], allow=_referral_allowed, compare: 
     from scipy.optimize import Bounds, LinearConstraint, milp
     from scipy.sparse import lil_matrix
 
+    if not plans:
+        return {"available": False, "reason": "no planning hospitals"}
     n, D = len(plans), DAYS
     L = plans[0]["los_dengue"]
     edges = _edges(plans, allow)
@@ -522,12 +524,12 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
     surge = sum(p["beds"]["surge_open"] for p in resp["hospitals"])
     if surge:
         add("Open configured surge beds", surge, f"before week {s['first_shortage_week'] or s['first_reserve_breach_week'] or 1}",
-            "Surge beds reduce the bed gap before any referral", "beds_physical")
-    te0 = resp["network"].get("time_expanded") or {}
-    if r["referred"] and not te0.get("available"):                    # peak-day plan only when the 28-day plan is unavailable
+            "Surge beds reduce the bed gap before any referral", "beds_physical",
+            [f"{p['name']}: {p['beds']['surge_open']}" for p in resp["hospitals"] if p["beds"]["surge_open"]])
+    te = resp["network"].get("time_expanded") or {}
+    if r["referred"] and not te.get("available"):                    # peak-day plan only when the 28-day plan is unavailable
         add("Coordinate referrals inside the planning network (confirm with receiving hospitals)", r["referred"], f"week {resp['network']['worst_week']}",
             "Receivers with free beds below their own reserve exist", "network")
-    te = resp["network"].get("time_expanded") or {}
     if te.get("available") and te["referred"]:
         add("Plan referrals over the four weeks (confirm each with the receiving hospital)", te["referred"], "days " + ", ".join(sorted({f"{t['first_day']}-{t['last_day']}" for t in te["transfers"]})[:3]),
             f"A 28-day plan cuts patients without a bed from {te['unresolved_without_referral']} to {te['unresolved']}", "network_28d",
@@ -539,9 +541,12 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
             add(f"Move {label} inside the network on day 1", rd["placed"], f"arrive day {1 + rd['transfer_days']}",
                 "Donors keep their own safety stock; this covers unmet days before new orders arrive", f"{res}_redistribution",
                 [f"{t['from_name']} to {t['to_name']}: {t['units']}" for t in rd["transfers"]])
-    if r["bed_gap_after_referral"]:
-        add("Escalate: bed gap remains after surge beds and referrals", r["bed_gap_after_referral"], f"week {resp['network']['worst_week']}",
-            "No modelled option closes the remaining gap; it needs capacity outside this network", "network")
+    gap_after = te["unresolved"] if te.get("available") else r["bed_gap_after_referral"]
+    if gap_after:
+        add("Escalate: bed gap remains after surge beds and referrals", gap_after,
+            "over 4 weeks" if te.get("available") else f"week {resp['network']['worst_week']}",
+            "No modelled option closes the remaining gap; it needs capacity outside this network",
+            "network_28d" if te.get("available") else "network")
     for res, label in (("saline", "saline bags"), ("kits", "diagnostic kits")):
         # the orders the response actually places (after redistribution), with each hospital's own order-by day from the crisis
         placed = [(p, p["orders"][res]) for p in resp["hospitals"] if p.get("orders", {}).get(res)]

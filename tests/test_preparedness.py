@@ -257,3 +257,11 @@ def test_brief_reports_the_28_day_plan_and_inventory_policies(client):
     d = client.get("/api/preparedness/plan?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60").json()["states"]["response"]["summary"]
     txt = client.get("/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60&format=txt").text
     assert f"28-day plan: referrals {d['referred_28d']}, without a bed {d['unresolved_28d']}" in txt
+
+
+def test_escalate_action_uses_28_day_unresolved_total(client):
+    d = client.get("/api/preparedness/plan?origin=2024-08-05&city=Dhaka%20North&shock=1.5&closed=25").json()
+    r = d["states"]["response"]["summary"]
+    assert r["unresolved_28d"] > r["bed_gap_after_referral"]
+    esc = [a for a in d["actions"] if a["action"].startswith("Escalate:")]
+    assert len(esc) == 1 and esc[0]["quantity"] == r["unresolved_28d"] and esc[0]["trigger"] == "network_28d"

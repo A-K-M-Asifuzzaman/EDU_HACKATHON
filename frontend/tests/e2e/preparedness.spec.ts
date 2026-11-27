@@ -64,7 +64,10 @@ test.describe("Hospital preparedness", () => {
   test("the brief downloads carry the scenario id shown on screen", async ({ page }) => {
     await page.goto(PAGE);
     const box = page.locator("#prepare");
+    await expect(box.getByTestId("prep-scenario-id")).toBeVisible({ timeout: 60_000 });
+    const id0 = await box.getByTestId("prep-scenario-id").textContent();
     await box.getByRole("button", { name: "Mentor demonstration" }).click();
+    await expect(box.getByTestId("prep-scenario-id")).not.toHaveText(id0!, { timeout: 60_000 });
     const id = await box.getByTestId("prep-scenario-id").textContent({ timeout: 60_000 });
     const href = await box.getByRole("link", { name: "Download the preparation brief as CSV" }).getAttribute("href");
     const csv = await (await page.request.get(href!)).text();

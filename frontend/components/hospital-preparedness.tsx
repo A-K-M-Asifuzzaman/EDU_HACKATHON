@@ -40,7 +40,7 @@ export default function HospitalPreparedness({ shared }: { shared: PlanShared })
   const p = useDebounced({ c, city, service: shared.service }, 250);
   const query = qs({ origin: sel.origin, service: p.service, city: p.city, source: srcParam(sel), shock: p.c.shock, non_dengue: p.c.non_dengue, dengue_now: p.c.dengue_now,
     closed: p.c.closed, surge: p.c.surge, reserve: p.c.reserve ?? undefined, saline: p.c.saline, kits: p.c.kits, lead: p.c.lead ?? undefined, los: p.c.los, los_other: p.c.los_other, crews: p.c.crews });
-  const q = useAsync((s) => (blocked ? Promise.resolve(null) : api<any>(`/api/preparedness/plan?${query}`, { signal: s, timeout: 60_000 })), [query, blocked]);
+  const q = useAsync<any>((s) => (blocked ? Promise.resolve(null) : api<any>(`/api/preparedness/plan?${query}`, { signal: s, timeout: 60_000 }).then((data) => ({ data, query }))), [query, blocked]);
   const demo = () => { setC(MENTOR_DEMO); if (shared.city === "All") shared.setCity("Dhaka North"); setView("crisis"); };
   const isDemo = JSON.stringify(c) === JSON.stringify(MENTOR_DEMO);
 
@@ -76,7 +76,7 @@ export default function HospitalPreparedness({ shared }: { shared: PlanShared })
       <p className="text-[12px] leading-relaxed text-ink-3">Shock changes dengue demand only. Beds and closures change the overflow, never the forecast. Stock here is hospital inventory, kept apart from the Stage 1 regional stock.</p>
     </div>
 
-    <Live q={q} h={520} label="Hospital preparedness">{(d: any) => <Workspace d={d} view={view} setView={setView} lang={lang} query={query} />}</Live>
+    <Live q={q} h={520} label="Hospital preparedness">{(res: { data: any; query: string }) => <Workspace d={res.data} view={view} setView={setView} lang={lang} query={res.query} />}</Live>
     </>)}
   </section>);
 }
@@ -266,7 +266,7 @@ function TransferNetwork({ st }: { st: any }) {
   return (<section aria-labelledby="net-title" className="ops-panel p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 id="net-title" className="text-[14px] font-semibold text-ink">{mode === "28d" ? "Referral plan over 28 days" : `Referral network at the worst day (week ${st.network.worst_week})`}</h3>
       <div role="group" aria-label="Referral plan" className="flex gap-1.5">{te?.available && <button type="button" aria-pressed={mode === "28d"} onClick={() => setMode("28d")} className="ops-chip">28-day plan</button>}<button type="button" aria-pressed={mode === "peak"} onClick={() => setMode("peak")} className="ops-chip">Peak day</button></div></div>
     <p className="mt-0.5 text-[12.5px] text-ink-3">Fictional planning hospitals only; arrows are the computed referrals (patients). Positions are abstract. Real transfers need clinical coordination and the receiving hospital&apos;s confirmation.</p>
-    <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full max-w-[760px]" role="img" aria-label={`${tr.length} referral links moving ${st.network.placed} patients; ${st.network.unresolved} still without a bed`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full max-w-[760px]" role="img" aria-label={`${tr.length} referral links moving ${mode === "28d" && te?.available ? te.referred : st.network.placed} patients; ${mode === "28d" && te?.available ? te.unresolved : st.network.unresolved} still without a bed`}>
       <defs><marker id="prep-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill={C.surge} /></marker></defs>
       {tr.map((t: any) => { const [x1, y1] = pos[t.from], [x2, y2] = pos[t.to]; const L = Math.hypot(x2 - x1, y2 - y1) || 1; const mx = (x1 + x2) / 2 - (40 * (y2 - y1)) / L, my = (y1 + y2) / 2 + (40 * (x2 - x1)) / L;   // bend sideways so labels never sit on the straight line
         return (<g key={`${t.from}>${t.to}`}><path className="ops-draw" pathLength={1} d={`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`} fill="none" stroke={C.surge} strokeWidth={Math.min(9, 1.5 + t.patients / 6)} markerEnd="url(#prep-head)" opacity={0.85} />
