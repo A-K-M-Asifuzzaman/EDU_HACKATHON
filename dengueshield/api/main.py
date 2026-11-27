@@ -9,6 +9,7 @@ import json
 import hmac
 import os
 import re
+import subprocess
 import time
 from datetime import date
 from pathlib import Path
@@ -178,20 +179,38 @@ def _inference_probe():
     return _PROBE["v"]
 
 
+def _build_commit() -> Optional[str]:
+    """The source commit this server runs: app_data/BUILD_COMMIT (written by scripts/deploy_space.py), else git, with -dirty when
+    tracked files differ from the commit. Shown in the site footer so a recording can be matched to the submitted commit."""
+    f = ROOT / "app_data" / "BUILD_COMMIT"
+    if f.exists():
+        return f.read_text().strip()[:12] or None
+    try:
+        sha = subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], cwd=ROOT, capture_output=True, text=True, timeout=5).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"], cwd=ROOT, capture_output=True, text=True, timeout=5).stdout.strip()
+        return (sha + ("-dirty" if dirty else "")) if sha else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+BUILD_COMMIT = _build_commit()
+
+
 @app.get("/api/health")
 def health():
     ok = {"dataset": S.panel is not None, "bundle": S.bundle is not None, "replay": S.replay is not None, "artifacts": not [k for k in S.errors if k in S.art or k in ("profile",)]}
     probe = _inference_probe()
     status = "ok" if all(ok.values()) else ("degraded" if ok["bundle"] or ok["replay"] else "down")
     return {"status": status, "components": ok, "errors": S.errors, "uptime_s": round(time.time() - STARTED), "inference_probe_ms": probe,
-            "latency_ms": S.latency_ms, "openai_configured": integrations.openai_configured(), "cache_entries": len(S.cache)}
+            "latency_ms": S.latency_ms, "openai_configured": integrations.openai_configured(), "cache_entries": len(S.cache),
+            "build_commit": BUILD_COMMIT}
 
 
 @app.get("/api/system/offline")
 def system_offline():
     """Offline readiness: mode, local artifacts, external assets in the built dashboard, service states and blocked outbound attempts."""
     arts, _ = S.cache.get_or(("offline_artifacts",), lambda: offline_mode.check_artifacts())
-    return {"offline_mode": offline_mode.active(), "artifacts_ok": all(a["ok"] for a in arts), "artifacts": arts,
+    return {"offline_mode": offline_mode.active(), "build_commit": BUILD_COMMIT, "artifacts_ok": all(a["ok"] for a in arts), "artifacts": arts,
             "external_assets": offline_mode.external_assets(), "services": offline_mode.SERVICES_OFFLINE if offline_mode.active() else None,
             "blocked_attempts": list(offline_mode.BLOCKED), "blocked_count": len(offline_mode.BLOCKED),
             "note": "Offline mode is set by scripts/launch_offline.sh (DENGUESHIELD_OFFLINE=1). Blocked attempts come from optional services only."}

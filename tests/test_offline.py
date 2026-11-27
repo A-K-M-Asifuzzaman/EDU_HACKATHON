@@ -152,3 +152,11 @@ def test_real_offline_server_process_serves_every_engine():
     finally:
         proc.terminate()
         proc.wait(timeout=20)
+
+
+def test_build_commit_is_reported_for_recordings():
+    sha = subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    got = client.get("/api/health").json()["build_commit"]
+    if sha:                                                                                     # a git checkout (local, CI)
+        assert got in (sha, sha + "-dirty")
+    assert client.get("/api/system/offline").json()["build_commit"] == got

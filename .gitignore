@@ -28,3 +28,4 @@ var/
 
 # kill-switch test output (evidence is copied to exports/offline)
 killswitch/
+app_data/BUILD_COMMIT
