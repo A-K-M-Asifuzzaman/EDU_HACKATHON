@@ -26,13 +26,38 @@ Resume here. Keep this file short; update after every unit.
 
 ## Open
 
-- Full regression rerun on the onsite venv (first run: 652 Python passed, 3 env/interference failures; browser 135 passed,
-  4 failed: Codex's scenario test vs a duplicate "Reset scenario" button name (renamed), two preparedness tests racing the URL
-  scenario restore (now open Dhaka North by URL), Firebase test needing google-auth in the server venv (server switched)).
-- Not done: physical Wi-Fi-off run on the judging laptop, video recording, production deploy (needs owner approval), 3D mosquito
-  placement across pages (existing landing intro mosquito only), real hospital capacity data (none bundled).
+- CI run 45999833899 on `a7f37b9` (see FINAL_TEST_REPORT.md for the local runs).
+- Not done: physical Wi-Fi-off run on the judging laptop, fresh-clone setup, video recording, production deploy (needs owner
+  approval), 3D mosquitoes on other pages (only the existing landing intro), real hospital capacity data (none exists in the bundle),
+  more districts (OSM data and road graphs cover Dhaka, Gazipur, Narayanganj, Chattogram only).
+
+## Acceptance gates
+
+| Gate | Status | Evidence |
+|---|---|---|
+| 1 Codex work recovered | PASS | `bab676e`, 65 tests |
+| 2 Existing functionality preserved | PASS (local) | full Python and browser runs, FINAL_TEST_REPORT.md |
+| 3 Mixed-patient occupancy | PASS | flow/split checks on every row, 17 unit tests |
+| 4 Bed capacity and reserve accounting | PASS | capacity, reserve, zero capacity, surge, closure tests |
+| 5 Inventory | PASS | conservation, zero stock, delayed delivery, ROP, procurement tests |
+| 6 Dynamic thresholds | PASS | Normal→Emergency rule tests; scenario changes move statuses |
+| 7 Sudden outbreak simulation integrated | PASS | three states; Stage 3 prevented share feeds demand |
+| 8 Resource allocation preserved | PASS | allocation suites unchanged and passing |
+| 9 Hospital network optimization | PASS | LP vs independent max-flow, receiver limits, city rules |
+| 10 Verified alternatives where coverage permits | CONDITIONAL | OSM tiers by road time in 4 districts; capacity unknown everywhere |
+| 11 Verified ambulance and emergency information | CONDITIONAL | 999 and 16263 only (pre-existing sources, not re-verified); 59 OSM phone tags; no ambulance-provider numbers |
+| 12 Synthetic and real data separated | PASS | provenance labels, tests that real cards never carry capacity |
+| 13 Brief and dispatch consistency | PASS | scenario id equal on screen and in files (API and browser tests) |
+| 14 Premium hospital command UI | PASS (screenshots) | `#prepare` workspace; owner review pending |
+| 15 Immersive visuals optional and performant | CONDITIONAL | cursor and sound opt-in, idle-safe; no new 3D placements |
+| 16 Offline core execution | PASS (macOS sandbox) | 28/28; physical Wi-Fi run NOT RUN |
+| 17 Regression tests | PASS (local) / CI pending | see above |
+| 18 Accessibility and responsive | PASS (automated) | axe light and Dim on /response/, 360/390 px tests |
+| 19 Build and scenario compatibility | PASS | build, scenario.spec |
+| 20 Official rubric evidence | PASS | FINAL_RUBRIC_CHECKLIST.md |
+| 21 Video readiness | CONDITIONAL | script ready; not recorded |
+| 22 Technical Q&A readiness | PASS | JUDGE_QA_BANGLA.md, 46 answers |
 
 ## Next exact step
 
-Read the rerun results, fix anything real, rebuild, run `preparedness`, `scenario`, `mosquito-cursor`, `v4` specs, commit docs and the
-cursor, push, write FINAL_TEST_REPORT.md with the actual numbers.
+Owner review of the branch; then the release checklist (FINAL_RELEASE_CHECKLIST.md): judging-laptop offline run, video, deploy approval.
