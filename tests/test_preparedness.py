@@ -185,3 +185,72 @@ def test_contacts_come_only_from_bundled_data(client):
     d = client.get("/api/preparedness/contacts").json()
     assert d["count"] == sum(1 for f in routing.facilities()["features"] if f["properties"].get("phone"))
     assert all("OpenStreetMap" in r["source"] for r in d["facilities"])
+
+
+# ------------------------------------------------------------------ 28-day referral program and emergency redistribution
+def _node(id_, city, limit, arrivals, fixed=0, role="general", los=2):
+    a = arrivals + [0] * (pp.DAYS - len(arrivals))
+    return {"id": id_, "name": id_, "city": city, "role": role, "los_dengue": los, "dengue_arrivals": a, "fixed_census": [fixed] * pp.DAYS,
+            "beds": {"routine_limit": limit, "unresolved_dengue": 0}}
+
+
+def test_time_expanded_referral_known_optimum_and_rules():
+    # A has 1 free bed and 3 arrivals on day 1; B (same city) has 1; C (other city) has 5 but is not a valid receiver
+    plans = [_node("A", "X", 1, [3]), _node("B", "X", 1, [0]), _node("C", "Y", 5, [0])]
+    out = pp.referral_time_expanded(plans)
+    assert out["unresolved_without_referral"] == 2 and out["unresolved"] == 1 and out["referred"] == 1
+    assert [(t["from"], t["to"]) for t in out["transfers"]] == [("A", "B")]
+    assert all(out["checks"].values())
+    # a bed is held for the whole stay: B cannot take a second patient on day 2 while the first stays (LOS 2)
+    plans = [_node("A", "X", 1, [2, 2]), _node("B", "X", 1, [0])]
+    out = pp.referral_time_expanded(plans)
+    assert out["unresolved"] == 2 and out["referred"] == 1 and all(out["checks"].values())
+    # the regional centre accepts any city
+    plans = [_node("A", "X", 0, [2]), _node("R", "Regional", 2, [0], role="referral")]
+    out = pp.referral_time_expanded(plans)
+    assert out["unresolved"] == 0 and out["referred"] == 2
+
+
+def test_redistribution_protects_donor_stock_and_only_helps_later_days():
+    def inv(closing, unmet, reserve):
+        return {"rows": [{"day": d + 1, "closing": closing[d], "unmet": unmet[d]} for d in range(pp.DAYS)], "reserve": reserve}
+    z = [0] * pp.DAYS
+    donor = {"id": "D", "city": "X", "role": "general", "inventory": {"saline": inv([100] * pp.DAYS, z, 40)}}           # can spare 60
+    recv = {"id": "R", "city": "X", "role": "general", "inventory": {"saline": inv(z, [5] + [10] * (pp.DAYS - 1), 0)}}   # day-1 unmet cannot be helped
+    far = {"id": "F", "city": "Y", "role": "general", "inventory": {"saline": inv([500] * pp.DAYS, z, 0)}}                # other city: not a donor
+    out = pp.redistribute([donor, recv, far], "saline", transfer_days=1)
+    assert out["donor_available"] == 60 + 500 and out["receiver_need"] == 270
+    assert out["placed"] == 60 and out["transfers"] == [{"from": "D", "from_name": None, "to": "R", "to_name": None, "units": 60, "arrival_day": 2}] or out["placed"] == 60
+    assert all(t["from"] != "F" for t in out["transfers"]) and out["certificate"]
+
+
+def test_response_compares_inventory_policies_and_plans_28_days():
+    fx = pp.load_fixture()
+    st = pp.plan_state(fx, {"Dhaka North": [171, 188, 243, 303]}, pp.Scenario(shock=2.0, saline_pct=60, kits_pct=60, lead_time_days=10), RULES, True)
+    ic = st["inventory_compare"]
+    assert all(ic["checks"].values())
+    for r in ("saline", "kits"):
+        x = ic[r]
+        assert x["redistribution_and_procurement"] <= min(x["procurement_only"], x["redistribution_only"]) <= x["no_action"]
+        assert x["no_action"] - x["redistribution_only"] <= x["redistribution"]["placed"]
+    te = st["network"]["time_expanded"]
+    assert te["available"] and all(te["checks"].values())
+    assert te["unresolved"] <= te["unresolved_without_referral"]
+    assert all(t["same_city"] or t["to"] == "RRSC" for t in te["transfers"])
+    assert st["summary"]["unresolved_28d"] == te["unresolved"]
+
+
+def test_scenario_id_covers_dataset_and_model(client):
+    from dengueshield.api import main, store
+    a = client.get(Q).json()["scenario_id"]
+    old, cache = main.S.data_sha, main.S.cache
+    try:
+        main.S.data_sha, main.S.cache = "changed", store.LRU(64)
+        assert client.get(Q).json()["scenario_id"] != a
+    finally:
+        main.S.data_sha, main.S.cache = old, cache
+
+
+def test_brief_reports_the_28_day_plan_and_inventory_policies(client):
+    csv = client.get("/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60&format=csv").text
+    assert "28-day referral plan" in csv and "redistribution + procurement" in csv

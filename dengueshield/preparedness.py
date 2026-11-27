@@ -152,6 +152,8 @@ def hospital_plan(h: dict, weekly_cases: list[float], sc: Scenario, rules: dict,
     # beds that exist now; existing patients beyond them would be an input error, kept visible rather than clipped
     occ = _occupancy(functional, closed, surge, reserve, other0, dengue0, oa, da, sc.los_other_days, sc.los_dengue_days, False)
     need = _occupancy(functional, closed, surge, reserve, other0, dengue0, oa, da, sc.los_other_days, sc.los_dengue_days, True)
+    # beds held without any new dengue admission (other illnesses keep priority; existing dengue patients leave on schedule)
+    fixed = _occupancy(functional, closed, surge, reserve, other0, dengue0, oa, [0] * DAYS, sc.los_other_days, sc.los_dengue_days, False)
     cap, limit = occ["capacity"], occ["limit"]
     census_need = [r["other"] + r["dengue"] for r in need["rows"]]
     shortage_day = next((d for d, c in enumerate(census_need, 1) if c > cap), None)
@@ -192,7 +194,8 @@ def hospital_plan(h: dict, weekly_cases: list[float], sc: Scenario, rules: dict,
                     "reserve_breach_day": breach_day, "reserve_breach_week": week_of(breach_day),
                     "unresolved_dengue": sum(r["unresolved_dengue"] for r in occ["rows"]),
                     "unresolved_other": sum(r["unresolved_other"] for r in occ["rows"])},
-           "inventory": inv, "weeks": weeks, "daily": occ["rows"], "daily_needed": [r["other"] + r["dengue"] for r in need["rows"]]}
+           "inventory": inv, "weeks": weeks, "daily": occ["rows"], "daily_needed": [r["other"] + r["dengue"] for r in need["rows"]],
+           "dengue_arrivals": da, "fixed_census": [r["other"] + r["dengue"] for r in fixed["rows"]], "los_dengue": sc.los_dengue_days}
     out["checks"] = _checks(out, occ, other0, dengue0, oa, da)
     out["alerts"] = alerts(out)
     out["status"] = max((a["severity"] for a in out["alerts"]), key=SEVERITY.index, default="Normal")
@@ -299,23 +302,167 @@ def referral_lp(nodes: list[dict]) -> dict:
 
 
 # ------------------------------------------------------------------ one scenario state for a set of cities
-def plan_state(fx: dict, city_cases: dict[str, list[float]], sc: Scenario, rules: dict, response: bool) -> dict:
+def _edges(nodes: list[dict], allow) -> list[tuple[int, int]]:
+    return [(i, j) for i, x in enumerate(nodes) for j, y in enumerate(nodes) if i != j and allow(x, y)]
+
+
+def _referral_allowed(x: dict, y: dict) -> bool:
+    return x["role"] != "referral" and (x["city"] == y["city"] or y["role"] == "referral")
+
+
+def referral_time_expanded(plans: list[dict], allow=_referral_allowed, compare: bool = True) -> dict:
+    """28-day referral plan as an integer program. For hospital i and day d: arrivals = own admissions + referrals out + unresolved;
+    on every day t and hospital j, beds held without new dengue admissions + every patient admitted or received in the last LOS days
+    <= routine limit (patients stay exactly LOS days, so a referral occupies the receiver's bed for its whole stay). Stage 1 minimizes
+    unresolved patients; stage 2, at that minimum, minimizes referrals (same city cost 1, regional centre 3). Verified by an
+    independent day-by-day re-simulation of the chosen plan."""
+    from scipy.optimize import Bounds, LinearConstraint, milp
+    from scipy.sparse import lil_matrix
+
+    n, D = len(plans), DAYS
+    L = plans[0]["los_dengue"]
+    edges = _edges(plans, allow)
+    nA, nU, nR = n * D, n * D, len(edges) * D
+    N = nA + nU + nR
+    ia = lambda j, d: j * D + d
+    iu = lambda j, d: nA + j * D + d
+    ir = lambda e, d: nA + nU + e * D + d
+    rows = n * D + n * D
+    A = lil_matrix((rows, N))
+    lo, hi = np.zeros(rows), np.zeros(rows)
+    r = 0
+    for i, p in enumerate(plans):                                  # arrivals split exactly
+        for d in range(D):
+            A[r, ia(i, d)] = 1; A[r, iu(i, d)] = 1
+            for e, (s_, _) in enumerate(edges):
+                if s_ == i:
+                    A[r, ir(e, d)] = 1
+            lo[r] = hi[r] = p["dengue_arrivals"][d]; r += 1
+    for j, p in enumerate(plans):                                  # beds on every day
+        lim = p["beds"]["routine_limit"]
+        for t in range(D):
+            for d in range(max(0, t - L + 1), t + 1):
+                A[r, ia(j, d)] = 1
+                for e, (_, t_) in enumerate(edges):
+                    if t_ == j:
+                        A[r, ir(e, d)] = 1
+            lo[r], hi[r] = -np.inf, max(0, lim - p["fixed_census"][t]); r += 1
+    cons = [LinearConstraint(A.tocsr(), lo, hi)]
+    c1 = np.zeros(N); c1[nA:nA + nU] = 1
+    integ, bnd = np.ones(N), Bounds(0, np.inf)
+    s1 = milp(c1, constraints=cons, integrality=integ, bounds=bnd, options={"time_limit": 20})
+    if s1.status != 0 or s1.x is None:
+        return {"available": False, "reason": f"solver status {s1.status}: {s1.message}"}
+    U = int(round(s1.fun))
+    c2 = np.zeros(N)
+    for e, (s_, t_) in enumerate(edges):
+        c2[nA + nU + e * D: nA + nU + (e + 1) * D] = 1.0 if plans[s_]["city"] == plans[t_]["city"] else 3.0
+    s2 = milp(c2, constraints=cons + [LinearConstraint(c1.reshape(1, -1), -np.inf, U)], integrality=integ, bounds=bnd, options={"time_limit": 20})
+    x = np.rint((s2.x if s2.status == 0 and s2.x is not None else s1.x)).astype(int)
+    # independent re-simulation of the chosen plan
+    adm = {j: [int(x[ia(j, d)]) for d in range(D)] for j in range(n)}
+    rec = {j: [0] * D for j in range(n)}
+    out = {i: [0] * D for i in range(n)}
+    transfers = []
+    for e, (s_, t_) in enumerate(edges):
+        days = [int(x[ir(e, d)]) for d in range(D)]
+        for d, v in enumerate(days):
+            rec[t_][d] += v; out[s_][d] += v
+        if sum(days):
+            transfers.append({"from": plans[s_]["id"], "from_name": plans[s_]["name"], "to": plans[t_]["id"], "to_name": plans[t_]["name"],
+                              "patients": sum(days), "same_city": plans[s_]["city"] == plans[t_]["city"],
+                              "first_day": next(d + 1 for d, v in enumerate(days) if v), "last_day": max(d + 1 for d, v in enumerate(days) if v)})
+    split_ok = all(adm[i][d] + out[i][d] + int(x[iu(i, d)]) == plans[i]["dengue_arrivals"][d] and min(adm[i][d], out[i][d], x[iu(i, d)]) >= 0
+                   for i in range(n) for d in range(D))
+    beds_ok, peak_use = True, {}
+    for j, p in enumerate(plans):
+        use = [p["fixed_census"][t] + sum(adm[j][d] + rec[j][d] for d in range(max(0, t - L + 1), t + 1)) for t in range(D)]
+        beds_ok &= all(u_ <= max(p["beds"]["routine_limit"], p["fixed_census"][t]) for t, u_ in enumerate(use))
+        peak_use[p["id"]] = int(max(use))
+    # the same program with no referral links: the like-for-like baseline for "patients helped by referral"
+    no_ref = referral_time_expanded(plans, allow=lambda a_, b_: False, compare=False)["unresolved"] if compare else None
+    unresolved = int(sum(x[iu(j, d)] for j in range(n) for d in range(D)))
+    daily = [{"day": d + 1, "referred": int(sum(out[i][d] for i in range(n))), "unresolved": int(sum(x[iu(i, d)] for i in range(n)))} for d in range(D)]
+    return {"available": True, "method": "time-expanded integer program (HiGHS), 28 days", "unresolved": unresolved, "referred": int(sum(t["patients"] for t in transfers)),
+            "unresolved_without_referral": no_ref, "transfers": transfers, "daily": daily, "peak_use": peak_use,
+            "checks": {"arrivals_split": bool(split_ok), "beds_within_limits": bool(beds_ok), "allowed_edges_only": all(allow(plans[s_], plans[t_]) for s_, t_ in edges),
+                       "stage1_optimal": s1.status == 0, "stage2_optimal": s2.status == 0, "objective_matches_resimulation": unresolved == U},
+            "policy": "Other-illness patients keep their beds; dengue patients are admitted locally, referred, or counted as unresolved. Referred patients stay LOS days at the receiver."}
+
+
+def redistribute(plans: list[dict], res: str, transfer_days: int = 1) -> dict:
+    """Emergency redistribution of one resource on day 1 (arriving after transfer_days). Donors give only what stays above their own
+    safety stock on every day of their own projection; a receiver can use only units that arrive before its unmet days. Transport LP
+    (integral), checked by re-simulating both sides."""
+    from scipy.optimize import linprog
+    t0 = 1 + transfer_days
+    give = {p["id"]: max(0, min(r["closing"] for r in p["inventory"][res]["rows"]) - p["inventory"][res]["reserve"]) for p in plans}
+    take = {p["id"]: sum(r["unmet"] for r in p["inventory"][res]["rows"] if r["day"] >= t0) for p in plans}
+    allowed = lambda x, y: x["id"] != y["id"] and (x["city"] == y["city"] or x["role"] == "referral")
+    edges = [(i, j) for i, x in enumerate(plans) for j, y in enumerate(plans) if allowed(x, y) and give[x["id"]] > 0 and take[y["id"]] > 0]
+    base = {"resource": res, "transfer_days": transfer_days, "donor_available": sum(give.values()), "receiver_need": sum(take.values())}
+    if not edges:
+        return {**base, "placed": 0, "transfers": [], "certificate": True}
+    m = len(edges)
+    A = [[1.0 if e[0] == i else 0.0 for e in edges] for i in range(len(plans))] + [[1.0 if e[1] == j else 0.0 for e in edges] for j in range(len(plans))]
+    b = [give[p["id"]] for p in plans] + [take[p["id"]] for p in plans]
+    s1 = linprog(-np.ones(m), A_ub=A, b_ub=b, bounds=[(0, None)] * m, method="highs")
+    placed = int(round(-s1.fun))
+    cost = [1.0 if plans[i]["city"] == plans[j]["city"] else 2.0 for i, j in edges]
+    s2 = linprog(cost, A_ub=A, b_ub=b, A_eq=[[1.0] * m], b_eq=[placed], bounds=[(0, None)] * m, method="highs")
+    x = np.rint(s2.x if s2.success else s1.x).astype(int)
+    tr = [{"from": plans[i]["id"], "from_name": plans[i].get("name"), "to": plans[j]["id"], "to_name": plans[j].get("name"), "units": int(v),
+           "arrival_day": t0} for (i, j), v in zip(edges, x) if v > 0]
+    return {**base, "placed": int(x.sum()), "transfers": tr, "lp_optimum": placed, "certificate": int(x.sum()) == placed}
+
+
+def _receipts(*parts: dict) -> dict:
+    out: dict = {}
+    for part in parts:
+        for hid, by_res in part.items():
+            for res, days in by_res.items():
+                for d, q in days.items():
+                    out.setdefault(hid, {}).setdefault(res, {}); out[hid][res][d] = out[hid][res].get(d, 0) + q
+    return out
+
+
+def plan_state(fx: dict, city_cases: dict[str, list[float]], sc: Scenario, rules: dict, response: bool, transfer_days: int = 1) -> dict:
     """Plan every planning hospital of the given cities plus the regional referral centre. With response=True: open surge beds,
-    place procurement orders today (they arrive after the lead time), then refer the remaining bed gap through the network."""
+    redistribute saline and kits inside the network, order what is still needed today (arriving after the lead time), and plan
+    referrals over 28 days (time-expanded integer program; the peak-day plan is kept as a cross-check and fallback)."""
     hs = [h for h in fx["hospitals"] if h["city"] in city_cases or h.get("role") == "referral"]
-    plans = []
-    for h in hs:
-        cases = city_cases.get(h["city"], [0.0] * WEEKS)
-        p = hospital_plan(h, cases, sc, rules, surge_open=response)
-        if response:
-            lead = p["inventory"]["saline"]["lead_time_days"]
-            orders = {res: {min(DAYS, max(1, lead)): p["inventory"][res]["procurement_required"]}
-                      for res in ("saline", "kits") if p["inventory"][res]["procurement_required"] > 0}
-            if orders:
-                p = hospital_plan(h, cases, sc, rules, surge_open=True, extra_receipts=orders)
-                p["orders"] = {res: {"quantity": q, "arrival_day": d} for res, v in orders.items() for d, q in v.items()}
-        plans.append(p)
-    # worst day of the network: the day with the largest total bed gap
+    cases = {h["id"]: city_cases.get(h["city"], [0.0] * WEEKS) for h in hs}
+    run = lambda rec=None: [hospital_plan(h, cases[h["id"]], sc, rules, surge_open=response, extra_receipts=(rec or {}).get(h["id"])) for h in hs]
+    plans = run()
+    inventory_compare = None
+    if response:
+        surge_only = plans
+        redis = {res: redistribute(surge_only, res, transfer_days) for res in ("saline", "kits")}
+        moves: dict = {}
+        for res, rd in redis.items():
+            for t in rd["transfers"]:
+                moves.setdefault(t["from"], {}).setdefault(res, {}).setdefault(1, 0)
+                moves[t["from"]][res][1] -= t["units"]
+                moves.setdefault(t["to"], {}).setdefault(res, {}).setdefault(t["arrival_day"], 0)
+                moves[t["to"]][res][t["arrival_day"]] += t["units"]
+        after_r = run(moves)
+        order = lambda ps: {p["id"]: {res: {min(DAYS, max(1, p["inventory"][res]["lead_time_days"])): p["inventory"][res]["procurement_required"]}
+                                     for res in ("saline", "kits") if p["inventory"][res]["procurement_required"] > 0} for p in ps}
+        proc_only = run(order(surge_only))
+        orders = order(after_r)
+        plans = run(_receipts(moves, orders))
+        for p in plans:
+            if orders.get(p["id"]):
+                p["orders"] = {res: {"quantity": q, "arrival_day": d} for res, v in orders[p["id"]].items() for d, q in v.items()}
+        unmet = lambda ps, res: sum(p["inventory"][res]["unmet_total"] for p in ps if p["role"] != "referral")
+        donors_ok = all(min(r["closing"] for r in p["inventory"][res]["rows"]) >= min(p["inventory"][res]["reserve"], min(r["closing"] for r in q["inventory"][res]["rows"]))
+                        for p, q in zip(after_r, surge_only) for res in ("saline", "kits"))
+        inventory_compare = {res: {"no_action": unmet(surge_only, res), "procurement_only": unmet(proc_only, res), "redistribution_only": unmet(after_r, res),
+                                   "redistribution_and_procurement": unmet(plans, res), "redistribution": redis[res]} for res in ("saline", "kits")}
+        inventory_compare["checks"] = {"donors_keep_safety_stock": bool(donors_ok),
+                                       "conservation": all(p["checks"]["inventory_conservation"] for p in after_r + plans),
+                                       "redistribution_never_increases_unmet": all(inventory_compare[r]["redistribution_only"] <= inventory_compare[r]["no_action"] for r in ("saline", "kits"))}
+    # peak-day plan (kept as cross-check and fallback)
     gaps = [sum(max(0, p["daily_needed"][d] - p["beds"]["routine_limit"]) for p in plans) for d in range(DAYS)]
     worst = int(np.argmax(gaps)) if any(gaps) else int(np.argmax([sum(p["daily_needed"][d] for p in plans) for d in range(DAYS)]))
     nodes = [{"id": p["id"], "name": p["name"], "city": p["city"], "role": p["role"], "needed": p["daily_needed"][worst],
@@ -325,7 +472,14 @@ def plan_state(fx: dict, city_cases: dict[str, list[float]], sc: Scenario, rules
     network = referral_lp(nodes) if response else {"transfers": [], "placed": 0, "gap": sum(n["gap"] for n in nodes),
                                                      "unresolved": sum(n["gap"] for n in nodes), "maxflow_check": None, "certificate": True}
     network.update({"worst_day": worst + 1, "worst_week": week_of(worst + 1), "nodes": nodes})
+    if response:
+        te = referral_time_expanded(plans)
+        if te.get("available") and all(te["checks"].values()):
+            network["time_expanded"] = te
+        else:
+            network["time_expanded"] = {"available": False, "reason": te.get("reason", "checks failed: " + str(te.get("checks"))), "fallback": "peak-day plan"}
     tot = lambda f: sum(f(p) for p in plans if p["role"] != "referral")
+    te_ok = response and network.get("time_expanded", {}).get("available")
     summary = {"functional": tot(lambda p: p["beds"]["functional"]), "capacity": tot(lambda p: p["beds"]["capacity"]),
                "reserve": tot(lambda p: p["beds"]["reserve"]), "other_now": tot(lambda p: p["beds"]["other_now"]),
                "dengue_now": tot(lambda p: p["beds"]["dengue_now"]), "free_now": tot(lambda p: p["beds"]["free_now"]),
@@ -336,25 +490,35 @@ def plan_state(fx: dict, city_cases: dict[str, list[float]], sc: Scenario, rules
                "kits_required": tot(lambda p: p["inventory"]["kits"]["procurement_required"]),
                "saline_unmet": tot(lambda p: p["inventory"]["saline"]["unmet_total"]), "kits_unmet": tot(lambda p: p["inventory"]["kits"]["unmet_total"]),
                "bed_gap_worst_day": network["gap"], "referred": network["placed"], "bed_gap_after_referral": network["unresolved"],
+               "referred_28d": network["time_expanded"]["referred"] if te_ok else None,
+               "unresolved_28d": network["time_expanded"]["unresolved"] if te_ok else None,
                "first_shortage_week": min((p["beds"]["shortage_week"] for p in plans if p["beds"]["shortage_week"]), default=None),
                "first_reserve_breach_week": min((p["beds"]["reserve_breach_week"] for p in plans if p["beds"]["reserve_breach_week"]), default=None),
                "first_saline_stockout_week": min((week_of(p["inventory"]["saline"]["stockout_day"]) for p in plans if p["inventory"]["saline"]["stockout_day"]), default=None),
                "first_kits_stockout_week": min((week_of(p["inventory"]["kits"]["stockout_day"]) for p in plans if p["inventory"]["kits"]["stockout_day"]), default=None),
+               "first_saline_stockout_day": min((p["inventory"]["saline"]["stockout_day"] for p in plans if p["inventory"]["saline"]["stockout_day"]), default=None),
+               "first_kits_stockout_day": min((p["inventory"]["kits"]["stockout_day"] for p in plans if p["inventory"]["kits"]["stockout_day"]), default=None),
                "status": max((p["status"] for p in plans), key=rank, default="Normal")}
-    return {"hospitals": plans, "network": network, "summary": summary,
-            "checks": {k: all(p["checks"][k] for p in plans) for k in plans[0]["checks"]} if plans else {}}
+    out = {"hospitals": plans, "network": network, "summary": summary,
+           "checks": {k: all(p["checks"][k] for p in plans) for k in plans[0]["checks"]} if plans else {}}
+    if inventory_compare:
+        out["inventory_compare"] = inventory_compare
+    return out
 
 
 def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
     """Deterministic preparation checklist; every item is tied to a computed number of the crisis or response state."""
     s, r, out = crisis["summary"], resp["summary"], []
 
-    def add(what, qty, when, why, src):
-        out.append({"action": what, "quantity": qty, "when": when, "why": why, "trigger": src})
+    def add(what, qty, when, why, src, where=None):
+        out.append({"action": what, "quantity": qty, "when": when, "why": why, "trigger": src, "where": where or []})
+
+    hosp = [p for p in crisis["hospitals"] if p["role"] != "referral"]
 
     if s["extra_beds_to_protect_reserve"]:
         add("Prepare additional functional beds", s["extra_beds_to_protect_reserve"], f"before week {s['first_reserve_breach_week']}",
-            "Projected patients needing a bed exceed the beds left after the protected reserve", "beds_reserve")
+            "Projected patients needing a bed exceed the beds left after the protected reserve", "beds_reserve",
+            [f"{p['name']}: {p['beds']['extra_beds_to_protect_reserve']} before week {p['beds']['reserve_breach_week']}" for p in hosp if p["beds"]["extra_beds_to_protect_reserve"]])
     surge = sum(p["beds"]["surge_open"] for p in resp["hospitals"])
     if surge:
         add("Open configured surge beds", surge, f"before week {s['first_shortage_week'] or s['first_reserve_breach_week'] or 1}",
@@ -362,6 +526,18 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
     if r["referred"]:
         add("Coordinate referrals inside the planning network (confirm with receiving hospitals)", r["referred"], f"week {resp['network']['worst_week']}",
             "Receivers with free beds below their own reserve exist", "network")
+    te = resp["network"].get("time_expanded") or {}
+    if te.get("available") and te["referred"]:
+        add("Plan referrals over the four weeks (confirm each with the receiving hospital)", te["referred"], "days " + ", ".join(sorted({f"{t['first_day']}-{t['last_day']}" for t in te["transfers"]})[:3]),
+            f"A 28-day plan cuts patients without a bed from {te['unresolved_without_referral']} to {te['unresolved']}", "network_28d",
+            [f"{t['from_name']} to {t['to_name']}: {t['patients']}" for t in te["transfers"]])
+    ic = resp.get("inventory_compare") or {}
+    for res, label in (("saline", "saline bags"), ("kits", "diagnostic kits")):
+        rd = (ic.get(res) or {}).get("redistribution") or {}
+        if rd.get("placed"):
+            add(f"Move {label} inside the network on day 1", rd["placed"], f"arrive day {1 + rd['transfer_days']}",
+                "Donors keep their own safety stock; this covers unmet days before new orders arrive", f"{res}_redistribution",
+                [f"{t['from_name']} to {t['to_name']}: {t['units']}" for t in rd["transfers"]])
     if r["bed_gap_after_referral"]:
         add("Escalate: bed gap remains after surge beds and referrals", r["bed_gap_after_referral"], f"week {resp['network']['worst_week']}",
             "No modelled option closes the remaining gap; it needs capacity outside this network", "network")
@@ -370,7 +546,8 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
         if q:
             late = [p for p in crisis["hospitals"] if (p["inventory"][res]["order_by_day"] or 1) <= 0]
             add(f"Order {label}", q, "now (already late for at least one hospital)" if late else "within the reorder window",
-                f"Stock plus confirmed deliveries fall below the safety stock; procurement lead time applies", f"{res}_reserve")
+                f"Stock plus confirmed deliveries fall below the safety stock; procurement lead time applies", f"{res}_reserve",
+                [f"{p['name']}: {p['inventory'][res]['procurement_required']}, order by day {max(0, p['inventory'][res]['order_by_day'] or 0)}" for p in hosp if p["inventory"][res]["procurement_required"]])
         if r[f"{res}_unmet"]:
             add(f"Expect {label} shortfall until the order arrives", r[f"{res}_unmet"], "until delivery",
                 "Orders placed today still arrive after the first stockout", f"{res}_stockout")
