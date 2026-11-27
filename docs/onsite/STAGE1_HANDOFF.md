@@ -164,9 +164,8 @@ CI is dispatched on the branch. Hashes and the CI run are reported in the Stage 
 
 ## 13. Remaining issues
 
-- Bundle forecasts on historical origins are in-sample (the bundle was trained on 2016–2024). The default source (`auto`) uses the
-  rolling-origin replay for every 2019–2024 target, so retrospective plans use origin-safe forecasts; choosing `source=bundle` for a
-  past origin does not, and the page's source chip says which is in use. Forward plans from 2024-12-30 use the bundle, which is correct.
+- Bundle forecasts on historical origins are in-sample (the bundle was trained on 2016–2024). Resolved in Stage 2: both decision
+  endpoints now refuse in-sample forecasts, and every page with the source control labels them (see STAGE2_HANDOFF.md, section 9).
 - The plan inherits the forecast's error, largest at outbreak peaks, where Phase 1 documented under-prediction. Upper 80% and 90%
   service levels are the hedge.
 - Weights, floor, crew rule and stock levels are policy assumptions, not measured; the defaults (alpha 0.7, floor 25%, 10 cases per
