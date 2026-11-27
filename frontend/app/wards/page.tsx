@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
-import { api, qs, TIERS, TIER_COLOR, type Forecast, type Tier } from "@/lib/api";
+import { referenceYear } from "@/components/season-figure";
+import { api, qs, seasonUrl, TIERS, TIER_COLOR, type Forecast, type Tier } from "@/lib/api";
 import { useSel, srcParam } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { cls, dateFmt, download, num, pct, toCsv } from "@/lib/format";
@@ -10,6 +11,7 @@ import RiskMatrix from "@/components/riskmatrix";
 import { Btn, Card, CardTitle, DataTable, EmptyState, Loading, Modal, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import { FanChart } from "@/components/charts";
 import { Chart, axisStyle } from "@/components/echart";
+import { Houses } from "@/components/illustrations";
 
 export default function Wards() {
   const { sel, set, ready } = useSel();
@@ -35,7 +37,7 @@ export default function Wards() {
       xAxis: { type: "category", data: ["2w", "3w", "4w"], ...axisStyle }, yAxis: { type: "value", name: t("fc.median"), min: 0, ...axisStyle },
       series: picked.map((id) => ({ name: id, type: "bar", data: [get(h2.data, id)?.median_cases, get(h3.data, id)?.median_cases, get(h4.data, id)?.median_cases], barMaxWidth: 26, itemStyle: { borderRadius: [5, 5, 0, 0] } })) };
   }, [picked, h2.data, h3.data, h4.data, t]);
-  const series = useAsync((s) => (detail ? api(`/api/forecast/series?${qs({ ward_id: detail, horizon: sel.horizon, year: Number(sel.origin.slice(0, 4)) })}`, { signal: s }).catch(() => null) : Promise.resolve(null)), [detail, sel.horizon, sel.origin]);
+  const series = useAsync((s) => (detail ? api(seasonUrl(detail, sel.horizon, sel.origin), { signal: s }).catch(() => null) : Promise.resolve(null)), [detail, sel.horizon, sel.origin]);
   const cols = [
     { key: "pick", label: "", render: (w: Forecast) => <input type="checkbox" aria-label={`Compare ${w.ward_id}`} checked={picked.includes(w.ward_id)} onChange={() => toggle(w.ward_id)} onClick={(e) => e.stopPropagation()} className="h-4 w-4 accent-emerald" /> },
     { key: "ward_id", label: t("ctl.ward"), render: (w: Forecast) => <b>{w.ward_id}</b> }, { key: "city", label: t("ctl.city") },
@@ -48,11 +50,11 @@ export default function Wards() {
     { key: "dens", label: "Density/km²", align: "right" as const, render: (w: Forecast) => num(w.vulnerability?.population_density_sqkm, lang, 0), sort: (w: Forecast) => w.vulnerability?.population_density_sqkm ?? 0 },
   ];
   return (<>
-    <PageHeader eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; official DGHS boundaries are on the Geography page as context only, because no verified mapping to these IDs exists." />
+    <PageHeader art={<Houses className="w-full" />} eyebrow={t("mode.replay")} title={t("nav.wards")} sub="All 60 wards at the selected origin and horizon: risk ranking, an interactive risk matrix, filters, comparison and drill-down. The wards are synthetic dataset identifiers; official DGHS boundaries are on the Geography page as context only, because no verified mapping to these IDs exists." />
     <ControlsBar show={["city", "origin", "horizon", "source"]} />
     <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
       <Card><CardTitle title="Risk matrix" sub={`${sel.horizon} ${t("ctl.weeks")} · ${dateFmt(sel.origin, lang)} · click a tile for details; tick rows below to compare`} right={<div className="flex gap-1.5">{TIERS.map((x) => <span key={x} className="flex items-center gap-1 text-[11px] text-ink-3"><i className="h-2.5 w-2.5 rounded-sm" style={{ background: TIER_COLOR[x] }} />{t(`risk.${x.toLowerCase()}`)}</span>)}</div>} />
-        <Loading q={all} h={300}>{() => <RiskMatrix wards={wards} city={sel.city} picked={picked} onOpen={setDetail} />}</Loading></Card>
+        <Loading q={all} h={300} kind="chart" label="Ward risk matrix">{() => <RiskMatrix wards={wards} city={sel.city} picked={picked} onOpen={setDetail} />}</Loading></Card>
       <Card><CardTitle title="City overview" sub="Alerting wards per city" />
         <CityMap points={cityPts} selected={sel.city !== "All" ? sel.city : undefined} onSelect={(c) => set({ city: c })} height={300} />
         <div className="mt-3 grid grid-cols-2 gap-2 text-[12px]">{cityPts.map((c: any) => (<button key={c.city} onClick={() => set({ city: sel.city === c.city ? "All" : c.city })} className={cls("rounded-xl border px-3 py-2 text-left hover:bg-mint-l/60", sel.city === c.city ? "border-emerald bg-mint-l" : "border-line")}><b>{c.city}</b><br /><span className="text-ink-3">{c.alerts}/{c.wards} alerts · {pct(c.meanP, lang)}</span></button>))}</div></Card>
@@ -71,7 +73,8 @@ export default function Wards() {
     <Modal open={!!detail} onClose={() => setDetail(null)} title={detail ?? ""} wide>
       {detail && (() => { const w = wards.find((x) => x.ward_id === detail); return w ? (<div className="grid gap-4"><div className="flex flex-wrap items-center gap-3"><RiskBadge tier={w.risk_tier} size="lg" /><ProvChip tone={w.outbreak_alert ? "warn" : "ok"}>{w.outbreak_alert ? t("fc.yes") : t("fc.no")}</ProvChip>
         <span className="text-sm">{t("fc.median")} <b className="num">{w.median_cases}</b> · {t("fc.mean")} <b className="num">{num(w.expected_cases, lang, 1)}</b> · 80% {w.lower_80}–{w.upper_80} · 90% {w.lower_90}–{w.upper_90} · P {pct(w.p_outbreak, lang)}</span></div>
-        {series.data ? <FanChart series={series.data.series} markDate={w.target_date} height={280} /> : <EmptyState text="No validated replay series for this origin year." />}
+        {series.data?.series?.length ? <>{referenceYear(series.data.series, sel.origin) && <p data-testid="reference-label" className="rounded-full border-2 border-ink bg-[#fff2cc] px-3 py-1 text-[12.5px] font-semibold text-[#4a3200]">{referenceYear(series.data.series, sel.origin)} reference data: replayed forecasts and reported {referenceYear(series.data.series, sel.origin)} cases. {sel.origin.slice(0, 4)} outcomes are locked and never shown.</p>}
+          <FanChart series={series.data.series} markDate={w.target_date} height={280} /></> : <EmptyState text="No validated replay series for this origin year." />}
         <div className="flex gap-2"><Btn onClick={() => { set({ ward: w.ward_id }); setDetail(null); }}>Use in Command Center</Btn></div></div>) : null; })()}
     </Modal>
   </>);

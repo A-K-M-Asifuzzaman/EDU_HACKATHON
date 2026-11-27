@@ -1,6 +1,8 @@
-import { useId } from "react";
 const P: Record<string, string> = {
   command: "M3 12l9-8 9 8M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9",
+  sun: "M12 3v2m0 14v2m9-9h-2M5 12H3m15.4-6.4L17 7M7 17l-1.4 1.4m0-12.8L7 7m10 10l1.4 1.4M12 8a4 4 0 100 8 4 4 0 000-8z",
+  moon: "M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z",
+  dashboard: "M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z",
   profiling: "M4 19V9m5 10V5m5 14v-7m5 7V8M3 19h18",
   wards: "M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11zm0-8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z",
   lab: "M9 3h6M10 3v6L4.5 19a1.5 1.5 0 001.3 2.2h12.4A1.5 1.5 0 0019.5 19L14 9V3M8 14h8",
@@ -20,7 +22,8 @@ export function Icon({ name, size = 20, className = "" }: { name: string; size?:
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><path d={P[name] ?? P.info} /></svg>);
 }
 export function Logo({ size = 30 }: { size?: number }) {
-  const id = "lg" + useId().replace(/:/g, "");   // unique per instance: the hidden sidebar copy must not own the only gradient
-  return (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id={id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#9fe7c2" /><stop offset="1" stopColor="#0e8f66" /></linearGradient></defs>
-    <path d="M16 2.5l11 4v8.2c0 6.2-4.4 11.2-11 14.8C9.4 25.9 5 20.9 5 14.7V6.5l11-4z" fill={`url(#${id})`} /><path d="M16 8c3 3.4 4.5 5.6 4.5 8a4.5 4.5 0 01-9 0c0-2.4 1.5-4.6 4.5-8z" fill="#073b2b" opacity=".92" /></svg>);
+  // flat mark (DESIGN.md): ink shield, paper drop; follows the theme through currentColor and the canvas token
+  return (<svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" className="text-ink">
+    <path d="M16 2.5l11 4v8.2c0 6.2-4.4 11.2-11 14.8C9.4 25.9 5 20.9 5 14.7V6.5l11-4z" fill="currentColor" />
+    <path d="M16 8c3 3.4 4.5 5.6 4.5 8a4.5 4.5 0 01-9 0c0-2.4 1.5-4.6 4.5-8z" fill="var(--color-canvas)" /></svg>);
 }

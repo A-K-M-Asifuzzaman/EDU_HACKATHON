@@ -1,7 +1,10 @@
 name: Deploy
 
-# Runs after CI succeeds on main (or manually). Backend -> Hugging Face Space, dashboard -> Vercel (static, proxies /api to the Space).
+# Runs after CI succeeds for a PUSH to main of THIS repository (or manually by a maintainer). Backend -> Hugging Face Space,
+# dashboard -> Vercel (static, proxies /api to the Space).
 # Needs repository secrets: HF_TOKEN (write access), VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID. Without them the jobs skip and say why.
+# Security: CI also runs on pull requests, and `branches: [main]` matches a fork's branch name, so every job also checks the event type
+# and the source repository; untrusted fork code is never checked out with deployment secrets. Secrets are scoped to the steps that use them.
 on:
   workflow_run:
     workflows: [CI]
@@ -22,26 +25,35 @@ env:
 jobs:
   backend:
     name: Backend to Hugging Face Space
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
     steps:
       - name: Check secret
         id: gate
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           if [ -z "$HF_TOKEN" ]; then echo "HF_TOKEN is not set: skipping backend deploy"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
       - if: steps.gate.outputs.go == 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
       - if: steps.gate.outputs.go == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - if: steps.gate.outputs.go == 'true'
-        run: pip install huggingface_hub && python scripts/deploy_space.py "$HF_SPACE"
+        run: pip install "huggingface_hub==1.28.0"
+      - name: Upload backend to the Space
+        if: steps.gate.outputs.go == 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/deploy_space.py "$HF_SPACE"
       - name: Wait for the Space and smoke-test it
         if: steps.gate.outputs.go == 'true'
         run: |
@@ -56,35 +68,45 @@ jobs:
   frontend:
     name: Dashboard to Vercel
     needs: backend
-    if: always() && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success') && needs.backend.result != 'failure'
+    if: >-
+      always() && needs.backend.result != 'failure' && (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository))
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - name: Check secrets
         id: gate
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then echo "Vercel secrets not set: skipping frontend deploy"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
       - if: steps.gate.outputs.go == 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
       - if: steps.gate.outputs.go == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Stage a git-free frontend folder (only frontend/ and vercel.json are uploaded)
         if: steps.gate.outputs.go == 'true'
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           mkdir -p /tmp/stage/.vercel && cp vercel.json /tmp/stage/
           rsync -a --exclude node_modules --exclude .next --exclude out frontend/ /tmp/stage/frontend/
           printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > /tmp/stage/.vercel/project.json
-      - if: steps.gate.outputs.go == 'true'
+      - name: Deploy to Vercel (token read from the environment, not the command line)
+        if: steps.gate.outputs.go == 'true'
         working-directory: /tmp/stage
-        run: npx --yes vercel@50 deploy --prod --yes --token "$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@50 deploy --prod --yes
       - name: Smoke-test production
         if: steps.gate.outputs.go == 'true'
         run: |

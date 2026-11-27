@@ -1,0 +1,182 @@
+{
+ "protocol": "PREREGISTRATION.md E4",
+ "seasons": [
+  2021,
+  2022,
+  2023,
+  2024
+ ],
+ "by_horizon": {
+  "2": {
+   "seasons": [
+    {
+     "season": 2021,
+     "brier_base": 0.0386,
+     "brier_cand": 0.0402,
+     "ece_base": 0.0228,
+     "ece_cand": 0.0294,
+     "recall_base": 0.701,
+     "recall_cand": 0.706,
+     "far_base": 0.0521,
+     "far_cand": 0.0606
+    },
+    {
+     "season": 2022,
+     "brier_base": 0.067,
+     "brier_cand": 0.0725,
+     "ece_base": 0.0362,
+     "ece_cand": 0.0532,
+     "recall_base": 0.688,
+     "recall_cand": 0.729,
+     "far_base": 0.0477,
+     "far_cand": 0.0581
+    },
+    {
+     "season": 2023,
+     "brier_base": 0.0422,
+     "brier_cand": 0.0423,
+     "ece_base": 0.0173,
+     "ece_cand": 0.0122,
+     "recall_base": 0.915,
+     "recall_cand": 0.859,
+     "far_base": 0.0616,
+     "far_cand": 0.0429
+    },
+    {
+     "season": 2024,
+     "brier_base": 0.0327,
+     "brier_cand": 0.0367,
+     "ece_base": 0.0105,
+     "ece_cand": 0.0274,
+     "recall_base": 0.774,
+     "recall_cand": 0.631,
+     "far_base": 0.0534,
+     "far_cand": 0.0307
+    }
+   ],
+   "brier_wins": 0,
+   "pooled": {
+    "recall_base": 0.782,
+    "recall_cand": 0.758,
+    "far_base": 0.0536,
+    "far_cand": 0.0479
+   },
+   "verdict": "FAIL",
+   "rule": "Brier lower in >= 3 of 4 seasons AND pooled recall not lower at FAR within +/-0.01"
+  },
+  "3": {
+   "seasons": [
+    {
+     "season": 2021,
+     "brier_base": 0.0636,
+     "brier_cand": 0.0613,
+     "ece_base": 0.0702,
+     "ece_cand": 0.0725,
+     "recall_base": 0.814,
+     "recall_cand": 0.819,
+     "far_base": 0.1426,
+     "far_cand": 0.1433
+    },
+    {
+     "season": 2022,
+     "brier_base": 0.0873,
+     "brier_cand": 0.1018,
+     "ece_base": 0.052,
+     "ece_cand": 0.0928,
+     "recall_base": 0.559,
+     "recall_cand": 0.709,
+     "far_base": 0.0575,
+     "far_cand": 0.0896
+    },
+    {
+     "season": 2023,
+     "brier_base": 0.0611,
+     "brier_cand": 0.0654,
+     "ece_base": 0.0279,
+     "ece_cand": 0.0424,
+     "recall_base": 0.824,
+     "recall_cand": 0.826,
+     "far_base": 0.0728,
+     "far_cand": 0.0728
+    },
+    {
+     "season": 2024,
+     "brier_base": 0.052,
+     "brier_cand": 0.0581,
+     "ece_base": 0.0327,
+     "ece_cand": 0.0664,
+     "recall_base": 0.872,
+     "recall_cand": 0.656,
+     "far_base": 0.1262,
+     "far_cand": 0.0713
+    }
+   ],
+   "brier_wins": 1,
+   "pooled": {
+    "recall_base": 0.731,
+    "recall_cand": 0.757,
+    "far_base": 0.102,
+    "far_cand": 0.0949
+   },
+   "verdict": "FAIL",
+   "rule": "Brier lower in >= 3 of 4 seasons AND pooled recall not lower at FAR within +/-0.01"
+  },
+  "4": {
+   "seasons": [
+    {
+     "season": 2021,
+     "brier_base": 0.1005,
+     "brier_cand": 0.0798,
+     "ece_base": 0.1196,
+     "ece_cand": 0.1001,
+     "recall_base": 0.893,
+     "recall_cand": 0.847,
+     "far_base": 0.2146,
+     "far_cand": 0.1765
+    },
+    {
+     "season": 2022,
+     "brier_base": 0.0983,
+     "brier_cand": 0.1188,
+     "ece_base": 0.0619,
+     "ece_cand": 0.1141,
+     "recall_base": 0.322,
+     "recall_cand": 0.607,
+     "far_base": 0.024,
+     "far_cand": 0.0834
+    },
+    {
+     "season": 2023,
+     "brier_base": 0.0648,
+     "brier_cand": 0.079,
+     "ece_base": 0.0383,
+     "ece_cand": 0.047,
+     "recall_base": 0.991,
+     "recall_cand": 0.573,
+     "far_base": 0.1876,
+     "far_cand": 0.0334
+    },
+    {
+     "season": 2024,
+     "brier_base": 0.0561,
+     "brier_cand": 0.0683,
+     "ece_base": 0.0604,
+     "ece_cand": 0.0953,
+     "recall_base": 0.995,
+     "recall_cand": 0.949,
+     "far_base": 0.2091,
+     "far_cand": 0.1446
+    }
+   ],
+   "brier_wins": 1,
+   "pooled": {
+    "recall_base": 0.718,
+    "recall_cand": 0.68,
+    "far_base": 0.1626,
+    "far_cand": 0.1123
+   },
+   "verdict": "FAIL",
+   "rule": "Brier lower in >= 3 of 4 seasons AND pooled recall not lower at FAR within +/-0.01"
+  }
+ }
+}

@@ -1,0 +1,958 @@
+source,model,fs,tag,year,horizon,mae,high_mae,recall
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2018,2,0.952,4.02,0.32
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2018,2,0.95,4.25,0.285
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2018,2,0.9513,3.9,0.34
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2018,2,1.7761,3.94,0.885
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2018,2,0.9516,3.815,0.395
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2018,2,1.0614,2.92,0.645
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2018,2,1.0873,3.005,0.665
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2018,2,1.0621,3.695,0.385
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2018,2,1.032,3.035,0.615
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2018,2,1.0546,3.375,0.525
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2018,2,1.0915,2.985,0.645
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2019,2,1.3677,4.6311,0.7495
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2019,2,1.3657,4.7165,0.7243
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2019,2,1.3877,4.7456,0.6932
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2019,2,1.5443,5.5049,0.5748
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2019,2,1.366,4.7029,0.7184
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2019,2,1.299,4.4738,0.6854
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2019,2,1.3577,4.7592,0.6641
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2019,2,1.3993,4.9417,0.7359
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2019,2,1.3753,4.7864,0.6738
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2019,2,1.409,4.868,0.6932
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2019,2,1.285,4.3825,0.6854
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2020,2,1.0017,4.2636,0.4184
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2020,2,1.004,4.4854,0.3849
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2020,2,1.0313,4.0126,0.4812
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2020,2,1.0787,3.6569,0.5188
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2020,2,0.9793,4.1757,0.4142
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2020,2,1.0163,4.3054,0.4603
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2020,2,1.0247,4.2887,0.4812
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2020,2,1.078,4.9456,0.2929
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2020,2,1.0257,4.4561,0.4351
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2020,2,1.0437,4.5649,0.4017
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2020,2,1.021,4.1967,0.4561
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2021,2,0.9837,4.1525,0.3333
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2021,2,0.9767,4.3729,0.2938
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2021,2,0.9797,4.2034,0.339
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2021,2,0.9803,4.2881,0.3277
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2021,2,0.97,4.5706,0.2825
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2021,2,1.076,3.8079,0.5028
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2021,2,1.097,3.8305,0.5254
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2021,2,1.0643,4.2599,0.4237
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2021,2,1.0683,3.7627,0.5311
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2021,2,1.009,3.5706,0.5085
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2021,2,1.075,3.9096,0.4972
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2022,2,1.2313,4.1561,0.5731
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2022,2,1.2533,4.3518,0.5356
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2022,2,1.2527,4.249,0.5613
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2022,2,1.2247,4.2569,0.5553
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2022,2,1.183,4.002,0.5988
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2022,2,1.4437,5.251,0.4289
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2022,2,1.409,5.0494,0.4447
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2022,2,1.4167,5.2411,0.3597
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2022,2,1.3463,4.6443,0.5119
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2022,2,1.4093,4.9506,0.4862
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2022,2,1.3903,4.9209,0.4585
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2023,2,1.1577,3.9896,0.722
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2023,2,1.168,3.9834,0.7324
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2023,2,1.1557,3.9274,0.7386
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2023,2,1.1863,4.0643,0.7469
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2023,2,1.0967,3.5747,0.7573
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2023,2,1.0883,3.5519,0.7697
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2023,2,1.2583,4.7054,0.7137
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2023,2,1.12,3.7075,0.7635
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2023,2,1.1887,3.9461,0.7905
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2023,2,1.0847,3.4938,0.7718
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2024,2,0.919,3.6769,0.5641
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2024,2,0.9141,3.7385,0.5487
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2024,2,0.9186,3.6769,0.5487
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2024,2,0.9059,3.7385,0.5385
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2024,2,0.9284,3.8359,0.5282
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2024,2,0.9245,3.4667,0.6051
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2024,2,0.9359,3.4769,0.6462
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2024,2,0.902,3.7692,0.4718
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2024,2,0.934,3.6256,0.6359
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2024,2,0.9654,3.5949,0.641
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2024,2,0.9314,3.641,0.6051
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2018,3,1.097,3.025,0.535
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2018,3,1.061,3.335,0.49
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2018,3,1.097,3.02,0.56
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2018,3,2.642,5.945,0.935
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2018,3,1.0233,3.795,0.375
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2018,3,1.359,3.3,0.725
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2018,3,1.367,3.365,0.725
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2018,3,1.176,2.995,0.575
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2018,3,1.3133,3.25,0.675
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2018,3,1.248,3.505,0.595
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2018,3,1.3997,3.375,0.67
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2019,3,1.5925,5.4388,0.5748
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2019,3,1.5997,5.2854,0.5981
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2019,3,1.9759,7.0971,0.3883
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2019,3,1.534,5.3184,0.635
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2019,3,1.6017,5.6175,0.5146
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2019,3,1.5864,5.4621,0.5728
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2019,3,1.7065,6.3146,0.4194
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2019,3,1.531,5.8117,0.4835
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2019,3,1.7201,6.433,0.4175
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2019,3,1.5673,5.6505,0.5049
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2020,3,1.1704,4.4184,0.4184
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2020,3,1.1456,4.7531,0.3389
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2020,3,1.2497,5.0293,0.251
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2020,3,1.1286,4.3013,0.4059
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2020,3,1.1408,5.1883,0.2343
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2020,3,1.2626,4.3138,0.5272
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2020,3,1.2827,4.4142,0.5439
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2020,3,1.2435,4.5565,0.3598
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2020,3,1.2503,4.1548,0.5356
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2020,3,1.2704,4.6109,0.4351
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2020,3,1.2361,3.9372,0.5649
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2021,3,1.3592,3.2712,0.6441
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2021,3,1.3037,3.4068,0.6158
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2021,3,1.1823,3.9322,0.4859
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2021,3,1.3452,3.435,0.6384
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2021,3,1.1418,4.1808,0.452
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2021,3,1.4483,4.1017,0.5424
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2021,3,1.448,4.1808,0.565
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2021,3,1.218,4.9548,0.1243
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2021,3,1.4548,3.9379,0.5367
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2021,3,1.3956,4.0565,0.5367
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2021,3,1.4486,4.209,0.5198
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2022,3,1.4986,4.9526,0.4842
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2022,3,1.5187,5.2826,0.4229
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2022,3,1.5184,5.1206,0.4585
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2022,3,1.5248,5.2292,0.4407
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2022,3,1.4633,5.0356,0.4565
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2022,3,1.6044,5.3775,0.4644
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2022,3,1.6139,5.581,0.4466
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2022,3,1.5466,5.7036,0.3004
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2022,3,1.5888,5.168,0.4881
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2022,3,1.5646,5.2253,0.4822
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2022,3,1.6061,5.4249,0.4822
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2023,3,1.4629,4.9647,0.6639
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2023,3,1.4776,5.2822,0.6017
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2023,3,1.4854,5.1183,0.6286
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2023,3,1.4585,5.1183,0.6369
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2023,3,1.4636,5.2054,0.6079
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2023,3,1.4759,4.7427,0.6888
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2023,3,1.4871,4.6494,0.7033
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2023,3,1.633,6.0249,0.5415
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2023,3,1.5408,4.9004,0.6846
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2023,3,1.6983,5.6577,0.6577
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2023,3,1.4939,4.7988,0.6826
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2024,3,1.2307,4.6718,0.5436
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2024,3,1.195,4.8359,0.4769
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2024,3,1.2237,4.6564,0.5385
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2024,3,1.172,4.959,0.4051
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2024,3,1.205,5.0308,0.4615
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2024,3,1.281,4.3744,0.6154
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2024,3,1.2883,4.2667,0.6513
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2024,3,1.1207,4.6615,0.3179
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2024,3,1.2653,4.2103,0.5897
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2024,3,1.2207,4.2974,0.6103
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2024,3,1.2437,4.1949,0.5846
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2018,4,1.4228,2.695,0.75
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2018,4,1.318,2.815,0.69
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2018,4,1.3139,3.32,0.56
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2018,4,2.9827,7.79,0.925
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2018,4,1.1241,5.465,0.02
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2018,4,1.4622,3.55,0.76
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2018,4,1.4813,3.8,0.73
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2018,4,1.1884,3.505,0.53
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2018,4,1.4772,3.595,0.735
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2018,4,1.4289,3.645,0.695
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2018,4,1.4915,3.71,0.725
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2019,4,1.8729,6.7592,0.3126
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2019,4,1.9997,7.7301,0.1107
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2019,4,1.7979,6.5107,0.3748
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2019,4,2.341,9.2854,0.0854
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2019,4,2.0882,8.5845,0.0
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2019,4,1.6892,6.2447,0.433
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2019,4,1.701,6.0233,0.4718
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2019,4,1.8698,6.9398,0.3243
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2019,4,1.7125,6.4602,0.3981
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2019,4,1.6552,6.0214,0.4699
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2019,4,1.7288,6.4175,0.3883
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2020,4,1.3587,4.2218,0.5063
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2020,4,1.2927,4.5565,0.4226
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2020,4,1.4031,3.5314,0.6862
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2020,4,1.8243,4.272,0.7992
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2020,4,1.3,4.8703,0.4059
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2020,4,1.3552,4.3096,0.5356
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2020,4,1.3458,4.2259,0.5356
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2020,4,1.2236,4.7071,0.2594
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2020,4,1.3358,4.1339,0.5146
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2020,4,1.3212,4.6653,0.4268
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2020,4,1.309,3.9749,0.5565
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2021,4,1.7403,3.6836,0.7345
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2021,4,1.6236,3.5819,0.6836
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2021,4,1.3507,3.7175,0.5537
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2021,4,1.7618,4.1808,0.7232
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2021,4,1.3642,3.8249,0.565
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2021,4,1.6069,3.7966,0.6045
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2021,4,1.6622,3.9492,0.6102
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2021,4,1.2986,4.661,0.2373
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2021,4,1.5729,3.887,0.548
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2021,4,1.5625,3.8418,0.5989
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2021,4,1.6295,4.0339,0.548
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2022,4,1.7927,6.2213,0.3202
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2022,4,1.8743,7.0277,0.1581
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2022,4,1.6656,5.5356,0.4387
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2022,4,1.7125,5.8557,0.4348
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2022,4,1.9785,7.9209,0.0
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2022,4,1.733,5.7233,0.498
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2022,4,1.7875,5.9506,0.4625
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2022,4,1.7434,6.7787,0.1957
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2022,4,1.7358,5.6561,0.5119
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2022,4,1.6899,5.587,0.4802
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2022,4,1.6736,5.3142,0.5395
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2023,4,1.5753,5.8341,0.5308
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2023,4,1.5924,6.2725,0.4526
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2023,4,1.5726,6.0308,0.4834
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2023,4,1.5924,6.0592,0.5118
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2023,4,1.5431,6.1896,0.4573
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2023,4,1.6903,5.936,0.5213
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2023,4,1.7021,5.9668,0.5237
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2023,4,1.7674,7.5664,0.09
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2023,4,1.6899,5.9763,0.5213
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2023,4,1.9208,6.5427,0.5047
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2023,4,1.7434,6.1493,0.5166
+Stage 3 tournament (notebooks/07),glm_poisson,F3,,2024,4,1.2269,3.4103,0.6821
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F3,,2024,4,1.1463,3.8256,0.5795
+Stage 3 tournament (notebooks/07),glm_spline,F3,,2024,4,1.2201,3.3385,0.6769
+Stage 3 tournament (notebooks/07),glm_nb,F3,,2024,4,1.1517,3.8769,0.5282
+Stage 3 tournament (notebooks/07),glm_tweedie,F3,,2024,4,1.1762,3.3385,0.6974
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,,2024,4,1.3969,3.6974,0.6821
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F3,,2024,4,1.3878,3.7231,0.6821
+Stage 3 tournament (notebooks/07),lgbm_l1,F3,,2024,4,1.2378,4.241,0.4667
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,,2024,4,1.3367,3.6359,0.6256
+Stage 3 tournament (notebooks/07),cat_poisson,F3,,2024,4,1.2765,3.6667,0.6308
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F3,,2024,4,1.3779,3.7487,0.6513
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2018,2,0.9448,4.095,0.31
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2018,2,0.9422,4.34,0.26
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2018,2,0.9474,4.04,0.31
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2018,2,0.9088,3.325,0.49
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2018,2,0.9327,4.6,0.175
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2018,2,1.0673,2.815,0.685
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2018,2,1.0765,3.02,0.635
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2018,2,1.0451,4.115,0.295
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2018,2,1.0203,3.045,0.59
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2018,2,1.0765,3.28,0.585
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2018,2,1.0706,2.945,0.65
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2019,2,1.3493,4.5981,0.732
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2019,2,1.353,4.6854,0.7146
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2019,2,1.3517,4.4757,0.7592
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2019,2,1.4417,5.1573,0.635
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2019,2,1.3637,4.7029,0.734
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2019,2,1.281,4.2194,0.7262
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2019,2,1.2923,4.2233,0.7456
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2019,2,1.363,4.6,0.7786
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2019,2,1.286,4.1553,0.7515
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2019,2,1.3717,4.8757,0.6447
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2019,2,1.2367,4.0621,0.7262
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2020,2,0.993,3.9372,0.4686
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2020,2,0.989,4.1046,0.4393
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2020,2,1.025,3.9121,0.5105
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2020,2,1.053,5.1967,0.2469
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2020,2,0.996,3.9874,0.4561
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2020,2,1.0193,4.2427,0.477
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2020,2,1.0223,4.1339,0.5146
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2020,2,1.069,4.9038,0.3264
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2020,2,1.016,4.3598,0.4812
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2020,2,1.0237,4.3515,0.4519
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2020,2,1.03,4.3724,0.4477
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2021,2,1.014,3.5593,0.4972
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2021,2,1.0027,3.7571,0.4463
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2021,2,0.98,3.9322,0.3898
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2021,2,0.9877,3.8079,0.4181
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2021,2,0.9877,4.0282,0.4011
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2021,2,1.073,3.7062,0.5198
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2021,2,1.086,3.8079,0.5141
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2021,2,1.0673,4.1469,0.4463
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2021,2,1.069,3.8814,0.5141
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2021,2,1.001,3.6384,0.4915
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2021,2,1.0703,3.9153,0.4915
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2022,2,1.2423,4.2549,0.5494
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2022,2,1.2637,4.4625,0.5059
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2022,2,1.2567,4.3024,0.5395
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2022,2,1.2233,4.2095,0.5455
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2022,2,1.2627,4.3893,0.5316
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2022,2,1.4557,5.2846,0.4229
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2022,2,1.405,5.0672,0.4427
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2022,2,1.4067,5.1601,0.3696
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2022,2,1.3397,4.5553,0.5079
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2022,2,1.367,4.83,0.4881
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2022,2,1.3803,4.8538,0.4644
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2023,2,1.1557,3.9357,0.7573
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2023,2,1.1547,4.0083,0.7178
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2023,2,1.1723,4.0519,0.7303
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2023,2,1.1603,4.029,0.7365
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2023,2,1.1747,4.0539,0.7531
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2023,2,1.0817,3.5124,0.7718
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2023,2,1.078,3.5726,0.7697
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2023,2,1.251,4.6058,0.695
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2023,2,1.1123,3.5996,0.7822
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2023,2,1.1097,3.4979,0.8008
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2023,2,1.0863,3.4896,0.7718
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2024,2,0.9229,3.6103,0.5641
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2024,2,0.9075,3.7128,0.5487
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2024,2,0.9281,3.7179,0.5436
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2024,2,0.9095,3.7179,0.559
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2024,2,0.9379,3.8769,0.5282
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2024,2,0.9193,3.4718,0.6308
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2024,2,0.9382,3.5436,0.641
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2024,2,0.9046,3.7385,0.4821
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2024,2,0.9327,3.5744,0.6513
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2024,2,0.9696,3.759,0.6513
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2024,2,0.934,3.6821,0.5692
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2018,3,1.0617,3.405,0.48
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2018,3,1.0203,3.775,0.415
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2018,3,1.042,3.325,0.5
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2018,3,0.9613,3.31,0.52
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2018,3,1.0093,3.995,0.335
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2018,3,1.3343,3.09,0.745
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2018,3,1.35,3.265,0.74
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2018,3,1.1827,2.975,0.6
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2018,3,1.3167,3.205,0.655
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2018,3,1.2447,3.79,0.53
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2018,3,1.366,3.205,0.7
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2019,3,1.5946,5.2699,0.6272
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2019,3,1.602,5.4078,0.5942
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2019,3,1.5714,5.1709,0.6466
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2019,3,1.7799,6.4835,0.4311
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2019,3,1.6061,5.4194,0.6097
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2019,3,1.552,5.2369,0.6233
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2019,3,1.5895,5.3592,0.6194
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2019,3,1.681,6.167,0.4699
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2019,3,1.5469,5.4524,0.5728
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2019,3,1.6408,5.9553,0.5417
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2019,3,1.5241,5.1612,0.6097
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2020,3,1.1782,4.2803,0.4184
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2020,3,1.1561,4.5983,0.3682
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2020,3,1.1772,4.1799,0.4351
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2020,3,1.1116,4.6611,0.3389
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2020,3,1.1697,4.8536,0.3096
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2020,3,1.2983,4.4895,0.5439
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2020,3,1.3146,4.5774,0.5481
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2020,3,1.2415,4.5649,0.3766
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2020,3,1.298,4.3473,0.5397
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2020,3,1.2561,4.6276,0.4644
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2020,3,1.2803,4.364,0.523
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2021,3,1.3901,3.2034,0.678
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2021,3,1.3238,3.2881,0.6384
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2021,3,1.1952,3.6384,0.5706
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2021,3,1.2949,3.3842,0.6328
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2021,3,1.1755,3.8192,0.5254
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2021,3,1.4429,4.0621,0.5593
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2021,3,1.4633,4.0565,0.565
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2021,3,1.2265,4.7175,0.322
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2021,3,1.4153,3.9887,0.5254
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2021,3,1.3905,4.3842,0.4859
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2021,3,1.4395,4.1977,0.5254
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2022,3,1.5075,5.1542,0.4348
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2022,3,1.535,5.4723,0.3735
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2022,3,1.5204,5.1976,0.4466
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2022,3,1.5221,5.1601,0.4644
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2022,3,1.866,7.751,0.0158
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2022,3,1.5946,5.2905,0.4723
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2022,3,1.5864,5.3953,0.4684
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2022,3,1.5776,5.7253,0.3399
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2022,3,1.598,5.1285,0.5099
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2022,3,1.5752,5.0059,0.5375
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2022,3,1.6092,5.4091,0.4625
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2023,3,1.4214,4.7925,0.6763
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2023,3,1.4483,5.1369,0.6245
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2023,3,1.4595,5.0539,0.6307
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2023,3,1.4303,4.9855,0.6515
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2023,3,1.4429,5.0809,0.6307
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2023,3,1.452,4.6369,0.6888
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2023,3,1.4724,4.6017,0.7033
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2023,3,1.616,5.9481,0.5228
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2023,3,1.5139,4.6867,0.7033
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2023,3,1.6027,5.1826,0.6743
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2023,3,1.4578,4.6183,0.6888
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2024,3,1.2497,4.6462,0.5436
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2024,3,1.1983,4.7641,0.4872
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2024,3,1.2367,4.6103,0.5282
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2024,3,1.1803,4.9487,0.4513
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2024,3,1.236,5.0359,0.4769
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2024,3,1.3027,4.5641,0.6154
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2024,3,1.2853,4.3897,0.6667
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2024,3,1.1367,4.5949,0.3897
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2024,3,1.2653,4.3026,0.6205
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2024,3,1.3033,4.4308,0.6154
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2024,3,1.2467,4.3692,0.6051
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2018,4,1.267,2.78,0.685
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2018,4,1.1895,3.09,0.6
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2018,4,1.3112,3.38,0.535
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2018,4,1.2361,3.225,0.72
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2018,4,1.1548,3.315,0.575
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2018,4,1.4231,3.27,0.76
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2018,4,1.4276,3.24,0.76
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2018,4,1.2133,3.265,0.545
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2018,4,1.4279,3.09,0.75
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2018,4,1.3837,3.635,0.625
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2018,4,1.4381,3.345,0.735
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2019,4,1.8003,6.3476,0.4097
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2019,4,1.8576,6.8835,0.3184
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2019,4,1.7885,6.3922,0.4019
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2019,4,2.1576,8.5204,0.1243
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2019,4,2.2267,9.2252,0.0
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2019,4,1.6632,5.8524,0.5029
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2019,4,1.6688,5.8369,0.5087
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2019,4,1.8705,7.1495,0.1592
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2019,4,1.7167,6.1379,0.4835
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2019,4,1.7701,6.2155,0.4738
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2019,4,1.6861,6.101,0.4583
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2020,4,1.3573,3.569,0.6444
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2020,4,1.299,3.7573,0.5941
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2020,4,1.3378,3.6653,0.636
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2020,4,2.8243,7.5523,0.8954
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2020,4,1.3191,3.8996,0.59
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2020,4,1.3569,4.4477,0.523
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2020,4,1.349,4.046,0.5649
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2020,4,1.2892,4.5607,0.4184
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2020,4,1.3816,4.4603,0.523
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2020,4,1.3753,5.1632,0.4059
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2020,4,1.3438,4.3515,0.5314
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2021,4,1.8649,3.7966,0.791
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2021,4,1.7458,3.5989,0.7627
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2021,4,1.3788,3.4181,0.6158
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2021,4,1.7003,3.6893,0.7684
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2021,4,1.1878,6.6949,0.0
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2021,4,1.651,3.8927,0.6158
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2021,4,1.7163,4.0452,0.6328
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2021,4,1.2972,4.4915,0.322
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2021,4,1.5944,3.904,0.5819
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2021,4,1.6253,4.0169,0.5819
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2021,4,1.6438,4.0056,0.5537
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2022,4,1.6601,5.4506,0.4368
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2022,4,1.6969,5.8953,0.3755
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2022,4,1.675,5.5632,0.4407
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2022,4,1.7285,5.6008,0.4783
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2022,4,2.0424,8.2905,0.0
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2022,4,1.7451,5.7194,0.5059
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2022,4,1.7868,5.8933,0.4783
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2022,4,1.7181,6.5375,0.1798
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2022,4,1.7826,5.7668,0.5059
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2022,4,1.6903,5.4328,0.5237
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2022,4,1.7253,5.3735,0.5553
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2023,4,1.5729,6.0047,0.4763
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2023,4,1.6094,6.6114,0.3886
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2023,4,1.5688,5.9929,0.4905
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2023,4,1.5337,5.8839,0.5213
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2023,4,1.6024,6.936,0.3152
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2023,4,1.6635,5.9147,0.5308
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2023,4,1.7097,5.8839,0.5569
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2023,4,1.7819,7.6777,0.09
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2023,4,1.6944,6.0521,0.5118
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2023,4,1.8733,6.6588,0.4882
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2023,4,1.7389,6.128,0.519
+Stage 3 tournament (notebooks/07),glm_poisson,F8,,2024,4,1.3037,3.2308,0.759
+Stage 3 tournament (notebooks/07),glm_poisson_nbdisp,F8,,2024,4,1.218,3.3846,0.7179
+Stage 3 tournament (notebooks/07),glm_spline,F8,,2024,4,1.2867,3.2718,0.7436
+Stage 3 tournament (notebooks/07),glm_nb,F8,,2024,4,1.2187,3.5385,0.6821
+Stage 3 tournament (notebooks/07),glm_tweedie,F8,,2024,4,1.2762,3.3231,0.7333
+Stage 3 tournament (notebooks/07),lgbm_poisson,F8,,2024,4,1.3527,3.6256,0.6718
+Stage 3 tournament (notebooks/07),lgbm_tweedie,F8,,2024,4,1.3687,3.5641,0.7026
+Stage 3 tournament (notebooks/07),lgbm_l1,F8,,2024,4,1.2048,5.159,0.0
+Stage 3 tournament (notebooks/07),xgb_poisson,F8,,2024,4,1.3122,3.5487,0.6513
+Stage 3 tournament (notebooks/07),cat_poisson,F8,,2024,4,1.317,3.8718,0.6051
+Stage 3 tournament (notebooks/07),hurdle_lgbm,F8,,2024,4,1.3357,3.5795,0.6821
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2018,2,1.2386,3.33,0.55
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2019,2,1.3397,4.765,0.6641
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2020,2,1.0853,4.7029,0.4184
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2021,2,1.0263,3.6893,0.4859
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2022,2,1.4713,4.9743,0.4921
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2023,2,1.114,3.5996,0.7925
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2024,2,0.8993,3.559,0.6
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2018,3,1.2667,3.685,0.55
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2019,3,1.6102,5.8971,0.5223
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2020,3,1.2483,4.1255,0.4979
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2021,3,1.4139,4.0,0.5141
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2022,3,1.598,5.3399,0.4506
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2023,3,1.4714,4.7946,0.6826
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2024,3,1.2143,4.3128,0.559
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2018,4,1.4241,3.89,0.635
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2019,4,1.6767,6.2078,0.4466
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2020,4,1.2729,4.7029,0.4226
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2021,4,1.4719,3.8983,0.565
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2022,4,1.6917,5.6877,0.4407
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2023,4,1.7622,6.1991,0.455
+Stage 3 tournament (notebooks/07),cat_poisson,F3,tuned,2024,4,1.2731,3.7538,0.6205
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2018,2,1.0954,3.12,0.645
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2019,2,1.2953,4.299,0.732
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2020,2,1.024,4.3473,0.4268
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2021,2,1.0703,3.9153,0.4746
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2022,2,1.4063,5.0929,0.415
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2023,2,1.109,3.6722,0.749
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2024,2,0.9382,3.5846,0.6256
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2018,3,1.3487,3.515,0.68
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2019,3,1.5728,5.3534,0.6136
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2020,3,1.2187,3.9121,0.5523
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2021,3,1.3745,3.904,0.5311
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2022,3,1.5503,5.4407,0.4111
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2023,3,1.5061,4.666,0.6971
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2024,3,1.2547,4.5231,0.5026
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2018,4,1.4738,3.8,0.67
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2019,4,1.741,6.3262,0.433
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2020,4,1.2823,3.4812,0.6192
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2021,4,1.5052,3.6045,0.5932
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2022,4,1.642,5.5336,0.4466
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2023,4,1.6372,5.9787,0.4692
+Stage 3 tournament (notebooks/07),lgbm_poisson,F3,tuned,2024,4,1.2823,3.5846,0.6051
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2018,2,1.034,3.02,0.59
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2019,2,1.3257,4.5709,0.699
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2020,2,1.016,4.2427,0.4393
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2021,2,1.062,3.8249,0.5198
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2022,2,1.361,4.753,0.4802
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2023,2,1.1177,3.6929,0.7593
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2024,2,0.9183,3.5641,0.6154
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2018,3,1.319,3.165,0.665
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2019,3,1.5619,5.833,0.5068
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2020,3,1.2282,4.0669,0.5314
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2021,3,1.3612,3.6441,0.548
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2022,3,1.5935,5.4526,0.3834
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2023,3,1.498,5.0788,0.6577
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2024,3,1.2277,4.3231,0.5231
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2018,4,1.4939,3.41,0.74
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2019,4,1.7003,6.3282,0.4019
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2020,4,1.242,3.9414,0.5063
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2021,4,1.4247,3.4915,0.5593
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2022,4,1.6677,5.7431,0.4229
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2023,4,1.6465,5.9763,0.5095
+Stage 3 tournament (notebooks/07),xgb_poisson,F3,tuned,2024,4,1.3051,3.6974,0.6051
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2019,2,1.326,4.5184,0.7398
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2020,2,0.9953,4.2552,0.4435
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2021,2,1.0253,3.8983,0.4576
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2022,2,1.248,4.2569,0.5573
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2024,2,0.9154,3.5385,0.5795
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2020,3,1.1755,4.3933,0.4184
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2021,3,1.3721,3.4633,0.6215
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2022,3,1.4986,4.9526,0.4842
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2023,3,1.4629,4.9647,0.6639
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2024,3,1.231,4.5949,0.5538
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2019,4,1.7885,6.5689,0.3612
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2020,4,1.3222,4.2218,0.5356
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2021,4,1.608,3.6836,0.6158
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2022,4,1.6868,5.6285,0.4605
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2023,4,1.6233,5.8578,0.545
+Stage 3 tournament (notebooks/07),ens_glm+lgbm,F3,ensemble,2024,4,1.2741,3.4974,0.6974
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2019,2,1.326,4.5864,0.7184
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2020,2,0.992,4.3389,0.4226
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2021,2,0.9967,3.9774,0.3955
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2022,2,1.2323,4.1739,0.5791
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2024,2,0.9193,3.5897,0.5795
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2020,3,1.1745,4.2678,0.4477
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2021,3,1.4,3.5367,0.5932
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2022,3,1.4986,4.9526,0.4842
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2023,3,1.4629,4.9647,0.6639
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2024,3,1.2287,4.5692,0.5436
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2019,4,1.8174,6.6854,0.3359
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2020,4,1.3191,4.1046,0.5146
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2021,4,1.5774,3.7345,0.5819
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2022,4,1.7146,5.6126,0.5
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2023,4,1.6434,5.8934,0.5213
+Stage 3 tournament (notebooks/07),ens_glm+xgb,F3,ensemble,2024,4,1.2469,3.4615,0.6821
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2019,2,1.3547,4.6311,0.732
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2020,2,0.9963,4.3682,0.3975
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2021,2,0.98,3.8531,0.4237
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2022,2,1.2447,4.2411,0.5652
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2023,2,1.1597,3.9087,0.749
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2024,2,0.9216,3.5846,0.5744
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2019,3,1.5891,5.3243,0.6019
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2020,3,1.1704,4.4184,0.4184
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2021,3,1.3592,3.2712,0.6441
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2022,3,1.4986,4.9526,0.4842
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2023,3,1.4929,5.0539,0.6598
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2024,3,1.2307,4.6718,0.5436
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2019,4,1.7399,6.4039,0.4
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2020,4,1.2986,4.5272,0.4477
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2021,4,1.5722,3.7514,0.6045
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2022,4,1.6826,5.6047,0.4644
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2023,4,1.9208,6.5427,0.5047
+Stage 3 tournament (notebooks/07),ens_glm+cat,F3,ensemble,2024,4,1.2259,3.4256,0.6923
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2019,2,1.3257,4.5049,0.732
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2020,2,0.992,4.2385,0.4435
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2021,2,1.0073,3.9774,0.435
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2022,2,1.2333,4.168,0.5731
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2024,2,0.9163,3.5949,0.5692
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2020,3,1.1759,4.3766,0.4226
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2021,3,1.3854,3.5311,0.6158
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2022,3,1.4986,4.9526,0.4842
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2023,3,1.4616,4.9398,0.6639
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2024,3,1.2267,4.5897,0.5487
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2019,4,1.8181,6.6757,0.3417
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2020,4,1.2903,4.0628,0.5272
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2021,4,1.6267,3.9266,0.5706
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2022,4,1.6566,5.33,0.498
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2023,4,1.6917,6.0758,0.5095
+Stage 3 tournament (notebooks/07),ens_glm+hurdle,F3,ensemble,2024,4,1.2714,3.5333,0.6872
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2019,2,1.3643,4.6466,0.7359
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2020,2,1.001,4.1715,0.4268
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2021,2,0.9793,4.1695,0.3333
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2022,2,1.2427,4.2055,0.5632
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2023,2,1.1653,3.9398,0.7427
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2024,2,0.919,3.6769,0.5641
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2019,3,1.5891,5.2505,0.6058
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2020,3,1.1704,4.4184,0.4184
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2021,3,1.3592,3.2712,0.6441
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2022,3,1.5163,5.1047,0.4585
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2023,3,1.4854,5.1183,0.6286
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2024,3,1.2307,4.6718,0.5436
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2019,4,1.8062,6.5476,0.3689
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2020,4,1.4031,3.5314,0.6862
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2021,4,1.5146,3.452,0.6384
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2022,4,1.6656,5.5356,0.4387
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2023,4,1.5726,6.0308,0.4834
+Stage 3 tournament (notebooks/07),ens_glm+spline,F3,ensemble,2024,4,1.2201,3.3385,0.6769
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2019,2,1.3613,4.6078,0.7515
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2020,2,0.9847,4.1548,0.4142
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2021,2,0.9807,4.2881,0.3107
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2022,2,1.1917,3.9447,0.6166
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2023,2,1.193,4.027,0.7718
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2024,2,0.9392,3.7795,0.5487
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2019,3,1.5367,5.1223,0.6738
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2020,3,1.1602,4.7364,0.3556
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2021,3,1.1796,3.9153,0.5141
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2022,3,1.4435,4.7391,0.5158
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2023,3,1.4456,4.8755,0.6639
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2024,3,1.2407,4.8359,0.5231
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2019,4,1.8573,7.1087,0.1961
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2020,4,1.3736,4.4561,0.4937
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2021,4,1.599,3.5763,0.661
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2022,4,1.8215,6.836,0.1443
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2023,4,1.5184,5.6848,0.5284
+Stage 3 tournament (notebooks/07),ens_glm+tweedie,F3,ensemble,2024,4,1.2626,3.1282,0.7538
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2019,2,1.3677,4.6311,0.7495
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2020,2,0.994,4.3766,0.4059
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2021,2,0.9853,3.9096,0.3898
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2022,2,1.2437,4.2036,0.5672
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2024,2,0.9026,3.5385,0.5795
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2019,3,1.5789,5.2796,0.6078
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2020,3,1.1687,4.3473,0.4435
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2021,3,1.3673,3.4237,0.6328
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2022,3,1.4864,4.9368,0.4802
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2023,3,1.4616,4.9481,0.6639
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2024,3,1.22,4.5897,0.5282
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2019,4,1.7576,6.532,0.3689
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2020,4,1.2556,4.5063,0.4477
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2021,4,1.4868,3.7627,0.5876
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2022,4,1.6917,5.6877,0.4407
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2023,4,1.7622,6.1991,0.455
+Stage 3 tournament (notebooks/07),ens_glm+cat_tuned,F3,ensemble,2024,4,1.2269,3.4974,0.6667
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2019,2,1.3267,4.5029,0.7456
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2020,2,0.9947,4.3305,0.4142
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2021,2,1.0373,3.9661,0.4463
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2022,2,1.236,4.1996,0.5652
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2024,2,0.9196,3.6513,0.5744
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2020,3,1.1724,4.364,0.4226
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2021,3,1.3548,3.5424,0.6158
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2022,3,1.5014,5.083,0.4545
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2023,3,1.4585,4.917,0.666
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2024,3,1.23,4.6308,0.5436
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2019,4,1.8083,6.6311,0.3495
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2020,4,1.2806,3.7573,0.5732
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2021,4,1.5601,3.4294,0.6271
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2022,4,1.642,5.5336,0.4466
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2023,4,1.6372,5.9787,0.4692
+Stage 3 tournament (notebooks/07),ens_glm+lgbm_tuned,F3,ensemble,2024,4,1.2602,3.5179,0.641
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2019,2,1.3277,4.5592,0.7243
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2020,2,0.9867,4.2301,0.4226
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2021,2,1.0247,3.887,0.4689
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2022,2,1.235,4.1798,0.5731
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2023,2,1.1633,3.9274,0.7407
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2024,2,0.9134,3.5436,0.5795
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2019,3,1.5864,5.2388,0.6097
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2020,3,1.1718,4.3808,0.4184
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2021,3,1.3459,3.3277,0.6215
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2022,3,1.5119,5.0711,0.4605
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2023,3,1.4565,4.9668,0.6598
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2024,3,1.221,4.5487,0.5385
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2019,4,1.7958,6.6136,0.3573
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2020,4,1.2535,3.9874,0.5105
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2021,4,1.4247,3.4915,0.5593
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2022,4,1.6677,5.7431,0.4229
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2023,4,1.6465,5.9763,0.5095
+Stage 3 tournament (notebooks/07),ens_glm+xgb_tuned,F3,ensemble,2024,4,1.2694,3.6205,0.6359
+"V3 baseline re-run, convention B",global_mean,none,,2019,2,4.1903,11.2718,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2019,2,4.0397,11.3903,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2019,2,1.5603,5.5165,0.5515
+"V3 baseline re-run, convention B",last_known,none,,2019,2,2.334,6.4369,0.6175
+"V3 baseline re-run, convention B",moving_avg_4,none,,2019,2,2.7533,6.9612,0.5146
+V3 classical benchmark,rf,F3,,2019,2,1.2693,4.0485,0.7398
+V3 classical benchmark,extra_trees,F3,,2019,2,1.351,4.2214,0.7573
+V3 classical benchmark,ridge_ls,F3,,2019,2,1.6077,4.9029,0.7573
+V3 classical benchmark,knn,F3,,2019,2,1.4777,5.1922,0.635
+V3 classical benchmark,mlp,F3,,2019,2,1.599,6.0388,0.5417
+V3 classical benchmark,rf,F8,,2019,2,1.2457,3.8485,0.7864
+V3 classical benchmark,extra_trees,F8,,2019,2,1.3183,4.0641,0.8
+V3 classical benchmark,ridge_ls,F8,,2019,2,1.5837,4.668,0.8194
+V3 classical benchmark,knn,F8,,2019,2,1.4377,5.0544,0.668
+V3 classical benchmark,mlp,F8,,2019,2,1.457,4.4718,0.8097
+"V3 baseline re-run, convention B",global_mean,none,,2019,3,4.2146,11.2718,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2019,3,4.0745,11.3709,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2019,3,1.5922,5.5165,0.5515
+"V3 baseline re-run, convention B",last_known,none,,2019,3,2.7537,7.2369,0.5515
+"V3 baseline re-run, convention B",moving_avg_4,none,,2019,3,3.2592,7.934,0.4291
+V3 classical benchmark,rf,F3,,2019,3,1.5122,4.9262,0.6194
+V3 classical benchmark,extra_trees,F3,,2019,3,1.5367,5.0913,0.6408
+V3 classical benchmark,ridge_ls,F3,,2019,3,1.8248,5.7437,0.6194
+V3 classical benchmark,knn,F3,,2019,3,1.8092,6.3883,0.4699
+V3 classical benchmark,mlp,F3,,2019,3,1.9707,7.0835,0.4097
+V3 classical benchmark,rf,F8,,2019,3,1.5289,4.767,0.701
+V3 classical benchmark,extra_trees,F8,,2019,3,1.5592,5.1495,0.6738
+V3 classical benchmark,ridge_ls,F8,,2019,3,1.8112,5.4447,0.6699
+V3 classical benchmark,knn,F8,,2019,3,1.8095,6.233,0.5049
+V3 classical benchmark,mlp,F8,,2019,3,2.0442,7.2058,0.4427
+"V3 baseline re-run, convention B",global_mean,none,,2019,4,4.2399,11.2718,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2019,4,4.117,11.332,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2019,4,1.6253,5.5165,0.5515
+"V3 baseline re-run, convention B",last_known,none,,2019,4,3.2535,8.1709,0.4524
+"V3 baseline re-run, convention B",moving_avg_4,none,,2019,4,3.8181,9.0039,0.3437
+V3 classical benchmark,rf,F3,,2019,4,1.5913,5.5301,0.5165
+V3 classical benchmark,extra_trees,F3,,2019,4,1.7066,5.9845,0.5126
+V3 classical benchmark,ridge_ls,F3,,2019,4,1.9837,6.5631,0.3728
+V3 classical benchmark,knn,F3,,2019,4,1.9986,7.0388,0.301
+V3 classical benchmark,mlp,F3,,2019,4,2.2069,7.2757,0.3359
+V3 classical benchmark,rf,F8,,2019,4,1.6243,5.3184,0.5883
+V3 classical benchmark,extra_trees,F8,,2019,4,1.7319,6.1223,0.5049
+V3 classical benchmark,ridge_ls,F8,,2019,4,1.9931,6.5825,0.3631
+V3 classical benchmark,knn,F8,,2019,4,2.0049,7.068,0.2835
+V3 classical benchmark,mlp,F8,,2019,4,2.184,6.9379,0.3806
+"V3 baseline re-run, convention B",global_mean,none,,2020,2,3.2687,10.0879,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2020,2,3.1347,9.9079,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2020,2,1.297,4.0879,0.5481
+"V3 baseline re-run, convention B",last_known,none,,2020,2,1.9663,5.9833,0.3054
+"V3 baseline re-run, convention B",moving_avg_4,none,,2020,2,2.1827,6.6778,0.1715
+V3 classical benchmark,rf,F3,,2020,2,1.0837,3.9038,0.5523
+V3 classical benchmark,extra_trees,F3,,2020,2,1.0443,3.8703,0.5105
+V3 classical benchmark,ridge_ls,F3,,2020,2,1.351,4.3054,0.3808
+V3 classical benchmark,knn,F3,,2020,2,1.2493,4.8033,0.3264
+V3 classical benchmark,mlp,F3,,2020,2,1.2197,4.2092,0.5397
+V3 classical benchmark,rf,F8,,2020,2,1.0773,3.9833,0.5356
+V3 classical benchmark,extra_trees,F8,,2020,2,1.0567,3.9498,0.5021
+V3 classical benchmark,ridge_ls,F8,,2020,2,1.3487,4.2218,0.3975
+V3 classical benchmark,knn,F8,,2020,2,1.284,5.0711,0.2929
+V3 classical benchmark,mlp,F8,,2020,2,1.1763,4.2301,0.4351
+"V3 baseline re-run, convention B",global_mean,none,,2020,3,3.2741,10.0879,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2020,3,3.1486,9.8787,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2020,3,1.3235,4.0879,0.5481
+"V3 baseline re-run, convention B",last_known,none,,2020,3,2.3588,6.9916,0.2301
+"V3 baseline re-run, convention B",moving_avg_4,none,,2020,3,2.4707,7.2887,0.1172
+V3 classical benchmark,rf,F3,,2020,3,1.3316,3.8577,0.5816
+V3 classical benchmark,extra_trees,F3,,2020,3,1.2486,3.9121,0.5565
+V3 classical benchmark,ridge_ls,F3,,2020,3,1.4367,4.7029,0.2385
+V3 classical benchmark,knn,F3,,2020,3,1.2442,4.8912,0.3096
+V3 classical benchmark,mlp,F3,,2020,3,1.384,4.9833,0.4393
+V3 classical benchmark,rf,F8,,2020,3,1.3636,4.0084,0.6025
+V3 classical benchmark,extra_trees,F8,,2020,3,1.2707,3.8745,0.5649
+V3 classical benchmark,ridge_ls,F8,,2020,3,1.4551,4.6444,0.2343
+V3 classical benchmark,knn,F8,,2020,3,1.2435,4.364,0.4393
+V3 classical benchmark,mlp,F8,,2020,3,1.6357,4.6234,0.5397
+"V3 baseline re-run, convention B",global_mean,none,,2020,4,3.2799,10.0879,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2020,4,3.1618,9.8494,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2020,4,1.351,4.0879,0.5481
+"V3 baseline re-run, convention B",last_known,none,,2020,4,2.6066,7.3473,0.205
+"V3 baseline re-run, convention B",moving_avg_4,none,,2020,4,2.7326,7.6527,0.0795
+V3 classical benchmark,rf,F3,,2020,4,1.3802,3.8075,0.5523
+V3 classical benchmark,extra_trees,F3,,2020,4,1.3507,4.0377,0.5188
+V3 classical benchmark,ridge_ls,F3,,2020,4,1.524,4.2929,0.4268
+V3 classical benchmark,knn,F3,,2020,4,1.3149,4.2301,0.5021
+V3 classical benchmark,mlp,F3,,2020,4,1.4299,3.7908,0.5816
+V3 classical benchmark,rf,F8,,2020,4,1.4052,4.1213,0.5146
+V3 classical benchmark,extra_trees,F8,,2020,4,1.349,4.0921,0.5188
+V3 classical benchmark,ridge_ls,F8,,2020,4,1.5073,4.4226,0.4142
+V3 classical benchmark,knn,F8,,2020,4,1.3031,4.0126,0.523
+V3 classical benchmark,mlp,F8,,2020,4,1.7917,5.0586,0.6109
+"V3 baseline re-run, convention B",global_mean,none,,2021,2,3.0513,9.6949,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2021,2,2.91,9.4237,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2021,2,1.359,3.6271,0.5593
+"V3 baseline re-run, convention B",last_known,none,,2021,2,1.7607,6.4633,0.2938
+"V3 baseline re-run, convention B",moving_avg_4,none,,2021,2,1.8093,6.1808,0.1638
+V3 classical benchmark,rf,F3,,2021,2,1.0917,3.5819,0.5311
+V3 classical benchmark,extra_trees,F3,,2021,2,1.0663,3.6893,0.4746
+V3 classical benchmark,ridge_ls,F3,,2021,2,1.222,4.3164,0.2825
+V3 classical benchmark,knn,F3,,2021,2,1.1077,4.226,0.3842
+V3 classical benchmark,mlp,F3,,2021,2,1.1267,3.8588,0.4859
+V3 classical benchmark,rf,F8,,2021,2,1.098,3.6384,0.5085
+V3 classical benchmark,extra_trees,F8,,2021,2,1.064,3.7514,0.452
+V3 classical benchmark,ridge_ls,F8,,2021,2,1.2067,4.5198,0.2712
+V3 classical benchmark,knn,F8,,2021,2,1.094,4.2486,0.4181
+V3 classical benchmark,mlp,F8,,2021,2,1.186,3.661,0.5367
+"V3 baseline re-run, convention B",global_mean,none,,2021,3,3.0524,9.6949,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2021,3,2.9224,9.4068,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2021,3,1.3867,3.6271,0.5593
+"V3 baseline re-run, convention B",last_known,none,,2021,3,1.9204,6.0847,0.3051
+"V3 baseline re-run, convention B",moving_avg_4,none,,2021,3,2.0748,6.8023,0.1186
+V3 classical benchmark,rf,F3,,2021,3,1.4442,3.4802,0.5932
+V3 classical benchmark,extra_trees,F3,,2021,3,1.4133,3.5989,0.565
+V3 classical benchmark,ridge_ls,F3,,2021,3,1.3925,4.3616,0.2147
+V3 classical benchmark,knn,F3,,2021,3,1.2697,4.226,0.4011
+V3 classical benchmark,mlp,F3,,2021,3,1.399,4.4294,0.5706
+V3 classical benchmark,rf,F8,,2021,3,1.4374,3.452,0.5876
+V3 classical benchmark,extra_trees,F8,,2021,3,1.4296,3.6554,0.5706
+V3 classical benchmark,ridge_ls,F8,,2021,3,1.4041,4.3842,0.209
+V3 classical benchmark,knn,F8,,2021,3,1.3544,4.1243,0.4972
+V3 classical benchmark,mlp,F8,,2021,3,1.4888,4.0847,0.5989
+"V3 baseline re-run, convention B",global_mean,none,,2021,4,3.0538,9.6949,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2021,4,2.9344,9.3842,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2021,4,1.4153,3.6271,0.5593
+"V3 baseline re-run, convention B",last_known,none,,2021,4,2.1441,6.0734,0.2712
+"V3 baseline re-run, convention B",moving_avg_4,none,,2021,4,2.3656,7.4576,0.0904
+V3 classical benchmark,rf,F3,,2021,4,1.6021,3.3503,0.5819
+V3 classical benchmark,extra_trees,F3,,2021,4,1.6115,3.5989,0.5311
+V3 classical benchmark,ridge_ls,F3,,2021,4,1.5229,4.0791,0.3955
+V3 classical benchmark,knn,F3,,2021,4,1.3816,3.452,0.5367
+V3 classical benchmark,mlp,F3,,2021,4,1.9698,4.2599,0.6271
+V3 classical benchmark,rf,F8,,2021,4,1.6299,3.4237,0.5876
+V3 classical benchmark,extra_trees,F8,,2021,4,1.6524,3.5706,0.5819
+V3 classical benchmark,ridge_ls,F8,,2021,4,1.5104,4.1356,0.3842
+V3 classical benchmark,knn,F8,,2021,4,1.3924,3.4463,0.5593
+V3 classical benchmark,mlp,F8,,2021,4,2.0764,3.8362,0.6949
+"V3 baseline re-run, convention B",global_mean,none,,2022,2,3.9957,10.1779,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2022,2,3.8743,10.2431,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2022,2,1.5687,5.4723,0.4644
+"V3 baseline re-run, convention B",last_known,none,,2022,2,2.5117,6.7964,0.4941
+"V3 baseline re-run, convention B",moving_avg_4,none,,2022,2,2.5933,6.6403,0.4842
+V3 classical benchmark,rf,F3,,2022,2,1.44,4.8557,0.5
+V3 classical benchmark,extra_trees,F3,,2022,2,1.4863,5.1126,0.4881
+V3 classical benchmark,ridge_ls,F3,,2022,2,1.4973,4.2826,0.6146
+V3 classical benchmark,knn,F3,,2022,2,1.4513,4.9308,0.5237
+V3 classical benchmark,mlp,F3,,2022,2,1.6047,5.3953,0.496
+V3 classical benchmark,rf,F8,,2022,2,1.4473,4.8439,0.5119
+V3 classical benchmark,extra_trees,F8,,2022,2,1.4633,5.0,0.4901
+V3 classical benchmark,ridge_ls,F8,,2022,2,1.501,4.3182,0.6126
+V3 classical benchmark,knn,F8,,2022,2,1.5057,5.1897,0.4901
+V3 classical benchmark,mlp,F8,,2022,2,1.5783,5.2312,0.4822
+"V3 baseline re-run, convention B",global_mean,none,,2022,3,4.016,10.1779,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2022,3,3.9037,10.2154,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2022,3,1.6007,5.4723,0.4644
+"V3 baseline re-run, convention B",last_known,none,,2022,3,2.9228,7.6008,0.4407
+"V3 baseline re-run, convention B",moving_avg_4,none,,2022,3,2.9048,7.0731,0.4684
+V3 classical benchmark,rf,F3,,2022,3,1.6772,5.2312,0.5296
+V3 classical benchmark,extra_trees,F3,,2022,3,1.6194,5.2016,0.5079
+V3 classical benchmark,ridge_ls,F3,,2022,3,1.7541,5.3676,0.3735
+V3 classical benchmark,knn,F3,,2022,3,1.5772,5.087,0.4783
+V3 classical benchmark,mlp,F3,,2022,3,1.9813,6.1225,0.4941
+V3 classical benchmark,rf,F8,,2022,3,1.6939,5.1976,0.5178
+V3 classical benchmark,extra_trees,F8,,2022,3,1.6367,5.2332,0.5099
+V3 classical benchmark,ridge_ls,F8,,2022,3,1.7446,5.4545,0.3518
+V3 classical benchmark,knn,F8,,2022,3,1.5891,5.0375,0.5217
+V3 classical benchmark,mlp,F8,,2022,3,1.9167,6.0138,0.4763
+"V3 baseline re-run, convention B",global_mean,none,,2022,4,4.0372,10.1779,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2022,4,3.9295,10.2154,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2022,4,1.634,5.4723,0.4644
+"V3 baseline re-run, convention B",last_known,none,,2022,4,3.1219,7.83,0.4249
+"V3 baseline re-run, convention B",moving_avg_4,none,,2022,4,3.1736,7.1937,0.4289
+V3 classical benchmark,rf,F3,,2022,4,1.7566,5.3893,0.5395
+V3 classical benchmark,extra_trees,F3,,2022,4,1.6965,5.6206,0.4763
+V3 classical benchmark,ridge_ls,F3,,2022,4,1.8986,5.834,0.4605
+V3 classical benchmark,knn,F3,,2022,4,1.6524,5.5474,0.4783
+V3 classical benchmark,mlp,F3,,2022,4,2.1969,7.0395,0.4822
+V3 classical benchmark,rf,F8,,2022,4,1.7938,5.4229,0.5494
+V3 classical benchmark,extra_trees,F8,,2022,4,1.7035,5.5771,0.5059
+V3 classical benchmark,ridge_ls,F8,,2022,4,1.8892,5.8261,0.4921
+V3 classical benchmark,knn,F8,,2022,4,1.6733,5.5791,0.4881
+V3 classical benchmark,mlp,F8,,2022,4,2.2799,7.0771,0.5178
+"V3 baseline re-run, convention B",global_mean,none,,2023,2,4.0707,11.5685,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2023,2,3.9487,11.61,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2023,2,1.5103,5.5643,0.5747
+"V3 baseline re-run, convention B",last_known,none,,2023,2,2.8013,8.3423,0.5083
+"V3 baseline re-run, convention B",moving_avg_4,none,,2023,2,2.655,6.778,0.4979
+V3 classical benchmark,rf,F3,,2023,2,1.1847,3.4129,0.8714
+V3 classical benchmark,extra_trees,F3,,2023,2,1.1797,3.5145,0.8423
+V3 classical benchmark,ridge_ls,F3,,2023,2,1.3703,4.3465,0.8008
+V3 classical benchmark,knn,F3,,2023,2,1.2897,4.388,0.7365
+V3 classical benchmark,mlp,F3,,2023,2,1.4983,4.6037,0.6867
+V3 classical benchmark,rf,F8,,2023,2,1.1753,3.388,0.8568
+V3 classical benchmark,extra_trees,F8,,2023,2,1.1563,3.4564,0.8506
+V3 classical benchmark,ridge_ls,F8,,2023,2,1.3857,4.39,0.7967
+V3 classical benchmark,knn,F8,,2023,2,1.1973,3.9627,0.8174
+V3 classical benchmark,mlp,F8,,2023,2,1.3497,4.0768,0.8071
+"V3 baseline re-run, convention B",global_mean,none,,2023,3,4.0935,11.5685,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2023,3,3.9745,11.61,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2023,3,1.5401,5.5643,0.5747
+"V3 baseline re-run, convention B",last_known,none,,2023,3,2.8997,7.749,0.4938
+"V3 baseline re-run, convention B",moving_avg_4,none,,2023,3,3.0279,7.4025,0.4378
+V3 classical benchmark,rf,F3,,2023,3,1.6133,4.4793,0.7656
+V3 classical benchmark,extra_trees,F3,,2023,3,1.6068,4.8485,0.6992
+V3 classical benchmark,ridge_ls,F3,,2023,3,1.7078,5.5311,0.668
+V3 classical benchmark,knn,F3,,2023,3,1.5949,5.5415,0.61
+V3 classical benchmark,mlp,F3,,2023,3,1.819,5.7469,0.5913
+V3 classical benchmark,rf,F8,,2023,3,1.569,4.417,0.7469
+V3 classical benchmark,extra_trees,F8,,2023,3,1.5473,4.5145,0.7614
+V3 classical benchmark,ridge_ls,F8,,2023,3,1.683,5.5,0.666
+V3 classical benchmark,knn,F8,,2023,3,1.4493,4.7324,0.7282
+V3 classical benchmark,mlp,F8,,2023,3,1.8367,4.5768,0.7739
+"V3 baseline re-run, convention B",global_mean,none,,2023,4,4.117,12.3602,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2023,4,4.0073,12.3318,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2023,4,1.5715,6.064,0.4716
+"V3 baseline re-run, convention B",last_known,none,,2023,4,3.1628,8.0782,0.4384
+"V3 baseline re-run, convention B",moving_avg_4,none,,2023,4,3.5306,8.91,0.3128
+V3 classical benchmark,rf,F3,,2023,4,1.9771,6.1493,0.5355
+V3 classical benchmark,extra_trees,F3,,2023,4,1.9983,6.2559,0.5474
+V3 classical benchmark,ridge_ls,F3,,2023,4,1.8184,6.5687,0.372
+V3 classical benchmark,knn,F3,,2023,4,1.7403,6.2915,0.4668
+V3 classical benchmark,mlp,F3,,2023,4,2.2802,6.6256,0.5474
+V3 classical benchmark,rf,F8,,2023,4,1.9826,6.0948,0.5474
+V3 classical benchmark,extra_trees,F8,,2023,4,1.9017,5.9882,0.5569
+V3 classical benchmark,ridge_ls,F8,,2023,4,1.8229,6.5829,0.3697
+V3 classical benchmark,knn,F8,,2023,4,1.7267,6.2701,0.4502
+V3 classical benchmark,mlp,F8,,2023,4,2.3795,6.5047,0.4716
+"V3 baseline re-run, convention B",global_mean,none,,2024,2,3.1752,10.2615,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2024,2,3.0542,9.9744,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2024,2,1.2183,3.5179,0.6615
+"V3 baseline re-run, convention B",last_known,none,,2024,2,1.8232,6.959,0.2923
+"V3 baseline re-run, convention B",moving_avg_4,none,,2024,2,1.9307,6.7128,0.2205
+V3 classical benchmark,rf,F3,,2024,2,0.9837,3.2564,0.6564
+V3 classical benchmark,extra_trees,F3,,2024,2,0.9487,3.2974,0.641
+V3 classical benchmark,ridge_ls,F3,,2024,2,1.0977,3.8308,0.4308
+V3 classical benchmark,knn,F3,,2024,2,0.9173,3.5077,0.5385
+V3 classical benchmark,mlp,F3,,2024,2,0.9523,3.5538,0.6
+V3 classical benchmark,rf,F8,,2024,2,1.0,3.2718,0.6769
+V3 classical benchmark,extra_trees,F8,,2024,2,0.9405,3.241,0.6513
+V3 classical benchmark,ridge_ls,F8,,2024,2,1.1082,3.8359,0.4308
+V3 classical benchmark,knn,F8,,2024,2,0.9288,3.3949,0.5846
+V3 classical benchmark,mlp,F8,,2024,2,1.0327,4.4974,0.4359
+"V3 baseline re-run, convention B",global_mean,none,,2024,3,3.1787,10.2615,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2024,3,3.066,9.9692,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2024,3,1.2427,3.5179,0.6615
+"V3 baseline re-run, convention B",last_known,none,,2024,3,2.067,7.2872,0.2769
+"V3 baseline re-run, convention B",moving_avg_4,none,,2024,3,2.2173,7.4154,0.1436
+V3 classical benchmark,rf,F3,,2024,3,1.331,4.2051,0.5692
+V3 classical benchmark,extra_trees,F3,,2024,3,1.295,3.8564,0.6051
+V3 classical benchmark,ridge_ls,F3,,2024,3,1.3197,4.4564,0.2821
+V3 classical benchmark,knn,F3,,2024,3,1.1623,4.2051,0.4872
+V3 classical benchmark,mlp,F3,,2024,3,1.3237,4.4256,0.5795
+V3 classical benchmark,rf,F8,,2024,3,1.3247,4.0821,0.5744
+V3 classical benchmark,extra_trees,F8,,2024,3,1.278,3.6667,0.6103
+V3 classical benchmark,ridge_ls,F8,,2024,3,1.314,4.4103,0.2513
+V3 classical benchmark,knn,F8,,2024,3,1.135,3.6103,0.6359
+V3 classical benchmark,mlp,F8,,2024,3,1.1633,3.441,0.6667
+"V3 baseline re-run, convention B",global_mean,none,,2024,4,3.183,10.2615,0.0
+"V3 baseline re-run, convention B",ward_mean,none,,2024,4,3.0718,9.9692,0.0
+"V3 baseline re-run, convention B",seasonal_avg,none,,2024,4,1.2673,3.5179,0.6615
+"V3 baseline re-run, convention B",last_known,none,,2024,4,2.2772,7.4821,0.2513
+"V3 baseline re-run, convention B",moving_avg_4,none,,2024,4,2.4959,8.0821,0.1077
+V3 classical benchmark,rf,F3,,2024,4,1.4531,4.0,0.641
+V3 classical benchmark,extra_trees,F3,,2024,4,1.3748,3.7897,0.7077
+V3 classical benchmark,ridge_ls,F3,,2024,4,1.3714,3.559,0.6872
+V3 classical benchmark,knn,F3,,2024,4,1.251,3.359,0.7179
+V3 classical benchmark,mlp,F3,,2024,4,1.6779,4.7795,0.5641
+V3 classical benchmark,rf,F8,,2024,4,1.4932,4.1949,0.6359
+V3 classical benchmark,extra_trees,F8,,2024,4,1.4136,3.7744,0.7231
+V3 classical benchmark,ridge_ls,F8,,2024,4,1.3463,3.5897,0.6872
+V3 classical benchmark,knn,F8,,2024,4,1.252,3.3744,0.6974
+V3 classical benchmark,mlp,F8,,2024,4,1.4646,3.6974,0.6923

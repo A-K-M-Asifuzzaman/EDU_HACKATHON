@@ -1,5 +1,8 @@
 # Stage 4 handoff: what the dashboard must use and respect
 
+> **V3 correction (2026-11-25).** Peak figures in this document (0.607 / 0.740 coverage, 74% under-predicted, bias −3.2) are unweighted means over the 18 season × horizon cells. Pooled over all out-of-time weeks they are 0.573 / 0.707, 77.2% and −3.67. The deployed `nb_coverage` dispersion sits at its grid floor (α = 0.001), so intervals are effectively Poisson; zero-case weeks carry the average coverage. Canonical source: `app_data/metrics_canonical.json`; research follow-up: `research/v3/`. The original text below is kept unchanged.
+
+
 ## 1. Load and call the model
 
 ```python

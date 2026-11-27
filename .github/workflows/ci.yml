@@ -48,6 +48,15 @@ jobs:
         working-directory: frontend
       - run: npm run build
         working-directory: frontend
+        env:
+          # This build is only used by the browser tests below (Deploy builds separately on Vercel). Placeholders, not credentials:
+          # an offline Firebase demo project (no network calls until someone signs in) and a dummy MapTiler key whose style, tile and
+          # geocoding requests the tests answer locally (frontend/tests/e2e/fixtures.ts).
+          NEXT_PUBLIC_FIREBASE_API_KEY: e2e-placeholder-not-a-key
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: demo-dengueshield-e2e.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: demo-dengueshield-e2e
+          NEXT_PUBLIC_FIREBASE_APP_ID: "1:000000000000:web:e2e"
+          NEXT_PUBLIC_MAPTILER_KEY: e2e-placeholder-not-a-key
       - uses: actions/upload-artifact@v4
         with:
           name: frontend-out
@@ -82,6 +91,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
         working-directory: frontend
       - name: Start the app (API serves the built dashboard)
+        env:
+          FIREBASE_PROJECT_ID: demo-dengueshield-e2e          # accounts switched on against the demo project: protected routes answer 401
         run: |
           nohup python -m uvicorn dengueshield.api.main:app --host 127.0.0.1 --port 8000 > api.log 2>&1 &
           for i in $(seq 1 90); do curl -sf http://127.0.0.1:8000/api/health >/dev/null && break; sleep 2; done

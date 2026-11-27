@@ -31,13 +31,13 @@ export function Mosquito({ active, onHover, animate, flapSpeed = 18, flapAmp = 0
   const glow = (p: Part) => (active === p ? 0.55 : 0);
   const hit = (p: Part) => ({ onPointerOver: (e: any) => { e.stopPropagation(); onHover(p); document.body.style.cursor = "pointer"; }, onPointerOut: () => { onHover(null); document.body.style.cursor = ""; } });
   return (<group ref={body} rotation={[0, 0, 0]}>
-    <mesh position={[0, 0, -0.85]} scale={[0.34, 0.3, 1.0]} {...hit("abdomen")}><sphereGeometry args={[1, 28, 20]} /><meshStandardMaterial color={DARK} roughness={0.6} emissive="#0e8f66" emissiveIntensity={glow("abdomen")} /></mesh>
+    <mesh position={[0, 0, -0.85]} scale={[0.34, 0.3, 1.0]} {...hit("abdomen")}><sphereGeometry args={[1, 28, 20]} /><meshStandardMaterial color={DARK} roughness={0.6} emissive="#4b45d1" emissiveIntensity={glow("abdomen")} /></mesh>
     {[-0.35, -0.6, -0.85, -1.1, -1.35].map((z) => (<mesh key={z} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, 1]}><torusGeometry args={[0.3 * Math.sqrt(Math.max(0.05, 1 - ((z + 0.85) / 1.0) ** 2)) + 0.012, 0.022, 8, 28]} /><meshStandardMaterial color={BAND} roughness={0.5} /></mesh>))}
-    <mesh position={[0, 0.12, 0.35]} scale={[0.4, 0.38, 0.5]} {...hit("thorax")}><sphereGeometry args={[1, 28, 20]} /><meshStandardMaterial color="#3a3f45" roughness={0.55} emissive="#0e8f66" emissiveIntensity={glow("thorax")} /></mesh>
+    <mesh position={[0, 0.12, 0.35]} scale={[0.4, 0.38, 0.5]} {...hit("thorax")}><sphereGeometry args={[1, 28, 20]} /><meshStandardMaterial color="#3a3f45" roughness={0.55} emissive="#4b45d1" emissiveIntensity={glow("thorax")} /></mesh>
     <mesh position={[0, 0.3, 0.38]} scale={[0.07, 0.015, 0.36]}><boxGeometry args={[1, 1, 1]} /><meshStandardMaterial color={BAND} /></mesh>
-    <mesh position={[0, 0.05, 1.0]} scale={[0.22, 0.22, 0.26]} {...hit("head")}><sphereGeometry args={[1, 24, 18]} /><meshStandardMaterial color={DARK} emissive="#0e8f66" emissiveIntensity={glow("head")} /></mesh>
+    <mesh position={[0, 0.05, 1.0]} scale={[0.22, 0.22, 0.26]} {...hit("head")}><sphereGeometry args={[1, 24, 18]} /><meshStandardMaterial color={DARK} emissive="#4b45d1" emissiveIntensity={glow("head")} /></mesh>
     {[-1, 1].map((s) => (<mesh key={s} position={[s * 0.15, 0.1, 1.12]}><sphereGeometry args={[0.075, 14, 12]} /><meshStandardMaterial color="#111" metalness={0.3} roughness={0.2} /></mesh>))}
-    <mesh position={[0, -0.08, 1.55]} rotation={[Math.PI / 2, 0, 0]} {...hit("proboscis")}><cylinderGeometry args={[0.022, 0.012, 0.95, 8]} /><meshStandardMaterial color="#1c1f22" emissive="#0e8f66" emissiveIntensity={glow("proboscis")} /></mesh>
+    <mesh position={[0, -0.08, 1.55]} rotation={[Math.PI / 2, 0, 0]} {...hit("proboscis")}><cylinderGeometry args={[0.022, 0.012, 0.95, 8]} /><meshStandardMaterial color="#1c1f22" emissive="#4b45d1" emissiveIntensity={glow("proboscis")} /></mesh>
     {[-1, 1].map((s) => (<mesh key={s} position={[s * 0.1, 0.34, 1.32]} rotation={[0.9, 0, s * 0.35]}><cylinderGeometry args={[0.008, 0.008, 0.5, 5]} /><meshStandardMaterial color="#444" /></mesh>))}
     <mesh ref={wl} position={[0.5, 0.42, 0.3]} rotation={[0.1, 0.15, 0.5]} scale={[0.75, 0.012, 0.22]} {...hit("wings")}><sphereGeometry args={[1, 24, 8]} /><meshStandardMaterial color="#cfe9ff" transparent opacity={active === "wings" ? 0.75 : 0.42} roughness={0.2} side={THREE.DoubleSide} /></mesh>
     <mesh ref={wr} position={[-0.5, 0.42, 0.3]} rotation={[0.1, -0.15, -0.5]} scale={[0.75, 0.012, 0.22]} {...hit("wings")}><sphereGeometry args={[1, 24, 8]} /><meshStandardMaterial color="#cfe9ff" transparent opacity={active === "wings" ? 0.75 : 0.42} roughness={0.2} side={THREE.DoubleSide} /></mesh>
@@ -56,7 +56,7 @@ function CameraRig({ view }: { view: string }) {
 export default function Mosquito3D({ active, onHover, view, reduce, visible }: { active: Part | null; onHover: (p: Part | null) => void; view: string; reduce: boolean; visible: boolean }) {
   const [ready, setReady] = useState(false);
   return (<Canvas dpr={[1, 1.5]} frameloop={visible ? "always" : "never"} camera={{ position: VIEWS["3/4"], fov: 38 }} gl={{ antialias: true, powerPreference: "low-power" }} onCreated={() => setReady(true)} aria-label="Interactive stylised mosquito model">
-    <color attach="background" args={["#0b3b2c"]} /><ambientLight intensity={0.8} /><directionalLight position={[3, 5, 4]} intensity={1.6} /><directionalLight position={[-4, -2, -3]} intensity={0.5} color="#9fe7c2" />
+    <color attach="background" args={["#2a157f"]} /><ambientLight intensity={0.8} /><directionalLight position={[3, 5, 4]} intensity={1.6} /><directionalLight position={[-4, -2, -3]} intensity={0.5} color="#c9c6ff" />
     <Mosquito active={active} onHover={onHover} animate={!reduce && ready} /><CameraRig view={view} />
     <OrbitControls enablePan={false} enableZoom={false} autoRotate={!reduce && !active} autoRotateSpeed={0.9} minPolarAngle={0.5} maxPolarAngle={2.4} /></Canvas>);
 }

@@ -1,0 +1,1480 @@
+model,fs,conv,tag,year,horizon,cache_key,attribution,n,mae_check,mae_matches_cell,r2_basis,sse_expected,sum_y,sum_y2
+glm_poisson,F3,B,,2018,2,330ff88056e42fffc723,exact cache key + in-file metadata,3060.0,0.9519607843137254,True,mean,10813.035193708401,6620.0,56032.0
+glm_poisson_nbdisp,F3,B,,2018,2,f4aae91a1f22fbb5334f,exact cache key + in-file metadata,3060.0,0.95,True,mean,10813.035193708401,6620.0,56032.0
+glm_spline,F3,B,,2018,2,2dff733a65094dbaad63,exact cache key + in-file metadata,3060.0,0.9513071895424836,True,mean,10617.929998482467,6620.0,56032.0
+glm_nb,F3,B,,2018,2,f2c9f10664ed016fcb37,exact cache key + in-file metadata,3060.0,1.776143790849673,True,mean,39805.05365144009,6620.0,56032.0
+glm_tweedie,F3,B,,2018,2,8eef7f549cb156b6c7ae,exact cache key + in-file metadata,3060.0,0.9516339869281045,True,mean,11412.876854264352,6620.0,56032.0
+lgbm_poisson,F3,B,,2018,2,33ea483d6d50155c8d09,exact cache key + in-file metadata,3060.0,1.061437908496732,True,mean,14846.519977152893,6620.0,56032.0
+lgbm_tweedie,F3,B,,2018,2,1c9749a7a40bfa6862cd,exact cache key + in-file metadata,3060.0,1.0872549019607842,True,mean,15447.79797039866,6620.0,56032.0
+lgbm_l1,F3,B,,2018,2,61881fa585c622755389,exact cache key + in-file metadata,3060.0,1.0620915032679739,True,point,13164.0,6620.0,56032.0
+xgb_poisson,F3,B,,2018,2,c00622f83df4b9e4066a,exact cache key + in-file metadata,3060.0,1.0320261437908498,True,mean,13680.136563081414,6620.0,56032.0
+cat_poisson,F3,B,,2018,2,27cbc99e3c8c066ea593,exact cache key + in-file metadata,3060.0,1.0545751633986928,True,mean,13967.373837105179,6620.0,56032.0
+hurdle_lgbm,F3,B,,2018,2,73185900e4be16554edd,exact cache key + in-file metadata,3060.0,1.091503267973856,True,mean,14814.836321497063,6620.0,56032.0
+glm_poisson,F3,B,,2019,2,d708dd40fa46b9511208,exact cache key + in-file metadata,3000.0,1.3676666666666666,True,mean,22669.07676195719,9967.0,129807.0
+glm_poisson_nbdisp,F3,B,,2019,2,52dd44d0d78a0e3a816d,exact cache key + in-file metadata,3000.0,1.3656666666666666,True,mean,22669.07676195719,9967.0,129807.0
+glm_spline,F3,B,,2019,2,ffa8d53ea7f6e03b285f,exact cache key + in-file metadata,3000.0,1.3876666666666666,True,mean,23735.438117130303,9967.0,129807.0
+glm_nb,F3,B,,2019,2,070171167633b0bb8ab0,exact cache key + in-file metadata,3000.0,1.5443333333333333,True,mean,29992.784255839735,9967.0,129807.0
+glm_tweedie,F3,B,,2019,2,20523f4c7c0fa0a8395b,exact cache key + in-file metadata,3000.0,1.366,True,mean,23055.2529877298,9967.0,129807.0
+lgbm_poisson,F3,B,,2019,2,41d17868c5033ea39665,exact cache key + in-file metadata,3000.0,1.299,True,mean,20303.56804625783,9967.0,129807.0
+lgbm_tweedie,F3,B,,2019,2,995feb6e9a0786ed8bee,exact cache key + in-file metadata,3000.0,1.3576666666666666,True,mean,22182.960159865706,9967.0,129807.0
+lgbm_l1,F3,B,,2019,2,9a359009bc0aac384197,exact cache key + in-file metadata,3000.0,1.3993333333333333,True,point,25742.0,9967.0,129807.0
+xgb_poisson,F3,B,,2019,2,c07e565f9699689b4313,exact cache key + in-file metadata,3000.0,1.3753333333333333,True,mean,22398.717060388928,9967.0,129807.0
+cat_poisson,F3,B,,2019,2,bd386ba0c62240886775,exact cache key + in-file metadata,3000.0,1.409,True,mean,23791.963920523594,9967.0,129807.0
+hurdle_lgbm,F3,B,,2019,2,ac83566da2d630ceecc9,exact cache key + in-file metadata,3000.0,1.285,True,mean,19706.434312255224,9967.0,129807.0
+glm_poisson,F3,B,,2020,2,0d3b235f567ae2d364aa,exact cache key + in-file metadata,3000.0,1.0016666666666667,True,mean,11425.467560198935,7668.0,69146.0
+glm_poisson_nbdisp,F3,B,,2020,2,f29e0aaeae42098b54c0,exact cache key + in-file metadata,3000.0,1.004,True,mean,11425.467560198935,7668.0,69146.0
+glm_spline,F3,B,,2020,2,5e94f800767f25637151,exact cache key + in-file metadata,3000.0,1.0313333333333334,True,mean,11812.745875061133,7668.0,69146.0
+glm_nb,F3,B,,2020,2,547b960a6faf53bb43aa,exact cache key + in-file metadata,3000.0,1.0786666666666667,True,mean,13302.069849590236,7668.0,69146.0
+glm_tweedie,F3,B,,2020,2,d9fc38c102d40e1a333e,exact cache key + in-file metadata,3000.0,0.9793333333333333,True,mean,10600.580785381168,7668.0,69146.0
+lgbm_poisson,F3,B,,2020,2,acf997141c4cd87b9e5a,exact cache key + in-file metadata,3000.0,1.0163333333333333,True,mean,12045.115023698982,7668.0,69146.0
+lgbm_tweedie,F3,B,,2020,2,d2ade27ef851d576feb1,exact cache key + in-file metadata,3000.0,1.0246666666666666,True,mean,12022.606518573819,7668.0,69146.0
+lgbm_l1,F3,B,,2020,2,66f5e8ca4139c2427e38,exact cache key + in-file metadata,3000.0,1.078,True,point,13340.0,7668.0,69146.0
+xgb_poisson,F3,B,,2020,2,f719b9bc84a5a118ee2f,exact cache key + in-file metadata,3000.0,1.0256666666666667,True,mean,12189.465287835348,7668.0,69146.0
+cat_poisson,F3,B,,2020,2,3bac32d50c6fd4256bf8,exact cache key + in-file metadata,3000.0,1.0436666666666667,True,mean,12310.388137167267,7668.0,69146.0
+hurdle_lgbm,F3,B,,2020,2,a3d6b81edf31bc213686,exact cache key + in-file metadata,3000.0,1.021,True,mean,11878.724057383726,7668.0,69146.0
+glm_poisson,F3,B,,2021,2,285dd39a548691c3c2aa,exact cache key + in-file metadata,3000.0,0.9836666666666667,True,mean,10782.683328710456,6530.0,52912.0
+glm_poisson_nbdisp,F3,B,,2021,2,36915d4cd2c6efc281a5,exact cache key + in-file metadata,3000.0,0.9766666666666667,True,mean,10782.683328710456,6530.0,52912.0
+glm_spline,F3,B,,2021,2,2472a9bc7f1f041c3d78,exact cache key + in-file metadata,3000.0,0.9796666666666667,True,mean,10801.354371887668,6530.0,52912.0
+glm_nb,F3,B,,2021,2,7597c9f55a0cc4553826,exact cache key + in-file metadata,3000.0,0.9803333333333333,True,mean,11077.265319442995,6530.0,52912.0
+glm_tweedie,F3,B,,2021,2,8dc70b9c3098a03c6538,exact cache key + in-file metadata,3000.0,0.97,True,mean,10966.676639823254,6530.0,52912.0
+lgbm_poisson,F3,B,,2021,2,be4e4ba7d9075eac9908,exact cache key + in-file metadata,3000.0,1.076,True,mean,12925.976377778232,6530.0,52912.0
+lgbm_tweedie,F3,B,,2021,2,54f7d4068e5d937ecbdc,exact cache key + in-file metadata,3000.0,1.097,True,mean,13654.112133217037,6530.0,52912.0
+lgbm_l1,F3,B,,2021,2,a2a9f8a05f67219d0329,exact cache key + in-file metadata,3000.0,1.0643333333333334,True,point,12577.0,6530.0,52912.0
+xgb_poisson,F3,B,,2021,2,2ce8002ce3a2378f9dc2,exact cache key + in-file metadata,3000.0,1.0683333333333334,True,mean,12774.29400542682,6530.0,52912.0
+cat_poisson,F3,B,,2021,2,df7dd2de70d851fcebad,exact cache key + in-file metadata,3000.0,1.009,True,mean,11436.633667837303,6530.0,52912.0
+hurdle_lgbm,F3,B,,2021,2,6930691f9db2ce69e1ef,exact cache key + in-file metadata,3000.0,1.075,True,mean,13030.60813723015,6530.0,52912.0
+glm_poisson,F3,B,,2022,2,a776e0aaefed1586c94e,exact cache key + in-file metadata,3000.0,1.2313333333333334,True,mean,17011.23424691798,10013.0,114635.0
+glm_poisson_nbdisp,F3,B,,2022,2,606791bea5f470341392,exact cache key + in-file metadata,3000.0,1.2533333333333334,True,mean,17011.23424691798,10013.0,114635.0
+glm_spline,F3,B,,2022,2,c1370709a3c2ccd013fd,exact cache key + in-file metadata,3000.0,1.2526666666666666,True,mean,17765.8465092018,10013.0,114635.0
+glm_nb,F3,B,,2022,2,77167260311336a98b20,exact cache key + in-file metadata,3000.0,1.2246666666666666,True,mean,16313.49288158747,10013.0,114635.0
+glm_tweedie,F3,B,,2022,2,7166df1cdabc2224c05f,exact cache key + in-file metadata,3000.0,1.183,True,mean,15437.266790262222,10013.0,114635.0
+lgbm_poisson,F3,B,,2022,2,e9b9b578cd2f89cc7a61,exact cache key + in-file metadata,3000.0,1.4436666666666667,True,mean,26789.882344693695,10013.0,114635.0
+lgbm_tweedie,F3,B,,2022,2,74c0e432c07a0eba8049,exact cache key + in-file metadata,3000.0,1.409,True,mean,24920.015266622962,10013.0,114635.0
+lgbm_l1,F3,B,,2022,2,194a06a50992768a22db,exact cache key + in-file metadata,3000.0,1.4166666666666667,True,point,26000.0,10013.0,114635.0
+xgb_poisson,F3,B,,2022,2,265ce7da0a20a4c3d7f0,exact cache key + in-file metadata,3000.0,1.3463333333333334,True,mean,21322.810750153116,10013.0,114635.0
+cat_poisson,F3,B,,2022,2,1a4d5c67cafd3daa3f62,exact cache key + in-file metadata,3000.0,1.4093333333333333,True,mean,24248.422691955577,10013.0,114635.0
+hurdle_lgbm,F3,B,,2022,2,9ff1d99a6a4264ef5ee4,exact cache key + in-file metadata,3000.0,1.3903333333333334,True,mean,24326.280848664115,10013.0,114635.0
+glm_poisson,F3,B,,2023,2,f91cc25081003fec6c8c,exact cache key + in-file metadata,3000.0,1.1633333333333333,True,mean,16662.6516595674,9954.0,128702.0
+glm_poisson_nbdisp,F3,B,,2023,2,6c2acf09312423f164cc,exact cache key + in-file metadata,3000.0,1.1576666666666666,True,mean,16662.6516595674,9954.0,128702.0
+glm_spline,F3,B,,2023,2,d9ccdf2c7f32a6a77992,exact cache key + in-file metadata,3000.0,1.168,True,mean,16720.765096937866,9954.0,128702.0
+glm_nb,F3,B,,2023,2,5c48881907fa6b90e597,exact cache key + in-file metadata,3000.0,1.1556666666666666,True,mean,16759.340807968918,9954.0,128702.0
+glm_tweedie,F3,B,,2023,2,92a04f0bd1dd785647c4,exact cache key + in-file metadata,3000.0,1.1863333333333332,True,mean,18232.31746533378,9954.0,128702.0
+lgbm_poisson,F3,B,,2023,2,10dfec8a8dc415e540ce,exact cache key + in-file metadata,3000.0,1.0966666666666667,True,mean,13952.450343334394,9954.0,128702.0
+lgbm_tweedie,F3,B,,2023,2,fabb1cc117c2135d9d41,exact cache key + in-file metadata,3000.0,1.0883333333333334,True,mean,14085.979953982735,9954.0,128702.0
+lgbm_l1,F3,B,,2023,2,0e47e51ca46280731cc6,exact cache key + in-file metadata,3000.0,1.2583333333333333,True,point,21035.0,9954.0,128702.0
+xgb_poisson,F3,B,,2023,2,b8f13bcb75379440be5d,exact cache key + in-file metadata,3000.0,1.12,True,mean,14976.306360221126,9954.0,128702.0
+cat_poisson,F3,B,,2023,2,683b2eaf3d2a48468c82,exact cache key + in-file metadata,3000.0,1.1886666666666668,True,mean,17704.33078038451,9954.0,128702.0
+hurdle_lgbm,F3,B,,2023,2,027d622c92df997ccbe3,exact cache key + in-file metadata,3000.0,1.0846666666666667,True,mean,13800.706659669266,9954.0,128702.0
+glm_poisson,F3,B,,2024,2,093cd44ad5fa1a527f70,exact cache key + in-file metadata,3060.0,0.918954248366013,True,mean,10055.46620660868,6760.0,59652.0
+glm_poisson_nbdisp,F3,B,,2024,2,4daa5e838d797ce2b858,exact cache key + in-file metadata,3060.0,0.9140522875816993,True,mean,10055.46620660868,6760.0,59652.0
+glm_spline,F3,B,,2024,2,c57653ebe8a5143d0a21,exact cache key + in-file metadata,3060.0,0.9186274509803921,True,mean,9777.833249976557,6760.0,59652.0
+glm_nb,F3,B,,2024,2,ed9080e299dad8f9153d,exact cache key + in-file metadata,3060.0,0.9058823529411765,True,mean,9835.532014640758,6760.0,59652.0
+glm_tweedie,F3,B,,2024,2,7ecb7c08b0bb0b85ea5f,exact cache key + in-file metadata,3060.0,0.9284313725490196,True,mean,10495.30767958555,6760.0,59652.0
+lgbm_poisson,F3,B,,2024,2,902f88a55b7cc651545a,exact cache key + in-file metadata,3060.0,0.9245098039215687,True,mean,10381.771233343447,6760.0,59652.0
+lgbm_tweedie,F3,B,,2024,2,d0c9f6fe1052bd7e7dfe,exact cache key + in-file metadata,3060.0,0.9359477124183007,True,mean,11002.105921492597,6760.0,59652.0
+lgbm_l1,F3,B,,2024,2,83e2afcbe7cb80c215e2,exact cache key + in-file metadata,3060.0,0.9019607843137255,True,point,10060.0,6760.0,59652.0
+xgb_poisson,F3,B,,2024,2,854bf32137356b2cdb34,exact cache key + in-file metadata,3060.0,0.9339869281045752,True,mean,10705.256775165384,6760.0,59652.0
+cat_poisson,F3,B,,2024,2,66a10cd822a9fc2b5ea0,exact cache key + in-file metadata,3060.0,0.965359477124183,True,mean,11556.577418220351,6760.0,59652.0
+hurdle_lgbm,F3,B,,2024,2,f80eeead13747030270d,exact cache key + in-file metadata,3060.0,0.9313725490196079,True,mean,10572.588790284462,6760.0,59652.0
+glm_poisson,F3,B,,2018,3,60816a1bd81759759a16,exact cache key + in-file metadata,3000.0,1.097,True,mean,13479.405847415823,6620.0,56032.0
+glm_poisson_nbdisp,F3,B,,2018,3,cf3b98477f13e2d7c19a,exact cache key + in-file metadata,3000.0,1.061,True,mean,13479.405847415823,6620.0,56032.0
+glm_spline,F3,B,,2018,3,cd5b045efda2c5dd8f56,exact cache key + in-file metadata,3000.0,1.097,True,mean,13297.376379184618,6620.0,56032.0
+glm_nb,F3,B,,2018,3,d83071823db60ba372f1,exact cache key + in-file metadata,3000.0,2.642,True,mean,81289.66617319803,6620.0,56032.0
+glm_tweedie,F3,B,,2018,3,d0dfca55fa154ebeb05c,exact cache key + in-file metadata,3000.0,1.0233333333333334,True,mean,12831.227587112713,6620.0,56032.0
+lgbm_poisson,F3,B,,2018,3,721b3a2fbf692c4693bd,exact cache key + in-file metadata,3000.0,1.359,True,mean,24871.9397641474,6620.0,56032.0
+lgbm_tweedie,F3,B,,2018,3,bb191952ca479de3e07f,exact cache key + in-file metadata,3000.0,1.367,True,mean,25085.5134551748,6620.0,56032.0
+lgbm_l1,F3,B,,2018,3,acdc9684b84c5acbc25a,exact cache key + in-file metadata,3000.0,1.176,True,point,15576.0,6620.0,56032.0
+xgb_poisson,F3,B,,2018,3,520064bbd20ab0f49e4e,exact cache key + in-file metadata,3000.0,1.3133333333333332,True,mean,23084.242538458428,6620.0,56032.0
+cat_poisson,F3,B,,2018,3,e6a07883a7c8131a239c,exact cache key + in-file metadata,3000.0,1.248,True,mean,18956.799371788264,6620.0,56032.0
+hurdle_lgbm,F3,B,,2018,3,7105ffc3cfa4f78d7fd4,exact cache key + in-file metadata,3000.0,1.3996666666666666,True,mean,24966.440143830583,6620.0,56032.0
+glm_poisson,F3,B,,2019,3,1672aca4c5e1b6511581,exact cache key + in-file metadata,2940.0,1.5863945578231293,True,mean,28968.016905792523,9967.0,129807.0
+glm_poisson_nbdisp,F3,B,,2019,3,4697548461dca9aa2d1b,exact cache key + in-file metadata,2940.0,1.592517006802721,True,mean,28968.016905792523,9967.0,129807.0
+glm_spline,F3,B,,2019,3,99ab201f3df5d80a155a,exact cache key + in-file metadata,2940.0,1.5996598639455781,True,mean,30100.38113675624,9967.0,129807.0
+glm_nb,F3,B,,2019,3,1493f36ce936c450bc5a,exact cache key + in-file metadata,2940.0,1.9758503401360543,True,mean,51312.034503679184,9967.0,129807.0
+glm_tweedie,F3,B,,2019,3,7cd903d88af4f7ef2991,exact cache key + in-file metadata,2940.0,1.534013605442177,True,mean,26841.346048648316,9967.0,129807.0
+lgbm_poisson,F3,B,,2019,3,51d17709ddfd35c482b1,exact cache key + in-file metadata,2940.0,1.6017006802721088,True,mean,30945.334765975946,9967.0,129807.0
+lgbm_tweedie,F3,B,,2019,3,e1358f0fb02f47448625,exact cache key + in-file metadata,2940.0,1.5863945578231293,True,mean,30376.61572246297,9967.0,129807.0
+lgbm_l1,F3,B,,2019,3,0713911f4cb7596f29b3,exact cache key + in-file metadata,2940.0,1.7064625850340136,True,point,37043.0,9967.0,129807.0
+xgb_poisson,F3,B,,2019,3,2497ab51a4bbed8f77b1,exact cache key + in-file metadata,2940.0,1.5309523809523808,True,mean,29062.237139476878,9967.0,129807.0
+cat_poisson,F3,B,,2019,3,83b0ad8b40dc69720935,exact cache key + in-file metadata,2940.0,1.7200680272108844,True,mean,36339.833998377784,9967.0,129807.0
+hurdle_lgbm,F3,B,,2019,3,f757b66c0871ea2b20ff,exact cache key + in-file metadata,2940.0,1.5673469387755101,True,mean,29815.95201356605,9967.0,129807.0
+glm_poisson,F3,B,,2020,3,2d3ed61f57626cae8c82,exact cache key + in-file metadata,2940.0,1.170408163265306,True,mean,15509.029942826899,7668.0,69146.0
+glm_poisson_nbdisp,F3,B,,2020,3,415a81cea0edc9804de6,exact cache key + in-file metadata,2940.0,1.145578231292517,True,mean,15509.029942826899,7668.0,69146.0
+glm_spline,F3,B,,2020,3,51fa714931d30c8ebba3,exact cache key + in-file metadata,2940.0,1.2496598639455783,True,mean,17422.81095291797,7668.0,69146.0
+glm_nb,F3,B,,2020,3,bbfbe344d4c99ff24e67,exact cache key + in-file metadata,2940.0,1.1285714285714286,True,mean,14372.553633234336,7668.0,69146.0
+glm_tweedie,F3,B,,2020,3,1440033817e48784f14a,exact cache key + in-file metadata,2940.0,1.1408163265306122,True,mean,15887.510458817927,7668.0,69146.0
+lgbm_poisson,F3,B,,2020,3,17fefb74f73c9584378a,exact cache key + in-file metadata,2940.0,1.2625850340136053,True,mean,18233.338697150604,7668.0,69146.0
+lgbm_tweedie,F3,B,,2020,3,ad566c89b78e47d6dd0c,exact cache key + in-file metadata,2940.0,1.2826530612244897,True,mean,18670.502007118102,7668.0,69146.0
+lgbm_l1,F3,B,,2020,3,492d58ecee8a3d311e0c,exact cache key + in-file metadata,2940.0,1.2435374149659864,True,point,16548.0,7668.0,69146.0
+xgb_poisson,F3,B,,2020,3,49ec7b8ce0e6a2211117,exact cache key + in-file metadata,2940.0,1.2503401360544217,True,mean,17363.890022927313,7668.0,69146.0
+cat_poisson,F3,B,,2020,3,543880c268d4c6283d24,exact cache key + in-file metadata,2940.0,1.2704081632653061,True,mean,18914.978129970754,7668.0,69146.0
+hurdle_lgbm,F3,B,,2020,3,4b29dafc7de372aadb51,exact cache key + in-file metadata,2940.0,1.2360544217687075,True,mean,16727.064620686524,7668.0,69146.0
+glm_poisson,F3,B,,2021,3,0c988113dac5571d12ef,exact cache key + in-file metadata,2940.0,1.3591836734693878,True,mean,19632.456574353444,6530.0,52912.0
+glm_poisson_nbdisp,F3,B,,2021,3,8aa762693304d78ba39e,exact cache key + in-file metadata,2940.0,1.3037414965986394,True,mean,19632.456574353444,6530.0,52912.0
+glm_spline,F3,B,,2021,3,a721ff83811f5940f8e3,exact cache key + in-file metadata,2940.0,1.182312925170068,True,mean,14974.776038992859,6530.0,52912.0
+glm_nb,F3,B,,2021,3,d220900bb2a557a53195,exact cache key + in-file metadata,2940.0,1.3452380952380953,True,mean,21977.764744354015,6530.0,52912.0
+glm_tweedie,F3,B,,2021,3,500125dffea3a5d4828b,exact cache key + in-file metadata,2940.0,1.1418367346938776,True,mean,14937.357009366126,6530.0,52912.0
+lgbm_poisson,F3,B,,2021,3,f336be578fe0af96d57a,exact cache key + in-file metadata,2940.0,1.448299319727891,True,mean,23503.151625794904,6530.0,52912.0
+lgbm_tweedie,F3,B,,2021,3,8fda187f34d3497da59a,exact cache key + in-file metadata,2940.0,1.4479591836734693,True,mean,24098.517299876166,6530.0,52912.0
+lgbm_l1,F3,B,,2021,3,ad61feeb1cdcb7f94299,exact cache key + in-file metadata,2940.0,1.2180272108843537,True,point,15701.0,6530.0,52912.0
+xgb_poisson,F3,B,,2021,3,03886237b08a78843c21,exact cache key + in-file metadata,2940.0,1.4547619047619047,True,mean,26013.30779308246,6530.0,52912.0
+cat_poisson,F3,B,,2021,3,f23d1084198dd2c028a6,exact cache key + in-file metadata,2940.0,1.395578231292517,True,mean,22957.206252998156,6530.0,52912.0
+hurdle_lgbm,F3,B,,2021,3,fcbdb786881c54f6dd6e,exact cache key + in-file metadata,2940.0,1.448639455782313,True,mean,24756.048634797477,6530.0,52912.0
+glm_poisson,F3,B,,2022,3,4e61f254db1605aee2fc,exact cache key + in-file metadata,2940.0,1.4986394557823128,True,mean,25062.964688831238,10013.0,114635.0
+glm_poisson_nbdisp,F3,B,,2022,3,09d240385ef6680cc315,exact cache key + in-file metadata,2940.0,1.5187074829931972,True,mean,25062.964688831238,10013.0,114635.0
+glm_spline,F3,B,,2022,3,8058f0f4fe6c223b48f1,exact cache key + in-file metadata,2940.0,1.5183673469387755,True,mean,26132.288219330854,10013.0,114635.0
+glm_nb,F3,B,,2022,3,84dd6c83bdbd421348f4,exact cache key + in-file metadata,2940.0,1.5248299319727892,True,mean,25737.479948766704,10013.0,114635.0
+glm_tweedie,F3,B,,2022,3,4ae7488ed3e8efded47e,exact cache key + in-file metadata,2940.0,1.463265306122449,True,mean,23131.047662925906,10013.0,114635.0
+lgbm_poisson,F3,B,,2022,3,90b74b34b9d71da92b69,exact cache key + in-file metadata,2940.0,1.604421768707483,True,mean,31164.834009173763,10013.0,114635.0
+lgbm_tweedie,F3,B,,2022,3,c994470acf12722cb080,exact cache key + in-file metadata,2940.0,1.6139455782312926,True,mean,32123.105519079647,10013.0,114635.0
+lgbm_l1,F3,B,,2022,3,795d94e51d5fad2830de,exact cache key + in-file metadata,2940.0,1.5465986394557822,True,point,30047.0,10013.0,114635.0
+xgb_poisson,F3,B,,2022,3,7cce1a9772bd4d7c319b,exact cache key + in-file metadata,2940.0,1.5887755102040817,True,mean,29859.456040869394,10013.0,114635.0
+cat_poisson,F3,B,,2022,3,fbd36a4d156487caa6a4,exact cache key + in-file metadata,2940.0,1.564625850340136,True,mean,27943.681032185705,10013.0,114635.0
+hurdle_lgbm,F3,B,,2022,3,e93fde857a7dd115bbe8,exact cache key + in-file metadata,2940.0,1.6061224489795918,True,mean,31444.97004419624,10013.0,114635.0
+glm_poisson,F3,B,,2023,3,d904ab8227618c7a2494,exact cache key + in-file metadata,2940.0,1.4629251700680272,True,mean,24698.741557206988,9951.0,128697.0
+glm_poisson_nbdisp,F3,B,,2023,3,f23ef612b2d95c094e90,exact cache key + in-file metadata,2940.0,1.4775510204081632,True,mean,24698.741557206988,9951.0,128697.0
+glm_spline,F3,B,,2023,3,fd732e3fa2978e078ba9,exact cache key + in-file metadata,2940.0,1.485374149659864,True,mean,25191.177053817282,9951.0,128697.0
+glm_nb,F3,B,,2023,3,0e74c195a18571599b83,exact cache key + in-file metadata,2940.0,1.4585034013605442,True,mean,24437.899034409704,9951.0,128697.0
+glm_tweedie,F3,B,,2023,3,73ba1c65ca54b112a3f0,exact cache key + in-file metadata,2940.0,1.4636054421768707,True,mean,24639.792759483476,9951.0,128697.0
+lgbm_poisson,F3,B,,2023,3,90878ebbb40bec01481e,exact cache key + in-file metadata,2940.0,1.4758503401360543,True,mean,24856.66959861783,9951.0,128697.0
+lgbm_tweedie,F3,B,,2023,3,36057e909f60b5b7e0cf,exact cache key + in-file metadata,2940.0,1.4870748299319727,True,mean,25507.37284103876,9951.0,128697.0
+lgbm_l1,F3,B,,2023,3,ebfec2abdde7a2c1150f,exact cache key + in-file metadata,2940.0,1.6329931972789116,True,point,33417.0,9951.0,128697.0
+xgb_poisson,F3,B,,2023,3,d8e3b35f19a8b807fe4e,exact cache key + in-file metadata,2940.0,1.5408163265306123,True,mean,26770.863549818925,9951.0,128697.0
+cat_poisson,F3,B,,2023,3,66d722f2c27bb7a1d66e,exact cache key + in-file metadata,2940.0,1.698299319727891,True,mean,34750.20486032466,9951.0,128697.0
+hurdle_lgbm,F3,B,,2023,3,6b713d6d45165a81f013,exact cache key + in-file metadata,2940.0,1.493877551020408,True,mean,25824.381693167998,9951.0,128697.0
+glm_poisson,F3,B,,2024,3,a5493f2987562e34a438,exact cache key + in-file metadata,3000.0,1.2306666666666666,True,mean,18494.714864310772,6760.0,59652.0
+glm_poisson_nbdisp,F3,B,,2024,3,38a698c79e982b2e0a72,exact cache key + in-file metadata,3000.0,1.195,True,mean,18494.714864310772,6760.0,59652.0
+glm_spline,F3,B,,2024,3,152ceba951d5a33c47a9,exact cache key + in-file metadata,3000.0,1.2236666666666667,True,mean,18215.591528268105,6760.0,59652.0
+glm_nb,F3,B,,2024,3,408209285680b6ffde59,exact cache key + in-file metadata,3000.0,1.172,True,mean,17128.734619507486,6760.0,59652.0
+glm_tweedie,F3,B,,2024,3,1488f144a83a773f06a0,exact cache key + in-file metadata,3000.0,1.205,True,mean,19209.47979311943,6760.0,59652.0
+lgbm_poisson,F3,B,,2024,3,a9328f8a1280ee79e139,exact cache key + in-file metadata,3000.0,1.281,True,mean,20285.043517273363,6760.0,59652.0
+lgbm_tweedie,F3,B,,2024,3,04c6d979ec492910de95,exact cache key + in-file metadata,3000.0,1.2883333333333333,True,mean,20494.956537553902,6760.0,59652.0
+lgbm_l1,F3,B,,2024,3,abc659577c1e5c8291d4,exact cache key + in-file metadata,3000.0,1.1206666666666667,True,point,15066.0,6760.0,59652.0
+xgb_poisson,F3,B,,2024,3,9ec32920f73ccdacf738,exact cache key + in-file metadata,3000.0,1.2653333333333334,True,mean,19119.326388657206,6760.0,59652.0
+cat_poisson,F3,B,,2024,3,47da2388cac0916ba44d,exact cache key + in-file metadata,3000.0,1.2206666666666666,True,mean,18655.232254031995,6760.0,59652.0
+hurdle_lgbm,F3,B,,2024,3,0385156465c8168e0569,exact cache key + in-file metadata,3000.0,1.2436666666666667,True,mean,19002.71553566216,6760.0,59652.0
+glm_poisson,F3,B,,2018,4,bd548e35fa29c327efc3,exact cache key + in-file metadata,2940.0,1.4227891156462584,True,mean,20783.960438600563,6619.0,56031.0
+glm_poisson_nbdisp,F3,B,,2018,4,ffac612712a83916983f,exact cache key + in-file metadata,2940.0,1.3180272108843538,True,mean,20783.960438600563,6619.0,56031.0
+glm_spline,F3,B,,2018,4,48cebfaca32a72a52813,exact cache key + in-file metadata,2940.0,1.3139455782312925,True,mean,16577.257231074404,6619.0,56031.0
+glm_nb,F3,B,,2018,4,49b7688c1ad3588bbbcf,exact cache key + in-file metadata,2940.0,2.98265306122449,True,mean,106269.75569685576,6619.0,56031.0
+glm_tweedie,F3,B,,2018,4,8e30e5e8410b8cd7feab,exact cache key + in-file metadata,2940.0,1.1241496598639455,True,mean,14985.060832077746,6619.0,56031.0
+lgbm_poisson,F3,B,,2018,4,f9240d7dd45129251a46,exact cache key + in-file metadata,2940.0,1.4622448979591838,True,mean,27030.74300069531,6619.0,56031.0
+lgbm_tweedie,F3,B,,2018,4,872edc14187ec27fafa9,exact cache key + in-file metadata,2940.0,1.4812925170068028,True,mean,28285.82396296531,6619.0,56031.0
+lgbm_l1,F3,B,,2018,4,06881df15ffe9edeaa74,exact cache key + in-file metadata,2940.0,1.1884353741496598,True,point,15788.0,6619.0,56031.0
+xgb_poisson,F3,B,,2018,4,57c7038a27991f0f7f99,exact cache key + in-file metadata,2940.0,1.4772108843537415,True,mean,28640.467333445216,6619.0,56031.0
+cat_poisson,F3,B,,2018,4,59ef8eeb14459c6f468a,exact cache key + in-file metadata,2940.0,1.4289115646258503,True,mean,25966.865140789916,6619.0,56031.0
+hurdle_lgbm,F3,B,,2018,4,979d77d409e8f8504bc2,exact cache key + in-file metadata,2940.0,1.4914965986394557,True,mean,27995.69004983279,6619.0,56031.0
+glm_poisson,F3,B,,2019,4,a628b06d2d74e393ac1d,exact cache key + in-file metadata,2880.0,1.8729166666666666,True,mean,37353.45141169292,9967.0,129807.0
+glm_poisson_nbdisp,F3,B,,2019,4,5821b7ef40856a320227,exact cache key + in-file metadata,2880.0,1.9996527777777777,True,mean,37353.45141169292,9967.0,129807.0
+glm_spline,F3,B,,2019,4,2aab8dd1e5c9dbe07d70,exact cache key + in-file metadata,2880.0,1.7979166666666666,True,mean,35586.109550955545,9967.0,129807.0
+glm_nb,F3,B,,2019,4,f0a8c364cf1d22737d58,exact cache key + in-file metadata,2880.0,2.3409722222222222,True,mean,59261.68846881997,9967.0,129807.0
+glm_tweedie,F3,B,,2019,4,80d76e8fd8f7e849e53a,exact cache key + in-file metadata,2880.0,2.0881944444444445,True,mean,39129.420414415275,9967.0,129807.0
+lgbm_poisson,F3,B,,2019,4,481eda75a246645d783f,exact cache key + in-file metadata,2880.0,1.6892361111111112,True,mean,31605.70461755265,9967.0,129807.0
+lgbm_tweedie,F3,B,,2019,4,2f1e75da9dd2b4dd3105,exact cache key + in-file metadata,2880.0,1.7010416666666666,True,mean,31426.076568310735,9967.0,129807.0
+lgbm_l1,F3,B,,2019,4,5d5c9b726ad7a437a1ce,exact cache key + in-file metadata,2880.0,1.8697916666666667,True,point,41037.0,9967.0,129807.0
+xgb_poisson,F3,B,,2019,4,cd922eded97e474bf8e9,exact cache key + in-file metadata,2880.0,1.7125,True,mean,32864.28707112337,9967.0,129807.0
+cat_poisson,F3,B,,2019,4,d50188ab310460702475,exact cache key + in-file metadata,2880.0,1.6552083333333334,True,mean,30947.143320306077,9967.0,129807.0
+hurdle_lgbm,F3,B,,2019,4,35aa8eef541f21968691,exact cache key + in-file metadata,2880.0,1.7288194444444445,True,mean,33491.68516075925,9967.0,129807.0
+glm_poisson,F3,B,,2020,4,664a0e53b9d7e6068048,exact cache key + in-file metadata,2880.0,1.3586805555555554,True,mean,19579.72846486777,7668.0,69146.0
+glm_poisson_nbdisp,F3,B,,2020,4,d97c350142f4e2ed3dad,exact cache key + in-file metadata,2880.0,1.2927083333333333,True,mean,19579.72846486777,7668.0,69146.0
+glm_spline,F3,B,,2020,4,83ec068bbd1f6ca2cb55,exact cache key + in-file metadata,2880.0,1.403125,True,mean,20144.513581346782,7668.0,69146.0
+glm_nb,F3,B,,2020,4,2ca30d0c30a444a2d7e2,exact cache key + in-file metadata,2880.0,1.8243055555555556,True,mean,43384.04587118166,7668.0,69146.0
+glm_tweedie,F3,B,,2020,4,8de5a7f7ef4b5edee0bc,exact cache key + in-file metadata,2880.0,1.3,True,mean,20610.425414937054,7668.0,69146.0
+lgbm_poisson,F3,B,,2020,4,f0b08cdf9032f7a103bc,exact cache key + in-file metadata,2880.0,1.3552083333333333,True,mean,20210.561375697638,7668.0,69146.0
+lgbm_tweedie,F3,B,,2020,4,6e0ad7cd2cd2d2e11d39,exact cache key + in-file metadata,2880.0,1.3458333333333334,True,mean,19719.5266006195,7668.0,69146.0
+lgbm_l1,F3,B,,2020,4,4895012ab05669a2d944,exact cache key + in-file metadata,2880.0,1.2236111111111112,True,point,15826.0,7668.0,69146.0
+xgb_poisson,F3,B,,2020,4,5b783afdf07cf2cd64a6,exact cache key + in-file metadata,2880.0,1.335763888888889,True,mean,19222.758188010484,7668.0,69146.0
+cat_poisson,F3,B,,2020,4,a9f4f16acff19ee45f0e,exact cache key + in-file metadata,2880.0,1.3211805555555556,True,mean,19743.084420404022,7668.0,69146.0
+hurdle_lgbm,F3,B,,2020,4,eaf884f392afac802994,exact cache key + in-file metadata,2880.0,1.3090277777777777,True,mean,18133.865557119443,7668.0,69146.0
+glm_poisson,F3,B,,2021,4,d048a09711b6c7197821,exact cache key + in-file metadata,2880.0,1.7402777777777778,True,mean,31564.572949221714,6529.0,52911.0
+glm_poisson_nbdisp,F3,B,,2021,4,5fc087ca35e05fd4cc77,exact cache key + in-file metadata,2880.0,1.6236111111111111,True,mean,31564.572949221714,6529.0,52911.0
+glm_spline,F3,B,,2021,4,f5ee40319380f4d870fe,exact cache key + in-file metadata,2880.0,1.3506944444444444,True,mean,19255.795537613187,6529.0,52911.0
+glm_nb,F3,B,,2021,4,315dfe4a393cbcb0b4ba,exact cache key + in-file metadata,2880.0,1.7618055555555556,True,mean,38058.6240170051,6529.0,52911.0
+glm_tweedie,F3,B,,2021,4,d6148591be51b45af7c8,exact cache key + in-file metadata,2880.0,1.3642361111111112,True,mean,21671.833964890924,6529.0,52911.0
+lgbm_poisson,F3,B,,2021,4,72c3704d4863b067fb41,exact cache key + in-file metadata,2880.0,1.6069444444444445,True,mean,28642.238743751135,6529.0,52911.0
+lgbm_tweedie,F3,B,,2021,4,f0c097a5f7010a647b71,exact cache key + in-file metadata,2880.0,1.6621527777777778,True,mean,31122.435218132967,6529.0,52911.0
+lgbm_l1,F3,B,,2021,4,9fc7e0c8952bb4300639,exact cache key + in-file metadata,2880.0,1.2986111111111112,True,point,16738.0,6529.0,52911.0
+xgb_poisson,F3,B,,2021,4,367ee754d5893e051ed0,exact cache key + in-file metadata,2880.0,1.5729166666666667,True,mean,27282.506963701006,6529.0,52911.0
+cat_poisson,F3,B,,2021,4,86bbd18ec02125f3d249,exact cache key + in-file metadata,2880.0,1.5625,True,mean,26271.259247630114,6529.0,52911.0
+hurdle_lgbm,F3,B,,2021,4,98095053c48ce9a0083a,exact cache key + in-file metadata,2880.0,1.629513888888889,True,mean,30369.841696956286,6529.0,52911.0
+glm_poisson,F3,B,,2022,4,b9cd54fa8b7e4137ff9b,exact cache key + in-file metadata,2880.0,1.7927083333333333,True,mean,35216.52216056192,10013.0,114635.0
+glm_poisson_nbdisp,F3,B,,2022,4,c56ef13d4c11a443d8f7,exact cache key + in-file metadata,2880.0,1.8743055555555554,True,mean,35216.52216056192,10013.0,114635.0
+glm_spline,F3,B,,2022,4,a367163557d9f1ad45d2,exact cache key + in-file metadata,2880.0,1.665625,True,mean,31460.84216772129,10013.0,114635.0
+glm_nb,F3,B,,2022,4,3ebf07ff333667b8e19a,exact cache key + in-file metadata,2880.0,1.7125,True,mean,34261.52611797217,10013.0,114635.0
+glm_tweedie,F3,B,,2022,4,b32ba12eed36efe4dee8,exact cache key + in-file metadata,2880.0,1.9784722222222222,True,mean,37898.779492211994,10013.0,114635.0
+lgbm_poisson,F3,B,,2022,4,2de3868237003c815f4f,exact cache key + in-file metadata,2880.0,1.7329861111111111,True,mean,35297.16774453845,10013.0,114635.0
+lgbm_tweedie,F3,B,,2022,4,a78b432c1edec2dc65ae,exact cache key + in-file metadata,2880.0,1.7875,True,mean,37320.17854034611,10013.0,114635.0
+lgbm_l1,F3,B,,2022,4,989a85e60a7f641261b1,exact cache key + in-file metadata,2880.0,1.7434027777777779,True,point,38651.0,10013.0,114635.0
+xgb_poisson,F3,B,,2022,4,2ab9d72f16cfbfff28f6,exact cache key + in-file metadata,2880.0,1.7357638888888889,True,mean,35712.59869418478,10013.0,114635.0
+cat_poisson,F3,B,,2022,4,2a4a6b57c83646413498,exact cache key + in-file metadata,2880.0,1.6899305555555555,True,mean,34384.967021689314,10013.0,114635.0
+hurdle_lgbm,F3,B,,2022,4,168f479dfc38e81dc0eb,exact cache key + in-file metadata,2880.0,1.6736111111111112,True,mean,33979.860195605856,10013.0,114635.0
+glm_poisson,F3,B,,2023,4,538c71871e908f889cd1,exact cache key + in-file metadata,2880.0,1.5753472222222222,True,mean,28466.942579255017,9949.0,128695.0
+glm_poisson_nbdisp,F3,B,,2023,4,672b038cd55d8b1b060c,exact cache key + in-file metadata,2880.0,1.5923611111111111,True,mean,28466.942579255017,9949.0,128695.0
+glm_spline,F3,B,,2023,4,0380a811ca0ca5ef474a,exact cache key + in-file metadata,2880.0,1.5725694444444445,True,mean,28774.107730557935,9949.0,128695.0
+glm_nb,F3,B,,2023,4,31eccabb0bb92a6d1f40,exact cache key + in-file metadata,2880.0,1.5923611111111111,True,mean,28657.894936611418,9949.0,128695.0
+glm_tweedie,F3,B,,2023,4,fc727229bcd306f806cd,exact cache key + in-file metadata,2880.0,1.5430555555555556,True,mean,27134.036211305873,9949.0,128695.0
+lgbm_poisson,F3,B,,2023,4,d731b1f6d5cb600d158f,exact cache key + in-file metadata,2880.0,1.6902777777777778,True,mean,31164.334716421756,9949.0,128695.0
+lgbm_tweedie,F3,B,,2023,4,4fe8a1b53e972d2be23b,exact cache key + in-file metadata,2880.0,1.7020833333333334,True,mean,31497.554774682063,9949.0,128695.0
+lgbm_l1,F3,B,,2023,4,f65dc74a78c81b123a5e,exact cache key + in-file metadata,2880.0,1.7673611111111112,True,point,38816.0,9949.0,128695.0
+xgb_poisson,F3,B,,2023,4,13222ba6776cc1ba5b05,exact cache key + in-file metadata,2880.0,1.6899305555555555,True,mean,31514.693636814518,9949.0,128695.0
+cat_poisson,F3,B,,2023,4,52725f6ec0a76846ea87,exact cache key + in-file metadata,2880.0,1.9208333333333334,True,mean,39345.9759123458,9949.0,128695.0
+hurdle_lgbm,F3,B,,2023,4,99f7f44228f14b0d71ae,exact cache key + in-file metadata,2880.0,1.7434027777777779,True,mean,33006.572153206995,9949.0,128695.0
+glm_poisson,F3,B,,2024,4,0d17fe46fa4d10a74e11,exact cache key + in-file metadata,2940.0,1.2268707482993197,True,mean,15363.095317169462,6758.0,59650.0
+glm_poisson_nbdisp,F3,B,,2024,4,c01def7ae77cf5f4f00d,exact cache key + in-file metadata,2940.0,1.1462585034013606,True,mean,15363.095317169462,6758.0,59650.0
+glm_spline,F3,B,,2024,4,b7f2f3193882652c8131,exact cache key + in-file metadata,2940.0,1.2200680272108844,True,mean,15275.523010378147,6758.0,59650.0
+glm_nb,F3,B,,2024,4,7d10ceb2178f9fc75800,exact cache key + in-file metadata,2940.0,1.1517006802721088,True,mean,15733.214858993882,6758.0,59650.0
+glm_tweedie,F3,B,,2024,4,a95c1380f438e9a724e0,exact cache key + in-file metadata,2940.0,1.1761904761904762,True,mean,17151.00172352486,6758.0,59650.0
+lgbm_poisson,F3,B,,2024,4,594696a3b64b7a49a418,exact cache key + in-file metadata,2940.0,1.396938775510204,True,mean,20853.676183625146,6758.0,59650.0
+lgbm_tweedie,F3,B,,2024,4,7a7642c83201f5c35e94,exact cache key + in-file metadata,2940.0,1.3877551020408163,True,mean,21186.08845358783,6758.0,59650.0
+lgbm_l1,F3,B,,2024,4,bfb4a8eee8f7133ff3a3,exact cache key + in-file metadata,2940.0,1.2377551020408164,True,point,16097.0,6758.0,59650.0
+xgb_poisson,F3,B,,2024,4,ef51c1148c01596158cc,exact cache key + in-file metadata,2940.0,1.336734693877551,True,mean,19398.59011409549,6758.0,59650.0
+cat_poisson,F3,B,,2024,4,6104f7ab1bf5c3c17d51,exact cache key + in-file metadata,2940.0,1.276530612244898,True,mean,18252.737336667422,6758.0,59650.0
+hurdle_lgbm,F3,B,,2024,4,61c347c9b9f6762d81d1,exact cache key + in-file metadata,2940.0,1.377891156462585,True,mean,20533.09964648782,6758.0,59650.0
+glm_poisson,F8,B,,2018,2,684d9d721c23a3a8112b,exact cache key + in-file metadata,3060.0,0.9447712418300653,True,mean,10745.01907317379,6620.0,56032.0
+glm_poisson_nbdisp,F8,B,,2018,2,9596bce64aaac1a4b0da,exact cache key + in-file metadata,3060.0,0.942156862745098,True,mean,10745.01907317379,6620.0,56032.0
+glm_spline,F8,B,,2018,2,41eae39b15a7a4ef7689,exact cache key + in-file metadata,3060.0,0.9473856209150326,True,mean,10660.864949705177,6620.0,56032.0
+glm_nb,F8,B,,2018,2,2189802972ce1f820c21,exact cache key + in-file metadata,3060.0,0.9088235294117647,True,mean,10552.452430227075,6620.0,56032.0
+glm_tweedie,F8,B,,2018,2,d114fcd3eb6d75ee4205,exact cache key + in-file metadata,3060.0,0.9326797385620915,True,mean,10814.785481786006,6620.0,56032.0
+lgbm_poisson,F8,B,,2018,2,ea43bfbfd93e31f75dc8,exact cache key + in-file metadata,3060.0,1.0673202614379085,True,mean,14984.496708679766,6620.0,56032.0
+lgbm_tweedie,F8,B,,2018,2,f1cd9ddba7a6bb099ce8,exact cache key + in-file metadata,3060.0,1.076470588235294,True,mean,15074.470477926061,6620.0,56032.0
+lgbm_l1,F8,B,,2018,2,257408306194fdef6afb,exact cache key + in-file metadata,3060.0,1.0450980392156863,True,point,12860.0,6620.0,56032.0
+xgb_poisson,F8,B,,2018,2,ceac55d9d6e075a4b6d1,exact cache key + in-file metadata,3060.0,1.0202614379084967,True,mean,13528.101311590817,6620.0,56032.0
+cat_poisson,F8,B,,2018,2,d5e30e4988f744ea37a6,exact cache key + in-file metadata,3060.0,1.076470588235294,True,mean,15240.46968087685,6620.0,56032.0
+hurdle_lgbm,F8,B,,2018,2,66a4f972300ad0d32bff,exact cache key + in-file metadata,3060.0,1.0705882352941176,True,mean,14411.901521662192,6620.0,56032.0
+glm_poisson,F8,B,,2019,2,5e733708215892599690,exact cache key + in-file metadata,3000.0,1.3493333333333333,True,mean,22409.931914974484,9967.0,129807.0
+glm_poisson_nbdisp,F8,B,,2019,2,f78e5450f74a383ef651,exact cache key + in-file metadata,3000.0,1.353,True,mean,22409.931914974484,9967.0,129807.0
+glm_spline,F8,B,,2019,2,941a0dd8b17abdaea108,exact cache key + in-file metadata,3000.0,1.3516666666666666,True,mean,22047.77556746472,9967.0,129807.0
+glm_nb,F8,B,,2019,2,18b42a1c42f3145a7d82,exact cache key + in-file metadata,3000.0,1.4416666666666667,True,mean,25613.4686507324,9967.0,129807.0
+glm_tweedie,F8,B,,2019,2,7109b372ffee572c8790,exact cache key + in-file metadata,3000.0,1.3636666666666666,True,mean,23147.43589928291,9967.0,129807.0
+lgbm_poisson,F8,B,,2019,2,63bdac5f89b03e2111ae,exact cache key + in-file metadata,3000.0,1.281,True,mean,19354.601239095227,9967.0,129807.0
+lgbm_tweedie,F8,B,,2019,2,4afe2cb53c5d4b0365a9,exact cache key + in-file metadata,3000.0,1.2923333333333333,True,mean,19662.993361545014,9967.0,129807.0
+lgbm_l1,F8,B,,2019,2,dddc69f72c6609150a10,exact cache key + in-file metadata,3000.0,1.363,True,point,23881.0,9967.0,129807.0
+xgb_poisson,F8,B,,2019,2,feb517027eaff86c0cfb,exact cache key + in-file metadata,3000.0,1.286,True,mean,19351.33519937411,9967.0,129807.0
+cat_poisson,F8,B,,2019,2,21f94bda4f26c959c5d0,exact cache key + in-file metadata,3000.0,1.3716666666666666,True,mean,22884.35104013275,9967.0,129807.0
+hurdle_lgbm,F8,B,,2019,2,02508c6d6a79a5bb47d1,exact cache key + in-file metadata,3000.0,1.2366666666666666,True,mean,18150.47602365028,9967.0,129807.0
+glm_poisson,F8,B,,2020,2,eca03a00ceae3bebba00,exact cache key + in-file metadata,3000.0,0.993,True,mean,11047.453774487689,7668.0,69146.0
+glm_poisson_nbdisp,F8,B,,2020,2,e66ce3b1fc6ebd2b9305,exact cache key + in-file metadata,3000.0,0.989,True,mean,11047.453774487689,7668.0,69146.0
+glm_spline,F8,B,,2020,2,f9927fedffdf2cd5ce0a,exact cache key + in-file metadata,3000.0,1.025,True,mean,11678.999739005234,7668.0,69146.0
+glm_nb,F8,B,,2020,2,d4f97bd301dce74a1220,exact cache key + in-file metadata,3000.0,1.053,True,mean,12464.104847923914,7668.0,69146.0
+glm_tweedie,F8,B,,2020,2,721b749c2f189d93479c,exact cache key + in-file metadata,3000.0,0.996,True,mean,11216.353282962758,7668.0,69146.0
+lgbm_poisson,F8,B,,2020,2,9cd23fdf94825f6dbd6b,exact cache key + in-file metadata,3000.0,1.0193333333333334,True,mean,11959.504216675456,7668.0,69146.0
+lgbm_tweedie,F8,B,,2020,2,fc5bb971d07c324b92d7,exact cache key + in-file metadata,3000.0,1.0223333333333333,True,mean,11899.845835979704,7668.0,69146.0
+lgbm_l1,F8,B,,2020,2,cc8f233257a6008280eb,exact cache key + in-file metadata,3000.0,1.069,True,point,13127.0,7668.0,69146.0
+xgb_poisson,F8,B,,2020,2,a4ee94af28a7b949ba2e,exact cache key + in-file metadata,3000.0,1.016,True,mean,12082.145381905098,7668.0,69146.0
+cat_poisson,F8,B,,2020,2,f9f15c4576ba45a59e96,exact cache key + in-file metadata,3000.0,1.0236666666666667,True,mean,12186.398683599515,7668.0,69146.0
+hurdle_lgbm,F8,B,,2020,2,73591051b44ec3ebe4ad,exact cache key + in-file metadata,3000.0,1.03,True,mean,12144.28872778916,7668.0,69146.0
+glm_poisson,F8,B,,2021,2,5f9f7309f609f64d1f16,exact cache key + in-file metadata,3000.0,1.014,True,mean,11340.738314334603,6530.0,52912.0
+glm_poisson_nbdisp,F8,B,,2021,2,4399fedb28a5e19bdf3f,exact cache key + in-file metadata,3000.0,1.0026666666666666,True,mean,11340.738314334603,6530.0,52912.0
+glm_spline,F8,B,,2021,2,db3c5a98a82c511699a0,exact cache key + in-file metadata,3000.0,0.98,True,mean,10687.007050117023,6530.0,52912.0
+glm_nb,F8,B,,2021,2,bca867555808f07d8087,exact cache key + in-file metadata,3000.0,0.9876666666666667,True,mean,11129.422485147217,6530.0,52912.0
+glm_tweedie,F8,B,,2021,2,ceab747f762fbf64e2f8,exact cache key + in-file metadata,3000.0,0.9876666666666667,True,mean,11201.716656806788,6530.0,52912.0
+lgbm_poisson,F8,B,,2021,2,40aabc386e3cfb096b8d,exact cache key + in-file metadata,3000.0,1.073,True,mean,12759.554532289741,6530.0,52912.0
+lgbm_tweedie,F8,B,,2021,2,f5f24943ebb36a24e93d,exact cache key + in-file metadata,3000.0,1.086,True,mean,13301.411911608111,6530.0,52912.0
+lgbm_l1,F8,B,,2021,2,9785f5d7fa9f8d3ba587,exact cache key + in-file metadata,3000.0,1.0673333333333332,True,point,12578.0,6530.0,52912.0
+xgb_poisson,F8,B,,2021,2,df3db10017841a6712ff,exact cache key + in-file metadata,3000.0,1.069,True,mean,12671.448319683794,6530.0,52912.0
+cat_poisson,F8,B,,2021,2,228ef700ede3de15ee58,exact cache key + in-file metadata,3000.0,1.001,True,mean,11245.469321278939,6530.0,52912.0
+hurdle_lgbm,F8,B,,2021,2,4b138d3a585dcde93276,exact cache key + in-file metadata,3000.0,1.0703333333333334,True,mean,12982.28850427195,6530.0,52912.0
+glm_poisson,F8,B,,2022,2,29ce495726284bf029b2,exact cache key + in-file metadata,3000.0,1.2423333333333333,True,mean,17598.145835170515,10013.0,114635.0
+glm_poisson_nbdisp,F8,B,,2022,2,8bbd5279f85280a681e5,exact cache key + in-file metadata,3000.0,1.2636666666666667,True,mean,17598.145835170515,10013.0,114635.0
+glm_spline,F8,B,,2022,2,341d932e79a5dfc28d27,exact cache key + in-file metadata,3000.0,1.2566666666666666,True,mean,18175.696633833075,10013.0,114635.0
+glm_nb,F8,B,,2022,2,5c734976e51a906a4ad1,exact cache key + in-file metadata,3000.0,1.2233333333333334,True,mean,16559.28123377094,10013.0,114635.0
+glm_tweedie,F8,B,,2022,2,71f9e9ea98bfe2afe796,exact cache key + in-file metadata,3000.0,1.2626666666666666,True,mean,16869.9720499622,10013.0,114635.0
+lgbm_poisson,F8,B,,2022,2,bf48c1ba6813d9357323,exact cache key + in-file metadata,3000.0,1.4556666666666667,True,mean,27176.910080843954,10013.0,114635.0
+lgbm_tweedie,F8,B,,2022,2,4627fa55347d93f6c784,exact cache key + in-file metadata,3000.0,1.405,True,mean,24839.77547712639,10013.0,114635.0
+lgbm_l1,F8,B,,2022,2,9b28bd1aeb6795df6930,exact cache key + in-file metadata,3000.0,1.4066666666666667,True,point,25548.0,10013.0,114635.0
+xgb_poisson,F8,B,,2022,2,a73990edbcdf58a33408,exact cache key + in-file metadata,3000.0,1.3396666666666666,True,mean,20753.834066984142,10013.0,114635.0
+cat_poisson,F8,B,,2022,2,4f4c3229dfa3b52b3d83,exact cache key + in-file metadata,3000.0,1.367,True,mean,22846.894443710145,10013.0,114635.0
+hurdle_lgbm,F8,B,,2022,2,3c2d9b62c678cf39dc1a,exact cache key + in-file metadata,3000.0,1.3803333333333334,True,mean,23748.341204167613,10013.0,114635.0
+glm_poisson,F8,B,,2023,2,9e0acf80ea63b9274573,exact cache key + in-file metadata,3000.0,1.1556666666666666,True,mean,16683.766312218708,9954.0,128702.0
+glm_poisson_nbdisp,F8,B,,2023,2,876aa074dc13864ebff7,exact cache key + in-file metadata,3000.0,1.1546666666666667,True,mean,16683.766312218708,9954.0,128702.0
+glm_spline,F8,B,,2023,2,b27492cc63ecb1be2343,exact cache key + in-file metadata,3000.0,1.1723333333333332,True,mean,17072.22260113817,9954.0,128702.0
+glm_nb,F8,B,,2023,2,f20fced8c973fddae20e,exact cache key + in-file metadata,3000.0,1.1603333333333334,True,mean,17244.99152063852,9954.0,128702.0
+glm_tweedie,F8,B,,2023,2,ed54dc14ec1bcd0e06c8,exact cache key + in-file metadata,3000.0,1.1746666666666667,True,mean,18060.59707082311,9954.0,128702.0
+lgbm_poisson,F8,B,,2023,2,30e648d2d6b78a32f873,exact cache key + in-file metadata,3000.0,1.0816666666666668,True,mean,13850.993170504424,9954.0,128702.0
+lgbm_tweedie,F8,B,,2023,2,87610b405f256352eaf2,exact cache key + in-file metadata,3000.0,1.078,True,mean,13965.083254427493,9954.0,128702.0
+lgbm_l1,F8,B,,2023,2,a0a538b52a3cf977de38,exact cache key + in-file metadata,3000.0,1.251,True,point,20267.0,9954.0,128702.0
+xgb_poisson,F8,B,,2023,2,9c09bfa3f4ea29388ed8,exact cache key + in-file metadata,3000.0,1.1123333333333334,True,mean,14758.15020978763,9954.0,128702.0
+cat_poisson,F8,B,,2023,2,59f574b4bc9dfd460af0,exact cache key + in-file metadata,3000.0,1.1096666666666666,True,mean,14737.53448198737,9954.0,128702.0
+hurdle_lgbm,F8,B,,2023,2,82fc0d4c256f0f0c69ba,exact cache key + in-file metadata,3000.0,1.0863333333333334,True,mean,13778.162897421105,9954.0,128702.0
+glm_poisson,F8,B,,2024,2,1ff487c6d0cb31adc947,exact cache key + in-file metadata,3060.0,0.9228758169934641,True,mean,10317.077889392658,6760.0,59652.0
+glm_poisson_nbdisp,F8,B,,2024,2,e487c803512bf9e2a732,exact cache key + in-file metadata,3060.0,0.907516339869281,True,mean,10317.077889392658,6760.0,59652.0
+glm_spline,F8,B,,2024,2,232b992c6539e6cd29de,exact cache key + in-file metadata,3060.0,0.9281045751633987,True,mean,9976.056412234124,6760.0,59652.0
+glm_nb,F8,B,,2024,2,51533dd4c215c86e9e9d,exact cache key + in-file metadata,3060.0,0.9094771241830065,True,mean,10284.426781793518,6760.0,59652.0
+glm_tweedie,F8,B,,2024,2,8cdc561476b3f744e23e,exact cache key + in-file metadata,3060.0,0.9379084967320261,True,mean,11084.741006603701,6760.0,59652.0
+lgbm_poisson,F8,B,,2024,2,f9021ff602849babce5f,exact cache key + in-file metadata,3060.0,0.9192810457516339,True,mean,10260.740858616717,6760.0,59652.0
+lgbm_tweedie,F8,B,,2024,2,c8aa920cca19d4106deb,exact cache key + in-file metadata,3060.0,0.9382352941176471,True,mean,10791.500384009712,6760.0,59652.0
+lgbm_l1,F8,B,,2024,2,6bcbfa695d37bfff0b87,exact cache key + in-file metadata,3060.0,0.9045751633986928,True,point,10034.0,6760.0,59652.0
+xgb_poisson,F8,B,,2024,2,d0782d20d5592cafeb71,exact cache key + in-file metadata,3060.0,0.9326797385620915,True,mean,10828.22784767704,6760.0,59652.0
+cat_poisson,F8,B,,2024,2,ccba0337ad6b029e0d4e,exact cache key + in-file metadata,3060.0,0.9696078431372549,True,mean,11964.680971118127,6760.0,59652.0
+hurdle_lgbm,F8,B,,2024,2,ea637c065ff11c8e3196,exact cache key + in-file metadata,3060.0,0.9339869281045752,True,mean,10535.957847635505,6760.0,59652.0
+glm_poisson,F8,B,,2018,3,cc2f3b662478773f34f8,exact cache key + in-file metadata,3000.0,1.0616666666666668,True,mean,12621.601816136637,6620.0,56032.0
+glm_poisson_nbdisp,F8,B,,2018,3,6008e949453fd1c7079d,exact cache key + in-file metadata,3000.0,1.0203333333333333,True,mean,12621.601816136637,6620.0,56032.0
+glm_spline,F8,B,,2018,3,37fad532622948c12b95,exact cache key + in-file metadata,3000.0,1.042,True,mean,12107.603738458296,6620.0,56032.0
+glm_nb,F8,B,,2018,3,5338faf31a21f17dbd2d,exact cache key + in-file metadata,3000.0,0.9613333333333334,True,mean,11237.045389112598,6620.0,56032.0
+glm_tweedie,F8,B,,2018,3,d0a0272ab33b0cbb96f1,exact cache key + in-file metadata,3000.0,1.0093333333333334,True,mean,12609.458129948507,6620.0,56032.0
+lgbm_poisson,F8,B,,2018,3,fb4f1580224406eb0a07,exact cache key + in-file metadata,3000.0,1.3343333333333334,True,mean,23969.623822422465,6620.0,56032.0
+lgbm_tweedie,F8,B,,2018,3,c35ae37ca4d5b45ec023,exact cache key + in-file metadata,3000.0,1.35,True,mean,25183.829768263364,6620.0,56032.0
+lgbm_l1,F8,B,,2018,3,8b4b1c5270b91b2d04f5,exact cache key + in-file metadata,3000.0,1.1826666666666668,True,point,15884.0,6620.0,56032.0
+xgb_poisson,F8,B,,2018,3,5df476c8052c7b0be178,exact cache key + in-file metadata,3000.0,1.3166666666666667,True,mean,23620.512039105488,6620.0,56032.0
+cat_poisson,F8,B,,2018,3,4f22dad3b4b9da8d3d85,exact cache key + in-file metadata,3000.0,1.2446666666666666,True,mean,19525.10792319321,6620.0,56032.0
+hurdle_lgbm,F8,B,,2018,3,9063a003abcb5ca0500c,exact cache key + in-file metadata,3000.0,1.366,True,mean,23892.81592960066,6620.0,56032.0
+glm_poisson,F8,B,,2019,3,f62cfb8e45d8795c5557,exact cache key + in-file metadata,2940.0,1.5945578231292517,True,mean,30041.96726351408,9967.0,129807.0
+glm_poisson_nbdisp,F8,B,,2019,3,36974c013cfa240d3d86,exact cache key + in-file metadata,2940.0,1.6020408163265305,True,mean,30041.96726351408,9967.0,129807.0
+glm_spline,F8,B,,2019,3,42b518c13ef8e9034579,exact cache key + in-file metadata,2940.0,1.5714285714285714,True,mean,28339.83780830054,9967.0,129807.0
+glm_nb,F8,B,,2019,3,69c44f5d80f78baecf62,exact cache key + in-file metadata,2940.0,1.7799319727891156,True,mean,37883.433365978504,9967.0,129807.0
+glm_tweedie,F8,B,,2019,3,53968e5ca9c1b919f5be,exact cache key + in-file metadata,2940.0,1.6061224489795918,True,mean,29909.922141849158,9967.0,129807.0
+lgbm_poisson,F8,B,,2019,3,360c46e4b97db1744ed8,exact cache key + in-file metadata,2940.0,1.5520408163265307,True,mean,28715.975228246352,9967.0,129807.0
+lgbm_tweedie,F8,B,,2019,3,2bb3b362ec83eb8ab87c,exact cache key + in-file metadata,2940.0,1.5894557823129252,True,mean,30264.194691865603,9967.0,129807.0
+lgbm_l1,F8,B,,2019,3,2d1a4f11b4f423d31eed,exact cache key + in-file metadata,2940.0,1.680952380952381,True,point,36136.0,9967.0,129807.0
+xgb_poisson,F8,B,,2019,3,e79faafbfd9bbc8b1001,exact cache key + in-file metadata,2940.0,1.546938775510204,True,mean,28264.591435044862,9967.0,129807.0
+cat_poisson,F8,B,,2019,3,d6e315bef629790d4ad9,exact cache key + in-file metadata,2940.0,1.6408163265306122,True,mean,33513.36707451904,9967.0,129807.0
+hurdle_lgbm,F8,B,,2019,3,53c98ecf43a3e7834f3a,exact cache key + in-file metadata,2940.0,1.5241496598639457,True,mean,27584.76593365307,9967.0,129807.0
+glm_poisson,F8,B,,2020,3,7cb1004acbe069a1d3c6,exact cache key + in-file metadata,2940.0,1.1782312925170069,True,mean,15499.522761717786,7668.0,69146.0
+glm_poisson_nbdisp,F8,B,,2020,3,46d8783c69b42f992f81,exact cache key + in-file metadata,2940.0,1.1561224489795918,True,mean,15499.522761717786,7668.0,69146.0
+glm_spline,F8,B,,2020,3,2c800c7c3f8bef4a7569,exact cache key + in-file metadata,2940.0,1.1772108843537414,True,mean,15223.305545765947,7668.0,69146.0
+glm_nb,F8,B,,2020,3,9da63de70d7000d51d3b,exact cache key + in-file metadata,2940.0,1.1115646258503402,True,mean,13370.003931288804,7668.0,69146.0
+glm_tweedie,F8,B,,2020,3,89fb37b2939e169aa549,exact cache key + in-file metadata,2940.0,1.1697278911564626,True,mean,16319.515602559948,7668.0,69146.0
+lgbm_poisson,F8,B,,2020,3,70e1673907290f9355a1,exact cache key + in-file metadata,2940.0,1.2982993197278911,True,mean,19236.380441888534,7668.0,69146.0
+lgbm_tweedie,F8,B,,2020,3,3a5d9cddeb8c1c055ab5,exact cache key + in-file metadata,2940.0,1.314625850340136,True,mean,19893.19728637312,7668.0,69146.0
+lgbm_l1,F8,B,,2020,3,e720bdb63ec136611fe0,exact cache key + in-file metadata,2940.0,1.2414965986394557,True,point,16390.0,7668.0,69146.0
+xgb_poisson,F8,B,,2020,3,8710469595433a253d23,exact cache key + in-file metadata,2940.0,1.2979591836734694,True,mean,19080.34147946736,7668.0,69146.0
+cat_poisson,F8,B,,2020,3,5aa9f4bbbca4709243ee,exact cache key + in-file metadata,2940.0,1.256122448979592,True,mean,18269.89481379361,7668.0,69146.0
+hurdle_lgbm,F8,B,,2020,3,2128193e18149ab1bc92,exact cache key + in-file metadata,2940.0,1.2802721088435374,True,mean,18416.45932716613,7668.0,69146.0
+glm_poisson,F8,B,,2021,3,9a8cb470899d0a8c1446,exact cache key + in-file metadata,2940.0,1.3901360544217687,True,mean,20723.007581048176,6530.0,52912.0
+glm_poisson_nbdisp,F8,B,,2021,3,9bff473bc15a70e50f52,exact cache key + in-file metadata,2940.0,1.3238095238095238,True,mean,20723.007581048176,6530.0,52912.0
+glm_spline,F8,B,,2021,3,2926733cbd7ecfbeb4da,exact cache key + in-file metadata,2940.0,1.1952380952380952,True,mean,15383.573358137519,6530.0,52912.0
+glm_nb,F8,B,,2021,3,54ad4324606789544a96,exact cache key + in-file metadata,2940.0,1.2948979591836736,True,mean,19841.144901241903,6530.0,52912.0
+glm_tweedie,F8,B,,2021,3,cf23f889a63dce5a31d9,exact cache key + in-file metadata,2940.0,1.1755102040816328,True,mean,16056.908770942806,6530.0,52912.0
+lgbm_poisson,F8,B,,2021,3,1b74fde28d9bcf19f831,exact cache key + in-file metadata,2940.0,1.4428571428571428,True,mean,23420.38079149979,6530.0,52912.0
+lgbm_tweedie,F8,B,,2021,3,81a9c78fe740e50add3f,exact cache key + in-file metadata,2940.0,1.463265306122449,True,mean,24668.321583904773,6530.0,52912.0
+lgbm_l1,F8,B,,2021,3,37de3c437447a81acb5f,exact cache key + in-file metadata,2940.0,1.226530612244898,True,point,16114.0,6530.0,52912.0
+xgb_poisson,F8,B,,2021,3,44996aea73032c5efb12,exact cache key + in-file metadata,2940.0,1.4153061224489796,True,mean,23766.055177230624,6530.0,52912.0
+cat_poisson,F8,B,,2021,3,0e54301e190a2b6ed55b,exact cache key + in-file metadata,2940.0,1.3904761904761904,True,mean,22284.38005737141,6530.0,52912.0
+hurdle_lgbm,F8,B,,2021,3,a2de66df49f052c11b5a,exact cache key + in-file metadata,2940.0,1.4394557823129253,True,mean,24416.83365255283,6530.0,52912.0
+glm_poisson,F8,B,,2022,3,9b262014ef52fcd78d8a,exact cache key + in-file metadata,2940.0,1.5074829931972789,True,mean,25662.477702342054,10013.0,114635.0
+glm_poisson_nbdisp,F8,B,,2022,3,0184452dc5c460156255,exact cache key + in-file metadata,2940.0,1.5350340136054421,True,mean,25662.477702342054,10013.0,114635.0
+glm_spline,F8,B,,2022,3,dbbd140569d6d3de179d,exact cache key + in-file metadata,2940.0,1.5204081632653061,True,mean,26656.819075743013,10013.0,114635.0
+glm_nb,F8,B,,2022,3,b7fca67c830c2449ecaa,exact cache key + in-file metadata,2940.0,1.522108843537415,True,mean,25626.955272161635,10013.0,114635.0
+glm_tweedie,F8,B,,2022,3,c64e8849fe9f47377b26,exact cache key + in-file metadata,2940.0,1.8659863945578232,True,mean,34076.36314906049,10013.0,114635.0
+lgbm_poisson,F8,B,,2022,3,57e296309cf583883909,exact cache key + in-file metadata,2940.0,1.5945578231292517,True,mean,30521.124340584116,10013.0,114635.0
+lgbm_tweedie,F8,B,,2022,3,ebdda89b9eac1ecfa781,exact cache key + in-file metadata,2940.0,1.5863945578231293,True,mean,30743.490537519872,10013.0,114635.0
+lgbm_l1,F8,B,,2022,3,24d8f13a1d874f6c3275,exact cache key + in-file metadata,2940.0,1.5775510204081633,True,point,31054.0,10013.0,114635.0
+xgb_poisson,F8,B,,2022,3,5132c405298ff697c66e,exact cache key + in-file metadata,2940.0,1.5979591836734695,True,mean,30361.800689505988,10013.0,114635.0
+cat_poisson,F8,B,,2022,3,48532703d55c861a78ab,exact cache key + in-file metadata,2940.0,1.575170068027211,True,mean,27392.305922460695,10013.0,114635.0
+hurdle_lgbm,F8,B,,2022,3,902cca578ca81734b0d4,exact cache key + in-file metadata,2940.0,1.6091836734693878,True,mean,31101.055920694635,10013.0,114635.0
+glm_poisson,F8,B,,2023,3,d0f696fd4dd1a535db79,exact cache key + in-file metadata,2940.0,1.4214285714285715,True,mean,23717.746879777034,9951.0,128697.0
+glm_poisson_nbdisp,F8,B,,2023,3,bd650eb605d585589907,exact cache key + in-file metadata,2940.0,1.448299319727891,True,mean,23717.746879777034,9951.0,128697.0
+glm_spline,F8,B,,2023,3,c330c58f27cb000f44db,exact cache key + in-file metadata,2940.0,1.4595238095238094,True,mean,24402.28825020008,9951.0,128697.0
+glm_nb,F8,B,,2023,3,31a4fdf96f24a912a079,exact cache key + in-file metadata,2940.0,1.4302721088435375,True,mean,23355.102466999793,9951.0,128697.0
+glm_tweedie,F8,B,,2023,3,f05312705ef94e3d74c1,exact cache key + in-file metadata,2940.0,1.4428571428571428,True,mean,24034.95105528819,9951.0,128697.0
+lgbm_poisson,F8,B,,2023,3,c2b94bc42f879253d690,exact cache key + in-file metadata,2940.0,1.4520408163265306,True,mean,23908.767464321645,9951.0,128697.0
+lgbm_tweedie,F8,B,,2023,3,1b3e807d278e6b74a3fb,exact cache key + in-file metadata,2940.0,1.4724489795918367,True,mean,24789.53328339591,9951.0,128697.0
+lgbm_l1,F8,B,,2023,3,084c2cc874a910df94c6,exact cache key + in-file metadata,2940.0,1.6159863945578232,True,point,32541.0,9951.0,128697.0
+xgb_poisson,F8,B,,2023,3,e89c318eb5b5f52cfee9,exact cache key + in-file metadata,2940.0,1.5139455782312925,True,mean,26157.63490455335,9951.0,128697.0
+cat_poisson,F8,B,,2023,3,48d8c25ecbc236e3f625,exact cache key + in-file metadata,2940.0,1.6027210884353742,True,mean,29458.985520045273,9951.0,128697.0
+hurdle_lgbm,F8,B,,2023,3,c680d68c977d0054013b,exact cache key + in-file metadata,2940.0,1.4578231292517008,True,mean,24505.606436367318,9951.0,128697.0
+glm_poisson,F8,B,,2024,3,2eb5b835c86adcb58ea1,exact cache key + in-file metadata,3000.0,1.2496666666666667,True,mean,19190.4421872971,6760.0,59652.0
+glm_poisson_nbdisp,F8,B,,2024,3,1377b31402f06943c12d,exact cache key + in-file metadata,3000.0,1.1983333333333333,True,mean,19190.4421872971,6760.0,59652.0
+glm_spline,F8,B,,2024,3,9c1dd793cea751dec01b,exact cache key + in-file metadata,3000.0,1.2366666666666666,True,mean,18722.9324199492,6760.0,59652.0
+glm_nb,F8,B,,2024,3,e05d8646160338fe9d65,exact cache key + in-file metadata,3000.0,1.1803333333333332,True,mean,18424.507249606035,6760.0,59652.0
+glm_tweedie,F8,B,,2024,3,802995e539b131782948,exact cache key + in-file metadata,3000.0,1.236,True,mean,20723.84501445471,6760.0,59652.0
+lgbm_poisson,F8,B,,2024,3,7bf3bb46ed0d884e2ab1,exact cache key + in-file metadata,3000.0,1.3026666666666666,True,mean,21824.594634403795,6760.0,59652.0
+lgbm_tweedie,F8,B,,2024,3,80b2762e804ef61fc90a,exact cache key + in-file metadata,3000.0,1.2853333333333334,True,mean,21237.172374869053,6760.0,59652.0
+lgbm_l1,F8,B,,2024,3,314a270687366183cb6b,exact cache key + in-file metadata,3000.0,1.1366666666666667,True,point,15544.0,6760.0,59652.0
+xgb_poisson,F8,B,,2024,3,ff9a22393acbedbc3f26,exact cache key + in-file metadata,3000.0,1.2653333333333334,True,mean,19674.492206501593,6760.0,59652.0
+cat_poisson,F8,B,,2024,3,e491f8c53b30e74832b6,exact cache key + in-file metadata,3000.0,1.3033333333333332,True,mean,23913.6349919604,6760.0,59652.0
+hurdle_lgbm,F8,B,,2024,3,8c9376f971ec7f702b2e,exact cache key + in-file metadata,3000.0,1.2466666666666666,True,mean,19489.125174662615,6760.0,59652.0
+glm_poisson,F8,B,,2018,4,0b2e47eb484c3e7e8510,exact cache key + in-file metadata,2940.0,1.2670068027210883,True,mean,17042.951042777542,6619.0,56031.0
+glm_poisson_nbdisp,F8,B,,2018,4,1145188d7180283f58ba,exact cache key + in-file metadata,2940.0,1.1894557823129253,True,mean,17042.951042777542,6619.0,56031.0
+glm_spline,F8,B,,2018,4,2824433ae8d152b7fcbe,exact cache key + in-file metadata,2940.0,1.3112244897959184,True,mean,16630.546026253127,6619.0,56031.0
+glm_nb,F8,B,,2018,4,7815b5c2ae8a17bac493,exact cache key + in-file metadata,2940.0,1.2360544217687075,True,mean,19742.415300778615,6619.0,56031.0
+glm_tweedie,F8,B,,2018,4,b422e34a41932b0121ed,exact cache key + in-file metadata,2940.0,1.1547619047619047,True,mean,17214.662934915614,6619.0,56031.0
+lgbm_poisson,F8,B,,2018,4,264f3c0a253688c3bca6,exact cache key + in-file metadata,2940.0,1.4231292517006802,True,mean,25384.945311007963,6619.0,56031.0
+lgbm_tweedie,F8,B,,2018,4,6cd4aa4e93bd3901f14a,exact cache key + in-file metadata,2940.0,1.4275510204081632,True,mean,25769.22149092023,6619.0,56031.0
+lgbm_l1,F8,B,,2018,4,75c58867573c5865ab19,exact cache key + in-file metadata,2940.0,1.213265306122449,True,point,15567.0,6619.0,56031.0
+xgb_poisson,F8,B,,2018,4,226178c6cd1373fe0c2b,exact cache key + in-file metadata,2940.0,1.4278911564625851,True,mean,26703.69166188253,6619.0,56031.0
+cat_poisson,F8,B,,2018,4,f2fb51b95d75d3e44a9f,exact cache key + in-file metadata,2940.0,1.383673469387755,True,mean,24918.15145901314,6619.0,56031.0
+hurdle_lgbm,F8,B,,2018,4,1da2c44fa5b448fb6583,exact cache key + in-file metadata,2940.0,1.438095238095238,True,mean,26139.96075997452,6619.0,56031.0
+glm_poisson,F8,B,,2019,4,83c5ebaa076634bed584,exact cache key + in-file metadata,2880.0,1.8003472222222223,True,mean,34914.71340315134,9967.0,129807.0
+glm_poisson_nbdisp,F8,B,,2019,4,572eae8b0d725a8097cf,exact cache key + in-file metadata,2880.0,1.8576388888888888,True,mean,34914.71340315134,9967.0,129807.0
+glm_spline,F8,B,,2019,4,21759768c80651c7fae1,exact cache key + in-file metadata,2880.0,1.7885416666666667,True,mean,34817.957696740414,9967.0,129807.0
+glm_nb,F8,B,,2019,4,04b9c1d2d328cab86564,exact cache key + in-file metadata,2880.0,2.157638888888889,True,mean,50584.87939800263,9967.0,129807.0
+glm_tweedie,F8,B,,2019,4,2a0066b4676014fb39c0,exact cache key + in-file metadata,2880.0,2.2267361111111112,True,mean,43255.461104326445,9967.0,129807.0
+lgbm_poisson,F8,B,,2019,4,ff9d81451ee17d9aa4ac,exact cache key + in-file metadata,2880.0,1.6631944444444444,True,mean,30221.021229729864,9967.0,129807.0
+lgbm_tweedie,F8,B,,2019,4,48d777c9cd3199dd6524,exact cache key + in-file metadata,2880.0,1.66875,True,mean,30418.30015825434,9967.0,129807.0
+lgbm_l1,F8,B,,2019,4,91fd8e663a3461d30214,exact cache key + in-file metadata,2880.0,1.870486111111111,True,point,42539.0,9967.0,129807.0
+xgb_poisson,F8,B,,2019,4,0016f68d7ae7bcabf26e,exact cache key + in-file metadata,2880.0,1.7166666666666666,True,mean,32097.826803169723,9967.0,129807.0
+cat_poisson,F8,B,,2019,4,a3eee9ea789bf30605bf,exact cache key + in-file metadata,2880.0,1.770138888888889,True,mean,35313.78040910505,9967.0,129807.0
+hurdle_lgbm,F8,B,,2019,4,0edda4f01a81fefbb748,exact cache key + in-file metadata,2880.0,1.6861111111111111,True,mean,31478.159124473535,9967.0,129807.0
+glm_poisson,F8,B,,2020,4,0a91c1431f0c15f0d3cd,exact cache key + in-file metadata,2880.0,1.3572916666666666,True,mean,19290.56060423228,7668.0,69146.0
+glm_poisson_nbdisp,F8,B,,2020,4,afd5dafdfb51e2788dc8,exact cache key + in-file metadata,2880.0,1.2989583333333334,True,mean,19290.56060423228,7668.0,69146.0
+glm_spline,F8,B,,2020,4,fd2f48118f3be1744315,exact cache key + in-file metadata,2880.0,1.3378472222222222,True,mean,18471.501549312143,7668.0,69146.0
+glm_nb,F8,B,,2020,4,f76cf4a5307f20a82b9a,exact cache key + in-file metadata,2880.0,2.8243055555555556,True,mean,105678.50513858626,7668.0,69146.0
+glm_tweedie,F8,B,,2020,4,f3a41096cd68d48861ad,exact cache key + in-file metadata,2880.0,1.3190972222222221,True,mean,20266.2706642,7668.0,69146.0
+lgbm_poisson,F8,B,,2020,4,bb817f0e20feca35cef4,exact cache key + in-file metadata,2880.0,1.3569444444444445,True,mean,20672.443357662196,7668.0,69146.0
+lgbm_tweedie,F8,B,,2020,4,d9b64bae3fd48bfda5d4,exact cache key + in-file metadata,2880.0,1.3489583333333333,True,mean,19883.44722660625,7668.0,69146.0
+lgbm_l1,F8,B,,2020,4,2462990c73fca4716990,exact cache key + in-file metadata,2880.0,1.289236111111111,True,point,17269.0,7668.0,69146.0
+xgb_poisson,F8,B,,2020,4,f5666811b693f2cd986b,exact cache key + in-file metadata,2880.0,1.3815972222222221,True,mean,20986.580547105215,7668.0,69146.0
+cat_poisson,F8,B,,2020,4,8d058965dd4697ac365c,exact cache key + in-file metadata,2880.0,1.3753472222222223,True,mean,21523.375335702294,7668.0,69146.0
+hurdle_lgbm,F8,B,,2020,4,b4fa59c57fbed97c97c2,exact cache key + in-file metadata,2880.0,1.34375,True,mean,19502.87976103082,7668.0,69146.0
+glm_poisson,F8,B,,2021,4,c52b576f3c75159c001b,exact cache key + in-file metadata,2880.0,1.8649305555555555,True,mean,36561.73489251198,6529.0,52911.0
+glm_poisson_nbdisp,F8,B,,2021,4,71340a5a75600307ec9d,exact cache key + in-file metadata,2880.0,1.7458333333333333,True,mean,36561.73489251198,6529.0,52911.0
+glm_spline,F8,B,,2021,4,0f70c2092008d79f22df,exact cache key + in-file metadata,2880.0,1.3788194444444444,True,mean,20489.924923637587,6529.0,52911.0
+glm_nb,F8,B,,2021,4,877930450e6339872e42,exact cache key + in-file metadata,2880.0,1.7003472222222222,True,mean,34623.6623079709,6529.0,52911.0
+glm_tweedie,F8,B,,2021,4,4cf96c54727ece1fa60f,exact cache key + in-file metadata,2880.0,1.1878472222222223,True,mean,15927.4616929502,6529.0,52911.0
+lgbm_poisson,F8,B,,2021,4,9a98f6d6d38c865d247f,exact cache key + in-file metadata,2880.0,1.6510416666666667,True,mean,29952.724401117837,6529.0,52911.0
+lgbm_tweedie,F8,B,,2021,4,37acb9162f967440febd,exact cache key + in-file metadata,2880.0,1.7163194444444445,True,mean,33375.09242225214,6529.0,52911.0
+lgbm_l1,F8,B,,2021,4,e617d84a1be6ac504eb2,exact cache key + in-file metadata,2880.0,1.2972222222222223,True,point,16288.0,6529.0,52911.0
+xgb_poisson,F8,B,,2021,4,0a9ac06f87f43fd068af,exact cache key + in-file metadata,2880.0,1.5944444444444446,True,mean,27797.225372539775,6529.0,52911.0
+cat_poisson,F8,B,,2021,4,2ef4f8094f41bdf2918c,exact cache key + in-file metadata,2880.0,1.6253472222222223,True,mean,28974.095726341424,6529.0,52911.0
+hurdle_lgbm,F8,B,,2021,4,d1af7d99d4b79419dd2f,exact cache key + in-file metadata,2880.0,1.64375,True,mean,31020.5272963799,6529.0,52911.0
+glm_poisson,F8,B,,2022,4,7fbbc21716a8667ea72b,exact cache key + in-file metadata,2880.0,1.6600694444444444,True,mean,30710.884540837113,10013.0,114635.0
+glm_poisson_nbdisp,F8,B,,2022,4,9550fbb67e5d98268615,exact cache key + in-file metadata,2880.0,1.696875,True,mean,30710.884540837113,10013.0,114635.0
+glm_spline,F8,B,,2022,4,fd7288c7d42a0e481e72,exact cache key + in-file metadata,2880.0,1.675,True,mean,31912.074041975313,10013.0,114635.0
+glm_nb,F8,B,,2022,4,83c2b21178fcb5c7b318,exact cache key + in-file metadata,2880.0,1.7284722222222222,True,mean,34405.34037072145,10013.0,114635.0
+glm_tweedie,F8,B,,2022,4,ba769f3491bd2ebede19,exact cache key + in-file metadata,2880.0,2.042361111111111,True,mean,38919.2066659085,10013.0,114635.0
+lgbm_poisson,F8,B,,2022,4,e521b755324545446dcf,exact cache key + in-file metadata,2880.0,1.7451388888888888,True,mean,35604.366835374334,10013.0,114635.0
+lgbm_tweedie,F8,B,,2022,4,815bb61b303930ca19dd,exact cache key + in-file metadata,2880.0,1.7868055555555555,True,mean,37144.067534586284,10013.0,114635.0
+lgbm_l1,F8,B,,2022,4,c788c027f3a8c8e7a79f,exact cache key + in-file metadata,2880.0,1.7180555555555554,True,point,37484.0,10013.0,114635.0
+xgb_poisson,F8,B,,2022,4,932ccfc25360b7652849,exact cache key + in-file metadata,2880.0,1.7826388888888889,True,mean,37394.305543395014,10013.0,114635.0
+cat_poisson,F8,B,,2022,4,6cf242d163ff8da7617e,exact cache key + in-file metadata,2880.0,1.6902777777777778,True,mean,33674.983891403346,10013.0,114635.0
+hurdle_lgbm,F8,B,,2022,4,f2b4ee1ecb7b7610df73,exact cache key + in-file metadata,2880.0,1.7253472222222221,True,mean,35378.393796744946,10013.0,114635.0
+glm_poisson,F8,B,,2023,4,23a7a925a07513b6e1e3,exact cache key + in-file metadata,2880.0,1.5729166666666667,True,mean,28572.313337651554,9949.0,128695.0
+glm_poisson_nbdisp,F8,B,,2023,4,5e95269a12ed2338803b,exact cache key + in-file metadata,2880.0,1.609375,True,mean,28572.313337651554,9949.0,128695.0
+glm_spline,F8,B,,2023,4,369f7b9cc7556f91ea1d,exact cache key + in-file metadata,2880.0,1.56875,True,mean,28681.745101156368,9949.0,128695.0
+glm_nb,F8,B,,2023,4,b62b09973c501b1724b3,exact cache key + in-file metadata,2880.0,1.5336805555555555,True,mean,25979.785438586965,9949.0,128695.0
+glm_tweedie,F8,B,,2023,4,162d7866c2c57d02f515,exact cache key + in-file metadata,2880.0,1.6024305555555556,True,mean,28159.257038861037,9949.0,128695.0
+lgbm_poisson,F8,B,,2023,4,578856e960caa016e107,exact cache key + in-file metadata,2880.0,1.6635416666666667,True,mean,30413.839341590556,9949.0,128695.0
+lgbm_tweedie,F8,B,,2023,4,cdf5ddf76137fc217f1f,exact cache key + in-file metadata,2880.0,1.7097222222222221,True,mean,31766.778392158973,9949.0,128695.0
+lgbm_l1,F8,B,,2023,4,c44793e262b9c9bc1748,exact cache key + in-file metadata,2880.0,1.7819444444444446,True,point,39908.0,9949.0,128695.0
+xgb_poisson,F8,B,,2023,4,3a7ad5421382ac1a316b,exact cache key + in-file metadata,2880.0,1.6944444444444444,True,mean,31570.2711451863,9949.0,128695.0
+cat_poisson,F8,B,,2023,4,81b912ef6c3442076089,exact cache key + in-file metadata,2880.0,1.8732638888888888,True,mean,38492.8836028213,9949.0,128695.0
+hurdle_lgbm,F8,B,,2023,4,6ff5dbc5919d5878a959,exact cache key + in-file metadata,2880.0,1.738888888888889,True,mean,32987.89029866738,9949.0,128695.0
+glm_poisson,F8,B,,2024,4,01548bc35e2712c7f0de,exact cache key + in-file metadata,2940.0,1.3037414965986394,True,mean,18570.26745506939,6758.0,59650.0
+glm_poisson_nbdisp,F8,B,,2024,4,f1fc6fe93c66995632e0,exact cache key + in-file metadata,2940.0,1.2180272108843537,True,mean,18570.26745506939,6758.0,59650.0
+glm_spline,F8,B,,2024,4,39a99999a59ee7834a48,exact cache key + in-file metadata,2940.0,1.286734693877551,True,mean,18194.560156206262,6758.0,59650.0
+glm_nb,F8,B,,2024,4,783649a208b785541fd9,exact cache key + in-file metadata,2940.0,1.2187074829931972,True,mean,19215.180685384417,6758.0,59650.0
+glm_tweedie,F8,B,,2024,4,7dc3da96b6e7d1123d45,exact cache key + in-file metadata,2940.0,1.276190476190476,True,mean,21118.90293315326,6758.0,59650.0
+lgbm_poisson,F8,B,,2024,4,1f67c272f5053e85d3f3,exact cache key + in-file metadata,2940.0,1.3527210884353742,True,mean,19719.454049111715,6758.0,59650.0
+lgbm_tweedie,F8,B,,2024,4,632af04a9373cae6b44a,exact cache key + in-file metadata,2940.0,1.3687074829931973,True,mean,20676.937676190595,6758.0,59650.0
+lgbm_l1,F8,B,,2024,4,16e9247da7402e247b05,exact cache key + in-file metadata,2940.0,1.2047619047619047,True,point,15390.0,6758.0,59650.0
+xgb_poisson,F8,B,,2024,4,06539328b349b4119536,exact cache key + in-file metadata,2940.0,1.3122448979591836,True,mean,18728.004809807255,6758.0,59650.0
+cat_poisson,F8,B,,2024,4,fec1054679aab405f941,exact cache key + in-file metadata,2940.0,1.3170068027210884,True,mean,19594.978495153744,6758.0,59650.0
+hurdle_lgbm,F8,B,,2024,4,9a4f8b0e9cfdf301d7f6,exact cache key + in-file metadata,2940.0,1.3357142857142856,True,mean,19456.096662897093,6758.0,59650.0
+glm_poisson,F3,A,,2018,2,85d89dfcc1010ed74cfd,exact cache key + in-file metadata,3060.0,0.9915032679738562,True,mean,11535.69128787737,6620.0,56032.0
+glm_poisson_nbdisp,F3,A,,2018,2,1bc053f1a42cd6b62abf,exact cache key + in-file metadata,3060.0,0.9911764705882353,True,mean,11535.69128787737,6620.0,56032.0
+glm_spline,F3,A,,2018,2,e26592f466f26ec6f060,exact cache key + in-file metadata,3060.0,0.9941176470588236,True,mean,11290.24173289798,6620.0,56032.0
+glm_nb,F3,A,,2018,2,1f9942aefcc1bd5d3b7b,exact cache key + in-file metadata,3060.0,0.9526143790849673,True,mean,11294.790168459687,6620.0,56032.0
+glm_tweedie,F3,A,,2018,2,8094311e257a8a63d126,exact cache key + in-file metadata,3060.0,1.0218954248366012,True,mean,12590.814786698496,6620.0,56032.0
+lgbm_poisson,F3,A,,2018,2,be156119389e7e053e57,exact cache key + in-file metadata,3060.0,0.961437908496732,True,mean,11700.985365920435,6620.0,56032.0
+lgbm_tweedie,F3,A,,2018,2,b1d7b052dd3fd11a3933,exact cache key + in-file metadata,3060.0,0.9637254901960784,True,mean,11595.395311466205,6620.0,56032.0
+lgbm_l1,F3,A,,2018,2,627b8666becee766bfbd,exact cache key + in-file metadata,3060.0,1.0366013071895426,True,point,12778.0,6620.0,56032.0
+xgb_poisson,F3,A,,2018,2,897c8d08c8624de4c705,exact cache key + in-file metadata,3060.0,1.0062091503267974,True,mean,12778.114551912064,6620.0,56032.0
+cat_poisson,F3,A,,2018,2,da0f49a51629133ab8ca,exact cache key + in-file metadata,3060.0,1.018954248366013,True,mean,13155.681043274883,6620.0,56032.0
+hurdle_lgbm,F3,A,,2018,2,d97c7e6da3ba9304f3e7,exact cache key + in-file metadata,3060.0,1.0173202614379084,True,mean,12580.311875792377,6620.0,56032.0
+glm_poisson,F3,A,,2019,2,e3984896ec1ea4641941,exact cache key + in-file metadata,3000.0,1.295,True,mean,20249.73768746812,9967.0,129807.0
+glm_poisson_nbdisp,F3,A,,2019,2,494ab17bb01dd524043f,exact cache key + in-file metadata,3000.0,1.286,True,mean,20249.73768746812,9967.0,129807.0
+glm_spline,F3,A,,2019,2,d03157f21b23de144227,exact cache key + in-file metadata,3000.0,1.264,True,mean,19371.768989772674,9967.0,129807.0
+glm_nb,F3,A,,2019,2,03b9d1dd314720f118a1,exact cache key + in-file metadata,3000.0,1.4246666666666667,True,mean,28275.973558303172,9967.0,129807.0
+glm_tweedie,F3,A,,2019,2,982b2facfa4aa34ab496,exact cache key + in-file metadata,3000.0,1.3003333333333333,True,mean,21185.222935175592,9967.0,129807.0
+lgbm_poisson,F3,A,,2019,2,7ee8199776b1d74bc3a3,exact cache key + in-file metadata,3000.0,1.238,True,mean,18558.69291679987,9967.0,129807.0
+lgbm_tweedie,F3,A,,2019,2,d0139eb88dd7741b7eca,exact cache key + in-file metadata,3000.0,1.2723333333333333,True,mean,19544.019429646618,9967.0,129807.0
+lgbm_l1,F3,A,,2019,2,41d946ca0e7af6e7a831,exact cache key + in-file metadata,3000.0,1.3343333333333334,True,point,23055.0,9967.0,129807.0
+xgb_poisson,F3,A,,2019,2,c361515dcfad42f20300,exact cache key + in-file metadata,3000.0,1.366,True,mean,22455.01717518828,9967.0,129807.0
+cat_poisson,F3,A,,2019,2,5e61de526e97e1b108a9,exact cache key + in-file metadata,3000.0,1.2926666666666666,True,mean,20961.115538462524,9967.0,129807.0
+hurdle_lgbm,F3,A,,2019,2,95aad069ac51b92a0833,exact cache key + in-file metadata,3000.0,1.2426666666666666,True,mean,18896.558493543645,9967.0,129807.0
+glm_poisson,F3,A,,2020,2,7276fe6bf036b5a6fc55,exact cache key + in-file metadata,3000.0,1.158,True,mean,15391.038419724759,7668.0,69146.0
+glm_poisson_nbdisp,F3,A,,2020,2,d92856399f1f612b374c,exact cache key + in-file metadata,3000.0,1.1606666666666667,True,mean,15391.038419724759,7668.0,69146.0
+glm_spline,F3,A,,2020,2,3779cdb0983a5c522b18,exact cache key + in-file metadata,3000.0,1.1386666666666667,True,mean,14774.22530272976,7668.0,69146.0
+glm_nb,F3,A,,2020,2,dc084c8d0e07a542dc7c,exact cache key + in-file metadata,3000.0,1.4083333333333334,True,mean,26396.018862490764,7668.0,69146.0
+glm_tweedie,F3,A,,2020,2,a5659f8c8227d9ec1814,exact cache key + in-file metadata,3000.0,1.2246666666666666,True,mean,17044.69987662717,7668.0,69146.0
+lgbm_poisson,F3,A,,2020,2,b55d04aa9c2a1273900f,exact cache key + in-file metadata,3000.0,1.1183333333333334,True,mean,14343.365833191157,7668.0,69146.0
+lgbm_tweedie,F3,A,,2020,2,c11c5116a400bd1066c8,exact cache key + in-file metadata,3000.0,1.1366666666666667,True,mean,14946.219773323062,7668.0,69146.0
+lgbm_l1,F3,A,,2020,2,41a01841deca81993826,exact cache key + in-file metadata,3000.0,1.1786666666666668,True,point,15052.0,7668.0,69146.0
+xgb_poisson,F3,A,,2020,2,6a1939a431787b0c43f5,exact cache key + in-file metadata,3000.0,1.0996666666666666,True,mean,13903.752784668333,7668.0,69146.0
+cat_poisson,F3,A,,2020,2,3bb8704fed4ce7418148,exact cache key + in-file metadata,3000.0,1.1436666666666666,True,mean,14267.58795657092,7668.0,69146.0
+hurdle_lgbm,F3,A,,2020,2,47e014bde5f2b71b7dcc,exact cache key + in-file metadata,3000.0,1.142,True,mean,14442.536836803385,7668.0,69146.0
+glm_poisson,F3,A,,2021,2,476df485289865c69a96,exact cache key + in-file metadata,3000.0,0.9656666666666667,True,mean,10244.024287717917,6530.0,52912.0
+glm_poisson_nbdisp,F3,A,,2021,2,122528f180046ca07430,exact cache key + in-file metadata,3000.0,0.9556666666666667,True,mean,10244.024287717917,6530.0,52912.0
+glm_spline,F3,A,,2021,2,866595a7c49902fa5edf,exact cache key + in-file metadata,3000.0,0.9476666666666667,True,mean,10111.042327080573,6530.0,52912.0
+glm_nb,F3,A,,2021,2,dfaa2103c3d74cd6f172,exact cache key + in-file metadata,3000.0,0.9556666666666667,True,mean,10448.348601862166,6530.0,52912.0
+glm_tweedie,F3,A,,2021,2,88a23586e04d3e9627b1,exact cache key + in-file metadata,3000.0,0.96,True,mean,10411.598492079174,6530.0,52912.0
+lgbm_poisson,F3,A,,2021,2,a1cc8512bda3c2f1fcd3,exact cache key + in-file metadata,3000.0,1.001,True,mean,11318.026738355471,6530.0,52912.0
+lgbm_tweedie,F3,A,,2021,2,9b58effb1675bb81b464,exact cache key + in-file metadata,3000.0,1.0123333333333333,True,mean,11526.641014429108,6530.0,52912.0
+lgbm_l1,F3,A,,2021,2,816e6bb665e621a022fe,exact cache key + in-file metadata,3000.0,1.0186666666666666,True,point,11696.0,6530.0,52912.0
+xgb_poisson,F3,A,,2021,2,3070b114aefd63225c90,exact cache key + in-file metadata,3000.0,1.0296666666666667,True,mean,11739.74990583292,6530.0,52912.0
+cat_poisson,F3,A,,2021,2,01f7ff93d7a4ce7a0f6d,exact cache key + in-file metadata,3000.0,0.952,True,mean,10145.246629714346,6530.0,52912.0
+hurdle_lgbm,F3,A,,2021,2,f67e035bf740e7e3b6fb,exact cache key + in-file metadata,3000.0,1.0133333333333334,True,mean,11579.159462749667,6530.0,52912.0
+glm_poisson,F3,A,,2022,2,539802d41e929d477bbe,exact cache key + in-file metadata,3000.0,1.1963333333333332,True,mean,15867.276492335814,10013.0,114635.0
+glm_poisson_nbdisp,F3,A,,2022,2,96f988c69d2535e3c4ba,exact cache key + in-file metadata,3000.0,1.2206666666666666,True,mean,15867.276492335814,10013.0,114635.0
+glm_spline,F3,A,,2022,2,f6d450c9e5507f79b573,exact cache key + in-file metadata,3000.0,1.2196666666666667,True,mean,16483.651176578023,10013.0,114635.0
+glm_nb,F3,A,,2022,2,703005f1818775a23c4a,exact cache key + in-file metadata,3000.0,1.238,True,mean,16535.750534842773,10013.0,114635.0
+glm_tweedie,F3,A,,2022,2,9e865386fe52bd671615,exact cache key + in-file metadata,3000.0,1.1896666666666667,True,mean,15032.274631083787,10013.0,114635.0
+lgbm_poisson,F3,A,,2022,2,1e6ea0b813b3acc4727a,exact cache key + in-file metadata,3000.0,1.3626666666666667,True,mean,23364.813130895942,10013.0,114635.0
+lgbm_tweedie,F3,A,,2022,2,6ccc2271551f6183274f,exact cache key + in-file metadata,3000.0,1.381,True,mean,23872.441418703722,10013.0,114635.0
+lgbm_l1,F3,A,,2022,2,88ca6d7fb20f7f412f5e,exact cache key + in-file metadata,3000.0,1.359,True,point,24087.0,10013.0,114635.0
+xgb_poisson,F3,A,,2022,2,b62bd17d5f91168ba5ca,exact cache key + in-file metadata,3000.0,1.332,True,mean,21080.361376961257,10013.0,114635.0
+cat_poisson,F3,A,,2022,2,f52b9408c74ea8b6a1ed,exact cache key + in-file metadata,3000.0,1.378,True,mean,22659.961881744926,10013.0,114635.0
+hurdle_lgbm,F3,A,,2022,2,df741cbefee3a1b0c5b4,exact cache key + in-file metadata,3000.0,1.3496666666666666,True,mean,22698.614804572542,10013.0,114635.0
+glm_poisson,F3,A,,2023,2,aea4e0279d27a612fbb1,exact cache key + in-file metadata,3000.0,1.1443333333333334,True,mean,16320.950296551904,9954.0,128702.0
+glm_poisson_nbdisp,F3,A,,2023,2,8ef5099246095f0c7449,exact cache key + in-file metadata,3000.0,1.1446666666666667,True,mean,16320.950296551904,9954.0,128702.0
+glm_spline,F3,A,,2023,2,5d6a7a8e4e8f024286c6,exact cache key + in-file metadata,3000.0,1.1376666666666666,True,mean,15941.4848511689,9954.0,128702.0
+glm_nb,F3,A,,2023,2,6b83844912a3a9ef63d7,exact cache key + in-file metadata,3000.0,1.1733333333333333,True,mean,17318.039324094465,9954.0,128702.0
+glm_tweedie,F3,A,,2023,2,8277a4f6f04e7967dddf,exact cache key + in-file metadata,3000.0,1.1533333333333333,True,mean,17069.7672063536,9954.0,128702.0
+lgbm_poisson,F3,A,,2023,2,b157bb78978ee85053a3,exact cache key + in-file metadata,3000.0,1.0633333333333332,True,mean,13783.750536685538,9954.0,128702.0
+lgbm_tweedie,F3,A,,2023,2,3479ff4bc31963936dca,exact cache key + in-file metadata,3000.0,1.0693333333333332,True,mean,13920.805890206857,9954.0,128702.0
+lgbm_l1,F3,A,,2023,2,df13892cc433bb4e8b38,exact cache key + in-file metadata,3000.0,1.2286666666666666,True,point,20536.0,9954.0,128702.0
+xgb_poisson,F3,A,,2023,2,2138e557bc764b75ce45,exact cache key + in-file metadata,3000.0,1.0636666666666668,True,mean,13738.028828599117,9954.0,128702.0
+cat_poisson,F3,A,,2023,2,7b7a951986498a07ab05,exact cache key + in-file metadata,3000.0,1.134,True,mean,15180.158249351913,9954.0,128702.0
+hurdle_lgbm,F3,A,,2023,2,655040c65564f1635550,exact cache key + in-file metadata,3000.0,1.0756666666666668,True,mean,13914.589745705416,9954.0,128702.0
+glm_poisson,F3,A,,2024,2,e97d2ffc33887e8eb7da,exact cache key + in-file metadata,3060.0,0.884313725490196,True,mean,9248.914810227861,6760.0,59652.0
+glm_poisson_nbdisp,F3,A,,2024,2,146793f678d30693aa2f,exact cache key + in-file metadata,3060.0,0.8748366013071895,True,mean,9248.914810227861,6760.0,59652.0
+glm_spline,F3,A,,2024,2,f650455b8cc8bc5eb559,exact cache key + in-file metadata,3060.0,0.8803921568627451,True,mean,9151.551711368698,6760.0,59652.0
+glm_nb,F3,A,,2024,2,d8c68397371b4d7131f9,exact cache key + in-file metadata,3060.0,0.8771241830065359,True,mean,9089.664732255918,6760.0,59652.0
+glm_tweedie,F3,A,,2024,2,9a4006d4949d9da5fd47,exact cache key + in-file metadata,3060.0,0.8875816993464052,True,mean,9521.44994178465,6760.0,59652.0
+lgbm_poisson,F3,A,,2024,2,a71dd06d6c75e74dedf0,exact cache key + in-file metadata,3060.0,0.8803921568627451,True,mean,9487.748598072452,6760.0,59652.0
+lgbm_tweedie,F3,A,,2024,2,0fd49f71a9cce3bcb3aa,exact cache key + in-file metadata,3060.0,0.8751633986928105,True,mean,9546.708114391207,6760.0,59652.0
+lgbm_l1,F3,A,,2024,2,4befe090cdd81e6dad19,exact cache key + in-file metadata,3060.0,0.9094771241830065,True,point,10283.0,6760.0,59652.0
+xgb_poisson,F3,A,,2024,2,8597a985c5212d3505c9,exact cache key + in-file metadata,3060.0,0.8820261437908496,True,mean,9571.519034990448,6760.0,59652.0
+cat_poisson,F3,A,,2024,2,23725c304eae315d212c,exact cache key + in-file metadata,3060.0,0.8993464052287582,True,mean,10112.227645929219,6760.0,59652.0
+hurdle_lgbm,F3,A,,2024,2,31c7e71291279d7d0e75,exact cache key + in-file metadata,3060.0,0.8875816993464052,True,mean,9421.12866396498,6760.0,59652.0
+glm_poisson,F3,A,,2018,3,8231a605e790e869a06c,exact cache key + in-file metadata,3000.0,1.0086666666666666,True,mean,11450.414374035163,6620.0,56032.0
+glm_poisson_nbdisp,F3,A,,2018,3,ed54c6fe9455472dda1f,exact cache key + in-file metadata,3000.0,1.001,True,mean,11450.414374035163,6620.0,56032.0
+glm_spline,F3,A,,2018,3,d1f554df35e411d4b91e,exact cache key + in-file metadata,3000.0,0.994,True,mean,11016.09267821748,6620.0,56032.0
+glm_nb,F3,A,,2018,3,77a43803770b031e3c02,exact cache key + in-file metadata,3000.0,1.2713333333333334,True,mean,19758.267480529656,6620.0,56032.0
+glm_tweedie,F3,A,,2018,3,c143e8e1ca11c243e11a,exact cache key + in-file metadata,3000.0,1.0056666666666667,True,mean,11918.463240560148,6620.0,56032.0
+lgbm_poisson,F3,A,,2018,3,6df2cb8eb7592a700953,exact cache key + in-file metadata,3000.0,1.0683333333333334,True,mean,14643.280880131882,6620.0,56032.0
+lgbm_tweedie,F3,A,,2018,3,504d714748970e4a8c05,exact cache key + in-file metadata,3000.0,1.0873333333333333,True,mean,14812.779952942637,6620.0,56032.0
+lgbm_l1,F3,A,,2018,3,abfadabe14725551efd7,exact cache key + in-file metadata,3000.0,1.0603333333333333,True,point,13127.0,6620.0,56032.0
+xgb_poisson,F3,A,,2018,3,a3d867643d3c705df6aa,exact cache key + in-file metadata,3000.0,1.0566666666666666,True,mean,13991.735090082444,6620.0,56032.0
+cat_poisson,F3,A,,2018,3,5fdd938d4bdbfd5876b1,exact cache key + in-file metadata,3000.0,1.1883333333333332,True,mean,16644.246313890548,6620.0,56032.0
+hurdle_lgbm,F3,A,,2018,3,5ad3322a66434805fc66,exact cache key + in-file metadata,3000.0,1.1206666666666667,True,mean,15156.66604836436,6620.0,56032.0
+glm_poisson,F3,A,,2019,3,df68f22900b25ac4d0fb,exact cache key + in-file metadata,2940.0,1.4884353741496599,True,mean,25942.09691416195,9967.0,129807.0
+glm_poisson_nbdisp,F3,A,,2019,3,9d9f04d4954d8456caa9,exact cache key + in-file metadata,2940.0,1.489455782312925,True,mean,25942.09691416195,9967.0,129807.0
+glm_spline,F3,A,,2019,3,3a37a015be1d3f26edb6,exact cache key + in-file metadata,2940.0,1.4761904761904763,True,mean,25358.04850007708,9967.0,129807.0
+glm_nb,F3,A,,2019,3,a12c563f183c10ffcd3e,exact cache key + in-file metadata,2940.0,1.6064625850340135,True,mean,30643.970675856363,9967.0,129807.0
+glm_tweedie,F3,A,,2019,3,7f295ef808a16cf34642,exact cache key + in-file metadata,2940.0,1.4653061224489796,True,mean,25195.897751207965,9967.0,129807.0
+lgbm_poisson,F3,A,,2019,3,22cd6111d05cd111d479,exact cache key + in-file metadata,2940.0,1.3680272108843536,True,mean,21548.29013979782,9967.0,129807.0
+lgbm_tweedie,F3,A,,2019,3,846fe1a399ecdf51273b,exact cache key + in-file metadata,2940.0,1.3884353741496598,True,mean,22206.848682901993,9967.0,129807.0
+lgbm_l1,F3,A,,2019,3,6c822494a570006ea9fa,exact cache key + in-file metadata,2940.0,1.5391156462585034,True,point,29707.0,9967.0,129807.0
+xgb_poisson,F3,A,,2019,3,fd131c0f11f07cbdda90,exact cache key + in-file metadata,2940.0,1.3891156462585035,True,mean,22376.50803408582,9967.0,129807.0
+cat_poisson,F3,A,,2019,3,a4764da52256cb75b4dc,exact cache key + in-file metadata,2940.0,1.485374149659864,True,mean,25426.75621030601,9967.0,129807.0
+hurdle_lgbm,F3,A,,2019,3,34a2e76428f9e8022b76,exact cache key + in-file metadata,2940.0,1.3653061224489795,True,mean,21336.19350658554,9967.0,129807.0
+glm_poisson,F3,A,,2020,3,505e8a44b8d3ac503de7,exact cache key + in-file metadata,2940.0,1.0571428571428572,True,mean,12287.814066291983,7668.0,69146.0
+glm_poisson_nbdisp,F3,A,,2020,3,9ed64bddc9d43607993a,exact cache key + in-file metadata,2940.0,1.0585034013605443,True,mean,12287.814066291983,7668.0,69146.0
+glm_spline,F3,A,,2020,3,0f3d6e0229d4f200623b,exact cache key + in-file metadata,2940.0,1.0486394557823129,True,mean,11777.770281929872,7668.0,69146.0
+glm_nb,F3,A,,2020,3,9332d5c22c12f6947279,exact cache key + in-file metadata,2940.0,1.0510204081632653,True,mean,11835.95096448062,7668.0,69146.0
+glm_tweedie,F3,A,,2020,3,f1c1aa9e71f7eb682a40,exact cache key + in-file metadata,2940.0,1.2343537414965986,True,mean,15993.464676643815,7668.0,69146.0
+lgbm_poisson,F3,A,,2020,3,1dc271c32229edc47418,exact cache key + in-file metadata,2940.0,1.0421768707482992,True,mean,12131.83350373886,7668.0,69146.0
+lgbm_tweedie,F3,A,,2020,3,d3e232811a9086f4dc03,exact cache key + in-file metadata,2940.0,1.0605442176870747,True,mean,12305.562926034512,7668.0,69146.0
+lgbm_l1,F3,A,,2020,3,067e7aa6a98a61e9c2ec,exact cache key + in-file metadata,2940.0,1.125170068027211,True,point,13960.0,7668.0,69146.0
+xgb_poisson,F3,A,,2020,3,d3036eefc643441a5b68,exact cache key + in-file metadata,2940.0,1.0534013605442176,True,mean,12066.167581560734,7668.0,69146.0
+cat_poisson,F3,A,,2020,3,e85188a1ce899c8281e1,exact cache key + in-file metadata,2940.0,1.0666666666666667,True,mean,12356.4902996132,7668.0,69146.0
+hurdle_lgbm,F3,A,,2020,3,6b11d3897b7508f0066c,exact cache key + in-file metadata,2940.0,1.051700680272109,True,mean,11850.265993195946,7668.0,69146.0
+glm_poisson,F3,A,,2021,3,f8e4d80b11a8964c6b97,exact cache key + in-file metadata,2940.0,1.0523809523809524,True,mean,11863.190623510507,6530.0,52912.0
+glm_poisson_nbdisp,F3,A,,2021,3,fd30435edfefe8cd9c82,exact cache key + in-file metadata,2940.0,1.0418367346938775,True,mean,11863.190623510507,6530.0,52912.0
+glm_spline,F3,A,,2021,3,7a59ab6316a6b16bf293,exact cache key + in-file metadata,2940.0,1.0207482993197279,True,mean,11415.895926431846,6530.0,52912.0
+glm_nb,F3,A,,2021,3,08fc17d421abc6f655a1,exact cache key + in-file metadata,2940.0,1.0346938775510204,True,mean,12075.77109637783,6530.0,52912.0
+glm_tweedie,F3,A,,2021,3,c02d5e7cfc3143f4ec4b,exact cache key + in-file metadata,2940.0,1.0020408163265306,True,mean,11359.736135162591,6530.0,52912.0
+lgbm_poisson,F3,A,,2021,3,1da3c81c4ea17239fbb0,exact cache key + in-file metadata,2940.0,1.1319727891156464,True,mean,14125.919796515118,6530.0,52912.0
+lgbm_tweedie,F3,A,,2021,3,d0672b0764088c4d5cd8,exact cache key + in-file metadata,2940.0,1.1551020408163266,True,mean,14881.22873694967,6530.0,52912.0
+lgbm_l1,F3,A,,2021,3,d4740ca043ec9dfd2e95,exact cache key + in-file metadata,2940.0,1.0996598639455781,True,point,13053.0,6530.0,52912.0
+xgb_poisson,F3,A,,2021,3,fef9dd0fe554ab1cfcdf,exact cache key + in-file metadata,2940.0,1.1268707482993197,True,mean,13697.92775982886,6530.0,52912.0
+cat_poisson,F3,A,,2021,3,c0b2f59c59c0e7367f06,exact cache key + in-file metadata,2940.0,1.1261904761904762,True,mean,14271.363219644376,6530.0,52912.0
+hurdle_lgbm,F3,A,,2021,3,2cfe9be64d6ea64822d2,exact cache key + in-file metadata,2940.0,1.1081632653061224,True,mean,13593.18080316065,6530.0,52912.0
+glm_poisson,F3,A,,2022,3,96ceb2c2b306d613e8df,exact cache key + in-file metadata,2940.0,1.3149659863945578,True,mean,18018.489810885676,10013.0,114635.0
+glm_poisson_nbdisp,F3,A,,2022,3,c21753c7c9a769873bcf,exact cache key + in-file metadata,2940.0,1.3346938775510204,True,mean,18018.489810885676,10013.0,114635.0
+glm_spline,F3,A,,2022,3,f7ab777b880da8ffc5c0,exact cache key + in-file metadata,2940.0,1.320748299319728,True,mean,18512.242021895592,10013.0,114635.0
+glm_nb,F3,A,,2022,3,5a6a773271219eafccb0,exact cache key + in-file metadata,2940.0,1.2826530612244897,True,mean,17277.76932477197,10013.0,114635.0
+glm_tweedie,F3,A,,2022,3,77fbbbedb7f8dc8bbf81,exact cache key + in-file metadata,2940.0,1.2714285714285714,True,mean,16604.788877446284,10013.0,114635.0
+lgbm_poisson,F3,A,,2022,3,ac41097668bfa2bb0bb7,exact cache key + in-file metadata,2940.0,1.4469387755102041,True,mean,25024.957164890024,10013.0,114635.0
+lgbm_tweedie,F3,A,,2022,3,97fde296b0fdff22344d,exact cache key + in-file metadata,2940.0,1.4445578231292517,True,mean,24701.997128989053,10013.0,114635.0
+lgbm_l1,F3,A,,2022,3,a0f87526d3c7a53ac98c,exact cache key + in-file metadata,2940.0,1.424829931972789,True,point,24857.0,10013.0,114635.0
+xgb_poisson,F3,A,,2022,3,010df014e3154730e016,exact cache key + in-file metadata,2940.0,1.4435374149659863,True,mean,24614.16983758378,10013.0,114635.0
+cat_poisson,F3,A,,2022,3,41f6473ba13e86c68d6f,exact cache key + in-file metadata,2940.0,1.4557823129251701,True,mean,24966.72054473005,10013.0,114635.0
+hurdle_lgbm,F3,A,,2022,3,873c789bd19f746d1335,exact cache key + in-file metadata,2940.0,1.4377551020408164,True,mean,25567.89555575803,10013.0,114635.0
+glm_poisson,F3,A,,2023,3,b9cc81bc22c8d65eb812,exact cache key + in-file metadata,2940.0,1.1391156462585035,True,mean,15489.901048662043,9951.0,128697.0
+glm_poisson_nbdisp,F3,A,,2023,3,03a35b11d3414286bab9,exact cache key + in-file metadata,2940.0,1.1394557823129252,True,mean,15489.901048662043,9951.0,128697.0
+glm_spline,F3,A,,2023,3,0bdc91594c05091d692f,exact cache key + in-file metadata,2940.0,1.1411564625850341,True,mean,15717.952436546988,9951.0,128697.0
+glm_nb,F3,A,,2023,3,43f240977824e1102f2f,exact cache key + in-file metadata,2940.0,1.1435374149659865,True,mean,16037.982175289239,9951.0,128697.0
+glm_tweedie,F3,A,,2023,3,c2b62ec9d3046115b7cd,exact cache key + in-file metadata,2940.0,1.1496598639455782,True,mean,16644.584200191657,9951.0,128697.0
+lgbm_poisson,F3,A,,2023,3,0e08c6d513f945e807f8,exact cache key + in-file metadata,2940.0,1.1010204081632653,True,mean,14107.803195685508,9951.0,128697.0
+lgbm_tweedie,F3,A,,2023,3,ba02b7509737ef195b0f,exact cache key + in-file metadata,2940.0,1.083673469387755,True,mean,13634.107448178323,9951.0,128697.0
+lgbm_l1,F3,A,,2023,3,9036d7254233554017cf,exact cache key + in-file metadata,2940.0,1.202721088435374,True,point,18222.0,9951.0,128697.0
+xgb_poisson,F3,A,,2023,3,44eda575b8d4fd9f30d3,exact cache key + in-file metadata,2940.0,1.1731292517006802,True,mean,16381.365302611572,9951.0,128697.0
+cat_poisson,F3,A,,2023,3,4e6d19d65e06100081c9,exact cache key + in-file metadata,2940.0,1.142517006802721,True,mean,15214.514095767483,9951.0,128697.0
+hurdle_lgbm,F3,A,,2023,3,f0ee4277d420297ae24b,exact cache key + in-file metadata,2940.0,1.1027210884353742,True,mean,14107.81054610802,9951.0,128697.0
+glm_poisson,F3,A,,2024,3,dba10d887912fdbd3d4e,exact cache key + in-file metadata,3000.0,0.9536666666666667,True,mean,10147.851033680572,6760.0,59652.0
+glm_poisson_nbdisp,F3,A,,2024,3,2c109ff318cd5917c256,exact cache key + in-file metadata,3000.0,0.9483333333333334,True,mean,10147.851033680572,6760.0,59652.0
+glm_spline,F3,A,,2024,3,9b8158854af651e86980,exact cache key + in-file metadata,3000.0,0.9496666666666667,True,mean,10101.150455144261,6760.0,59652.0
+glm_nb,F3,A,,2024,3,4ce2ffc4ca8c8733b318,exact cache key + in-file metadata,3000.0,0.9363333333333334,True,mean,9883.292023333797,6760.0,59652.0
+glm_tweedie,F3,A,,2024,3,80a83bd527a5c814df74,exact cache key + in-file metadata,3000.0,0.9666666666666667,True,mean,10954.841313653427,6760.0,59652.0
+lgbm_poisson,F3,A,,2024,3,50abea15e2d8240f282b,exact cache key + in-file metadata,3000.0,0.9423333333333334,True,mean,10259.341565160683,6760.0,59652.0
+lgbm_tweedie,F3,A,,2024,3,9a75295b8d4916463124,exact cache key + in-file metadata,3000.0,0.9603333333333334,True,mean,10611.0941651116,6760.0,59652.0
+lgbm_l1,F3,A,,2024,3,70dc6d65f2e50f93bcf1,exact cache key + in-file metadata,3000.0,0.9326666666666666,True,point,10216.0,6760.0,59652.0
+xgb_poisson,F3,A,,2024,3,00d5ee13ccc720e9a23c,exact cache key + in-file metadata,3000.0,0.967,True,mean,10722.439191895846,6760.0,59652.0
+cat_poisson,F3,A,,2024,3,8e8329fb9f1c66811ec5,exact cache key + in-file metadata,3000.0,0.9586666666666667,True,mean,10729.585890488117,6760.0,59652.0
+hurdle_lgbm,F3,A,,2024,3,53fe8310530becb223c4,exact cache key + in-file metadata,3000.0,0.952,True,mean,10477.314956065286,6760.0,59652.0
+glm_poisson,F3,A,,2018,4,d523c49a76139c7e5aec,exact cache key + in-file metadata,2940.0,1.1921768707482994,True,mean,14370.002054269513,6619.0,56031.0
+glm_poisson_nbdisp,F3,A,,2018,4,66fa091020d355b7407e,exact cache key + in-file metadata,2940.0,1.1496598639455782,True,mean,14370.002054269513,6619.0,56031.0
+glm_spline,F3,A,,2018,4,d1b597443e9891d7f2d6,exact cache key + in-file metadata,2940.0,1.1581632653061225,True,mean,13818.24489962146,6619.0,56031.0
+glm_nb,F3,A,,2018,4,51cb3ec6903666306126,exact cache key + in-file metadata,2940.0,2.0129251700680273,True,mean,45559.597073150006,6619.0,56031.0
+glm_tweedie,F3,A,,2018,4,55193a62000438e4098f,exact cache key + in-file metadata,2940.0,1.1326530612244898,True,mean,14054.9176575454,6619.0,56031.0
+lgbm_poisson,F3,A,,2018,4,4bd2d67af895ed369202,exact cache key + in-file metadata,2940.0,1.3931972789115645,True,mean,24748.40294745328,6619.0,56031.0
+lgbm_tweedie,F3,A,,2018,4,f3c3666807f9db3dd418,exact cache key + in-file metadata,2940.0,1.4170068027210885,True,mean,25702.14151213756,6619.0,56031.0
+lgbm_l1,F3,A,,2018,4,1d019344613b9ed596c0,exact cache key + in-file metadata,2940.0,1.226530612244898,True,point,15768.0,6619.0,56031.0
+xgb_poisson,F3,A,,2018,4,a2f6914ceb991edbee4c,exact cache key + in-file metadata,2940.0,1.4149659863945578,True,mean,25597.35047954819,6619.0,56031.0
+cat_poisson,F3,A,,2018,4,4244896ed5e88ad08c96,exact cache key + in-file metadata,2940.0,1.2700680272108844,True,mean,19139.452256481978,6619.0,56031.0
+hurdle_lgbm,F3,A,,2018,4,6410e3077010a5af7958,exact cache key + in-file metadata,2940.0,1.3775510204081634,True,mean,23644.7433342735,6619.0,56031.0
+glm_poisson,F3,A,,2019,4,e5529e35bf0f4c7beac6,exact cache key + in-file metadata,2880.0,1.65,True,mean,29281.25354428024,9967.0,129807.0
+glm_poisson_nbdisp,F3,A,,2019,4,563b3ce14abb753bba15,exact cache key + in-file metadata,2880.0,1.6458333333333333,True,mean,29281.25354428024,9967.0,129807.0
+glm_spline,F3,A,,2019,4,ce30181f85dcbeed613d,exact cache key + in-file metadata,2880.0,1.6583333333333334,True,mean,30462.359723275735,9967.0,129807.0
+glm_nb,F3,A,,2019,4,cf1de144d2d6db0248f9,exact cache key + in-file metadata,2880.0,1.9746527777777778,True,mean,47786.759131597006,9967.0,129807.0
+glm_tweedie,F3,A,,2019,4,b171c374945fd7b71e3c,exact cache key + in-file metadata,2880.0,1.5871527777777779,True,mean,27197.844808936505,9967.0,129807.0
+lgbm_poisson,F3,A,,2019,4,c0c68717753b39e0735e,exact cache key + in-file metadata,2880.0,1.5666666666666667,True,mean,27945.493841299878,9967.0,129807.0
+lgbm_tweedie,F3,A,,2019,4,12099418ffae9a0c1821,exact cache key + in-file metadata,2880.0,1.5697916666666667,True,mean,28266.05914708617,9967.0,129807.0
+lgbm_l1,F3,A,,2019,4,d7ce3404289fc68531a2,exact cache key + in-file metadata,2880.0,1.6934027777777778,True,point,34809.0,9967.0,129807.0
+xgb_poisson,F3,A,,2019,4,05fe6bf3e168c68b52ef,exact cache key + in-file metadata,2880.0,1.584375,True,mean,29155.63665802012,9967.0,129807.0
+cat_poisson,F3,A,,2019,4,0333be8155cc9c16f569,exact cache key + in-file metadata,2880.0,1.6513888888888888,True,mean,33154.388669048276,9967.0,129807.0
+hurdle_lgbm,F3,A,,2019,4,e6797959891e9a80e7b7,exact cache key + in-file metadata,2880.0,1.5697916666666667,True,mean,28469.669849583748,9967.0,129807.0
+glm_poisson,F3,A,,2020,4,e77ad0ffcbbc032ff46a,exact cache key + in-file metadata,2880.0,1.2909722222222222,True,mean,17865.39650212665,7668.0,69146.0
+glm_poisson_nbdisp,F3,A,,2020,4,1de9717c7721eff4ed16,exact cache key + in-file metadata,2880.0,1.2729166666666667,True,mean,17865.39650212665,7668.0,69146.0
+glm_spline,F3,A,,2020,4,813cebd6696cb22becfa,exact cache key + in-file metadata,2880.0,1.2940972222222222,True,mean,17778.10218223974,7668.0,69146.0
+glm_nb,F3,A,,2020,4,21f24711299bd6fa1eb1,exact cache key + in-file metadata,2880.0,1.5270833333333333,True,mean,32637.321970371893,7668.0,69146.0
+glm_tweedie,F3,A,,2020,4,9f498eaf9e5b26161dd0,exact cache key + in-file metadata,2880.0,1.1982638888888888,True,mean,16792.25974356617,7668.0,69146.0
+lgbm_poisson,F3,A,,2020,4,14d7d7dd64e957f64c72,exact cache key + in-file metadata,2880.0,1.3284722222222223,True,mean,19160.778088923347,7668.0,69146.0
+lgbm_tweedie,F3,A,,2020,4,c7d2c1e4d23b61d203dc,exact cache key + in-file metadata,2880.0,1.3246527777777777,True,mean,18880.285336758458,7668.0,69146.0
+lgbm_l1,F3,A,,2020,4,fa8bdcb13dcd2dc44cac,exact cache key + in-file metadata,2880.0,1.3041666666666667,True,point,17628.0,7668.0,69146.0
+xgb_poisson,F3,A,,2020,4,bc770957b68ef202138c,exact cache key + in-file metadata,2880.0,1.2947916666666666,True,mean,17831.033051983577,7668.0,69146.0
+cat_poisson,F3,A,,2020,4,c42de1593c4ec8905195,exact cache key + in-file metadata,2880.0,1.2097222222222221,True,mean,15596.59500780491,7668.0,69146.0
+hurdle_lgbm,F3,A,,2020,4,5febfe16b8dde9956c4d,exact cache key + in-file metadata,2880.0,1.2885416666666667,True,mean,17251.714593305434,7668.0,69146.0
+glm_poisson,F3,A,,2021,4,9424b647d85cf4fc17b7,exact cache key + in-file metadata,2880.0,1.4861111111111112,True,mean,22930.704738091143,6529.0,52911.0
+glm_poisson_nbdisp,F3,A,,2021,4,3750cf89b569f3bb8e04,exact cache key + in-file metadata,2880.0,1.413888888888889,True,mean,22930.704738091143,6529.0,52911.0
+glm_spline,F3,A,,2021,4,98e1c65e8e66e41aa3bb,exact cache key + in-file metadata,2880.0,1.2177083333333334,True,mean,15593.714129615168,6529.0,52911.0
+glm_nb,F3,A,,2021,4,c4780b9674b78d8bf4d5,exact cache key + in-file metadata,2880.0,1.473263888888889,True,mean,26115.008231154476,6529.0,52911.0
+glm_tweedie,F3,A,,2021,4,98c5b4d4184e3d47966b,exact cache key + in-file metadata,2880.0,1.2045138888888889,True,mean,15932.557596907023,6529.0,52911.0
+lgbm_poisson,F3,A,,2021,4,5fd53c88bcca0aa88daf,exact cache key + in-file metadata,2880.0,1.4552083333333334,True,mean,22893.773176553703,6529.0,52911.0
+lgbm_tweedie,F3,A,,2021,4,fd43aa10b6fbd54f46a8,exact cache key + in-file metadata,2880.0,1.4840277777777777,True,mean,24024.72641480943,6529.0,52911.0
+lgbm_l1,F3,A,,2021,4,b5adda53092b6c4ef31f,exact cache key + in-file metadata,2880.0,1.3003472222222223,True,point,16619.0,6529.0,52911.0
+xgb_poisson,F3,A,,2021,4,8db9f18eb06b0ed8552d,exact cache key + in-file metadata,2880.0,1.476736111111111,True,mean,25506.095301333604,6529.0,52911.0
+cat_poisson,F3,A,,2021,4,b5f8760011aa782de6b0,exact cache key + in-file metadata,2880.0,1.48125,True,mean,23884.347096378824,6529.0,52911.0
+hurdle_lgbm,F3,A,,2021,4,17e67d68ba97536ebfc2,exact cache key + in-file metadata,2880.0,1.4569444444444444,True,mean,23985.813094670528,6529.0,52911.0
+glm_poisson,F3,A,,2022,4,c98c361813a40a3c8ffa,exact cache key + in-file metadata,2880.0,1.5520833333333333,True,mean,26143.5420281589,10013.0,114635.0
+glm_poisson_nbdisp,F3,A,,2022,4,14292d9a1c16d8f01e5b,exact cache key + in-file metadata,2880.0,1.5663194444444444,True,mean,26143.5420281589,10013.0,114635.0
+glm_spline,F3,A,,2022,4,6f0b56bdb349eb00cc50,exact cache key + in-file metadata,2880.0,1.5795138888888889,True,mean,27045.934474539423,10013.0,114635.0
+glm_nb,F3,A,,2022,4,0a39bf7b401e8076a66e,exact cache key + in-file metadata,2880.0,1.6038194444444445,True,mean,28599.665405873864,10013.0,114635.0
+glm_tweedie,F3,A,,2022,4,127d62b6704cd9d254bc,exact cache key + in-file metadata,2880.0,1.554513888888889,True,mean,25591.594512645403,10013.0,114635.0
+lgbm_poisson,F3,A,,2022,4,57fced4284f7b8b5cc57,exact cache key + in-file metadata,2880.0,1.598263888888889,True,mean,30080.017992643006,10013.0,114635.0
+lgbm_tweedie,F3,A,,2022,4,51cb4b7291c589f7adb1,exact cache key + in-file metadata,2880.0,1.6510416666666667,True,mean,32243.567130880787,10013.0,114635.0
+lgbm_l1,F3,A,,2022,4,c1f451d79974b59ad32d,exact cache key + in-file metadata,2880.0,1.6149305555555555,True,point,31763.0,10013.0,114635.0
+xgb_poisson,F3,A,,2022,4,0e887dced5f76d872610,exact cache key + in-file metadata,2880.0,1.6552083333333334,True,mean,31662.713627035097,10013.0,114635.0
+cat_poisson,F3,A,,2022,4,3107cf425131f080648f,exact cache key + in-file metadata,2880.0,1.5965277777777778,True,mean,29753.351268076556,10013.0,114635.0
+hurdle_lgbm,F3,A,,2022,4,67983e25b5d3e1d184d1,exact cache key + in-file metadata,2880.0,1.6399305555555554,True,mean,31843.786070514943,10013.0,114635.0
+glm_poisson,F3,A,,2023,4,f48b7a66f34ed546dbc1,exact cache key + in-file metadata,2880.0,1.4746527777777778,True,mean,24336.006498535564,9949.0,128695.0
+glm_poisson_nbdisp,F3,A,,2023,4,76323eec5b6efc204ea0,exact cache key + in-file metadata,2880.0,1.4951388888888888,True,mean,24336.006498535564,9949.0,128695.0
+glm_spline,F3,A,,2023,4,73fe2189808d02d82d34,exact cache key + in-file metadata,2880.0,1.5100694444444445,True,mean,25169.968372533665,9949.0,128695.0
+glm_nb,F3,A,,2023,4,94cba37501b5194a85af,exact cache key + in-file metadata,2880.0,1.5010416666666666,True,mean,24857.26221483393,9949.0,128695.0
+glm_tweedie,F3,A,,2023,4,fd6b33af1c70be5e5b3b,exact cache key + in-file metadata,2880.0,1.4677083333333334,True,mean,23664.117171153124,9949.0,128695.0
+lgbm_poisson,F3,A,,2023,4,1f39a5afc6717f538b6c,exact cache key + in-file metadata,2880.0,1.4701388888888889,True,mean,24180.266002079297,9949.0,128695.0
+lgbm_tweedie,F3,A,,2023,4,d26de0fe456a39298b17,exact cache key + in-file metadata,2880.0,1.4829861111111111,True,mean,24942.8222768278,9949.0,128695.0
+lgbm_l1,F3,A,,2023,4,d28cadbfd46b04b284c5,exact cache key + in-file metadata,2880.0,1.6645833333333333,True,point,33570.0,9949.0,128695.0
+xgb_poisson,F3,A,,2023,4,627955f260e797ce0b58,exact cache key + in-file metadata,2880.0,1.526736111111111,True,mean,26169.10647851201,9949.0,128695.0
+cat_poisson,F3,A,,2023,4,6c88a5f7510dfe0e1edb,exact cache key + in-file metadata,2880.0,1.6371527777777777,True,mean,30337.26010946242,9949.0,128695.0
+hurdle_lgbm,F3,A,,2023,4,92e6375c523c08106fd9,exact cache key + in-file metadata,2880.0,1.5364583333333333,True,mean,25634.680589113043,9949.0,128695.0
+glm_poisson,F3,A,,2024,4,3a0f5267d866238dfb9d,exact cache key + in-file metadata,2940.0,1.2707482993197279,True,mean,18529.37920497697,6758.0,59650.0
+glm_poisson_nbdisp,F3,A,,2024,4,ddd1ffc0d0c5e74c3d16,exact cache key + in-file metadata,2940.0,1.2210884353741496,True,mean,18529.37920497697,6758.0,59650.0
+glm_spline,F3,A,,2024,4,b119375c20a4f9a19136,exact cache key + in-file metadata,2940.0,1.2595238095238095,True,mean,18400.752195499343,6758.0,59650.0
+glm_nb,F3,A,,2024,4,718bfc408d238be2b83f,exact cache key + in-file metadata,2940.0,1.188095238095238,True,mean,16832.09353764043,6758.0,59650.0
+glm_tweedie,F3,A,,2024,4,30274c8576d08a6f61fa,exact cache key + in-file metadata,2940.0,1.2408163265306122,True,mean,19321.92306935531,6758.0,59650.0
+lgbm_poisson,F3,A,,2024,4,8a0d12a7231b23fdbbf1,exact cache key + in-file metadata,2940.0,1.3343537414965987,True,mean,20957.60926556652,6758.0,59650.0
+lgbm_tweedie,F3,A,,2024,4,7cdcff65760be6443d3f,exact cache key + in-file metadata,2940.0,1.3517006802721088,True,mean,22536.672472383158,6758.0,59650.0
+lgbm_l1,F3,A,,2024,4,1b15476c1764184e8d3b,exact cache key + in-file metadata,2940.0,1.1870748299319729,True,point,15794.0,6758.0,59650.0
+xgb_poisson,F3,A,,2024,4,fd33315dff6803b14be8,exact cache key + in-file metadata,2940.0,1.2802721088435374,True,mean,19372.55181718313,6758.0,59650.0
+cat_poisson,F3,A,,2024,4,cf19bbfcfbafd7df1289,exact cache key + in-file metadata,2940.0,1.279591836734694,True,mean,20028.855165663444,6758.0,59650.0
+hurdle_lgbm,F3,A,,2024,4,371842ba0dd72afc456a,exact cache key + in-file metadata,2940.0,1.3003401360544218,True,mean,19829.989099418857,6758.0,59650.0
+glm_poisson,F8,A,,2018,2,e7d5c26863491183d61d,exact cache key + in-file metadata,3060.0,0.9934640522875817,True,mean,11563.368066751751,6620.0,56032.0
+glm_poisson_nbdisp,F8,A,,2018,2,77f122de3c5df295f74d,exact cache key + in-file metadata,3060.0,0.9918300653594772,True,mean,11563.368066751751,6620.0,56032.0
+glm_spline,F8,A,,2018,2,a0af137c9f5e6f379e7e,exact cache key + in-file metadata,3060.0,0.992483660130719,True,mean,11355.954603075643,6620.0,56032.0
+glm_nb,F8,A,,2018,2,60d2c38730dc5b48ade1,exact cache key + in-file metadata,3060.0,0.9382352941176471,True,mean,10430.493457624725,6620.0,56032.0
+glm_tweedie,F8,A,,2018,2,c66f8c22946056dd7627,exact cache key + in-file metadata,3060.0,1.0120915032679738,True,mean,12134.90704618964,6620.0,56032.0
+lgbm_poisson,F8,A,,2018,2,f26ad260cf9cc8e434b8,exact cache key + in-file metadata,3060.0,0.9715686274509804,True,mean,11865.444789040213,6620.0,56032.0
+lgbm_tweedie,F8,A,,2018,2,726bd96bde6492cfae28,exact cache key + in-file metadata,3060.0,0.9705882352941176,True,mean,11830.54471332764,6620.0,56032.0
+lgbm_l1,F8,A,,2018,2,f76dc4b1e0598a395fde,exact cache key + in-file metadata,3060.0,1.0339869281045753,True,point,13378.0,6620.0,56032.0
+xgb_poisson,F8,A,,2018,2,068f5bd661e730dac23e,exact cache key + in-file metadata,3060.0,0.9813725490196078,True,mean,12210.119622881113,6620.0,56032.0
+cat_poisson,F8,A,,2018,2,af48043e34fe6fbe535d,exact cache key + in-file metadata,3060.0,1.0758169934640522,True,mean,13951.527731375592,6620.0,56032.0
+hurdle_lgbm,F8,A,,2018,2,e0cf1ac600d0e627cadd,exact cache key + in-file metadata,3060.0,1.0042483660130719,True,mean,12186.060734944447,6620.0,56032.0
+glm_poisson,F8,A,,2019,2,371903c10fffd0281b66,exact cache key + in-file metadata,3000.0,1.2493333333333334,True,mean,18478.169659797124,9967.0,129807.0
+glm_poisson_nbdisp,F8,A,,2019,2,51be6ee96dc6e57dc0db,exact cache key + in-file metadata,3000.0,1.2416666666666667,True,mean,18478.169659797124,9967.0,129807.0
+glm_spline,F8,A,,2019,2,07cd9e20388d208f910b,exact cache key + in-file metadata,3000.0,1.1893333333333334,True,mean,16894.385212515168,9967.0,129807.0
+glm_nb,F8,A,,2019,2,8901977e4f8b66a324e1,exact cache key + in-file metadata,3000.0,1.2943333333333333,True,mean,20428.78555821636,9967.0,129807.0
+glm_tweedie,F8,A,,2019,2,795019832390bc1e39d0,exact cache key + in-file metadata,3000.0,1.2866666666666666,True,mean,20748.80078700505,9967.0,129807.0
+lgbm_poisson,F8,A,,2019,2,a764cf865a85cee3f35e,exact cache key + in-file metadata,3000.0,1.1993333333333334,True,mean,17335.905918541506,9967.0,129807.0
+lgbm_tweedie,F8,A,,2019,2,53f05c0b38f6f2a03a68,exact cache key + in-file metadata,3000.0,1.246,True,mean,18703.585792792346,9967.0,129807.0
+lgbm_l1,F8,A,,2019,2,b6e43d4f5928386ecb0d,exact cache key + in-file metadata,3000.0,1.263,True,point,20593.0,9967.0,129807.0
+xgb_poisson,F8,A,,2019,2,3722d3324c8da3d4812e,exact cache key + in-file metadata,3000.0,1.233,True,mean,18131.122517734864,9967.0,129807.0
+cat_poisson,F8,A,,2019,2,6cff56d10c595046e3a6,exact cache key + in-file metadata,3000.0,1.294,True,mean,20699.59682111641,9967.0,129807.0
+hurdle_lgbm,F8,A,,2019,2,0c75b5e00b8f17e26ac0,exact cache key + in-file metadata,3000.0,1.21,True,mean,17618.770398162756,9967.0,129807.0
+glm_poisson,F8,A,,2020,2,6d8cfe65e7f4b7bcc9a7,exact cache key + in-file metadata,3000.0,1.1246666666666667,True,mean,13926.604372567039,7668.0,69146.0
+glm_poisson_nbdisp,F8,A,,2020,2,1a74f45ae6564525aa1d,exact cache key + in-file metadata,3000.0,1.1246666666666667,True,mean,13926.604372567039,7668.0,69146.0
+glm_spline,F8,A,,2020,2,294aa199401965582407,exact cache key + in-file metadata,3000.0,1.1006666666666667,True,mean,13489.327116404738,7668.0,69146.0
+glm_nb,F8,A,,2020,2,5f5beb296feace998e2c,exact cache key + in-file metadata,3000.0,1.308,True,mean,21298.43644143049,7668.0,69146.0
+glm_tweedie,F8,A,,2020,2,7a97b814bcc171db899f,exact cache key + in-file metadata,3000.0,1.2293333333333334,True,mean,17050.86015359042,7668.0,69146.0
+lgbm_poisson,F8,A,,2020,2,5712eca44afb4fad601c,exact cache key + in-file metadata,3000.0,1.144,True,mean,15148.046769073768,7668.0,69146.0
+lgbm_tweedie,F8,A,,2020,2,bbd56be05edf3e59b00f,exact cache key + in-file metadata,3000.0,1.1163333333333334,True,mean,14217.631939139848,7668.0,69146.0
+lgbm_l1,F8,A,,2020,2,281a5eecbe9ad968a40d,exact cache key + in-file metadata,3000.0,1.2046666666666668,True,point,15980.0,7668.0,69146.0
+xgb_poisson,F8,A,,2020,2,9b7570eced24e28b8558,exact cache key + in-file metadata,3000.0,1.1106666666666667,True,mean,14251.447842792204,7668.0,69146.0
+cat_poisson,F8,A,,2020,2,94f56273885d1e727aad,exact cache key + in-file metadata,3000.0,1.1386666666666667,True,mean,14639.3682525521,7668.0,69146.0
+hurdle_lgbm,F8,A,,2020,2,0af0b698248124e7dc52,exact cache key + in-file metadata,3000.0,1.1866666666666668,True,mean,15660.676334213751,7668.0,69146.0
+glm_poisson,F8,A,,2021,2,271c538418bcd38e53d8,exact cache key + in-file metadata,3000.0,0.9516666666666667,True,mean,10049.007018773755,6530.0,52912.0
+glm_poisson_nbdisp,F8,A,,2021,2,98c345ab426abe63e689,exact cache key + in-file metadata,3000.0,0.9403333333333334,True,mean,10049.007018773755,6530.0,52912.0
+glm_spline,F8,A,,2021,2,c7f0107cff347da6970c,exact cache key + in-file metadata,3000.0,0.945,True,mean,10072.871116711282,6530.0,52912.0
+glm_nb,F8,A,,2021,2,e2b78f89de9f8a43f794,exact cache key + in-file metadata,3000.0,0.9553333333333334,True,mean,10460.078923018016,6530.0,52912.0
+glm_tweedie,F8,A,,2021,2,1f5488417616a91ad3ca,exact cache key + in-file metadata,3000.0,0.9573333333333334,True,mean,10634.144328525046,6530.0,52912.0
+lgbm_poisson,F8,A,,2021,2,91e1ffabb5b37960abbe,exact cache key + in-file metadata,3000.0,1.0036666666666667,True,mean,11333.255088760401,6530.0,52912.0
+lgbm_tweedie,F8,A,,2021,2,c0d55669fa6533b7705d,exact cache key + in-file metadata,3000.0,1.0303333333333333,True,mean,11856.480780922082,6530.0,52912.0
+lgbm_l1,F8,A,,2021,2,ebdb583e9684b1dbe1d8,exact cache key + in-file metadata,3000.0,1.0023333333333333,True,point,11407.0,6530.0,52912.0
+xgb_poisson,F8,A,,2021,2,7bc215b97acfda61bcf4,exact cache key + in-file metadata,3000.0,1.0116666666666667,True,mean,11218.694769100657,6530.0,52912.0
+cat_poisson,F8,A,,2021,2,883f1cf5603b5e1703a8,exact cache key + in-file metadata,3000.0,0.9623333333333334,True,mean,10358.010080597734,6530.0,52912.0
+hurdle_lgbm,F8,A,,2021,2,4b6e39144e42fe121cec,exact cache key + in-file metadata,3000.0,0.9973333333333333,True,mean,11377.78411709697,6530.0,52912.0
+glm_poisson,F8,A,,2022,2,96602704ac1a25d79557,exact cache key + in-file metadata,3000.0,1.201,True,mean,16022.92824975437,10013.0,114635.0
+glm_poisson_nbdisp,F8,A,,2022,2,22f0f3fa2ffc19d46aa2,exact cache key + in-file metadata,3000.0,1.222,True,mean,16022.92824975437,10013.0,114635.0
+glm_spline,F8,A,,2022,2,99a541869345165e23e9,exact cache key + in-file metadata,3000.0,1.2236666666666667,True,mean,16563.196454516554,10013.0,114635.0
+glm_nb,F8,A,,2022,2,dfa7bdb3f309ebb8313a,exact cache key + in-file metadata,3000.0,1.2186666666666666,True,mean,16055.246175370561,10013.0,114635.0
+glm_tweedie,F8,A,,2022,2,70d955615b6af9ba7a06,exact cache key + in-file metadata,3000.0,1.2356666666666667,True,mean,16681.638811666442,10013.0,114635.0
+lgbm_poisson,F8,A,,2022,2,5fdfa066015434748b79,exact cache key + in-file metadata,3000.0,1.351,True,mean,23110.87841899485,10013.0,114635.0
+lgbm_tweedie,F8,A,,2022,2,89516bbe5b4e8c9d5c5a,exact cache key + in-file metadata,3000.0,1.399,True,mean,24719.080244369252,10013.0,114635.0
+lgbm_l1,F8,A,,2022,2,082fb6646c05887ae0fa,exact cache key + in-file metadata,3000.0,1.3636666666666666,True,point,24077.0,10013.0,114635.0
+xgb_poisson,F8,A,,2022,2,6bf8cc4ff2fe3b13a613,exact cache key + in-file metadata,3000.0,1.3443333333333334,True,mean,21388.811389451857,10013.0,114635.0
+cat_poisson,F8,A,,2022,2,1417294652c13d6b6fb4,exact cache key + in-file metadata,3000.0,1.336,True,mean,21249.727261704025,10013.0,114635.0
+hurdle_lgbm,F8,A,,2022,2,bc7c9837b6eba6adb866,exact cache key + in-file metadata,3000.0,1.3506666666666667,True,mean,22889.991255106266,10013.0,114635.0
+glm_poisson,F8,A,,2023,2,399d949750a2021773b0,exact cache key + in-file metadata,3000.0,1.11,True,mean,15040.710346823631,9954.0,128702.0
+glm_poisson_nbdisp,F8,A,,2023,2,ed0670cdd154d6caba30,exact cache key + in-file metadata,3000.0,1.1076666666666666,True,mean,15040.710346823631,9954.0,128702.0
+glm_spline,F8,A,,2023,2,825e9d4c703843976861,exact cache key + in-file metadata,3000.0,1.1413333333333333,True,mean,16206.354662495625,9954.0,128702.0
+glm_nb,F8,A,,2023,2,02ee93a35e57d92a7f4f,exact cache key + in-file metadata,3000.0,1.149,True,mean,16573.104595985897,9954.0,128702.0
+glm_tweedie,F8,A,,2023,2,fe398a25b696830b8bb0,exact cache key + in-file metadata,3000.0,1.159,True,mean,17991.37970318712,9954.0,128702.0
+lgbm_poisson,F8,A,,2023,2,c196813111fb04f3a6ff,exact cache key + in-file metadata,3000.0,1.0633333333333332,True,mean,13853.18160218657,9954.0,128702.0
+lgbm_tweedie,F8,A,,2023,2,131aeaa1733bde9ccb7f,exact cache key + in-file metadata,3000.0,1.0736666666666668,True,mean,14049.310254766931,9954.0,128702.0
+lgbm_l1,F8,A,,2023,2,0c80a2eb52b19fc44cb8,exact cache key + in-file metadata,3000.0,1.203,True,point,19141.0,9954.0,128702.0
+xgb_poisson,F8,A,,2023,2,032a960653526004af60,exact cache key + in-file metadata,3000.0,1.0556666666666668,True,mean,13585.996978693205,9954.0,128702.0
+cat_poisson,F8,A,,2023,2,12788fb8429541528e0b,exact cache key + in-file metadata,3000.0,1.0763333333333334,True,mean,13966.987132582972,9954.0,128702.0
+hurdle_lgbm,F8,A,,2023,2,569c0ac7a512c2d4aab5,exact cache key + in-file metadata,3000.0,1.0783333333333334,True,mean,13899.378528786043,9954.0,128702.0
+glm_poisson,F8,A,,2024,2,efc92c843f4ef2086d72,exact cache key + in-file metadata,3060.0,0.8947712418300654,True,mean,9453.71121473152,6760.0,59652.0
+glm_poisson_nbdisp,F8,A,,2024,2,29e57503cca22f0333d0,exact cache key + in-file metadata,3060.0,0.8839869281045751,True,mean,9453.71121473152,6760.0,59652.0
+glm_spline,F8,A,,2024,2,fd214c7dd0fd7778d9ea,exact cache key + in-file metadata,3060.0,0.8800653594771242,True,mean,9312.131225811172,6760.0,59652.0
+glm_nb,F8,A,,2024,2,aaaa39a6f16ded2a79b1,exact cache key + in-file metadata,3060.0,0.8790849673202614,True,mean,9359.938209262542,6760.0,59652.0
+glm_tweedie,F8,A,,2024,2,c9a08663cb0b93db088d,exact cache key + in-file metadata,3060.0,0.9058823529411765,True,mean,10081.191761816091,6760.0,59652.0
+lgbm_poisson,F8,A,,2024,2,3adeff72042d2c27d27a,exact cache key + in-file metadata,3060.0,0.8839869281045751,True,mean,9612.526468855627,6760.0,59652.0
+lgbm_tweedie,F8,A,,2024,2,76a614fd2df86c11c195,exact cache key + in-file metadata,3060.0,0.8787581699346405,True,mean,9568.410618273014,6760.0,59652.0
+lgbm_l1,F8,A,,2024,2,8a62470b2b01d5f87ef5,exact cache key + in-file metadata,3060.0,0.8797385620915033,True,point,9656.0,6760.0,59652.0
+xgb_poisson,F8,A,,2024,2,4757c504244b23508c12,exact cache key + in-file metadata,3060.0,0.8823529411764706,True,mean,9573.98023077051,6760.0,59652.0
+cat_poisson,F8,A,,2024,2,bd0d52d7ea930471712a,exact cache key + in-file metadata,3060.0,0.8872549019607843,True,mean,9770.23981780214,6760.0,59652.0
+hurdle_lgbm,F8,A,,2024,2,d503b45759cb07f57c3d,exact cache key + in-file metadata,3060.0,0.8869281045751634,True,mean,9475.155615803153,6760.0,59652.0
+glm_poisson,F8,A,,2018,3,658bf4ae9c496523425b,exact cache key + in-file metadata,3000.0,0.9986666666666667,True,mean,11352.557771729076,6620.0,56032.0
+glm_poisson_nbdisp,F8,A,,2018,3,f390e770d68a3262898a,exact cache key + in-file metadata,3000.0,0.996,True,mean,11352.557771729076,6620.0,56032.0
+glm_spline,F8,A,,2018,3,bcbc13a6ca0efc046e16,exact cache key + in-file metadata,3000.0,0.9866666666666667,True,mean,11086.246771049922,6620.0,56032.0
+glm_nb,F8,A,,2018,3,69cbcc8ea3717da9445b,exact cache key + in-file metadata,3000.0,0.9333333333333333,True,mean,10149.700490789412,6620.0,56032.0
+glm_tweedie,F8,A,,2018,3,d358a54a560b04567888,exact cache key + in-file metadata,3000.0,0.9933333333333333,True,mean,11414.147201402659,6620.0,56032.0
+lgbm_poisson,F8,A,,2018,3,5890b0b79798e678e5f4,exact cache key + in-file metadata,3000.0,1.061,True,mean,14243.397316967103,6620.0,56032.0
+lgbm_tweedie,F8,A,,2018,3,c482637b052eed5442ed,exact cache key + in-file metadata,3000.0,1.065,True,mean,14363.62324866833,6620.0,56032.0
+lgbm_l1,F8,A,,2018,3,89bab40d8f19d3ff59f4,exact cache key + in-file metadata,3000.0,1.0463333333333333,True,point,12927.0,6620.0,56032.0
+xgb_poisson,F8,A,,2018,3,8495a2bc761acb086518,exact cache key + in-file metadata,3000.0,1.0403333333333333,True,mean,13359.34710458205,6620.0,56032.0
+cat_poisson,F8,A,,2018,3,34dcc860ac8f7719eb17,exact cache key + in-file metadata,3000.0,1.1256666666666666,True,mean,15395.701463266889,6620.0,56032.0
+hurdle_lgbm,F8,A,,2018,3,397b813d14f08d272abd,exact cache key + in-file metadata,3000.0,1.1093333333333333,True,mean,14780.977657627516,6620.0,56032.0
+glm_poisson,F8,A,,2019,3,660272fb70bb2603e2e9,exact cache key + in-file metadata,2940.0,1.4261904761904762,True,mean,23348.131807603946,9967.0,129807.0
+glm_poisson_nbdisp,F8,A,,2019,3,5402ce225c3305c2400f,exact cache key + in-file metadata,2940.0,1.426530612244898,True,mean,23348.131807603946,9967.0,129807.0
+glm_spline,F8,A,,2019,3,7af61c6039fb1ece1fe1,exact cache key + in-file metadata,2940.0,1.4278911564625851,True,mean,22806.24510651203,9967.0,129807.0
+glm_nb,F8,A,,2019,3,92baaf9e7972487aed0d,exact cache key + in-file metadata,2940.0,1.491156462585034,True,mean,25894.521945816756,9967.0,129807.0
+glm_tweedie,F8,A,,2019,3,0f737d51ad260b4e3045,exact cache key + in-file metadata,2940.0,1.4217687074829932,True,mean,23900.113227814523,9967.0,129807.0
+lgbm_poisson,F8,A,,2019,3,26d66d93cf3395406098,exact cache key + in-file metadata,2940.0,1.317687074829932,True,mean,19970.19330639408,9967.0,129807.0
+lgbm_tweedie,F8,A,,2019,3,e57aa258786d599fbffd,exact cache key + in-file metadata,2940.0,1.3476190476190477,True,mean,20817.285908412145,9967.0,129807.0
+lgbm_l1,F8,A,,2019,3,7fc54767df49cb376e9c,exact cache key + in-file metadata,2940.0,1.508843537414966,True,point,28394.0,9967.0,129807.0
+xgb_poisson,F8,A,,2019,3,83fa1a95100071d4ec8d,exact cache key + in-file metadata,2940.0,1.3221088435374149,True,mean,20136.849634378472,9967.0,129807.0
+cat_poisson,F8,A,,2019,3,8309fac21b0005b5e41a,exact cache key + in-file metadata,2940.0,1.4112244897959183,True,mean,22979.797143740943,9967.0,129807.0
+hurdle_lgbm,F8,A,,2019,3,0644de31a2993bba71ab,exact cache key + in-file metadata,2940.0,1.2908163265306123,True,mean,18980.54421927179,9967.0,129807.0
+glm_poisson,F8,A,,2020,3,94f6721dcb9ce1be20dc,exact cache key + in-file metadata,2940.0,1.0166666666666666,True,mean,11304.835689274189,7668.0,69146.0
+glm_poisson_nbdisp,F8,A,,2020,3,d961d1ebb5fb9a6fa4df,exact cache key + in-file metadata,2940.0,1.0204081632653061,True,mean,11304.835689274189,7668.0,69146.0
+glm_spline,F8,A,,2020,3,292df2086f13f095d8cd,exact cache key + in-file metadata,2940.0,1.0530612244897959,True,mean,11837.186201161196,7668.0,69146.0
+glm_nb,F8,A,,2020,3,e85ff8387c513355c395,exact cache key + in-file metadata,2940.0,1.0479591836734694,True,mean,11742.536298691115,7668.0,69146.0
+glm_tweedie,F8,A,,2020,3,7ba5bed25af637963e16,exact cache key + in-file metadata,2940.0,1.0564625850340137,True,mean,12252.679849093,7668.0,69146.0
+lgbm_poisson,F8,A,,2020,3,0824fb335f451589d819,exact cache key + in-file metadata,2940.0,1.0649659863945578,True,mean,12460.347143949844,7668.0,69146.0
+lgbm_tweedie,F8,A,,2020,3,18d30a8a8673d0a9a8c8,exact cache key + in-file metadata,2940.0,1.0479591836734694,True,mean,11843.297161656335,7668.0,69146.0
+lgbm_l1,F8,A,,2020,3,8d548b0f429ac26154f5,exact cache key + in-file metadata,2940.0,1.1200680272108843,True,point,13497.0,7668.0,69146.0
+xgb_poisson,F8,A,,2020,3,e91f0e35a85c10a5a8d8,exact cache key + in-file metadata,2940.0,1.0377551020408162,True,mean,11841.260620662384,7668.0,69146.0
+cat_poisson,F8,A,,2020,3,112348a45243585c3186,exact cache key + in-file metadata,2940.0,1.1431972789115645,True,mean,15575.223751840556,7668.0,69146.0
+hurdle_lgbm,F8,A,,2020,3,2a52bb2ad3690e16e9ce,exact cache key + in-file metadata,2940.0,1.0554421768707483,True,mean,12164.420223206624,7668.0,69146.0
+glm_poisson,F8,A,,2021,3,ed336490759c9dc2c838,exact cache key + in-file metadata,2940.0,1.0826530612244898,True,mean,12351.439673993005,6530.0,52912.0
+glm_poisson_nbdisp,F8,A,,2021,3,98288c94b182ce0f5989,exact cache key + in-file metadata,2940.0,1.0581632653061224,True,mean,12351.439673993005,6530.0,52912.0
+glm_spline,F8,A,,2021,3,40c5252b4d855ccd4173,exact cache key + in-file metadata,2940.0,1.0244897959183674,True,mean,11423.30716958465,6530.0,52912.0
+glm_nb,F8,A,,2021,3,f9e5d0464d421eb04a7b,exact cache key + in-file metadata,2940.0,1.0459183673469388,True,mean,12057.644642527477,6530.0,52912.0
+glm_tweedie,F8,A,,2021,3,37e7936caa71644c31f1,exact cache key + in-file metadata,2940.0,1.0187074829931972,True,mean,11611.43744904301,6530.0,52912.0
+lgbm_poisson,F8,A,,2021,3,8e5ef4e08c1b7a028ea2,exact cache key + in-file metadata,2940.0,1.1343537414965987,True,mean,14259.116814299272,6530.0,52912.0
+lgbm_tweedie,F8,A,,2021,3,1c6ed2aeec11d863a9eb,exact cache key + in-file metadata,2940.0,1.1612244897959183,True,mean,15134.281854059103,6530.0,52912.0
+lgbm_l1,F8,A,,2021,3,3eac332727f8ff7bc0fe,exact cache key + in-file metadata,2940.0,1.0945578231292517,True,point,12872.0,6530.0,52912.0
+xgb_poisson,F8,A,,2021,3,8cbbcd235207e398e86f,exact cache key + in-file metadata,2940.0,1.1224489795918366,True,mean,13370.437476869549,6530.0,52912.0
+cat_poisson,F8,A,,2021,3,2350e14cb8707681170b,exact cache key + in-file metadata,2940.0,1.1527210884353742,True,mean,14885.324237636229,6530.0,52912.0
+hurdle_lgbm,F8,A,,2021,3,307485f51016173ce321,exact cache key + in-file metadata,2940.0,1.0948979591836734,True,mean,13417.935209267862,6530.0,52912.0
+glm_poisson,F8,A,,2022,3,8097e6a377aff64861cf,exact cache key + in-file metadata,2940.0,1.3261904761904761,True,mean,18579.273565285388,10013.0,114635.0
+glm_poisson_nbdisp,F8,A,,2022,3,df64b3ea57f330fb4355,exact cache key + in-file metadata,2940.0,1.3472789115646258,True,mean,18579.273565285388,10013.0,114635.0
+glm_spline,F8,A,,2022,3,6493f91cd30e556cae9e,exact cache key + in-file metadata,2940.0,1.3258503401360544,True,mean,18888.21379205861,10013.0,114635.0
+glm_nb,F8,A,,2022,3,8a7af8b9fff22cfff159,exact cache key + in-file metadata,2940.0,1.3,True,mean,17537.31401539249,10013.0,114635.0
+glm_tweedie,F8,A,,2022,3,00a9572d7135eee485dd,exact cache key + in-file metadata,2940.0,1.3360544217687076,True,mean,17822.379582960362,10013.0,114635.0
+lgbm_poisson,F8,A,,2022,3,79a54f0927d1fd6d91b9,exact cache key + in-file metadata,2940.0,1.4401360544217687,True,mean,25053.034335816614,10013.0,114635.0
+lgbm_tweedie,F8,A,,2022,3,f6a9607cad082d6b3aea,exact cache key + in-file metadata,2940.0,1.4319727891156462,True,mean,24265.134504897098,10013.0,114635.0
+lgbm_l1,F8,A,,2022,3,7e5a92e0d3dab408ada8,exact cache key + in-file metadata,2940.0,1.4136054421768707,True,point,24186.0,10013.0,114635.0
+xgb_poisson,F8,A,,2022,3,a08c04843f1f46bbf6ab,exact cache key + in-file metadata,2940.0,1.407482993197279,True,mean,22890.182747770254,10013.0,114635.0
+cat_poisson,F8,A,,2022,3,8f713bb667a819b57b25,exact cache key + in-file metadata,2940.0,1.3884353741496598,True,mean,22315.011165310407,10013.0,114635.0
+hurdle_lgbm,F8,A,,2022,3,25ce7b2dd9cf6edb1df9,exact cache key + in-file metadata,2940.0,1.4319727891156462,True,mean,25510.46384375536,10013.0,114635.0
+glm_poisson,F8,A,,2023,3,305f5572179302f4e58f,exact cache key + in-file metadata,2940.0,1.1656462585034013,True,mean,16606.018384506206,9951.0,128697.0
+glm_poisson_nbdisp,F8,A,,2023,3,623c7e088820b818246c,exact cache key + in-file metadata,2940.0,1.1547619047619047,True,mean,16606.018384506206,9951.0,128697.0
+glm_spline,F8,A,,2023,3,0fccfa3ba3c180518859,exact cache key + in-file metadata,2940.0,1.1527210884353742,True,mean,16142.437264824302,9951.0,128697.0
+glm_nb,F8,A,,2023,3,2d1cf7d1e99be7c5e3d5,exact cache key + in-file metadata,2940.0,1.1710884353741497,True,mean,17585.450698230692,9951.0,128697.0
+glm_tweedie,F8,A,,2023,3,2980b12ae5a9ff9cbb60,exact cache key + in-file metadata,2940.0,1.1860544217687075,True,mean,18345.769317463506,9951.0,128697.0
+lgbm_poisson,F8,A,,2023,3,1a572faef96ee690e4af,exact cache key + in-file metadata,2940.0,1.1061224489795918,True,mean,14105.744780852478,9951.0,128697.0
+lgbm_tweedie,F8,A,,2023,3,feb499dcc96382479692,exact cache key + in-file metadata,2940.0,1.0921768707482993,True,mean,13601.342241219865,9951.0,128697.0
+lgbm_l1,F8,A,,2023,3,fbfc3db5be714061c269,exact cache key + in-file metadata,2940.0,1.3010204081632653,True,point,21987.0,9951.0,128697.0
+xgb_poisson,F8,A,,2023,3,be174c52513df07dc6ff,exact cache key + in-file metadata,2940.0,1.1629251700680272,True,mean,16142.17782805501,9951.0,128697.0
+cat_poisson,F8,A,,2023,3,2283ea800b7a0435a0c3,exact cache key + in-file metadata,2940.0,1.1238095238095238,True,mean,14456.584441527928,9951.0,128697.0
+hurdle_lgbm,F8,A,,2023,3,5661158130c5284bf26a,exact cache key + in-file metadata,2940.0,1.0948979591836734,True,mean,13908.546199755983,9951.0,128697.0
+glm_poisson,F8,A,,2024,3,8656b9b6b4ae1988c250,exact cache key + in-file metadata,3000.0,0.964,True,mean,10543.72204776964,6760.0,59652.0
+glm_poisson_nbdisp,F8,A,,2024,3,2422607dcccebdb4bff4,exact cache key + in-file metadata,3000.0,0.9473333333333334,True,mean,10543.72204776964,6760.0,59652.0
+glm_spline,F8,A,,2024,3,5c9aad327d0f019c671c,exact cache key + in-file metadata,3000.0,0.964,True,mean,10185.255537758596,6760.0,59652.0
+glm_nb,F8,A,,2024,3,61e4c0ae08802d68746c,exact cache key + in-file metadata,3000.0,0.9396666666666667,True,mean,10312.359999477678,6760.0,59652.0
+glm_tweedie,F8,A,,2024,3,947877aa2a9599a5487c,exact cache key + in-file metadata,3000.0,0.9676666666666667,True,mean,11096.328510964464,6760.0,59652.0
+lgbm_poisson,F8,A,,2024,3,4900dac8cc48e33e84a7,exact cache key + in-file metadata,3000.0,0.947,True,mean,10467.111244142585,6760.0,59652.0
+lgbm_tweedie,F8,A,,2024,3,1f949742c645408ceebe,exact cache key + in-file metadata,3000.0,0.959,True,mean,10816.562860574073,6760.0,59652.0
+lgbm_l1,F8,A,,2024,3,d31c16b2125c31969995,exact cache key + in-file metadata,3000.0,0.9323333333333333,True,point,10215.0,6760.0,59652.0
+xgb_poisson,F8,A,,2024,3,8e350c18d4094080beda,exact cache key + in-file metadata,3000.0,0.9646666666666667,True,mean,10823.495450336199,6760.0,59652.0
+cat_poisson,F8,A,,2024,3,65185bf6bef0f3e3c5c2,exact cache key + in-file metadata,3000.0,0.995,True,mean,11783.587401413795,6760.0,59652.0
+hurdle_lgbm,F8,A,,2024,3,ac7bbfb3e4377f06ece7,exact cache key + in-file metadata,3000.0,0.954,True,mean,10465.49131415047,6760.0,59652.0
+glm_poisson,F8,A,,2018,4,a0f2ce566ec38896a7a7,exact cache key + in-file metadata,2940.0,1.1282312925170068,True,mean,13287.353970122771,6619.0,56031.0
+glm_poisson_nbdisp,F8,A,,2018,4,99eb1f6ba2c7d661fe1c,exact cache key + in-file metadata,2940.0,1.088095238095238,True,mean,13287.353970122771,6619.0,56031.0
+glm_spline,F8,A,,2018,4,4bfd47067281cbba8dd7,exact cache key + in-file metadata,2940.0,1.0979591836734695,True,mean,12549.160541057503,6619.0,56031.0
+glm_nb,F8,A,,2018,4,890bee920aeca6bd1519,exact cache key + in-file metadata,2940.0,0.995578231292517,True,mean,11129.312023458133,6619.0,56031.0
+glm_tweedie,F8,A,,2018,4,c8eb1c19f1d96e6e8426,exact cache key + in-file metadata,2940.0,1.0789115646258503,True,mean,13285.828483582723,6619.0,56031.0
+lgbm_poisson,F8,A,,2018,4,353f8affd243f9d09e08,exact cache key + in-file metadata,2940.0,1.4003401360544219,True,mean,24529.89831276128,6619.0,56031.0
+lgbm_tweedie,F8,A,,2018,4,5079f91f81738415529c,exact cache key + in-file metadata,2940.0,1.3833333333333333,True,mean,24045.293085526453,6619.0,56031.0
+lgbm_l1,F8,A,,2018,4,5aaf6a6376a33e17a5dd,exact cache key + in-file metadata,2940.0,1.170408163265306,True,point,14341.0,6619.0,56031.0
+xgb_poisson,F8,A,,2018,4,82f9a2f0d8a647673d9f,exact cache key + in-file metadata,2940.0,1.3534013605442177,True,mean,23108.400640780943,6619.0,56031.0
+cat_poisson,F8,A,,2018,4,abb8d2708f2ac89cf29a,exact cache key + in-file metadata,2940.0,1.3071428571428572,True,mean,22009.667438955446,6619.0,56031.0
+hurdle_lgbm,F8,A,,2018,4,8afab6643858bf3ad0b0,exact cache key + in-file metadata,2940.0,1.382312925170068,True,mean,24199.969712463077,6619.0,56031.0
+glm_poisson,F8,A,,2019,4,68803544cda3ce1ca738,exact cache key + in-file metadata,2880.0,1.6375,True,mean,30321.1241759041,9967.0,129807.0
+glm_poisson_nbdisp,F8,A,,2019,4,35f110a6771960e28052,exact cache key + in-file metadata,2880.0,1.6416666666666666,True,mean,30321.1241759041,9967.0,129807.0
+glm_spline,F8,A,,2019,4,505647ec6bbde784e287,exact cache key + in-file metadata,2880.0,1.6284722222222223,True,mean,28768.185677652033,9967.0,129807.0
+glm_nb,F8,A,,2019,4,787268dbbd1f607a401d,exact cache key + in-file metadata,2880.0,1.8072916666666667,True,mean,37769.01596903587,9967.0,129807.0
+glm_tweedie,F8,A,,2019,4,1fd6039eac355e432cf9,exact cache key + in-file metadata,2880.0,1.6666666666666667,True,mean,30909.153017375473,9967.0,129807.0
+lgbm_poisson,F8,A,,2019,4,4d3db42f6e8164b415d4,exact cache key + in-file metadata,2880.0,1.5378472222222221,True,mean,26488.819843618287,9967.0,129807.0
+lgbm_tweedie,F8,A,,2019,4,b1f2c87f370376f92c63,exact cache key + in-file metadata,2880.0,1.5631944444444446,True,mean,27839.8741611671,9967.0,129807.0
+lgbm_l1,F8,A,,2019,4,4141611ad0a890546d39,exact cache key + in-file metadata,2880.0,1.785763888888889,True,point,39947.0,9967.0,129807.0
+xgb_poisson,F8,A,,2019,4,f5fb3b866fcc6b9be151,exact cache key + in-file metadata,2880.0,1.5607638888888888,True,mean,27812.606091170193,9967.0,129807.0
+cat_poisson,F8,A,,2019,4,0c125327563a91ab1a99,exact cache key + in-file metadata,2880.0,1.6378472222222222,True,mean,32679.255750565386,9967.0,129807.0
+hurdle_lgbm,F8,A,,2019,4,fab78895fa32fe6d7762,exact cache key + in-file metadata,2880.0,1.5243055555555556,True,mean,26212.675177580066,9967.0,129807.0
+glm_poisson,F8,A,,2020,4,d0368f3d7f8a73b9a225,exact cache key + in-file metadata,2880.0,1.1347222222222222,True,mean,13199.862883234015,7668.0,69146.0
+glm_poisson_nbdisp,F8,A,,2020,4,d7354f6569be72354e86,exact cache key + in-file metadata,2880.0,1.1253472222222223,True,mean,13199.862883234015,7668.0,69146.0
+glm_spline,F8,A,,2020,4,f4ca522acb82ae4404f7,exact cache key + in-file metadata,2880.0,1.2197916666666666,True,mean,15310.848709250586,7668.0,69146.0
+glm_nb,F8,A,,2020,4,5f54b4d572f1eb30920e,exact cache key + in-file metadata,2880.0,1.3364583333333333,True,mean,20737.711745244174,7668.0,69146.0
+glm_tweedie,F8,A,,2020,4,7bffaa3d422a69dac4b7,exact cache key + in-file metadata,2880.0,1.2340277777777777,True,mean,17255.751687567354,7668.0,69146.0
+lgbm_poisson,F8,A,,2020,4,2872d496559b06a353cb,exact cache key + in-file metadata,2880.0,1.3413194444444445,True,mean,19880.89399142506,7668.0,69146.0
+lgbm_tweedie,F8,A,,2020,4,b6276d1c9e476ab6b2b3,exact cache key + in-file metadata,2880.0,1.3510416666666667,True,mean,19947.612499970055,7668.0,69146.0
+lgbm_l1,F8,A,,2020,4,3cfb1a781b3256ae9dfb,exact cache key + in-file metadata,2880.0,1.2916666666666667,True,point,17176.0,7668.0,69146.0
+xgb_poisson,F8,A,,2020,4,e896a866c1b1043c7c6c,exact cache key + in-file metadata,2880.0,1.3520833333333333,True,mean,19611.386116560625,7668.0,69146.0
+cat_poisson,F8,A,,2020,4,46bdff673a12edcc326d,exact cache key + in-file metadata,2880.0,1.304861111111111,True,mean,19099.15222738142,7668.0,69146.0
+hurdle_lgbm,F8,A,,2020,4,bcf91ba95aaf89d9606d,exact cache key + in-file metadata,2880.0,1.3333333333333333,True,mean,18827.86071383059,7668.0,69146.0
+glm_poisson,F8,A,,2021,4,94eabaafc5c7736add22,exact cache key + in-file metadata,2880.0,1.5538194444444444,True,mean,25400.78246878088,6529.0,52911.0
+glm_poisson_nbdisp,F8,A,,2021,4,1f7a53326e250b033d91,exact cache key + in-file metadata,2880.0,1.476736111111111,True,mean,25400.78246878088,6529.0,52911.0
+glm_spline,F8,A,,2021,4,46689ed85b8dec2796d3,exact cache key + in-file metadata,2880.0,1.2409722222222221,True,mean,16493.077629155334,6529.0,52911.0
+glm_nb,F8,A,,2021,4,05782ba127d47d39663d,exact cache key + in-file metadata,2880.0,1.4319444444444445,True,mean,24029.592729779648,6529.0,52911.0
+glm_tweedie,F8,A,,2021,4,0111068080849026cd98,exact cache key + in-file metadata,2880.0,1.2461805555555556,True,mean,17294.787033682605,6529.0,52911.0
+lgbm_poisson,F8,A,,2021,4,8001f0a87ba8d5dc9cad,exact cache key + in-file metadata,2880.0,1.4569444444444444,True,mean,22670.942439021987,6529.0,52911.0
+lgbm_tweedie,F8,A,,2021,4,5c7faa4aa498ac497078,exact cache key + in-file metadata,2880.0,1.4590277777777778,True,mean,23228.24150609495,6529.0,52911.0
+lgbm_l1,F8,A,,2021,4,bc5b53de111f6a45f988,exact cache key + in-file metadata,2880.0,1.2753472222222222,True,point,16507.0,6529.0,52911.0
+xgb_poisson,F8,A,,2021,4,67448b95f34f75898ca3,exact cache key + in-file metadata,2880.0,1.4111111111111112,True,mean,22398.798191036636,6529.0,52911.0
+cat_poisson,F8,A,,2021,4,719644a942f8da0d8775,exact cache key + in-file metadata,2880.0,1.4524305555555554,True,mean,23003.92702514416,6529.0,52911.0
+hurdle_lgbm,F8,A,,2021,4,1fa0226a701b1ce0339a,exact cache key + in-file metadata,2880.0,1.4850694444444446,True,mean,25369.852176902008,6529.0,52911.0
+glm_poisson,F8,A,,2022,4,fbe053ec2c49218c87a7,exact cache key + in-file metadata,2880.0,1.578125,True,mean,26900.556931648425,10013.0,114635.0
+glm_poisson_nbdisp,F8,A,,2022,4,5ad9b7ad89dc94962024,exact cache key + in-file metadata,2880.0,1.6090277777777777,True,mean,26900.556931648425,10013.0,114635.0
+glm_spline,F8,A,,2022,4,1273f2533d5051c30ed6,exact cache key + in-file metadata,2880.0,1.5847222222222221,True,mean,27498.75920473024,10013.0,114635.0
+glm_nb,F8,A,,2022,4,c5f410db5d6ff31d6546,exact cache key + in-file metadata,2880.0,1.6305555555555555,True,mean,28892.001023949408,10013.0,114635.0
+glm_tweedie,F8,A,,2022,4,85ed4d91e25215a1e1d0,exact cache key + in-file metadata,2880.0,1.9260416666666667,True,mean,34551.804944652045,10013.0,114635.0
+lgbm_poisson,F8,A,,2022,4,4745f286c251cd1f7993,exact cache key + in-file metadata,2880.0,1.640625,True,mean,30736.72539502012,10013.0,114635.0
+lgbm_tweedie,F8,A,,2022,4,a266ff8279ff19bb5c3e,exact cache key + in-file metadata,2880.0,1.6322916666666667,True,mean,30561.09460557237,10013.0,114635.0
+lgbm_l1,F8,A,,2022,4,716fad4d88da6ef6debb,exact cache key + in-file metadata,2880.0,1.6090277777777777,True,point,32028.0,10013.0,114635.0
+xgb_poisson,F8,A,,2022,4,d5c5873f8a410f17f6cb,exact cache key + in-file metadata,2880.0,1.663888888888889,True,mean,31476.852859268616,10013.0,114635.0
+cat_poisson,F8,A,,2022,4,db5d0f12781f29dc2a9c,exact cache key + in-file metadata,2880.0,1.5979166666666667,True,mean,30051.62162143804,10013.0,114635.0
+hurdle_lgbm,F8,A,,2022,4,2a7f0c977988fa7193f1,exact cache key + in-file metadata,2880.0,1.6444444444444444,True,mean,31563.82700472307,10013.0,114635.0
+glm_poisson,F8,A,,2023,4,d57be775f8ffa7cdc2eb,exact cache key + in-file metadata,2880.0,1.4993055555555554,True,mean,24751.89115157928,9949.0,128695.0
+glm_poisson_nbdisp,F8,A,,2023,4,1e17b3fff985ac4a6670,exact cache key + in-file metadata,2880.0,1.5243055555555556,True,mean,24751.89115157928,9949.0,128695.0
+glm_spline,F8,A,,2023,4,0aedf04ec53097e23d9a,exact cache key + in-file metadata,2880.0,1.4833333333333334,True,mean,24306.489662514054,9949.0,128695.0
+glm_nb,F8,A,,2023,4,fe274e4baa6ce5093424,exact cache key + in-file metadata,2880.0,1.4708333333333334,True,mean,23471.76926737169,9949.0,128695.0
+glm_tweedie,F8,A,,2023,4,6d0253d7a56527fca446,exact cache key + in-file metadata,2880.0,1.4569444444444444,True,mean,23350.04008570245,9949.0,128695.0
+lgbm_poisson,F8,A,,2023,4,9dd37c4b6034e6035e30,exact cache key + in-file metadata,2880.0,1.4715277777777778,True,mean,24187.13253472204,9949.0,128695.0
+lgbm_tweedie,F8,A,,2023,4,3f1d07589e5ed1e0258e,exact cache key + in-file metadata,2880.0,1.4850694444444446,True,mean,24850.31086134669,9949.0,128695.0
+lgbm_l1,F8,A,,2023,4,7437173c404836f8bf99,exact cache key + in-file metadata,2880.0,1.6100694444444446,True,point,30313.0,9949.0,128695.0
+xgb_poisson,F8,A,,2023,4,686c22b83bac31195eb4,exact cache key + in-file metadata,2880.0,1.5131944444444445,True,mean,25647.590519442252,9949.0,128695.0
+cat_poisson,F8,A,,2023,4,04616fad1e709971c5ac,exact cache key + in-file metadata,2880.0,1.540625,True,mean,27193.52874346159,9949.0,128695.0
+hurdle_lgbm,F8,A,,2023,4,ee8bfe77bfdff3fbc430,exact cache key + in-file metadata,2880.0,1.5052083333333333,True,mean,24931.682331700664,9949.0,128695.0
+glm_poisson,F8,A,,2024,4,11508c377899c8e090e9,exact cache key + in-file metadata,2940.0,1.2993197278911566,True,mean,19517.728757332836,6758.0,59650.0
+glm_poisson_nbdisp,F8,A,,2024,4,a194e98f5cee3e228ec1,exact cache key + in-file metadata,2940.0,1.251700680272109,True,mean,19517.728757332836,6758.0,59650.0
+glm_spline,F8,A,,2024,4,5a5fcab094c73670142c,exact cache key + in-file metadata,2940.0,1.2853741496598639,True,mean,19408.57187891954,6758.0,59650.0
+glm_nb,F8,A,,2024,4,1106afe8bc9402c0582e,exact cache key + in-file metadata,2940.0,1.2448979591836735,True,mean,19920.736182779125,6758.0,59650.0
+glm_tweedie,F8,A,,2024,4,bcbe4acc08df1483be25,exact cache key + in-file metadata,2940.0,1.2659863945578231,True,mean,20040.194530674336,6758.0,59650.0
+lgbm_poisson,F8,A,,2024,4,e9517333641fbb6abf79,exact cache key + in-file metadata,2940.0,1.3306122448979592,True,mean,21348.866125894376,6758.0,59650.0
+lgbm_tweedie,F8,A,,2024,4,bb7a3a340fcba986f6ef,exact cache key + in-file metadata,2940.0,1.329591836734694,True,mean,22002.312097407994,6758.0,59650.0
+lgbm_l1,F8,A,,2024,4,1b3a495747ffb41c87b7,exact cache key + in-file metadata,2940.0,1.1775510204081632,True,point,15818.0,6758.0,59650.0
+xgb_poisson,F8,A,,2024,4,4a00f78e80436aab8803,exact cache key + in-file metadata,2940.0,1.2554421768707482,True,mean,18882.635031665952,6758.0,59650.0
+cat_poisson,F8,A,,2024,4,5940473860f5c07dfb7a,exact cache key + in-file metadata,2940.0,1.3465986394557823,True,mean,23190.762121632753,6758.0,59650.0
+hurdle_lgbm,F8,A,,2024,4,78f1f471e9a5b8b6fc67,exact cache key + in-file metadata,2940.0,1.2959183673469388,True,mean,20565.039305011567,6758.0,59650.0
+glm_poisson,F3,C,,2018,2,220828a14389ed169205,exact cache key + in-file metadata,3060.0,0.9892156862745098,True,mean,11479.86811403658,6620.0,56032.0
+glm_tweedie,F3,C,,2018,2,1460866b72883d45852c,exact cache key + in-file metadata,3060.0,1.018627450980392,True,mean,12504.132215496498,6620.0,56032.0
+lgbm_poisson,F3,C,,2018,2,69160d98c7548d2fa7df,exact cache key + in-file metadata,3060.0,0.9826797385620915,True,mean,12135.969643881192,6620.0,56032.0
+xgb_poisson,F3,C,,2018,2,5925c09184f24dd78068,exact cache key + in-file metadata,3060.0,0.9915032679738562,True,mean,12450.36287977441,6620.0,56032.0
+cat_poisson,F3,C,,2018,2,ee4144a7e6459387a5d7,exact cache key + in-file metadata,3060.0,1.0392156862745099,True,mean,13368.50165709775,6620.0,56032.0
+glm_poisson,F3,C,,2019,2,5896681c4d3e28aa8b42,exact cache key + in-file metadata,3000.0,1.2953333333333332,True,mean,20240.032673949718,9967.0,129807.0
+glm_tweedie,F3,C,,2019,2,5d1fd4df776adde14757,exact cache key + in-file metadata,3000.0,1.296,True,mean,21036.875507808967,9967.0,129807.0
+lgbm_poisson,F3,C,,2019,2,05a1e8b8e96382a24027,exact cache key + in-file metadata,3000.0,1.243,True,mean,18589.88877492075,9967.0,129807.0
+xgb_poisson,F3,C,,2019,2,2b205a5055cbe4177804,exact cache key + in-file metadata,3000.0,1.343,True,mean,21652.542698571917,9967.0,129807.0
+cat_poisson,F3,C,,2019,2,efaf566572a60af22186,exact cache key + in-file metadata,3000.0,1.3303333333333334,True,mean,22037.66298483339,9967.0,129807.0
+glm_poisson,F3,C,,2020,2,e109ddd6293ee17ddb98,exact cache key + in-file metadata,3000.0,1.1566666666666667,True,mean,15379.421474988589,7668.0,69146.0
+glm_tweedie,F3,C,,2020,2,9b57c87eada0a6087a58,exact cache key + in-file metadata,3000.0,1.223,True,mean,17025.67580867358,7668.0,69146.0
+lgbm_poisson,F3,C,,2020,2,e2ea5bf8e88d218c301a,exact cache key + in-file metadata,3000.0,1.114,True,mean,14161.552061551189,7668.0,69146.0
+xgb_poisson,F3,C,,2020,2,a8b1c7a037bf89432228,exact cache key + in-file metadata,3000.0,1.102,True,mean,13921.483853163489,7668.0,69146.0
+cat_poisson,F3,C,,2020,2,dbc5c655727f8099768d,exact cache key + in-file metadata,3000.0,1.1706666666666667,True,mean,15363.848448658773,7668.0,69146.0
+glm_poisson,F3,C,,2021,2,08027ecd43d87da692b6,exact cache key + in-file metadata,3000.0,0.9653333333333334,True,mean,10241.326160435705,6530.0,52912.0
+glm_tweedie,F3,C,,2021,2,50031c97dc634bb61054,exact cache key + in-file metadata,3000.0,0.962,True,mean,10415.853114109204,6530.0,52912.0
+lgbm_poisson,F3,C,,2021,2,51cddacf0396c1eb84f9,exact cache key + in-file metadata,3000.0,1.001,True,mean,11282.440631403751,6530.0,52912.0
+xgb_poisson,F3,C,,2021,2,4d7c9b69738c44623638,exact cache key + in-file metadata,3000.0,1.0056666666666667,True,mean,11342.592279304055,6530.0,52912.0
+cat_poisson,F3,C,,2021,2,25488bfaa22d119f4842,exact cache key + in-file metadata,3000.0,0.9733333333333334,True,mean,10606.326821210807,6530.0,52912.0
+glm_poisson,F3,C,,2022,2,6f105775d836bf06fd56,exact cache key + in-file metadata,3000.0,1.196,True,mean,15869.943668084501,10013.0,114635.0
+glm_tweedie,F3,C,,2022,2,5b8ca5a0e1e5556e54d8,exact cache key + in-file metadata,3000.0,1.1896666666666667,True,mean,15032.143008448224,10013.0,114635.0
+lgbm_poisson,F3,C,,2022,2,c8f88e1ca1abfbfe7f63,exact cache key + in-file metadata,3000.0,1.3573333333333333,True,mean,23105.80538923131,10013.0,114635.0
+xgb_poisson,F3,C,,2022,2,4f60d3cb48dd482b46eb,exact cache key + in-file metadata,3000.0,1.3336666666666666,True,mean,21384.851047705488,10013.0,114635.0
+cat_poisson,F3,C,,2022,2,6651140b372bc4a1d083,exact cache key + in-file metadata,3000.0,1.298,True,mean,19652.938982158477,10013.0,114635.0
+glm_poisson,F3,C,,2023,2,a2c21f20a72ef9403672,exact cache key + in-file metadata,3000.0,1.1443333333333334,True,mean,16326.842022978813,9954.0,128702.0
+glm_tweedie,F3,C,,2023,2,fd26caedf8df5efd439a,exact cache key + in-file metadata,3000.0,1.1546666666666667,True,mean,17088.22820525149,9954.0,128702.0
+lgbm_poisson,F3,C,,2023,2,ec7cf2a42a0272636ed3,exact cache key + in-file metadata,3000.0,1.067,True,mean,13786.582286151062,9954.0,128702.0
+xgb_poisson,F3,C,,2023,2,1a1d2a2ab3b41514500c,exact cache key + in-file metadata,3000.0,1.0766666666666667,True,mean,14094.910367753677,9954.0,128702.0
+cat_poisson,F3,C,,2023,2,fed7750ed445be2806a9,exact cache key + in-file metadata,3000.0,1.1333333333333333,True,mean,15807.915744556285,9954.0,128702.0
+glm_poisson,F3,C,,2024,2,d8a2eeef96e525f9581b,exact cache key + in-file metadata,3060.0,0.884313725490196,True,mean,9250.118576689783,6760.0,59652.0
+glm_tweedie,F3,C,,2024,2,aa743a214f61993076c0,exact cache key + in-file metadata,3060.0,0.8885620915032679,True,mean,9526.34195255815,6760.0,59652.0
+lgbm_poisson,F3,C,,2024,2,83e44341d69917bb3d4b,exact cache key + in-file metadata,3060.0,0.8833333333333333,True,mean,9447.683413792529,6760.0,59652.0
+xgb_poisson,F3,C,,2024,2,8b2315d6f6c49421da09,exact cache key + in-file metadata,3060.0,0.8781045751633987,True,mean,9534.911169159453,6760.0,59652.0
+cat_poisson,F3,C,,2024,2,12d5999bd52a15b9d8d4,exact cache key + in-file metadata,3060.0,0.9,True,mean,10009.273148515666,6760.0,59652.0
+glm_poisson,F3,C,,2018,3,dbb86f7729875e8fccf7,exact cache key + in-file metadata,3000.0,1.008,True,mean,11396.271646537638,6620.0,56032.0
+glm_tweedie,F3,C,,2018,3,c0ceaff7266f223627f9,exact cache key + in-file metadata,3000.0,1.004,True,mean,11854.31541139332,6620.0,56032.0
+lgbm_poisson,F3,C,,2018,3,7b54a44b12c4077df278,exact cache key + in-file metadata,3000.0,1.074,True,mean,14834.886885183878,6620.0,56032.0
+xgb_poisson,F3,C,,2018,3,0e58a760037c62eb938b,exact cache key + in-file metadata,3000.0,1.0673333333333332,True,mean,14197.39949327727,6620.0,56032.0
+cat_poisson,F3,C,,2018,3,57367a3a85e46867005b,exact cache key + in-file metadata,3000.0,1.1746666666666667,True,mean,16599.626646850207,6620.0,56032.0
+glm_poisson,F3,C,,2019,3,1b49c957fae08ed261f7,exact cache key + in-file metadata,2940.0,1.4860544217687075,True,mean,25931.605736170262,9967.0,129807.0
+glm_tweedie,F3,C,,2019,3,7f9ada3ae4c6001b37f7,exact cache key + in-file metadata,2940.0,1.463265306122449,True,mean,25118.672594652737,9967.0,129807.0
+lgbm_poisson,F3,C,,2019,3,e964a72f1a8921b33af7,exact cache key + in-file metadata,2940.0,1.35578231292517,True,mean,21417.181623302164,9967.0,129807.0
+xgb_poisson,F3,C,,2019,3,bd2697bf44050d4b8014,exact cache key + in-file metadata,2940.0,1.424829931972789,True,mean,23244.770885648002,9967.0,129807.0
+cat_poisson,F3,C,,2019,3,1ebf1c93095124df37de,exact cache key + in-file metadata,2940.0,1.4193877551020408,True,mean,22955.941338868826,9967.0,129807.0
+glm_poisson,F3,C,,2020,3,9e74f7a9951e5173a2bf,exact cache key + in-file metadata,2940.0,1.0564625850340137,True,mean,12278.829655206937,7668.0,69146.0
+glm_tweedie,F3,C,,2020,3,cc1a75dec45cf8805262,exact cache key + in-file metadata,2940.0,1.2312925170068028,True,mean,15978.56676083487,7668.0,69146.0
+lgbm_poisson,F3,C,,2020,3,09fe4c240f3949ad50fd,exact cache key + in-file metadata,2940.0,1.0503401360544218,True,mean,12147.668717839837,7668.0,69146.0
+xgb_poisson,F3,C,,2020,3,18942110470cafdae2b6,exact cache key + in-file metadata,2940.0,1.0629251700680271,True,mean,12122.479817437797,7668.0,69146.0
+cat_poisson,F3,C,,2020,3,c3e94a55d43eb5a0c3e0,exact cache key + in-file metadata,2940.0,1.0806122448979592,True,mean,12428.73377328837,7668.0,69146.0
+glm_poisson,F3,C,,2021,3,ce68b5c0063745a2cb1e,exact cache key + in-file metadata,2940.0,1.0530612244897959,True,mean,11860.590042248688,6530.0,52912.0
+glm_tweedie,F3,C,,2021,3,cb2819231bcca19385ac,exact cache key + in-file metadata,2940.0,1.001700680272109,True,mean,11352.838985036815,6530.0,52912.0
+lgbm_poisson,F3,C,,2021,3,7419216f6963bd35232f,exact cache key + in-file metadata,2940.0,1.1350340136054422,True,mean,14254.926105296327,6530.0,52912.0
+xgb_poisson,F3,C,,2021,3,9f2af58c32abb4c89bcf,exact cache key + in-file metadata,2940.0,1.0979591836734695,True,mean,13182.769136467587,6530.0,52912.0
+cat_poisson,F3,C,,2021,3,452f3db8153048a6f61d,exact cache key + in-file metadata,2940.0,1.1282312925170068,True,mean,14213.129723906653,6530.0,52912.0
+glm_poisson,F3,C,,2022,3,3ba168bf4e7388c51953,exact cache key + in-file metadata,2940.0,1.3153061224489795,True,mean,18023.99929150708,10013.0,114635.0
+glm_tweedie,F3,C,,2022,3,a36e4f82b02df33a1885,exact cache key + in-file metadata,2940.0,1.271768707482993,True,mean,16607.31024062395,10013.0,114635.0
+lgbm_poisson,F3,C,,2022,3,56c46c1d8a7dad309d50,exact cache key + in-file metadata,2940.0,1.4448979591836735,True,mean,25074.94448349574,10013.0,114635.0
+xgb_poisson,F3,C,,2022,3,914f31b0b920d301bb12,exact cache key + in-file metadata,2940.0,1.4224489795918367,True,mean,23385.345999817328,10013.0,114635.0
+cat_poisson,F3,C,,2022,3,a31ed27cbfb7d9be0e2b,exact cache key + in-file metadata,2940.0,1.3870748299319728,True,mean,21959.426398405958,10013.0,114635.0
+glm_poisson,F3,C,,2023,3,b7a1e178c870bebab2c4,exact cache key + in-file metadata,2940.0,1.1394557823129252,True,mean,15493.473719919712,9951.0,128697.0
+glm_tweedie,F3,C,,2023,3,388aeb4f5ccad3b7eab2,exact cache key + in-file metadata,2940.0,1.1493197278911564,True,mean,16657.917863004466,9951.0,128697.0
+lgbm_poisson,F3,C,,2023,3,da0c5211c15dc9d5f8f8,exact cache key + in-file metadata,2940.0,1.1003401360544218,True,mean,14112.628209983077,9951.0,128697.0
+xgb_poisson,F3,C,,2023,3,c3106162eb447a94f76f,exact cache key + in-file metadata,2940.0,1.1387755102040817,True,mean,15232.05148380586,9951.0,128697.0
+cat_poisson,F3,C,,2023,3,f61c498f15613e185f58,exact cache key + in-file metadata,2940.0,1.1727891156462584,True,mean,16669.888881837276,9951.0,128697.0
+glm_poisson,F3,C,,2024,3,e533bdc0cea04a0d69c4,exact cache key + in-file metadata,3000.0,0.9533333333333334,True,mean,10148.396083971766,6760.0,59652.0
+glm_tweedie,F3,C,,2024,3,7d5eff15f3ee41fe65f4,exact cache key + in-file metadata,3000.0,0.9666666666666667,True,mean,10975.151860713415,6760.0,59652.0
+lgbm_poisson,F3,C,,2024,3,3f6b1de681cc5eb37cbf,exact cache key + in-file metadata,3000.0,0.9456666666666667,True,mean,10383.66432670916,6760.0,59652.0
+xgb_poisson,F3,C,,2024,3,e4c92c6cd41ca0d51df8,exact cache key + in-file metadata,3000.0,0.9603333333333334,True,mean,10677.334484363346,6760.0,59652.0
+cat_poisson,F3,C,,2024,3,6817f5c716d6a2230488,exact cache key + in-file metadata,3000.0,0.9853333333333333,True,mean,11514.843651051477,6760.0,59652.0
+glm_poisson,F3,C,,2018,4,9330630960197aa6db92,exact cache key + in-file metadata,2940.0,1.1870748299319729,True,mean,14299.747988746361,6619.0,56031.0
+glm_tweedie,F3,C,,2018,4,4a4cb854ed7ab970059c,exact cache key + in-file metadata,2940.0,1.1302721088435375,True,mean,14011.854166637195,6619.0,56031.0
+lgbm_poisson,F3,C,,2018,4,362279b44febb4f505e3,exact cache key + in-file metadata,2940.0,1.4034013605442177,True,mean,25071.301445473568,6619.0,56031.0
+xgb_poisson,F3,C,,2018,4,95d87713eb8cb3fcd1c2,exact cache key + in-file metadata,2940.0,1.4153061224489796,True,mean,25819.982218379708,6619.0,56031.0
+cat_poisson,F3,C,,2018,4,53a7c5e7ed4db2409c19,exact cache key + in-file metadata,2940.0,1.3085034013605443,True,mean,20663.021774428336,6619.0,56031.0
+glm_poisson,F3,C,,2019,4,9364820024a57d6f7612,exact cache key + in-file metadata,2880.0,1.6493055555555556,True,mean,29302.426301581305,9967.0,129807.0
+glm_tweedie,F3,C,,2019,4,cc88ab49d1b4471c3f02,exact cache key + in-file metadata,2880.0,1.5868055555555556,True,mean,27248.648508215516,9967.0,129807.0
+lgbm_poisson,F3,C,,2019,4,f186e839aa459ecc64a1,exact cache key + in-file metadata,2880.0,1.5576388888888888,True,mean,27553.44758050877,9967.0,129807.0
+xgb_poisson,F3,C,,2019,4,56248cf8591e3e52249b,exact cache key + in-file metadata,2880.0,1.554513888888889,True,mean,28258.88584333482,9967.0,129807.0
+cat_poisson,F3,C,,2019,4,db1323d7b3acd9f2398d,exact cache key + in-file metadata,2880.0,1.7184027777777777,True,mean,34808.492429601625,9967.0,129807.0
+glm_poisson,F3,C,,2020,4,1ea049a7691746703709,exact cache key + in-file metadata,2880.0,1.2913194444444445,True,mean,17865.209551927564,7668.0,69146.0
+glm_tweedie,F3,C,,2020,4,fda6618fb515d36f1d76,exact cache key + in-file metadata,2880.0,1.1989583333333333,True,mean,16806.01214110123,7668.0,69146.0
+lgbm_poisson,F3,C,,2020,4,54771218427ac261ab1c,exact cache key + in-file metadata,2880.0,1.3086805555555556,True,mean,18843.47976290514,7668.0,69146.0
+xgb_poisson,F3,C,,2020,4,ceb9f4662cf4271691a4,exact cache key + in-file metadata,2880.0,1.2868055555555555,True,mean,17863.91353920209,7668.0,69146.0
+cat_poisson,F3,C,,2020,4,ba605c64e11bb25176f2,exact cache key + in-file metadata,2880.0,1.290625,True,mean,17812.89509900222,7668.0,69146.0
+glm_poisson,F3,C,,2021,4,fd88927014173cec5fc1,exact cache key + in-file metadata,2880.0,1.4864583333333334,True,mean,22940.738885738112,6529.0,52911.0
+glm_tweedie,F3,C,,2021,4,65d25ba851363b077e7a,exact cache key + in-file metadata,2880.0,1.2034722222222223,True,mean,15922.275477918754,6529.0,52911.0
+lgbm_poisson,F3,C,,2021,4,7f08663c34d438891f6b,exact cache key + in-file metadata,2880.0,1.453125,True,mean,22859.05234321812,6529.0,52911.0
+xgb_poisson,F3,C,,2021,4,b74e0afa2cc9384b3086,exact cache key + in-file metadata,2880.0,1.4694444444444446,True,mean,25179.144907977952,6529.0,52911.0
+cat_poisson,F3,C,,2021,4,ea830af35ecb0dc548f5,exact cache key + in-file metadata,2880.0,1.4645833333333333,True,mean,23253.343996045165,6529.0,52911.0
+glm_poisson,F3,C,,2022,4,befb5d87a9ba27975dd6,exact cache key + in-file metadata,2880.0,1.551388888888889,True,mean,26139.89086751253,10013.0,114635.0
+glm_tweedie,F3,C,,2022,4,9a86ac188d4c3f0924dd,exact cache key + in-file metadata,2880.0,1.5552083333333333,True,mean,25579.24776245989,10013.0,114635.0
+lgbm_poisson,F3,C,,2022,4,b3448a2456118e925087,exact cache key + in-file metadata,2880.0,1.645138888888889,True,mean,31155.462729417202,10013.0,114635.0
+xgb_poisson,F3,C,,2022,4,907c1955b09ecd86e8eb,exact cache key + in-file metadata,2880.0,1.6604166666666667,True,mean,31899.249077793378,10013.0,114635.0
+cat_poisson,F3,C,,2022,4,17506db09dca64a6805a,exact cache key + in-file metadata,2880.0,1.6229166666666666,True,mean,31037.970459936438,10013.0,114635.0
+glm_poisson,F3,C,,2023,4,c7a15c7fc9ce18f63794,exact cache key + in-file metadata,2880.0,1.4746527777777778,True,mean,24337.6028894646,9949.0,128695.0
+glm_tweedie,F3,C,,2023,4,eb9f08fb1402aebe0ce3,exact cache key + in-file metadata,2880.0,1.4673611111111111,True,mean,23661.143971663478,9949.0,128695.0
+lgbm_poisson,F3,C,,2023,4,018716a967fd35507ba0,exact cache key + in-file metadata,2880.0,1.4815972222222222,True,mean,24681.86282120383,9949.0,128695.0
+xgb_poisson,F3,C,,2023,4,7e8a059624412f09a463,exact cache key + in-file metadata,2880.0,1.526736111111111,True,mean,26187.40707188016,9949.0,128695.0
+cat_poisson,F3,C,,2023,4,40047a44232f817e8614,exact cache key + in-file metadata,2880.0,1.6871527777777777,True,mean,32244.93963057811,9949.0,128695.0
+glm_poisson,F3,C,,2024,4,ba734fc46cf0f84e5ffe,exact cache key + in-file metadata,2940.0,1.2714285714285714,True,mean,18533.317337296183,6758.0,59650.0
+glm_tweedie,F3,C,,2024,4,92faf853f58c65df0c2d,exact cache key + in-file metadata,2940.0,1.2418367346938775,True,mean,19351.014545552807,6758.0,59650.0
+lgbm_poisson,F3,C,,2024,4,8541c77fdbd69e7e7768,exact cache key + in-file metadata,2940.0,1.3591836734693878,True,mean,21910.45738664509,6758.0,59650.0
+xgb_poisson,F3,C,,2024,4,c14c0804d15580f22f89,exact cache key + in-file metadata,2940.0,1.2829931972789115,True,mean,19802.372586059748,6758.0,59650.0
+cat_poisson,F3,C,,2024,4,b1f721a98195516de744,exact cache key + in-file metadata,2940.0,1.2326530612244897,True,mean,18201.258241500953,6758.0,59650.0
+cat_poisson,F3,B,tuned,2018,2,53f8b6fdd53768b70af5,exact cache key + in-file metadata,3060.0,1.238562091503268,True,mean,19398.398647178597,6620.0,56032.0
+cat_poisson,F3,B,tuned,2019,2,4a9e21d2de53462fc663,exact cache key + in-file metadata,3000.0,1.3396666666666666,True,mean,22515.26294458063,9967.0,129807.0
+cat_poisson,F3,B,tuned,2020,2,e08e691eb638647bddf9,exact cache key + in-file metadata,3000.0,1.0853333333333333,True,mean,13215.27907246643,7668.0,69146.0
+cat_poisson,F3,B,tuned,2021,2,1ba2ff3bf28595a1fe8f,exact cache key + in-file metadata,3000.0,1.0263333333333333,True,mean,11509.29690805441,6530.0,52912.0
+cat_poisson,F3,B,tuned,2022,2,3d87f1271a31228a19c2,exact cache key + in-file metadata,3000.0,1.4713333333333334,True,mean,26196.76870184471,10013.0,114635.0
+cat_poisson,F3,B,tuned,2023,2,1d55bdff57e8b957b87c,exact cache key + in-file metadata,3000.0,1.114,True,mean,14915.958134243787,9954.0,128702.0
+cat_poisson,F3,B,tuned,2024,2,1e4d45c6ecddb7df0950,exact cache key + in-file metadata,3060.0,0.8993464052287582,True,mean,9947.010755010093,6760.0,59652.0
+cat_poisson,F3,B,tuned,2018,3,db97a2a16f5453e9b276,exact cache key + in-file metadata,3000.0,1.2666666666666666,True,mean,21382.670146260458,6620.0,56032.0
+cat_poisson,F3,B,tuned,2019,3,fda47a4e4202d88f4e7f,exact cache key + in-file metadata,2940.0,1.610204081632653,True,mean,32700.023803300857,9967.0,129807.0
+cat_poisson,F3,B,tuned,2020,3,51930706aa2d5c21ab37,exact cache key + in-file metadata,2940.0,1.248299319727891,True,mean,16321.093499178849,7668.0,69146.0
+cat_poisson,F3,B,tuned,2021,3,937d75335caa7a312eb6,exact cache key + in-file metadata,2940.0,1.4139455782312924,True,mean,22495.212721128075,6530.0,52912.0
+cat_poisson,F3,B,tuned,2022,3,fd5cf5cc46015bc27467,exact cache key + in-file metadata,2940.0,1.5979591836734695,True,mean,29112.43029294796,10013.0,114635.0
+cat_poisson,F3,B,tuned,2023,3,4ac9c8d31e05d8a233a3,exact cache key + in-file metadata,2940.0,1.4714285714285715,True,mean,25181.583310458558,9951.0,128697.0
+cat_poisson,F3,B,tuned,2024,3,6934af2c87971809157a,exact cache key + in-file metadata,3000.0,1.2143333333333333,True,mean,18548.322890222582,6760.0,59652.0
+cat_poisson,F3,B,tuned,2018,4,730900de87931d46d1d2,exact cache key + in-file metadata,2940.0,1.4241496598639456,True,mean,24634.054834557963,6619.0,56031.0
+cat_poisson,F3,B,tuned,2019,4,68e08cbda6671dd3c57d,exact cache key + in-file metadata,2880.0,1.6767361111111112,True,mean,32643.649125725584,9967.0,129807.0
+cat_poisson,F3,B,tuned,2020,4,fd4cec23e8c2c0ff6ffb,exact cache key + in-file metadata,2880.0,1.2729166666666667,True,mean,17830.272800284747,7668.0,69146.0
+cat_poisson,F3,B,tuned,2021,4,187d589c6dbc4cc064d3,exact cache key + in-file metadata,2880.0,1.471875,True,mean,23088.566119666204,6529.0,52911.0
+cat_poisson,F3,B,tuned,2022,4,c06df9881c7dded901ed,exact cache key + in-file metadata,2880.0,1.6916666666666667,True,mean,33698.112925031186,10013.0,114635.0
+cat_poisson,F3,B,tuned,2023,4,08bf6549bb74dc7bb52a,exact cache key + in-file metadata,2880.0,1.7621527777777777,True,mean,34490.671323880015,9949.0,128695.0
+cat_poisson,F3,B,tuned,2024,4,c85afdd1d6415c0d382b,exact cache key + in-file metadata,2940.0,1.2731292517006803,True,mean,17256.96709939242,6758.0,59650.0
+cat_poisson,F3,A,tuned,2018,2,51eb5dbdc2b97954394b,exact cache key + in-file metadata,3060.0,1.0470588235294118,True,mean,13343.336836670787,6620.0,56032.0
+cat_poisson,F3,A,tuned,2019,2,c993bb0dfd98a7af0ccf,exact cache key + in-file metadata,3000.0,1.294,True,mean,20501.614763088262,9967.0,129807.0
+cat_poisson,F3,A,tuned,2020,2,076558980fedf951408e,exact cache key + in-file metadata,3000.0,1.1626666666666667,True,mean,15086.95864547478,7668.0,69146.0
+cat_poisson,F3,A,tuned,2021,2,f0388dfa7b009ddb7561,exact cache key + in-file metadata,3000.0,0.9513333333333334,True,mean,10310.569811124957,6530.0,52912.0
+cat_poisson,F3,A,tuned,2022,2,54da03e58a69302e1744,exact cache key + in-file metadata,3000.0,1.4126666666666667,True,mean,23629.528089515137,10013.0,114635.0
+cat_poisson,F3,A,tuned,2023,2,39245ef188071a3c7512,exact cache key + in-file metadata,3000.0,1.1356666666666666,True,mean,15729.999130068316,9954.0,128702.0
+cat_poisson,F3,A,tuned,2024,2,a4c82bc9e2bbb6af7f20,exact cache key + in-file metadata,3060.0,0.9032679738562092,True,mean,10074.515305148689,6760.0,59652.0
+cat_poisson,F3,A,tuned,2018,3,3eedd98d4d5f5081e711,exact cache key + in-file metadata,3000.0,1.1856666666666666,True,mean,16761.365908659733,6620.0,56032.0
+cat_poisson,F3,A,tuned,2019,3,fe6aa06fd13be3a3293c,exact cache key + in-file metadata,2940.0,1.5431972789115647,True,mean,27817.942834230707,9967.0,129807.0
+cat_poisson,F3,A,tuned,2020,3,707835d7db97be76d79f,exact cache key + in-file metadata,2940.0,1.096938775510204,True,mean,12974.095800410934,7668.0,69146.0
+cat_poisson,F3,A,tuned,2021,3,25fb243aded2c4e74324,exact cache key + in-file metadata,2940.0,1.089795918367347,True,mean,12924.646422419142,6530.0,52912.0
+cat_poisson,F3,A,tuned,2022,3,a9669b50c820bfb01282,exact cache key + in-file metadata,2940.0,1.3615646258503402,True,mean,20601.3295289954,10013.0,114635.0
+cat_poisson,F3,A,tuned,2023,3,a21f9b30febe488c2abf,exact cache key + in-file metadata,2940.0,1.2551020408163265,True,mean,19942.678295968566,9951.0,128697.0
+cat_poisson,F3,A,tuned,2024,3,aa48b026a2cf8101eae6,exact cache key + in-file metadata,3000.0,0.9616666666666667,True,mean,10801.458582487694,6760.0,59652.0
+cat_poisson,F3,A,tuned,2018,4,2d569ae2ed985095f940,exact cache key + in-file metadata,2940.0,1.2683673469387755,True,mean,17834.86306307546,6619.0,56031.0
+cat_poisson,F3,A,tuned,2019,4,61d533672ca8ea5c3ec9,exact cache key + in-file metadata,2880.0,1.711111111111111,True,mean,35184.580158444915,9967.0,129807.0
+cat_poisson,F3,A,tuned,2020,4,5b7768128f23edd76a7a,exact cache key + in-file metadata,2880.0,1.2878472222222221,True,mean,17552.355675929095,7668.0,69146.0
+cat_poisson,F3,A,tuned,2021,4,3a5784d9ba75f3497915,exact cache key + in-file metadata,2880.0,1.403125,True,mean,20748.088071740676,6529.0,52911.0
+cat_poisson,F3,A,tuned,2022,4,85ab8a2863c13d987678,exact cache key + in-file metadata,2880.0,1.6215277777777777,True,mean,30947.870128802482,10013.0,114635.0
+cat_poisson,F3,A,tuned,2023,4,68529ead3c01e44c1823,exact cache key + in-file metadata,2880.0,1.6177083333333333,True,mean,28240.35884663576,9949.0,128695.0
+cat_poisson,F3,A,tuned,2024,4,28415e79d5d6fedb6beb,exact cache key + in-file metadata,2940.0,1.2741496598639457,True,mean,18316.47740814257,6758.0,59650.0
+lgbm_poisson,F3,B,tuned,2018,2,2b885738b302c5c0ee7e,exact cache key + in-file metadata,3060.0,1.0954248366013073,True,mean,15783.841828802044,6620.0,56032.0
+lgbm_poisson,F3,B,tuned,2019,2,f33af3c2d65a2e8bc2ae,exact cache key + in-file metadata,3000.0,1.2953333333333332,True,mean,20174.222340941025,9967.0,129807.0
+lgbm_poisson,F3,B,tuned,2020,2,7ee84cbb8e3335c3e79e,exact cache key + in-file metadata,3000.0,1.024,True,mean,12027.868737237055,7668.0,69146.0
+lgbm_poisson,F3,B,tuned,2021,2,127910ac0c616e4f34a1,exact cache key + in-file metadata,3000.0,1.0703333333333334,True,mean,12818.723666936632,6530.0,52912.0
+lgbm_poisson,F3,B,tuned,2022,2,e8ef84e3843975d94b15,exact cache key + in-file metadata,3000.0,1.4063333333333334,True,mean,24558.909140649885,10013.0,114635.0
+lgbm_poisson,F3,B,tuned,2023,2,922980ede7d357557fb8,exact cache key + in-file metadata,3000.0,1.109,True,mean,14731.505475638924,9954.0,128702.0
+lgbm_poisson,F3,B,tuned,2024,2,c1916026cc022de8c0d0,exact cache key + in-file metadata,3060.0,0.9382352941176471,True,mean,10989.126978554003,6760.0,59652.0
+lgbm_poisson,F3,B,tuned,2018,3,606c735616d916c9ae2e,exact cache key + in-file metadata,3000.0,1.3486666666666667,True,mean,23605.63387749622,6620.0,56032.0
+lgbm_poisson,F3,B,tuned,2019,3,d7a056f7cb03303f272c,exact cache key + in-file metadata,2940.0,1.5727891156462586,True,mean,29180.006159899847,9967.0,129807.0
+lgbm_poisson,F3,B,tuned,2020,3,3e6f067e477838d85ae6,exact cache key + in-file metadata,2940.0,1.2187074829931972,True,mean,16614.46116322634,7668.0,69146.0
+lgbm_poisson,F3,B,tuned,2021,3,d9ce14475346904a4b83,exact cache key + in-file metadata,2940.0,1.3744897959183673,True,mean,19977.83423491993,6530.0,52912.0
+lgbm_poisson,F3,B,tuned,2022,3,8814d157330ead3b8d73,exact cache key + in-file metadata,2940.0,1.5503401360544218,True,mean,29617.212965180875,10013.0,114635.0
+lgbm_poisson,F3,B,tuned,2023,3,24445c1756353269f5ea,exact cache key + in-file metadata,2940.0,1.506122448979592,True,mean,26051.459535653044,9951.0,128697.0
+lgbm_poisson,F3,B,tuned,2024,3,626cb9de427e4a58688a,exact cache key + in-file metadata,3000.0,1.2546666666666666,True,mean,18784.72902561517,6760.0,59652.0
+lgbm_poisson,F3,B,tuned,2018,4,f2ba9fb737aad0c25d83,exact cache key + in-file metadata,2940.0,1.473809523809524,True,mean,26076.269657427096,6619.0,56031.0
+lgbm_poisson,F3,B,tuned,2019,4,145e1b51d961461a4034,exact cache key + in-file metadata,2880.0,1.7409722222222221,True,mean,34061.52493911364,9967.0,129807.0
+lgbm_poisson,F3,B,tuned,2020,4,f6ee5da22e267bd459f8,exact cache key + in-file metadata,2880.0,1.2822916666666666,True,mean,17191.251216087945,7668.0,69146.0
+lgbm_poisson,F3,B,tuned,2021,4,d3fb3cc258493555a805,exact cache key + in-file metadata,2880.0,1.5052083333333333,True,mean,23700.073395442658,6529.0,52911.0
+lgbm_poisson,F3,B,tuned,2022,4,5270ace9ac71cfc2f6e7,exact cache key + in-file metadata,2880.0,1.6420138888888889,True,mean,32370.473310109457,10013.0,114635.0
+lgbm_poisson,F3,B,tuned,2023,4,3ec8894f7426a0093285,exact cache key + in-file metadata,2880.0,1.6371527777777777,True,mean,30502.991613652317,9949.0,128695.0
+lgbm_poisson,F3,B,tuned,2024,4,2f5a40c2be5c35cb473a,exact cache key + in-file metadata,2940.0,1.282312925170068,True,mean,17593.91257827768,6758.0,59650.0
+lgbm_poisson,F3,A,tuned,2018,2,83cfdbb536c9f4c2dab3,exact cache key + in-file metadata,3060.0,0.9790849673202614,True,mean,12206.762624101524,6620.0,56032.0
+lgbm_poisson,F3,A,tuned,2019,2,18daa0e954470a25b21b,exact cache key + in-file metadata,3000.0,1.3066666666666666,True,mean,20807.271138303968,9967.0,129807.0
+lgbm_poisson,F3,A,tuned,2020,2,e1f8877ae724c1baf90d,exact cache key + in-file metadata,3000.0,1.088,True,mean,13492.70048493662,7668.0,69146.0
+lgbm_poisson,F3,A,tuned,2021,2,3060a1d5038fa3616529,exact cache key + in-file metadata,3000.0,1.017,True,mean,11627.89244554929,6530.0,52912.0
+lgbm_poisson,F3,A,tuned,2022,2,3ad86d3d7f008f4993c8,exact cache key + in-file metadata,3000.0,1.3606666666666667,True,mean,22811.256434298295,10013.0,114635.0
+lgbm_poisson,F3,A,tuned,2023,2,0b4b2f2cde8637b5bbc9,exact cache key + in-file metadata,3000.0,1.0846666666666667,True,mean,14013.36629397752,9954.0,128702.0
+lgbm_poisson,F3,A,tuned,2024,2,53fa8f8606bfbf0c1c64,exact cache key + in-file metadata,3060.0,0.8784313725490196,True,mean,9472.267012069755,6760.0,59652.0
+lgbm_poisson,F3,A,tuned,2018,3,6473f70498cc7cfe21b4,exact cache key + in-file metadata,3000.0,1.0613333333333332,True,mean,13808.48743635638,6620.0,56032.0
+lgbm_poisson,F3,A,tuned,2019,3,9a2e3fb2e2a965e3aa2a,exact cache key + in-file metadata,2940.0,1.4054421768707483,True,mean,22480.040869908968,9967.0,129807.0
+lgbm_poisson,F3,A,tuned,2020,3,57756986128ca35fdca2,exact cache key + in-file metadata,2940.0,1.0673469387755101,True,mean,12493.790002454085,7668.0,69146.0
+lgbm_poisson,F3,A,tuned,2021,3,6cbb569830f26b269ce8,exact cache key + in-file metadata,2940.0,1.1438775510204082,True,mean,14842.396803363057,6530.0,52912.0
+lgbm_poisson,F3,A,tuned,2022,3,cf4151610d9c45207703,exact cache key + in-file metadata,2940.0,1.4649659863945579,True,mean,25986.440742187024,10013.0,114635.0
+lgbm_poisson,F3,A,tuned,2023,3,0f195765cac0d952e350,exact cache key + in-file metadata,2940.0,1.120748299319728,True,mean,14912.230722086995,9951.0,128697.0
+lgbm_poisson,F3,A,tuned,2024,3,688ca9fb474af39d4b0c,exact cache key + in-file metadata,3000.0,0.968,True,mean,11021.9518500886,6760.0,59652.0
+lgbm_poisson,F3,A,tuned,2018,4,810b70e5823b5f827bdc,exact cache key + in-file metadata,2940.0,1.3680272108843536,True,mean,22174.685332893412,6619.0,56031.0
+lgbm_poisson,F3,A,tuned,2019,4,66bdb91ff49280b43f61,exact cache key + in-file metadata,2880.0,1.5690972222222221,True,mean,28363.00220997782,9967.0,129807.0
+lgbm_poisson,F3,A,tuned,2020,4,939037c82b33e06371be,exact cache key + in-file metadata,2880.0,1.2986111111111112,True,mean,18368.673333034894,7668.0,69146.0
+lgbm_poisson,F3,A,tuned,2021,4,76fcea1e47c7f5e0e66e,exact cache key + in-file metadata,2880.0,1.3878472222222222,True,mean,19570.955609229866,6529.0,52911.0
+lgbm_poisson,F3,A,tuned,2022,4,87614ca871ed7add9267,exact cache key + in-file metadata,2880.0,1.5791666666666666,True,mean,29810.84863841761,10013.0,114635.0
+lgbm_poisson,F3,A,tuned,2023,4,eb5fbe6423331393e279,exact cache key + in-file metadata,2880.0,1.492361111111111,True,mean,24559.72489908828,9949.0,128695.0
+lgbm_poisson,F3,A,tuned,2024,4,5f60e10950899b9720da,exact cache key + in-file metadata,2940.0,1.3125850340136054,True,mean,20240.926562178196,6758.0,59650.0
+xgb_poisson,F3,B,tuned,2018,2,e5df017f29ede57cb4e3,exact cache key + in-file metadata,3060.0,1.0339869281045753,True,mean,13563.425007700334,6620.0,56032.0
+xgb_poisson,F3,B,tuned,2019,2,a36180f3d5f61c190d32,exact cache key + in-file metadata,3000.0,1.3256666666666668,True,mean,21231.042757142874,9967.0,129807.0
+xgb_poisson,F3,B,tuned,2020,2,471860b3431323715122,exact cache key + in-file metadata,3000.0,1.016,True,mean,11822.243662424335,7668.0,69146.0
+xgb_poisson,F3,B,tuned,2021,2,7f02ff14eb76619a5399,exact cache key + in-file metadata,3000.0,1.062,True,mean,12435.92367435764,6530.0,52912.0
+xgb_poisson,F3,B,tuned,2022,2,cf0cd83b45b64bd59191,exact cache key + in-file metadata,3000.0,1.361,True,mean,22105.81388974824,10013.0,114635.0
+xgb_poisson,F3,B,tuned,2023,2,22234a087be00bc8c252,exact cache key + in-file metadata,3000.0,1.1176666666666666,True,mean,15089.295443665273,9954.0,128702.0
+xgb_poisson,F3,B,tuned,2024,2,dd3637d7cae3189fa8bc,exact cache key + in-file metadata,3060.0,0.9183006535947712,True,mean,10194.41882801208,6760.0,59652.0
+xgb_poisson,F3,B,tuned,2018,3,f0a1b487af50ef6a3c8c,exact cache key + in-file metadata,3000.0,1.319,True,mean,22172.47378089418,6620.0,56032.0
+xgb_poisson,F3,B,tuned,2019,3,c6aca2b7ebfeecc53494,exact cache key + in-file metadata,2940.0,1.561904761904762,True,mean,29709.604297941427,9967.0,129807.0
+xgb_poisson,F3,B,tuned,2020,3,87b016bb0ce7966e5781,exact cache key + in-file metadata,2940.0,1.228231292517007,True,mean,16476.299525146715,7668.0,69146.0
+xgb_poisson,F3,B,tuned,2021,3,7dcb3bdc15a48c5993de,exact cache key + in-file metadata,2940.0,1.3612244897959183,True,mean,19929.030507528223,6530.0,52912.0
+xgb_poisson,F3,B,tuned,2022,3,b2857ba6d7f1d9a9b8fe,exact cache key + in-file metadata,2940.0,1.5935374149659864,True,mean,29871.805553542905,10013.0,114635.0
+xgb_poisson,F3,B,tuned,2023,3,12571fd6ecd493d94807,exact cache key + in-file metadata,2940.0,1.4979591836734694,True,mean,25580.9257770468,9951.0,128697.0
+xgb_poisson,F3,B,tuned,2024,3,8aa498c56ea5184d708c,exact cache key + in-file metadata,3000.0,1.2276666666666667,True,mean,17602.870461602797,6760.0,59652.0
+xgb_poisson,F3,B,tuned,2018,4,fad98e9427e920a549fa,exact cache key + in-file metadata,2940.0,1.493877551020408,True,mean,28181.48314248066,6619.0,56031.0
+xgb_poisson,F3,B,tuned,2019,4,437b5934ce6e3f9fbeb9,exact cache key + in-file metadata,2880.0,1.7003472222222222,True,mean,33525.655263220106,9967.0,129807.0
+xgb_poisson,F3,B,tuned,2020,4,9a333a1fa0a5ac7e39fa,exact cache key + in-file metadata,2880.0,1.242013888888889,True,mean,16185.059457143814,7668.0,69146.0
+xgb_poisson,F3,B,tuned,2021,4,4f07cf53b984ae09f64a,exact cache key + in-file metadata,2880.0,1.4246527777777778,True,mean,20879.998598021673,6529.0,52911.0
+xgb_poisson,F3,B,tuned,2022,4,45cfe003d04873b1c1b2,exact cache key + in-file metadata,2880.0,1.6677083333333333,True,mean,33428.30153323888,10013.0,114635.0
+xgb_poisson,F3,B,tuned,2023,4,ed84c9ad3b5c8bfd5eca,exact cache key + in-file metadata,2880.0,1.6465277777777778,True,mean,30464.713397502535,9949.0,128695.0
+xgb_poisson,F3,B,tuned,2024,4,148144036d51223b4c1d,exact cache key + in-file metadata,2940.0,1.3051020408163265,True,mean,17937.60594254636,6758.0,59650.0
+xgb_poisson,F3,A,tuned,2018,2,913c63433b330941a98b,exact cache key + in-file metadata,3060.0,0.9980392156862745,True,mean,12406.805975583913,6620.0,56032.0
+xgb_poisson,F3,A,tuned,2019,2,cf512a7e12958c92e9f4,exact cache key + in-file metadata,3000.0,1.2676666666666667,True,mean,19663.90258581935,9967.0,129807.0
+xgb_poisson,F3,A,tuned,2020,2,d88a7897ae89ec9f2932,exact cache key + in-file metadata,3000.0,1.1036666666666666,True,mean,13964.695692093377,7668.0,69146.0
+xgb_poisson,F3,A,tuned,2021,2,3526c0070640307bcbd9,exact cache key + in-file metadata,3000.0,1.0086666666666666,True,mean,11308.676236729276,6530.0,52912.0
+xgb_poisson,F3,A,tuned,2022,2,6eb90faf698ca48a7f91,exact cache key + in-file metadata,3000.0,1.3483333333333334,True,mean,22227.55829483916,10013.0,114635.0
+xgb_poisson,F3,A,tuned,2023,2,6c38b4d6f428abd0fb43,exact cache key + in-file metadata,3000.0,1.061,True,mean,13898.260256135396,9954.0,128702.0
+xgb_poisson,F3,A,tuned,2024,2,252c3e017db7b77d9a71,exact cache key + in-file metadata,3060.0,0.8748366013071895,True,mean,9362.866690034554,6760.0,59652.0
+xgb_poisson,F3,A,tuned,2018,3,efd69aaa8e504ca39af0,exact cache key + in-file metadata,3000.0,1.0506666666666666,True,mean,13431.54402309372,6620.0,56032.0
+xgb_poisson,F3,A,tuned,2019,3,54489d24df1cf9f07884,exact cache key + in-file metadata,2940.0,1.370408163265306,True,mean,22276.99147209876,9967.0,129807.0
+xgb_poisson,F3,A,tuned,2020,3,5b5945f402f15e415a4a,exact cache key + in-file metadata,2940.0,1.0285714285714285,True,mean,11674.471401668698,7668.0,69146.0
+xgb_poisson,F3,A,tuned,2021,3,b232f7e4b422bc1a62cf,exact cache key + in-file metadata,2940.0,1.085374149659864,True,mean,12680.194946520765,6530.0,52912.0
+xgb_poisson,F3,A,tuned,2022,3,7045333dcd69bf43569d,exact cache key + in-file metadata,2940.0,1.4166666666666667,True,mean,23316.90512547254,10013.0,114635.0
+xgb_poisson,F3,A,tuned,2023,3,0136230c91975192578a,exact cache key + in-file metadata,2940.0,1.1326530612244898,True,mean,15191.776512238763,9951.0,128697.0
+xgb_poisson,F3,A,tuned,2024,3,5658f00db54219753cc3,exact cache key + in-file metadata,3000.0,0.951,True,mean,10399.49236695038,6760.0,59652.0
+xgb_poisson,F3,A,tuned,2018,4,8f5ca1f1d62ca86e4822,exact cache key + in-file metadata,2940.0,1.388095238095238,True,mean,23756.801711045606,6619.0,56031.0
+xgb_poisson,F3,A,tuned,2019,4,74679d4e42eb377045f2,exact cache key + in-file metadata,2880.0,1.60625,True,mean,30711.033157453912,9967.0,129807.0
+xgb_poisson,F3,A,tuned,2020,4,6e591b95ae5f7a5444a2,exact cache key + in-file metadata,2880.0,1.2840277777777778,True,mean,17639.070885665435,7668.0,69146.0
+xgb_poisson,F3,A,tuned,2021,4,d30e47a381ba589dc606,exact cache key + in-file metadata,2880.0,1.3621527777777778,True,mean,19421.10795349451,6529.0,52911.0
+xgb_poisson,F3,A,tuned,2022,4,48e7642c512097680bd9,exact cache key + in-file metadata,2880.0,1.621875,True,mean,30442.325459749754,10013.0,114635.0
+xgb_poisson,F3,A,tuned,2023,4,7d62e0219092615543a7,exact cache key + in-file metadata,2880.0,1.5041666666666667,True,mean,25102.990434292384,9949.0,128695.0
+xgb_poisson,F3,A,tuned,2024,4,96a831ffcec291db3a90,exact cache key + in-file metadata,2940.0,1.2622448979591836,True,mean,18216.26008574031,6758.0,59650.0
+ens_glm+lgbm,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,B,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+hurdle,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+spline,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+tweedie,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+cat_tuned,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+lgbm_tuned,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2019,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2020,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2021,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2022,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2023,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2024,2,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2019,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2020,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2021,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2022,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2023,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2024,3,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2019,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2020,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2021,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2022,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2023,4,,none: ensemble never cached,,,,,,,
+ens_glm+xgb_tuned,F3,A,ensemble,2024,4,,none: ensemble never cached,,,,,,,

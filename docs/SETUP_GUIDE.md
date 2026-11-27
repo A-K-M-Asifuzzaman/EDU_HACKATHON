@@ -22,8 +22,8 @@ Before you begin, make sure you have these installed:
 ## Option A: One-Command Launch (Linux / macOS)
 
 ```bash
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git
-cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git
+cd EDU_HACKATHON_FINAL
 ./scripts/launch.sh
 ```
 
@@ -41,8 +41,8 @@ PORT=8100 ./scripts/launch.sh
 ### 1. Clone the Repository
 
 ```powershell
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git
-cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git
+cd EDU_HACKATHON_FINAL
 ```
 
 ### 2. Download the Dataset

@@ -60,7 +60,7 @@ class FeaturePipeline:
             raise ValueError("horizon must be 2, 3 or 4")
         t0 = time.perf_counter()
         grid = Grid.from_panel(panel)
-        feats = build_all(Ctx(grid, horizon, self.wlag, self.clag, self.stats, self.rain_est))
+        feats = build_all(Ctx(grid, horizon, self.wlag, self.clag, self.stats, self.rain_est, getattr(self, "proj_scale", 1.0)))
         names = [f.name for f in feats]
         if len(set(names)) != len(names) or set(names) & set(PROHIBITED):
             raise AssertionError("duplicate or prohibited feature name")

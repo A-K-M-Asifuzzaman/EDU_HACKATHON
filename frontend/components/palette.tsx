@@ -43,8 +43,8 @@ export default function Palette({ pages }: { pages: readonly (readonly [string, 
   useEffect(() => setI(0), [q]);
   return (<>
     {/* phones had no way to open search (the button was desktop-only): show an icon button there */}
-    <button onClick={() => setOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-line bg-white/80 p-2 text-[13px] text-ink-3 shadow-sm hover:border-teal/50 md:px-3 md:py-1.5" aria-label={t("pal.aria")}>
-      <Icon name="search" size={15} /><span className="hidden md:inline">{t("pal.button")}</span><kbd className="ml-3 hidden rounded border border-line bg-canvas px-1.5 text-[10px] font-semibold md:inline">⌘K</kbd></button>
+    <button onClick={() => setOpen(true)} className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full border-2 border-white/35 px-2.5 text-[13px] font-bold text-white transition-colors hover:border-white hover:bg-white/10 sm:min-h-10 xl:px-3" aria-label={t("pal.aria")}>
+      <Icon name="search" size={15} /><span className="hidden xl:inline">{t("pal.button")}</span><kbd className="ml-2 hidden rounded-[5px] border border-white/40 px-1 font-sans text-[11px] font-normal text-white/80 xl:inline">⌘K</kbd></button>
     {mounted && open && createPortal(
       <div className="fixed inset-0 z-[90] grid place-items-start justify-center bg-navy/45 p-4 pt-[12vh] backdrop-blur-sm" onClick={() => setOpen(false)}>
         <div role="dialog" aria-modal="true" aria-label={t("pal.button")} className="card w-full max-w-xl overflow-hidden p-0 shadow-[var(--shadow-pop)]" onClick={(e) => e.stopPropagation()}>
@@ -55,7 +55,7 @@ export default function Palette({ pages }: { pages: readonly (readonly [string, 
           <ul role="listbox" aria-label={t("pal.results")} className="scroll-thin max-h-[52vh] overflow-y-auto p-2">
             {items.length ? items.map((x, k) => (<li key={`${x.kind}${x.label}${k}`} role="option" aria-selected={k === i}>
               <button onMouseEnter={() => setI(k)} onClick={x.go} className={cls("flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left", k === i ? "bg-mint-l" : "hover:bg-canvas")}>
-                <span className={cls("w-16 shrink-0 rounded-md px-1.5 py-0.5 text-center text-[10px] font-semibold uppercase", x.kind === "Page" ? "bg-navy/8 text-navy" : x.kind === "Ward" ? "bg-amber/20 text-amber-d" : "bg-sky/15 text-sky")}>{t(`pal.kind.${x.kind}`)}</span>
+                <span className={cls("w-16 shrink-0 rounded-md px-1.5 py-0.5 text-center text-[11px] font-semibold uppercase", x.kind === "Page" ? "bg-navy/8 text-navy" : x.kind === "Ward" ? "bg-amber/20 text-amber-d" : "bg-sky/15 text-sky-d")}>{t(`pal.kind.${x.kind}`)}</span>
                 <span className="min-w-0"><span className="block truncate text-[14px] font-medium">{x.label}</span><span className="block truncate text-[11.5px] text-ink-3">{x.sub}</span></span></button></li>))
               : <li className="p-6 text-center text-sm text-ink-3">{t("pal.none")}</li>}
           </ul>

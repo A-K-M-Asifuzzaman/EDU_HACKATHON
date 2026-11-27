@@ -5,9 +5,11 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { openEmergency } from "./emergency";
+import { Skyline } from "./illustrations";
 import type { FlightState } from "./introscene";
 
 const IntroScene = dynamic(() => import("./introscene"), { ssr: false });
+const RainField = dynamic(() => import("./rain-field"), { ssr: false });
 const SEEN = "ds.intro.seen";
 
 function SvgMosquito({ state }: { state: React.MutableRefObject<FlightState> }) {
@@ -42,6 +44,7 @@ export default function Intro() {
   const [r, setR] = useState(0);
   const state = useRef<FlightState>({ px: 0, py: 0, pointer: false, swatted: false });
   const root = useRef<HTMLDivElement>(null);
+  const reticle = useRef<HTMLDivElement>(null);                   // pointer reticle, moved via ref (no re-render per move)
   // optional sound, muted by default; synthesised with Web Audio (no audio files) and started only by a user click
   const [sound, setSound] = useState(false);
   const audio = useRef<{ ctx: AudioContext; stop: () => void } | null>(null);
@@ -93,6 +96,7 @@ export default function Intro() {
   const swat = useCallback((x: number, y: number) => {
     if (phase !== "fly") return;
     state.current.swatted = true; setHit({ x, y }); setPhase("swat"); thwack();
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) root.current?.animate([{ transform: "translate(0,0)" }, { transform: "translate(-5px,3px)" }, { transform: "translate(4px,-3px)" }, { transform: "translate(-2px,1px)" }, { transform: "none" }], { duration: 260, easing: "ease-out" });
     setTimeout(() => {
       setPhase("reveal");
       const max = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)) + 40, t0 = performance.now();
@@ -105,25 +109,34 @@ export default function Intro() {
   const mask = phase === "reveal" && hit ? `radial-gradient(circle at ${hit.x}px ${hit.y}px, transparent ${r}px, #000 ${r + 2}px)` : undefined;
   return (<div ref={root} role="dialog" aria-modal="true" aria-label="DengueShield AI introduction. Press Enter to swat the mosquito, or Escape to skip." tabIndex={-1}
     className="fixed inset-0 z-[80] cursor-crosshair select-none overflow-hidden outline-none"
-    style={{ background: "radial-gradient(ellipse at 50% 40%, #0d4a37 0%, #062a1f 45%, #02120d 100%)", WebkitMaskImage: mask, maskImage: mask }}
-    onPointerMove={(e) => { state.current.px = (e.clientX / innerWidth) * 2 - 1; state.current.py = -((e.clientY / innerHeight) * 2 - 1); state.current.pointer = true; }}
-    onPointerLeave={() => { state.current.pointer = false; }}
+    style={{ background: "radial-gradient(120% 90% at 70% 10%, #6a45f0, #4a2bd0 45%, #2a157f)", WebkitMaskImage: mask, maskImage: mask }}
+    onPointerMove={(e) => { state.current.px = (e.clientX / innerWidth) * 2 - 1; state.current.py = -((e.clientY / innerHeight) * 2 - 1); state.current.pointer = true;
+      const r = reticle.current; if (r) { r.style.opacity = "1"; r.style.transform = `translate(${e.clientX}px,${e.clientY}px)`; } }}
+    onPointerLeave={() => { state.current.pointer = false; if (reticle.current) reticle.current.style.opacity = "0"; }}
     onClick={(e) => swat(e.clientX, e.clientY)}
     onKeyDown={(e) => { if (e.key === "Escape") finish(); else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); swat(innerWidth / 2, innerHeight / 2); } }}>
-    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,.55) 100%)" }} />
-    <div className="pointer-events-none absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(rgba(159,231,194,.5) 1px, transparent 1px)", backgroundSize: "46px 46px" }} />
+    <RainField mm={150} className="opacity-80" />
+    <Skyline className="pointer-events-none absolute inset-x-0 bottom-0 h-[110px] w-full sm:h-[170px]" />
+    <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(circle at 50% 46%, transparent 50%, rgba(26,15,82,.55) 100%)" }} />
+    <div className="pointer-events-none absolute left-4 top-4 sm:left-7 sm:top-6">
+      <div className="font-display text-[22px] font-extrabold tracking-[-0.02em] text-white">DengueShield <span className="align-[3px] font-sans text-[11px] font-bold tracking-[0.06em] text-[#ffd36e]">AI</span></div>
+      <div className="mt-1 hidden text-[12.5px] leading-relaxed text-white/80 sm:block">Historical replay of synthetic organizer data.<br />The forecasts are already loading behind this screen.</div></div>
     {webgl ? <IntroScene state={state} /> : <SvgMosquito state={state} />}
+    {phase === "fly" && (<div ref={reticle} className="ds-reticle pointer-events-none absolute left-0 top-0 opacity-0" aria-hidden>
+      <span className="absolute -left-7 -top-7 h-14 w-14 rounded-full border border-white/40" /><span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-white/80" /></div>)}
     {hit && (<div className="pointer-events-none absolute" style={{ left: hit.x, top: hit.y }}>
-      <span className="ds-impact absolute -left-16 -top-16 h-32 w-32 rounded-full border-4 border-mint" /><span className="ds-flash absolute -left-24 -top-24 h-48 w-48 rounded-full bg-white/70 blur-2xl" /></div>)}
-    <div className="pointer-events-none absolute inset-x-0 bottom-[14%] text-center text-white">
-      <div className="text-[13px] font-semibold uppercase tracking-[0.3em] text-mint/80">DengueShield AI</div>
-      <div className="mt-2 text-2xl font-bold sm:text-3xl">{phase === "fly" ? "Swat the mosquito to enter" : "Predict earlier. Respond smarter."}</div>
-      <div className="mt-2 text-sm text-white/60">Click or tap anywhere · Enter to swat · Esc to skip</div>
+      {/* raindrop-on-water ripples: the swat lands like a drop, and the page opens from that point */}
+      {[0, 110, 220].map((d, i) => <span key={d} className={"ds-ripple absolute -left-20 -top-20 h-40 w-40 rounded-full border " + (i === 1 ? "border-[#ffd36e]" : "border-white")} style={{ animationDelay: `${d}ms` }} />)}
+      <span className="ds-flash absolute -left-16 -top-16 h-32 w-32 rounded-full bg-white/50 blur-2xl" /></div>)}
+    <div className="pointer-events-none absolute inset-x-0 bottom-[12%] px-4 text-center text-white">
+      <div className="font-display text-[38px] font-extrabold leading-[0.98] tracking-[-0.03em] text-white sm:text-[64px]">{phase === "fly" ? <>Swat the mosquito <span className="text-[#ffd36e]">to enter.</span></> : <>Dengue forecasts, <span className="text-[#ffd36e]">two to four weeks ahead.</span></>}</div>
+      <div className="mt-4 text-[14px] text-white/85">Click or tap anywhere. Enter or Space also works; Esc skips.</div>
+      <div className="mt-1 text-[12.5px] text-white/75 sm:hidden">The forecasts are already loading behind this screen.</div>
     </div>
-    <div className="absolute right-4 top-4 flex gap-2">
-      <button onClick={(e) => { e.stopPropagation(); finish(); openEmergency(); }} className="rounded-xl bg-coral-d px-3.5 py-2 text-[13px] font-semibold text-white shadow-lg hover:bg-coral">✚ Emergency help</button>
-      <button onClick={(e) => { e.stopPropagation(); if (sound) stopSound(); else startSound(); }} aria-pressed={sound} aria-label={sound ? "Mute sound" : "Turn sound on"} className="rounded-xl border border-white/25 bg-white/10 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur hover:bg-white/20">{sound ? "🔊 Sound on" : "🔈 Sound off"}</button>
-      <button onClick={(e) => { e.stopPropagation(); finish(); }} className="rounded-xl border border-white/25 bg-white/10 px-3.5 py-2 text-[13px] font-semibold text-white backdrop-blur hover:bg-white/20">Skip intro</button>
+    <div className="absolute right-4 top-11 flex flex-wrap justify-end gap-2 sm:right-6 sm:top-6">
+      <button onClick={(e) => { e.stopPropagation(); finish(); openEmergency(); }} className="min-h-11 rounded-full border-[3px] border-[#1a1438] bg-[#c2303a] px-4 font-display text-[13.5px] font-extrabold text-white shadow-[3px_3px_0_#1a1438] hover:brightness-110">✚ Emergency help</button>
+      <button onClick={(e) => { e.stopPropagation(); if (sound) stopSound(); else startSound(); }} aria-pressed={sound} aria-label={sound ? "Mute sound" : "Turn sound on"} className="btn-ghost min-h-11 px-4 text-[13.5px]">{sound ? "🔊 Sound on" : "🔈 Sound off"}</button>
+      <button onClick={(e) => { e.stopPropagation(); finish(); }} className="btn-ghost min-h-11 px-4 text-[13.5px]">Skip intro</button>
     </div>
   </div>);
 }

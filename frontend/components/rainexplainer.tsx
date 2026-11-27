@@ -18,13 +18,13 @@ export default function RainExplainer() {
   const x = (w: number) => 60 + (w / 5) * 740;
   return (<div>
     <svg viewBox="0 0 860 300" role="img" aria-label="Conceptual timeline from rainfall to dengue cases over about five weeks" className="w-full">
-      <rect x={x(2)} y={26} width={x(4) - x(2)} height={190} rx={14} fill="#e3f8ee" /><text x={(x(2) + x(4)) / 2} y={46} textAnchor="middle" fontSize="12" fontWeight="700" fill="#0a6f4f">Model early-warning window: 2–4 weeks after rain</text>
+      <rect x={x(2)} y={26} width={x(4) - x(2)} height={190} rx={14} fill="#ecebfb" /><text x={(x(2) + x(4)) / 2} y={46} textAnchor="middle" fontSize="12" fontWeight="700" fill="#0a6f4f">Model early-warning window: 2–4 weeks after rain</text>
       <line x1={60} x2={800} y1={236} y2={236} stroke="#cfd9e2" strokeWidth={2} />
       {[0, 1, 2, 3, 4, 5].map((w) => (<g key={w}><line x1={x(w)} x2={x(w)} y1={230} y2={242} stroke="#7a8a9a" /><text x={x(w)} y={260} textAnchor="middle" fontSize="11" fill="#5b6b7b">{w === 0 ? "rain" : `+${w} wk`}</text></g>))}
       {STAGES.map((s, i) => (<motion.g key={s.title} animate={{ opacity: i <= active ? 1 : 0.28, y: i === active ? -6 : 0 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}>
-        <circle cx={x(s.w)} cy={150} r={i === active ? 34 : 28} fill={i === active ? "#073b2b" : "#fff"} stroke="#0e8f66" strokeWidth={2.5} />
+        <circle cx={x(s.w)} cy={150} r={i === active ? 34 : 28} fill={i === active ? "#2f2e72" : "#fff"} stroke="#3b3a8c" strokeWidth={2.5} />
         <Icon k={s.icon} cx={x(s.w)} cy={150} light={i === active} reduce={!!reduce} />
-        <text x={x(s.w)} y={202} textAnchor="middle" fontSize="11.5" fontWeight="650" fill="#073b2b">{s.title}</text></motion.g>))}
+        <text x={x(s.w)} y={202} textAnchor="middle" fontSize="11.5" fontWeight="650" fill="#2f2e72">{s.title}</text></motion.g>))}
       <motion.circle r={7} cy={236} fill="#ea575b" animate={{ cx: x(wk) }} transition={{ type: "spring", stiffness: 160, damping: 20 }} /></svg>
     <div className="mt-2 grid items-center gap-3 sm:grid-cols-[1fr_2fr]"><label className="flex flex-col gap-1 text-xs text-ink-3"><span className="eyebrow">Scrub time since the rain event</span><input type="range" min={0} max={5} step={0.1} value={wk} onChange={(e) => setWk(Number(e.target.value))} aria-label="Weeks since rainfall" className="accent-emerald" /><span className="num font-semibold text-forest">+{wk.toFixed(1)} weeks</span></label>
       <div className="rounded-xl border border-emerald/25 bg-mint-l p-3 text-[13px] text-ink-2"><b className="text-forest">{STAGES[active].title}.</b> {STAGES[active].text}</div></div>

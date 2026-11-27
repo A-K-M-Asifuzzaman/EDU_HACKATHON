@@ -23,3 +23,5 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/public/maplibre/
 .vercel
+# local account database (V4 auth)
+var/

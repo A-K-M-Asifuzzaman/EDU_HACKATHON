@@ -1,6 +1,6 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
-const ROUTES = ["/", "/profiling/", "/wards/", "/geography/", "/lab/", "/copilot/", "/evidence/", "/response/", "/climate/", "/learn/", "/provenance/"];
+const ROUTES = ["/", "/command/", "/profiling/", "/wards/", "/geography/", "/lab/", "/copilot/", "/evidence/", "/response/", "/climate/", "/learn/", "/provenance/"];
 const WARD = "DNCC_Ward_19", ORIGIN = "2024-08-05";
 const IGNORE = /Failed to load resource|ERR_ABORTED|WebGL|GPU stall|tile|maptiler|WebSocket/i;
 
@@ -17,14 +17,14 @@ const api = async (page: Page, path: string) => (await page.request.get(path)).j
 
 test("Command Center shows the same numbers the model API returns", async ({ page }) => {
   const errs = trackErrors(page);
-  await page.goto("/");
+  await page.goto("/command/");
   const truth = (await api(page, `/api/forecast?ward_id=${WARD}&origin=${ORIGIN}&horizon=3`)).forecast;
   await expect(page.getByRole("heading", { name: "Command Center" })).toBeVisible();
   await expect(page.getByText("Validated replay (out-of-time)").first()).toBeVisible();
   const summary = await api(page, `/api/reports/summary?origin=${ORIGIN}&horizon=3`);
   await expect(page.locator("main")).toContainText(String(summary.median_cases_total));            // KPI is model-backed
   await expect(page.locator("canvas").first()).toBeVisible();                                      // fan chart rendered
-  await expect(page.locator("main")).toContainText(`${truth.lower_80}–${truth.upper_80}`);
+  await expect(page.locator("main")).toContainText(`${truth.lower_80}-${truth.upper_80}`);                       // ranges use a hyphen (DESIGN.md copy rules)
   await expect(page.locator("main")).toContainText("Known limitations");
   expect(errs).toEqual([]);
 });
@@ -36,19 +36,19 @@ test("every route loads without console or page errors", async ({ page }) => {
 });
 
 test("horizon, ward and origin controls change the displayed forecast", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/command/");
   await page.getByRole("radio", { name: "4 weeks" }).click();
   const h4 = (await api(page, `/api/forecast?ward_id=${WARD}&origin=${ORIGIN}&horizon=4`)).forecast;
-  await expect(page.locator("main")).toContainText(`${h4.lower_90}–${h4.upper_90}`);
+  await expect(page.locator("main")).toContainText(`${h4.lower_90}-${h4.upper_90}`);
   await page.getByLabel("Ward", { exact: true }).selectOption("GCC_Ward_02");
-  await expect(page.getByText("Forecast with uncertainty — GCC_Ward_02")).toBeVisible();
+  await expect(page.getByTestId("answer-card").getByRole("heading", { name: /GCC_Ward_02/ })).toBeVisible();
   const slider = page.getByRole("slider", { name: "Forecast origin" });
   await slider.focus(); await slider.press("ArrowLeft"); await slider.press("ArrowLeft");
   await expect(page.locator("main")).toContainText("22 Jul 2024");
 });
 
 test("language switch translates the interface to Bangla and persists", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/command/");
   await page.getByRole("button", { name: "Switch language" }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "bn");
   await expect(page.getByRole("heading", { name: "কমান্ড সেন্টার" })).toBeVisible();
@@ -96,16 +96,17 @@ test("forecast lab explains observed vs projected rainfall per horizon", async (
 
 test("API outage shows an error state with retry and the shell keeps working", async ({ page }) => {
   await page.route("**/api/metadata", (r) => r.abort());
-  await page.goto("/");
+  await page.goto("/command/");
   await expect(page.getByRole("alert").first()).toContainText(/Cannot reach|unreachable/i);
-  await expect(page.getByRole("link", { name: "Data Profiling Studio" })).toBeVisible();
+  await page.getByRole("navigation", { name: "Primary" }).getByRole("button", { name: /^Evidence/ }).click();     // V4 shell: grouped panels still open
+  await expect(page.getByRole("link", { name: /Data Profiling Studio/ })).toBeVisible();
 });
 
 test("Climate Observatory degrades gracefully when NASA POWER and Open-Meteo fail", async ({ page }) => {
   await page.route("**/api/climate/**", (r) => r.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ status: "unavailable", error: "provider unreachable" }) }));
   await page.goto("/climate/");
   await expect(page.getByText(/Optional service unavailable/)).toBeVisible();
-  await page.goto("/");                                                                         // forecasts unaffected
+  await page.goto("/command/");                                                                         // forecasts unaffected
   await expect(page.locator("main canvas").first()).toBeVisible();
 });
 
@@ -174,7 +175,7 @@ test("no API key or secret appears in served pages, scripts or API responses", a
   await page.goto("/"); await page.goto("/copilot/"); await page.goto("/provenance/"); await page.waitForTimeout(800);
   for (const p of ["/api/health", "/api/metadata", "/api/integrations/status", "/api/assistant/status"]) seen.push(await (await request.get(p)).text());
   const all = seen.join("\n");
-  expect(all).not.toMatch(/sk-(proj-)?[A-Za-z0-9_-]{20,}/);
+  expect(all).not.toMatch(/(?<![A-Za-z0-9])sk-(proj-)?[A-Za-z0-9_-]{20,}/);   // a standalone token: "space-grotesk-latin-…" font names are not keys
   expect(all).not.toMatch(/OPENAI_API_KEY\s*=\s*sk/);
 });
 
@@ -183,7 +184,7 @@ test("map: search a hospital, route to it with A* (verified by Dijkstra), and li
   const errs = trackErrors(page);
   await context.grantPermissions(["geolocation"]); await context.setGeolocation({ latitude: 23.7104, longitude: 90.4074 });
   await page.goto("/geography/");
-  await expect(page.getByText("Not live hospital information.")).toBeVisible();
+  await expect(page.getByText("Not live hospital information.", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Use my location" }).click();
   await expect(page.getByText(/Your location/)).toBeVisible();
   await page.fill("#geo-search", "Square Hospital");
@@ -195,7 +196,10 @@ test("map: search a hospital, route to it with A* (verified by Dijkstra), and li
   await expect(panel.getByText("Dijkstra check")).toBeVisible({ timeout: 20_000 });
   await expect(panel.getByText("✓ equal")).toHaveCount(2);
   await page.getByRole("button", { name: "Nearest hospitals by road" }).click();
-  await expect(panel.getByText(/Closest hospitals by estimated road travel time/)).toBeVisible({ timeout: 20_000 });
+  await expect(panel.getByText(/General hospitals by estimated road travel time/)).toBeVisible({ timeout: 20_000 });
+  await expect(panel.getByText(/Veterinary, diagnostic-only and specialist facilities/)).toBeVisible();      // eligibility is explained
+  await expect(panel.getByText(/Emergency: (unknown|tagged in OSM, unverified)/).first()).toBeVisible();
+  await expect(panel.getByText(/confirmed|guaranteed/i)).toHaveCount(0);                         // never claims verified emergency care
   await expect(page.getByText(/Routing engine diagnostics/)).toBeVisible();
   await expect(page.getByText(/A\* matched Dijkstra's optimal cost in/)).toBeVisible();
   expect(errs).toEqual([]);
@@ -268,7 +272,7 @@ test("reliability center shows saved out-of-time diagnostics and the alert polic
   await page.goto("/evidence/");
   await expect(page.getByRole("tab", { name: "Reliability center" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Coverage by incidence severity")).toBeVisible();
-  await expect(page.getByText("0.607")).toBeVisible();                                           // documented peak coverage, 80% nominal
+  await expect(page.getByText("0.607").first()).toBeVisible();                                           // documented peak coverage, 80% nominal
   await expect(page.getByText("0.740")).toBeVisible();
   await expect(page.getByText("Outbreak alert policy simulator")).toBeVisible();
   const deployed = page.getByRole("row", { name: /Deployed rule \(as validated\)/ });
@@ -288,7 +292,7 @@ test("resource sandbox compares three transparent rules and labels itself a plan
 });
 
 test("command center: time-machine verdict, play control, intelligence brief and global search", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/command/");
   await expect(page.getByText("Time-machine verdict")).toBeVisible();
   await expect(page.getByText(/Out-of-time: forecast by a model trained only on seasons before/)).toBeVisible();
   const popup = page.waitForEvent("popup");
@@ -323,16 +327,16 @@ test("map: A* insight mode reports real exploration counts for A* and Dijkstra",
   await expect(panel.getByRole("link", { name: /Open in Google Maps/ })).toHaveAttribute("href", /google\.com\/maps\/dir\/\?api=1&origin=23\.7104,90\.4074&destination=/);
 });
 
-test("provenance document viewer opens architecture details and related documents", async ({ page }) => {
+test("provenance document viewer opens the architecture overview, the complete reference and related documents", async ({ page }) => {
   await page.goto("/provenance/");
   await page.getByRole("button", { name: /DengueShield AI: Architecture/ }).click();
   const dlg = page.getByRole("dialog");
-  await dlg.getByRole("link", { name: "ML pipeline", exact: true }).click();
-  await expect(dlg.getByRole("heading", { name: "ML pipeline: from raw data to a calibrated forecast bundle" })).toBeVisible();
-  await expect(dlg).toHaveAttribute("aria-label", "ARCHITECTURE.md");                              // all architecture is in one file
+  await expect(dlg).toHaveAttribute("aria-label", "ARCHITECTURE.md");
+  await dlg.getByRole("link", { name: "docs/architecture/COMPLETE_ARCHITECTURE.md" }).first().click();
+  await expect(dlg.getByRole("heading", { name: "DengueShield AI: complete architecture reference" })).toBeVisible();
   await dlg.getByRole("link", { name: "model_selection.md", exact: true }).first().click();
   await expect(dlg.getByRole("heading", { name: "Model selection (Stage 3)" })).toBeVisible();
-  await expect(page).toHaveURL(/\/provenance\/?$/);
+  await expect(page).toHaveURL(/\/provenance\/?/);
 });
 
 test("climate futures: exploratory scenarios are separate, computed live, comparable and bounded", async ({ page }) => {
@@ -348,4 +352,272 @@ test("climate futures: exploratory scenarios are separate, computed live, compar
   await expect(sec.getByText("1.30×")).toBeVisible();
   await sec.getByLabel("Scenario year").selectOption("2030");
   await expect(sec.getByText(/Median cases · 2030/)).toBeVisible({ timeout: 20_000 });
+});
+
+test.describe("V3", () => {
+  for (const vp of [{ width: 360, height: 740 }, { width: 390, height: 844 }, { width: 430, height: 932 }, { width: 1440, height: 900 }]) {
+    test(`answer card shows the forecast in the first screen, nothing covers it, no sideways scroll at ${vp.width}px`, async ({ page }) => {
+      await page.setViewportSize(vp);
+      await page.goto("/command/?nointro");
+      await expect(page.getByRole("heading", { name: /DNCC_Ward_19/ }).first()).toBeVisible({ timeout: 20_000 });
+      const card = page.getByTestId("answer-card");
+      const median = card.getByText("Median forecast");
+      const mb = (await median.boundingBox())!;
+      expect(mb.y + mb.height).toBeLessThan(vp.height);                                             // the forecast number itself is above the fold
+      await expect(card.getByText(/synthetic ward/)).toBeVisible();
+      await expect(card.getByText(/How reliable at 3 weeks/)).toBeVisible();
+      await expect(card.getByRole("navigation", { name: "Next steps" }).getByRole("link", { name: /Plan a response/ })).toBeVisible();
+      // the Copilot launcher lives in the top bar; no fixed element may sit on top of the answer card
+      await expect(page.getByRole("button", { name: "DengueShield Copilot" })).toBeVisible();
+      const overlaps = await page.evaluate(() => {
+        const c = document.querySelector("[data-testid=answer-card]")!.getBoundingClientRect();
+        return [...document.querySelectorAll("body *")].filter((e) => getComputedStyle(e).position === "fixed").map((e) => e.getBoundingClientRect())
+          .filter((r) => r.width > 0 && r.height > 0 && r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top).length;
+      });
+      expect(overlaps).toBe(0);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vp.width);
+    });
+  }
+
+  test("Back and Forward restore each page's selection (URL state)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });                                     // sidebar navigation visible
+    await page.goto("/command/?ward=DNCC_Ward_19&origin=2024-08-05&horizon=3&nointro");
+    await expect(page.getByTestId("answer-card")).toBeVisible({ timeout: 20_000 });
+    await page.getByRole("radio", { name: "2 weeks", exact: true }).first().click();
+    await expect(page).toHaveURL(/horizon=2/);
+    const primary = page.getByRole("navigation", { name: "Primary" });
+    await primary.getByRole("button", { name: /^Forecast/ }).click();                             // V4 shell: Forecast Intelligence menu
+    await primary.getByRole("link", { name: /AI Forecast Lab/ }).click();
+    await expect(page).toHaveURL(/\/lab\/\?.*horizon=2/);
+    await page.getByRole("radio", { name: "4 weeks", exact: true }).first().click();
+    await expect(page).toHaveURL(/\/lab\/\?.*horizon=4/);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/command\/\?.*horizon=2/);
+    await expect(page.getByText(/How reliable at 2 weeks/)).toBeVisible({ timeout: 20_000 });
+    await page.goForward();
+    await expect(page).toHaveURL(/\/lab\/\?.*horizon=4/);
+    await expect(page.getByRole("radio", { name: "4 weeks", exact: true }).first()).toHaveAttribute("aria-checked", "true");
+  });
+
+  test("deep links restore ward, origin and horizon; reset returns to the demo default", async ({ page }) => {
+    await page.goto("/lab/?ward=GCC_Ward_01&origin=2023-08-07&horizon=4&nointro");
+    await expect(page.getByLabel("Ward", { exact: true })).toHaveValue("GCC_Ward_01", { timeout: 20_000 });
+    await expect(page).toHaveURL(/ward=GCC_Ward_01/);
+    await expect(page).toHaveURL(/horizon=4/);
+    await page.getByRole("button", { name: "Reset demo" }).click();
+    await expect(page).toHaveURL(/ward=DNCC_Ward_19/);
+  });
+
+  test("rainfall what-if re-runs the model and lists the inputs it changed", async ({ page }) => {
+    await page.goto("/lab/?ward=DNCC_Ward_19&origin=2024-07-15&horizon=4&nointro");
+    await page.getByRole("button", { name: "Run scenario" }).click();
+    await expect(page.getByText(/Model inputs changed: rain_tl2/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/Not a causal effect/).first()).toBeVisible();
+  });
+
+  test("alert review queue is a labelled local draft and exports a log", async ({ page }) => {
+    await page.goto("/response/?nointro");
+    await expect(page.getByText("Alert review queue (local draft)")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/nothing is sent to field teams/)).toBeVisible();
+    const sel = page.getByLabel(/Review status for/).first();
+    await sel.selectOption("reviewed");
+    await expect(page.getByText(/1<\/b>|of \d+ alerts reviewed/).first()).toBeVisible();
+    const dl = page.waitForEvent("download"); await page.getByRole("button", { name: "Export review log (CSV)" }).click();
+    expect((await dl).suggestedFilename()).toMatch(/alert_review/);
+  });
+
+  test("phone charts wrap their legends instead of paging them", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/command/?nointro");
+    await expect(page.locator("main canvas").first()).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(1500);
+    await expect(page.getByText(/^1\/[23]$/)).toHaveCount(0);
+  });
+
+  for (const route of ["/", "/command/", "/wards/", "/geography/", "/lab/", "/response/", "/copilot/", "/evidence/"]) {
+    test(`${route} has no serious or critical axe (WCAG 2 A/AA) violations at rest`, async ({ page }) => {
+      await page.goto(route + "?nointro");
+      await expect(page.locator("main h1, main h2").first()).toBeVisible({ timeout: 20_000 });
+      await page.waitForTimeout(3000);                                                               // charts, maps and markers settle
+      await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js" });
+      const res: any = await page.evaluate(async () => (window as any).axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] }));
+      const bad = res.violations.filter((v: any) => v.impact === "critical" || v.impact === "serious").map((v: any) => `${v.id} (${v.nodes.length}): ${v.nodes[0].target.join(" ")}`);
+      expect(bad).toEqual([]);
+    });
+  }
+});
+
+test.describe("V3.5 landing", () => {
+  for (const vp of [{ width: 360, height: 740 }, { width: 390, height: 844 }, { width: 430, height: 932 }, { width: 768, height: 1024 }, { width: 1024, height: 768 }, { width: 1440, height: 900 }, { width: 1920, height: 1080 }]) {
+    test(`first screen explains the product and shows the real API forecast at ${vp.width}px`, async ({ page }) => {
+      await page.setViewportSize(vp);
+      await page.goto("/?nointro");
+      const truth = (await api(page, `/api/forecast?ward_id=${WARD}&origin=${ORIGIN}&horizon=3`)).forecast;
+      await expect(page.getByRole("heading", { level: 1 })).toContainText("Dengue forecasts");
+      const median = page.getByTestId("preview-median");
+      await expect(median).toHaveText(String(truth.median_cases), { timeout: 20_000 });               // not a decorative number
+      const preview = page.getByTestId("forecast-preview");
+      await expect(preview).toContainText(`${truth.lower_80}-${truth.upper_80}`);
+      await expect(preview).toContainText("synthetic ward");
+      await expect(preview).toContainText("Validated replay (out-of-time)");
+      const b = (await median.boundingBox())!;
+      expect(b.y + b.height).toBeLessThan(vp.height);                                                // real forecast above the fold
+      await expect(preview.getByRole("link", { name: /Open the full forecast/ })).toBeVisible();         // one obvious next action
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vp.width);
+    });
+  }
+
+  test("horizon and ward switches re-query the model and update the URL", async ({ page }) => {
+    await page.goto("/?nointro");
+    const preview = page.getByTestId("forecast-preview");
+    await expect(page.getByTestId("preview-median")).toBeVisible({ timeout: 20_000 });
+    await preview.getByRole("radio", { name: "4 weeks" }).click();
+    const h4 = (await api(page, `/api/forecast?ward_id=${WARD}&origin=${ORIGIN}&horizon=4`)).forecast;
+    await expect(page.getByTestId("preview-median")).toHaveText(String(h4.median_cases));
+    await expect(page).toHaveURL(/horizon=4/);
+    await preview.getByLabel("Ward").selectOption("GCC_Ward_02");
+    const g = (await api(page, `/api/forecast?ward_id=GCC_Ward_02&origin=${ORIGIN}&horizon=4`)).forecast;
+    await expect(preview).toContainText("GCC_Ward_02");
+    await expect(page.getByTestId("preview-median")).toHaveText(String(g.median_cases));
+  });
+
+  test("calls to action open the real tools with the selection; old deep links still work", async ({ page }) => {
+    await page.goto("/?ward=GCC_Ward_01&origin=2023-08-07&horizon=4&nointro");
+    await expect(page.getByTestId("forecast-preview")).toContainText("GCC_Ward_01", { timeout: 20_000 });
+    await page.getByTestId("forecast-preview").getByRole("link", { name: /Open the Forecast Lab/ }).click();
+    await expect(page).toHaveURL(/\/lab\/\?ward=GCC_Ward_01&origin=2023-08-07&horizon=4/);
+    await page.goBack();
+    await page.getByTestId("forecast-preview").getByRole("link", { name: /Open the full forecast/ }).click();
+    await expect(page).toHaveURL(/\/command\/\?ward=GCC_Ward_01/);
+    await expect(page.getByRole("heading", { name: "Command Center", level: 1 })).toBeVisible();
+    await expect(page.getByLabel("Ward", { exact: true })).toHaveValue("GCC_Ward_01");
+    await page.goto("/?nointro");
+    await page.getByRole("link", { name: "See how reliable it is" }).first().click();
+    await expect(page).toHaveURL(/\/evidence\//);
+  });
+
+  test("forecast outage shows an honest unavailable state, never invented numbers", async ({ page }) => {
+    await page.route("**/api/forecast?*", (r) => r.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: "down" }) }));
+    await page.goto("/?nointro");
+    await expect(page.getByTestId("forecast-preview").getByRole("alert")).toContainText(/not responding/, { timeout: 20_000 });
+    await expect(page.getByTestId("preview-median")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
+  });
+
+  test("decorative motion stops under reduced motion; emergency help, privacy and AI disclosure are on the page", async ({ page }) => {
+    await page.goto("/?nointro");                                                                    // config default: reducedMotion "reduce"
+    await expect(page.getByTestId("preview-median")).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator("canvas[data-rainfield]")).toHaveAttribute("data-static", "true");                          // rain drawn once, not animated
+    expect(await page.evaluate(() => getComputedStyle(document.querySelector(".wire-track")!).animationName)).toBe("none");   // the ward wire stands still
+    expect(await page.evaluate(() => getComputedStyle(document.querySelector("#land-title")!).opacity)).toBe("1");          // nothing waits on an entrance animation
+    const footer = page.getByRole("contentinfo", { name: "Site" });
+    await expect(footer.getByRole("link", { name: "999" })).toHaveAttribute("href", "tel:999");
+    await expect(footer).toContainText("Privacy");
+    await expect(footer).toContainText("AI and tool disclosure");
+    await expect(footer).toContainText("Not affiliated with or endorsed by DGHS");
+  });
+
+  test("navigation: four task groups; the context bar lists the current group's pages", async ({ page }) => {
+    await page.goto("/command/?nointro");
+    const section = page.getByRole("navigation", { name: "Section" });                            // context bar: pages of the current group
+    await expect(section.getByRole("link", { name: "Command Center" })).toHaveAttribute("aria-current", "page");
+    await expect(section.getByRole("link", { name: "Ward Risk Explorer" })).toBeVisible();
+    const nav = page.getByRole("navigation", { name: "Primary" });
+    for (const g of ["Forecast", "Respond", "Evidence", "Learn"]) await expect(nav.getByRole("button", { name: new RegExp(`^${g}`) })).toBeVisible();
+    await nav.getByRole("button", { name: /^Learn/ }).click();
+    await nav.getByRole("link", { name: /^Overview/ }).click();                                    // the tile, not "Start with Overview"
+    await expect(page).toHaveURL(/127\.0\.0\.1:\d+\/(\?|$)/);
+  });
+
+  test("a forward origin (2025) shows the last replay season and its own forecast range, with no 2025 cases", async ({ page }) => {
+    await page.goto("/lab/?ward=DNCC_Ward_19&origin=2025-01-06&horizon=3&nointro");
+    await expect(page.getByText(/this forecast's own range 2, 3 and 4 weeks ahead/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/Replayed forecasts exist for origins/)).toHaveCount(0);
+    await expect(page.getByTestId("reference-label")).toContainText("2024 reference data");                // labelled as 2024 reference data
+    await expect(page.getByTestId("reference-label")).toContainText("2025 outcomes are locked and never shown");
+    await page.goto("/command/?ward=DNCC_Ward_19&origin=2025-01-06&horizon=3&nointro");
+    await expect(page.getByTestId("reference-label")).toContainText("2024 reference data", { timeout: 20_000 });
+  });
+});
+
+test.describe("V3.5 keyboard and dialogs", () => {
+  test("keyboard: skip link comes first, and Tab reaches the landing calls to action and the forecast preview", async ({ page }) => {
+    await page.goto("/?nointro");
+    await expect(page.getByTestId("preview-median")).toBeVisible({ timeout: 20_000 });
+    await page.keyboard.press("Tab");
+    await expect(page.locator(":focus")).toHaveText("Skip to content");
+    const seen: string[] = [];
+    for (let i = 0; i < 40; i++) { await page.keyboard.press("Tab"); seen.push(((await page.locator(":focus").getAttribute("aria-label")) ?? (await page.locator(":focus").innerText().catch(() => ""))).trim()); }
+    expect(seen.some((x) => /Open the Command Center/.test(x))).toBe(true);
+    expect(seen.some((x) => /^3 weeks$/.test(x))).toBe(true);                                          // horizon switch in the preview
+    expect(seen.some((x) => /Open the full forecast/.test(x))).toBe(true);
+  });
+
+  test("dialogs keep focus inside, close on Escape and return focus to the opener", async ({ page }) => {
+    await page.goto("/command/?nointro");
+    const opener = page.getByRole("button", { name: "DengueShield Copilot" });
+    await opener.click();
+    const drawer = page.getByRole("dialog", { name: "DengueShield Copilot" });
+    await expect(drawer).toBeVisible();
+    for (let i = 0; i < 25; i++) await page.keyboard.press("Tab");
+    expect(await drawer.evaluate((d) => d.contains(document.activeElement))).toBe(true);               // Tab never leaves the drawer
+    await page.keyboard.press("Escape");
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
+    await page.goto("/response/?nointro");
+    await page.getByRole("table").first().getByRole("row").filter({ hasText: /_Ward_/ }).first().click({ timeout: 20_000 });   // wait for real ward rows, not a skeleton
+    const dlg = page.getByRole("dialog");
+    await expect(dlg).toContainText("Nothing here is sent to anyone");
+    await expect(dlg.getByRole("link", { name: /Open in Command Center/ })).toHaveAttribute("href", /\/command\/\?ward=/);
+    await page.keyboard.press("Escape");
+    await expect(dlg).toBeHidden();
+  });
+});
+
+test.describe("V3.5 colour modes", () => {
+  test("Light ↔ Dim toggle applies immediately and persists across reloads", async ({ page }) => {
+    await page.goto("/command/?nointro");
+    await expect(page.getByTestId("answer-card")).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await page.getByRole("button", { name: /Colour mode: Light/ }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dim");
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(20, 15, 46)");   // Royal Monsoon deep aubergine, not black
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dim");                                        // remembered, applied before paint
+    await page.getByRole("button", { name: /Colour mode: Dim/ }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  });
+
+  for (const route of ["/", "/command/", "/lab/", "/evidence/", "/response/", "/geography/", "/wards/", "/copilot/"]) {
+    test(`Dim mode: ${route} has no serious or critical axe violations (incl. contrast)`, async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem("ds.theme", "dim"));
+      await page.goto(route + "?nointro");
+      await expect(page.locator("main h1, main h2").first()).toBeVisible({ timeout: 20_000 });
+      await page.waitForTimeout(3000);
+      await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js" });
+      const res: any = await page.evaluate(async () => (window as any).axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] }));
+      const bad = res.violations.filter((v: any) => v.impact === "critical" || v.impact === "serious").map((v: any) => `${v.id} (${v.nodes.length}): ${v.nodes.slice(0, 3).map((n: any) => n.target.join(" ")).join(" | ")}`);
+      expect(bad).toEqual([]);
+    });
+  }
+});
+
+test("Model Evidence: comparison explorer shows saved results, the champion, separated non-model evidence and a CSV download", async ({ page }) => {
+  await page.goto("/evidence/?nointro");
+  await page.getByRole("tab", { name: "Model comparison" }).click();
+  const d = await api(page, "/api/model/comparison");
+  const champ = (w: string) => d.rows.find((r: any) => r.model === "glm_poisson" && r.feature_set === "F8" && !r.variant_tag && r.window === w && r.horizon === "2-4 mean");
+  await expect(page.getByText("How do the models compare?")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText(`(${champ("2019-2024").mae.toFixed(3)} MAE here)`)).toBeVisible();          // the same number the API serves
+  await expect(page.locator("main canvas").first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Download comparison CSV" })).toHaveAttribute("href", "/api/model/comparison.csv");
+  await expect(page.getByText(/hyperparameter trials/)).toBeVisible();                                    // trials are listed apart from models
+  await expect(page.getByText(/SARIMA was not run/)).toBeVisible();
+  await page.getByRole("radio", { name: /Selection seasons/ }).click();
+  await expect(page.getByText(`(${champ("2022-2024").mae.toFixed(3)} MAE here)`)).toBeVisible();
+  await expect(page.getByText(/Development validation used in model selection: not a blind test/)).toBeVisible();   // never presented as a blind test
+  await expect(page.getByText(/not a confidence interval/)).toBeVisible();                                 // ±0.05 is a selection tolerance
+  await page.addScriptTag({ url: "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.10.2/axe.min.js" });
+  const res: any = await page.evaluate(async () => (window as any).axe.run(document, { runOnly: ["wcag2a", "wcag2aa"] }));
+  expect(res.violations.filter((v: any) => v.impact === "critical" || v.impact === "serious").map((v: any) => v.id)).toEqual([]);
 });

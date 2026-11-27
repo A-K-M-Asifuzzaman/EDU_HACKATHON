@@ -30,8 +30,10 @@ from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, r
 app = FastAPI(title="DengueShield AI API", version="1.0.0",
               description="Ward-level dengue forecasting (2-4 weeks ahead). Historical Replay on the organizer dataset (2016-2024); the 2025 holdout is locked.")
 app.add_middleware(GZipMiddleware, minimum_size=2000)
+from dengueshield.api.guard import BodyLimit  # noqa: E402
+app.add_middleware(BodyLimit, paths=("/api/assistant/chat",))
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"],
-                   allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+                   allow_methods=["GET", "POST"], allow_headers=["Content-Type", "Authorization"])
 S = Store()
 H = Annotated[int, Query(ge=2, le=4, description="forecast horizon in weeks (2, 3 or 4)")]
 @app.middleware("http")
@@ -232,6 +234,25 @@ def forecast(ward_id: str, origin: str, horizon: H = 3, source: Optional[Literal
     return out
 
 
+@app.get("/api/forecast/rainfall-what-if")
+def rainfall_what_if(ward_id: str, origin: str, horizon: H = 3, change_pct: Annotated[int, Query(ge=-30, le=30)] = 0,
+                     mode: Literal["observed", "upcoming"] = "upcoming"):
+    """Re-run the saved model with hypothetical rainfall (dengueshield/whatif.py). Never multiplies case counts."""
+    from dengueshield import whatif
+    ward_check(ward_id), origin_check(origin)
+    if S.bundle is None or S.panel is None:
+        raise HTTPException(503, "model bundle not loaded")
+    city = next((w["city"] for w in S.wards_list() if w["ward_id"] == ward_id), None) if hasattr(S, "wards_list") else None
+    if city is None:
+        city = str(S.panel.loc[S.panel.ward_id == ward_id, "city"].iloc[0])
+    key = ("whatif", S.bundle_sha, ward_id, origin, horizon, change_pct, mode)
+    try:
+        v, _ = S.cache.get_or(key, lambda: S._heavy(lambda: whatif.rainfall_what_if(S.bundle, S.panel, origin, horizon, ward_id, city, change_pct, mode)))
+    except ValueError as e:
+        bad(str(e))
+    return v
+
+
 @app.get("/api/forecast/compare")
 def forecast_compare(ward_id: str, origin: str, source: Optional[Literal["replay", "bundle"]] = None):
     ward_check(ward_id), origin_check(origin)
@@ -248,15 +269,30 @@ def forecast_compare(ward_id: str, origin: str, source: Optional[Literal["replay
 
 
 @app.get("/api/forecast/series")
-def forecast_series(ward_id: str, horizon: H = 3, year: Optional[int] = Query(None, ge=2019, le=2024)):
-    """Out-of-time Historical Replay: median, mean, intervals and observed cases per target week (validation seasons 2019-2024)."""
+def forecast_series(ward_id: str, horizon: H = 3, year: Optional[int] = Query(None, ge=2019, le=2024), origin: Optional[str] = None):
+    """Out-of-time Historical Replay: median, mean, intervals and observed cases per target week (validation seasons 2019-2024).
+    With `origin` (alone or with `year`): after the last replay season, that season is followed by the origin's own 2-4 week forward
+    forecasts (`forward: true`, observed cases locked); without `year`, the origin picks its season, and an origin before the first
+    season gives an empty series."""
     ward_check(ward_id), need("replay")
     r = S.replay[(S.replay.ward_id == ward_id) & (S.replay.horizon == horizon)]
+    ahead: list = []
+    if origin:
+        origin_check(origin)
+        first, last, oy = int(S.replay.year.min()), int(S.replay.year.max()), int(origin[:4])
+        if year is None:
+            year = min(oy, last)
+            if oy < first:
+                r = r.iloc[0:0]
+        if oy > last and year == last:
+            ahead = [{"origin_date": f["origin_date"], "target_date": f["target_date"], "horizon": f["horizon"], "y_true": None, "mean": f["expected_cases"], "median": f["median_cases"],
+                      "lo80": f["lower_80"], "hi80": f["upper_80"], "lo90": f["lower_90"], "hi90": f["upper_90"], "p_outbreak": f["p_outbreak"], "tier": f.get("risk_tier"), "forward": True}
+                     for f in forecast_compare(ward_id, origin)["forecasts"] if not f.get("error")]
     if year:
         r = r[r.year == year]
     r = r.sort_values("target_date")
-    return {"ward_id": ward_id, "horizon": horizon, "convention": "B_start_of_week",
-            "note": "Each season was predicted by a model trained only on earlier seasons; calibration used the two preceding seasons.", "series": records(r.drop(columns=["city"]))}
+    return {"ward_id": ward_id, "horizon": horizon, "season": year, "convention": "B_start_of_week",
+            "note": "Each season was predicted by a model trained only on earlier seasons; calibration used the two preceding seasons.", "series": records(r.drop(columns=["city"])) + ahead}
 
 
 @app.get("/api/risk/wards")
@@ -327,6 +363,75 @@ def model_features():
 def model_validation():
     v = art("validation")
     return {k: v[k] for k in ("leaderboard", "champion_by_season", "optuna", "paired_vs_glm", "convention_comparison", "stage2_vs_stage3", "error_by_city", "limits")}
+
+
+@app.get("/api/model/canonical-metrics")
+def model_canonical_metrics():
+    """One versioned source for every reported model metric (built by scripts/build_canonical_metrics.py from the replay table).
+    Regimes are labelled: out-of-time replay 2019–2024, the 2022–2024 selection window (validation, not blind), sealed 2025."""
+    f = ROOT / "app_data" / "metrics_canonical.json"
+    if not f.exists():
+        raise HTTPException(503, "canonical metrics not built: run python scripts/build_canonical_metrics.py")
+    v, _ = S.cache.get_or(("canonical", f.stat().st_mtime), lambda: json.loads(f.read_text()))
+    return v
+
+
+@app.get("/api/research/v3")
+def research_v3():
+    """Pre-registered V3 research results (research/v3/PREREGISTRATION.md). Research candidates only: production intervals and the
+    alert rule are unchanged. Built by research/v3/e1_e4_calibration.py from saved out-of-time replay predictions."""
+    d = ROOT / "research" / "v3" / "results"
+    out = {"status": "research candidates; not deployed", "preregistration": "research/v3/PREREGISTRATION.md"}
+    for name in ("e1_intervals", "e4_alert"):
+        f = d / f"{name}.json"
+        out[name] = json.loads(f.read_text()) if f.exists() else None
+    if out["e1_intervals"]:
+        summ = {}
+        for h, x in out["e1_intervals"]["by_horizon"].items():
+            ss = x["seasons"]
+            avg = lambda side, k: round(float(np.mean([s_["80"][side][k] for s_ in ss])), 3)
+            summ[h] = {"verdict": x["verdict"], "seasons_passing": x["seasons_passing"], "seasons": [s_["season"] for s_ in ss],
+                       **{f"{side}_{k}": avg(side, k) for side in ("baseline", "candidate") for k in ("peaks", "positive_below_peak", "all", "width", "interval_score")}}
+        out["e1_summary"] = summ
+    vf = d / "e1_verification.json"                                     # independent verification (research/v3/verify_e1.py)
+    if vf.exists():
+        v = json.loads(vf.read_text())
+        by_bin = {}
+        for h, x in v["by_horizon"].items():                             # pooled 80% coverage per predicted-mean bin over the 4 seasons (row-weighted)
+            n = np.array([s_["n_eval_rows_by_mu_bin"] for s_ in x["seasons"]], float)
+            cov = lambda key: [round(float(np.nansum(np.array([[c if c is not None else np.nan for c in s_[key]] for s_ in x["seasons"]], float)[:, b] * n[:, b]) / n[:, b].sum()), 3) for b in range(n.shape[1])]
+            by_bin[h] = {"bins": ["<0.5", "0.5–2", "2–5", "5–10", "≥10"], "n": [int(c) for c in n.sum(0)],
+                         "baseline": cov("baseline_80_coverage_by_mu_bin"), "candidate": cov("candidate_80_coverage_by_mu_bin")}
+        out["e1_verification"] = {"recommendation": "INSUFFICIENT EVIDENCE to promote; deployed intervals retained",
+                                  "reproduces_saved_results_exactly": v["reproduces_saved_results_exactly"],
+                                  "by_horizon": {h: {k: x[k] for k in ("peak80_season_mean", "peak80_pooled_rows_2021_2024", "peak80_gain_pooled_ward_bootstrap_95ci",
+                                                                        "positive80_pooled", "all80_pooled", "width80_pooled", "audit_rule_per_bin_within_5pts")} for h, x in v["by_horizon"].items()},
+                                  "coverage_by_mu_bin": by_bin}
+    return out
+
+
+_MC: dict = {}
+
+
+@app.get("/api/model/comparison")
+def model_comparison():
+    """Unified model comparison (convention B): Stage 3 tournament, V3 classical benchmarks and baselines on identical folds.
+    Built by scripts/model_comparison/build_model_comparison.py from saved results; validation only (2025 sealed)."""
+    f = ROOT / "app_data" / "model_comparison.json"
+    if not f.exists():
+        raise HTTPException(404, "model comparison not built (run scripts/model_comparison/build_model_comparison.py)")
+    m = f.stat().st_mtime
+    if _MC.get("mtime") != m:
+        _MC.update(mtime=m, data=json.loads(f.read_text()))
+    return _MC["data"]
+
+
+@app.get("/api/model/comparison.csv", include_in_schema=False)
+def model_comparison_csv():
+    f = ROOT / "app_data" / "MODEL_COMPARISON.csv"
+    if not f.exists():
+        raise HTTPException(404, "model comparison CSV not built")
+    return FileResponse(f, media_type="text/csv", filename="DengueShield_MODEL_COMPARISON.csv")
 
 
 @app.get("/api/model/calibration")
@@ -519,6 +624,10 @@ def decision_allocation_season(year: Annotated[int, Query(ge=2019, le=2024)], ho
 # ------------------------------------------------------------------ healthcare facilities, A* routing, emergency help (OpenStreetMap, ODbL)
 APP_DATA_GEO = ROOT / "app_data" / "geo"
 OSM_ATTR = "Facilities and roads (c) OpenStreetMap contributors, ODbL 1.0"
+EMERGENCY_ELIGIBILITY = ("Emergency search lists general hospitals, plus general clinics tagged emergency=yes in OpenStreetMap. Veterinary, "
+                         "diagnostic-only and specialist facilities (eye, dental, maternity, cardiac and similar), and facilities tagged emergency=no, "
+                         "are left out; they stay in the directory. Most records have no emergency tag: unknown does not mean no service. "
+                         "Call before travelling; in a life-threatening emergency call 999.")
 FACILITY_NOTE = ("Community-mapped data, not verified by DGHS. Names, phone numbers and tagged bed counts may be outdated. "
                  "There is no live information on availability, beds, admissions or doctors on duty: call before travelling.")
 Lat = Annotated[float, Query(ge=-90, le=90)]
@@ -574,14 +683,17 @@ def route_between(from_lat: Lat, from_lon: Lon, to_lat: Optional[Lat] = None, to
 
 
 @app.get("/api/emergency/nearest")
-def emergency_nearest(lat: Lat, lon: Lon, k: Annotated[int, Query(ge=1, le=10)] = 5, kind: Literal["hospital", "clinic", "any"] = "hospital"):
-    """Nearest facilities by estimated road travel time (not straight-line distance)."""
+def emergency_nearest(lat: Lat, lon: Lon, k: Annotated[int, Query(ge=1, le=10)] = 5, kind: Literal["hospital", "clinic", "any"] = "hospital",
+                      purpose: Literal["emergency", "general"] = "emergency"):
+    """Nearest facilities by estimated road travel time (not straight-line distance).
+    Default purpose "emergency" leaves out veterinary, diagnostic-only and specialist facilities (see dengueshield/facility_class.py)."""
     _routing_ready()
     try:
-        out = routing.nearest_facilities(lat, lon, k, None if kind == "any" else kind)
+        out = routing.nearest_facilities(lat, lon, k, None if kind == "any" else kind, purpose)
     except routing.RoutingError as e:
         bad(str(e))
-    out.update({"attribution": OSM_ATTR, "note": FACILITY_NOTE, "emergency": EMERGENCY["numbers"]})
+    out.update({"attribution": OSM_ATTR, "note": FACILITY_NOTE, "emergency": EMERGENCY["numbers"],
+                "eligibility": EMERGENCY_ELIGIBILITY if purpose == "emergency" else "All human-care facilities of the requested kind; veterinary facilities excluded."})
     return out
 
 
@@ -751,7 +863,7 @@ def scenarios_backtest():
 # ------------------------------------------------------------------ methodology documents (allow-listed, read-only)
 def _doc_index() -> dict:
     out = {}
-    for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/team/*.md"):
+    for pat in ("README.md", "ARCHITECTURE.md", "data/README.md", "docs/*.md", "docs/architecture/*.md", "docs/team/*.md"):
         for f in sorted(ROOT.glob(pat)):
             if f.is_file() and f.name not in {".env", ".env.example"}:
                 out[f.relative_to(ROOT).as_posix()] = f
@@ -774,10 +886,10 @@ def docs_read(path: str = Query(max_length=80)):
 # ------------------------------------------------------------------ assistant
 @app.post("/api/assistant/chat")
 async def assistant_chat(req: ChatRequest, request: Request):
-    from dengueshield.api import rag
-    if int(request.headers.get("content-length", 0)) > 20_000:
-        raise HTTPException(413, "request too large")
-    sid = request.client.host if request.client else "local"
+    from dengueshield.api import guard, rag
+    # Body size is enforced as it streams by guard.BodyLimit (also for chunked bodies). The rate-limit key is the TCP peer,
+    # or a configured number of trusted proxy hops from the right of X-Forwarded-For; never a caller-chosen value.
+    sid = guard.client_key(request.client.host if request.client else None, request.headers.get("x-forwarded-for"))
     result = rag.answer(S, req, sid)
     if result.get("stream") is None:
         return JSONResponse(result["payload"], status_code=result.get("status", 200))
@@ -788,6 +900,12 @@ async def assistant_chat(req: ChatRequest, request: Request):
 def assistant_status():
     from dengueshield.api import rag
     return rag.status()
+
+
+# ------------------------------------------------------------------ accounts, roles and officer workflows (V4); public routes above stay anonymous
+from dengueshield.api import auth as _auth, ops as _ops  # noqa: E402
+app.include_router(_auth.router)
+app.include_router(_ops.router)
 
 
 # ------------------------------------------------------------------ static frontend (built Next.js export)

@@ -4,7 +4,7 @@
 
 <br/>
 
-[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml)
+[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
@@ -124,7 +124,7 @@ The GIFs above are rebuilt from these screenshots with `python scripts/make_read
 **Requirements:** Python 3.12+, Node 20.9+ and npm, internet access for the first run.
 
 ```bash
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git && cd EDU_HACKATHON_FINAL
 ./scripts/launch.sh            # http://127.0.0.1:8000
 # PORT=8100 ./scripts/launch.sh  # if 8000 is busy
 ```
@@ -132,6 +132,11 @@ git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKA
 The script creates `.venv`, installs runtime dependencies, downloads and checksum-verifies the
 organizer CSV, builds the Next.js dashboard (`npm ci && npm run build`) and starts a single
 process serving both the API and the dashboard.
+
+<p align="center"><img src="docs/media/diagrams/quickstart.svg" alt="Quick start: git clone, launch.sh, virtual environment, SHA-256 verified data download, dashboard build, then one server for API and dashboard" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
 
 ```mermaid
 flowchart LR
@@ -141,6 +146,8 @@ flowchart LR
     D --> E["npm ci && npm run build"]
     E --> F["uvicorn :8000<br/>API + dashboard"]
 ```
+
+</details>
 
 ---
 
@@ -162,8 +169,8 @@ flowchart LR
 ### Step 1 — Clone the Repository
 
 ```powershell
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git
-cd EDU_HACKATHON
+git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git
+cd EDU_HACKATHON_FINAL
 ```
 
 ### Step 2 — Download the Dataset
@@ -240,6 +247,11 @@ The measurement excludes the organizer CSV download.
 
 ## 🧱 Project Architecture
 
+<p align="center"><img src="docs/media/diagrams/architecture.svg" alt="Architecture: verified CSV, 24-feature pipeline, offline training with season-level cross-validation, 11 KB model bundle and replay forecasts, FastAPI backend, static Next.js dashboard; optional services are never model inputs" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart TB
     CSV[("Organizer CSV (synthetic)<br/>SHA-256 verified on every load")]
@@ -251,6 +263,8 @@ flowchart TB
     API --> UI["Next.js 16 Static Dashboard (frontend/out)<br/>React 19 · TypeScript · Tailwind 4 · ECharts 6 · MapLibre 6<br/>Served by FastAPI on the same origin (no CORS)"]
     EXT["NASA POWER · Open-Meteo · OpenAI · DGHS GIS<br/>(optional, never model inputs)"] -.-> API
 ```
+
+</details>
 
 <details>
 <summary>Plain-text version of the diagram</summary>
@@ -286,7 +300,7 @@ flowchart TB
 
 </details>
 
-For the full architectural breakdown with Mermaid diagrams (data flow, validation split, model selection and every subsystem), see [ARCHITECTURE.md](ARCHITECTURE.md).
+Architecture: a concise overview in [ARCHITECTURE.md](ARCHITECTURE.md) (data flow, validation split, model selection, cost controls) and the complete technical reference with every diagram in [docs/architecture/COMPLETE_ARCHITECTURE.md](docs/architecture/COMPLETE_ARCHITECTURE.md).
 
 ---
 
@@ -296,7 +310,7 @@ For the full architectural breakdown with Mermaid diagrams (data flow, validatio
 <summary><b>Show the full tree</b></summary>
 
 ```
-EDU_HACKATHON/
+EDU_HACKATHON_FINAL/
 ├── dengueshield/              # Python library (the core engine)
 │   ├── api/                   #   FastAPI app: main.py, store.py, schemas.py, climate.py,
 │   │                          #     geo.py, integrations.py, rag.py (Copilot)
@@ -398,6 +412,11 @@ Details: [`docs/model_selection.md`](docs/model_selection.md), [`docs/calibratio
 
 ### 🤔 Why This Model
 
+**Full model comparison:** [`reports/MODEL_COMPARISON.md`](reports/MODEL_COMPARISON.md) and the machine-readable
+[`reports/MODEL_COMPARISON.csv`](reports/MODEL_COMPARISON.csv): 28 model variants (23 from the Stage 3 tournament + 5 classical benchmarks
+added in V3) and 5 baselines on identical season folds, with MAE, RMSE, R², peak-week error, outbreak alerts, cost and selection status. It is
+also explorable in the app (Model Evidence → Model comparison).
+
 The selection rule was fixed before the tuned and ensemble results were seen: shortlist everything
 within 0.05 MAE of the best, then take the simplest. Tuned XGBoost, LightGBM, CatBoost, hurdle
 models and 9 ensembles did not beat the GLM by a meaningful margin. The GLM gives:
@@ -408,8 +427,10 @@ models and 9 ensembles did not beat the GLM by a meaningful margin. The GLM give
 
 ### ⚠️ Known Limitations
 
-- Intervals **under-cover outbreak peaks** (80% coverage: 0.607, 90%: 0.740 at peaks)
-- Peaks are under-predicted by approximately 3 cases
+- Intervals **under-cover outbreak peaks**: pooled over all out-of-time weeks (2019–2024), 80% intervals cover 0.57 and 90% intervals 0.71 of
+  peak weeks, against 0.85 / 0.91 overall (earlier documents quoted 0.607 / 0.740, an unweighted mean over season × horizon cells).
+- Peaks are under-predicted 77% of the time, by about 3.7 cases on average (pooled). One canonical source: `app_data/metrics_canonical.json`.
+- The 2022–2024 MAE figures come from seasons also used to choose the model: they are validation results, not a blind test. 2025 is sealed.
 - The dataset is **synthetic**; nothing in the app is live surveillance
 - Risk tiers are **statistical categories** from training quantiles, not official public-health warning levels
 
@@ -419,6 +440,11 @@ Each expanding outer fold fits on earlier seasons and predicts a later full seas
 Interval dispersion and alert thresholds are calibrated on the two preceding validation seasons only.
 The 2025 holdout is **sealed and excluded** from fit, selection, calibration and scoring. See
 [`docs/validation_protocol.md`](docs/validation_protocol.md) and [`docs/holdout_protocol.md`](docs/holdout_protocol.md).
+
+<p align="center"><img src="docs/media/diagrams/validation.svg" alt="Validation: six expanding folds each predict one full season from 2019 to 2024; 2019 to 2021 tune, 2022 to 2024 benchmark; 2025 sealed" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
 
 ```mermaid
 gantt
@@ -437,6 +463,8 @@ gantt
     section Sealed
     2025 holdout (never used) :crit, 2025, 2026
 ```
+
+</details>
 
 ---
 
@@ -459,12 +487,22 @@ The API is self-documented at **`/docs`** (Swagger UI) on a running server.
 
 ---
 
+Team, responsibilities and how contributions are recorded: `CONTRIBUTORS.md`. Decision-support methods and evidence: `docs/decision_support.md`. Three-minute walkthrough: `docs/demo_script.md`. Screenshots: `docs/screenshots/`, `reports/screenshots/`.
+
 ## 🔐 Security & Privacy
 
 > [!CAUTION]
 > **Never commit API keys, passwords, or secrets to the repository.** All secret files
 > (`.env`, `.env.local`, `.env.*.local`) are git-ignored. Review the `.gitignore` before
 > making any changes to ensure secrets remain excluded.
+
+### Accounts and Roles (V4)
+
+<p align="center"><img src="docs/media/diagrams/accounts.svg" alt="Accounts and roles: Firebase sign-in, ID token as a Bearer header, server-side verification, role check, officer and administrator workflows, refusals and the audit log" width="100%"/></p>
+
+Public forecasting needs no account. Officers review model alerts and draft generic response plans; administrators grant roles and approve
+other people's plans. Firebase Authentication handles sign-in, and the FastAPI backend checks the token and the role on every protected request.
+Setup and the full list of checks: [`docs/AUTH_FIREBASE.md`](docs/AUTH_FIREBASE.md).
 
 ### Secret Management
 
@@ -567,6 +605,11 @@ npx playwright test
 | **Dashboard** | Vercel (static site) | `vercel.json`, `.vercelignore` |
 | **API** | Hugging Face Spaces (Docker) | `Dockerfile.backend`, `scripts/deploy_space.py` |
 
+<p align="center"><img src="docs/media/diagrams/deployment.svg" alt="Deployment: browser, Vercel static export proxying /api to the FastAPI backend on a Hugging Face Space; MapTiler tiles, Firebase sign-in and optional APIs" width="100%"/></p>
+
+<details>
+<summary>Diagram source (Mermaid)</summary>
+
 ```mermaid
 flowchart LR
     U[👤 Browser] --> V[Vercel<br/>static Next.js export]
@@ -574,6 +617,8 @@ flowchart LR
     H -.-> O[OpenAI · NASA POWER · Open-Meteo · DGHS]
     U -.-> M[MapTiler tiles]
 ```
+
+</details>
 
 Vercel serves the static Next.js export and proxies `/api/*` to the FastAPI backend on HF Spaces.
 Detailed steps, secrets and cost controls are in [`docs/deployment.md`](docs/deployment.md).

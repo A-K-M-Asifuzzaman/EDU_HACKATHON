@@ -28,10 +28,16 @@ class ForecastItem(BaseModel):
     outbreak_threshold: Optional[float] = None
 
 
+class ChatTurn(BaseModel):
+    """One earlier turn supplied by the client. Only user/assistant roles are accepted, so a client cannot inject a system turn."""
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=2000)
+
+
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=1200)
     language: Literal["en", "bn"] = "en"
     ward_id: Optional[str] = Field(None, max_length=40)
     origin: Optional[str] = Field(None, max_length=10)
     horizon: Optional[Literal[2, 3, 4]] = None
-    history: list[dict] = Field(default_factory=list, max_length=8)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=8)

@@ -1,0 +1,741 @@
+{
+ "schema": "dengueshield.metrics/1",
+ "source": {
+  "replay": "app_data/replay.csv.gz",
+  "replay_sha256": "1f91c3178ce174a01df8ed7f0deada4b74158b78b87121c8a202ca6781815f8e",
+  "rows": 53100,
+  "seasons": [
+   2019,
+   2020,
+   2021,
+   2022,
+   2023,
+   2024
+  ]
+ },
+ "definitions": {
+  "peak": "y_true >= thr_q90 (training-period 90th percentile; the outbreak threshold)",
+  "pooled": "every replay row (ward-week x horizon) weighted equally",
+  "coverage": "share of weeks whose observed count lies inside the central interval",
+  "alert": "deployed rule: P(outbreak) above the tuned threshold; recall/precision against peaks"
+ },
+ "regimes": {
+  "out_of_time_2019_2024": {
+   "label": "Out-of-time replay: each season predicted by models fitted only on earlier seasons.",
+   "seasons": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+   ],
+   "by_horizon": {
+    "2": {
+     "n": 18060,
+     "mae": 1.112,
+     "rmse": 2.238,
+     "bias": -0.15,
+     "share_zero_weeks": 0.56,
+     "coverage": {
+      "all": {
+       "80": 0.888,
+       "90": 0.93
+      },
+      "zero_weeks": {
+       "80": 0.987,
+       "90": 0.99
+      },
+      "positive_below_peak": {
+       "80": 0.807,
+       "90": 0.891
+      },
+      "peaks": {
+       "80": 0.638,
+       "90": 0.749
+      },
+      "weeks_ge_20": {
+       "80": 0.323,
+       "90": 0.425
+      }
+     },
+     "width_mean": {
+      "80": 2.81,
+      "90": 3.63
+     },
+     "peaks": {
+      "n": 2114,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 4.112,
+      "bias": -2.878,
+      "under_share": 0.743,
+      "median_pred_over_actual": 0.765,
+      "width80_mean": 8.34
+     },
+     "weeks_ge_20": {
+      "n": 226,
+      "under_share": 0.858,
+      "bias": -6.743,
+      "coverage80": 0.323
+     },
+     "alert": {
+      "recall": 0.803,
+      "precision": 0.638,
+      "false_alert_rate": 0.06,
+      "alerts": 2661
+     }
+    },
+    "3": {
+     "n": 17700,
+     "mae": 1.39,
+     "rmse": 2.771,
+     "bias": -0.072,
+     "share_zero_weeks": 0.551,
+     "coverage": {
+      "all": {
+       "80": 0.85,
+       "90": 0.901
+      },
+      "zero_weeks": {
+       "80": 0.981,
+       "90": 0.986
+      },
+      "positive_below_peak": {
+       "80": 0.737,
+       "90": 0.841
+      },
+      "peaks": {
+       "80": 0.559,
+       "90": 0.678
+      },
+      "weeks_ge_20": {
+       "80": 0.15,
+       "90": 0.279
+      }
+     },
+     "width_mean": {
+      "80": 3.0,
+      "90": 3.97
+     },
+     "peaks": {
+      "n": 2114,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 4.791,
+      "bias": -3.831,
+      "under_share": 0.784,
+      "median_pred_over_actual": 0.706,
+      "width80_mean": 7.99
+     },
+     "weeks_ge_20": {
+      "n": 226,
+      "under_share": 0.996,
+      "bias": -10.664,
+      "coverage80": 0.15
+     },
+     "alert": {
+      "recall": 0.758,
+      "precision": 0.508,
+      "false_alert_rate": 0.099,
+      "alerts": 3151
+     }
+    },
+    "4": {
+     "n": 17340,
+     "mae": 1.592,
+     "rmse": 3.12,
+     "bias": 0.016,
+     "share_zero_weeks": 0.542,
+     "coverage": {
+      "all": {
+       "80": 0.825,
+       "90": 0.901
+      },
+      "zero_weeks": {
+       "80": 0.972,
+       "90": 0.983
+      },
+      "positive_below_peak": {
+       "80": 0.695,
+       "90": 0.844
+      },
+      "peaks": {
+       "80": 0.521,
+       "90": 0.694
+      },
+      "weeks_ge_20": {
+       "80": 0.058,
+       "90": 0.217
+      }
+     },
+     "width_mean": {
+      "80": 3.2,
+      "90": 4.68
+     },
+     "peaks": {
+      "n": 2054,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 5.217,
+      "bias": -4.321,
+      "under_share": 0.791,
+      "median_pred_over_actual": 0.69,
+      "width80_mean": 7.84
+     },
+     "weeks_ge_20": {
+      "n": 226,
+      "under_share": 1.0,
+      "bias": -12.465,
+      "coverage80": 0.058
+     },
+     "alert": {
+      "recall": 0.689,
+      "precision": 0.401,
+      "false_alert_rate": 0.138,
+      "alerts": 3526
+     }
+    }
+   },
+   "pooled_all_horizons": {
+    "n": 53100,
+    "mae": 1.361,
+    "rmse": 2.728,
+    "bias": -0.07,
+    "share_zero_weeks": 0.551,
+    "coverage": {
+     "all": {
+      "80": 0.855,
+      "90": 0.911
+     },
+     "zero_weeks": {
+      "80": 0.98,
+      "90": 0.987
+     },
+     "positive_below_peak": {
+      "80": 0.746,
+      "90": 0.858
+     },
+     "peaks": {
+      "80": 0.573,
+      "90": 0.707
+     },
+     "weeks_ge_20": {
+      "80": 0.177,
+      "90": 0.307
+     }
+    },
+    "width_mean": {
+     "80": 3.0,
+     "90": 4.08
+    },
+    "peaks": {
+     "n": 6282,
+     "definition": "y_true >= training q90 (outbreak threshold)",
+     "mae": 4.702,
+     "bias": -3.671,
+     "under_share": 0.772,
+     "median_pred_over_actual": 0.722,
+     "width80_mean": 8.06
+    },
+    "weeks_ge_20": {
+     "n": 678,
+     "under_share": 0.951,
+     "bias": -9.957,
+     "coverage80": 0.177
+    },
+    "alert": {
+     "recall": 0.75,
+     "precision": 0.505,
+     "false_alert_rate": 0.099,
+     "alerts": 9338
+    }
+   }
+  },
+  "selection_window_2022_2024": {
+   "label": "Validation seasons ALSO used to choose features, model, interval method and alert rule. Not a blind test.",
+   "seasons": [
+    2022,
+    2023,
+    2024
+   ],
+   "by_horizon": {
+    "2": {
+     "n": 9060,
+     "mae": 1.106,
+     "rmse": 2.235,
+     "bias": -0.19,
+     "share_zero_weeks": 0.561,
+     "coverage": {
+      "all": {
+       "80": 0.893,
+       "90": 0.936
+      },
+      "zero_weeks": {
+       "80": 0.988,
+       "90": 0.993
+      },
+      "positive_below_peak": {
+       "80": 0.823,
+       "90": 0.902
+      },
+      "peaks": {
+       "80": 0.648,
+       "90": 0.77
+      },
+      "weeks_ge_20": {
+       "80": 0.384,
+       "90": 0.493
+      }
+     },
+     "width_mean": {
+      "80": 2.89,
+      "90": 3.74
+     },
+     "peaks": {
+      "n": 1183,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 4.019,
+      "bias": -2.7,
+      "under_share": 0.744,
+      "median_pred_over_actual": 0.769,
+      "width80_mean": 8.41
+     },
+     "weeks_ge_20": {
+      "n": 138,
+      "under_share": 0.79,
+      "bias": -5.58,
+      "coverage80": 0.384
+     },
+     "alert": {
+      "recall": 0.795,
+      "precision": 0.688,
+      "false_alert_rate": 0.054,
+      "alerts": 1367
+     }
+    },
+    "3": {
+     "n": 8880,
+     "mae": 1.392,
+     "rmse": 2.799,
+     "bias": -0.213,
+     "share_zero_weeks": 0.552,
+     "coverage": {
+      "all": {
+       "80": 0.856,
+       "90": 0.909
+      },
+      "zero_weeks": {
+       "80": 0.985,
+       "90": 0.991
+      },
+      "positive_below_peak": {
+       "80": 0.763,
+       "90": 0.862
+      },
+      "peaks": {
+       "80": 0.539,
+       "90": 0.677
+      },
+      "weeks_ge_20": {
+       "80": 0.145,
+       "90": 0.304
+      }
+     },
+     "width_mean": {
+      "80": 3.0,
+      "90": 4.02
+     },
+     "peaks": {
+      "n": 1183,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 4.923,
+      "bias": -4.049,
+      "under_share": 0.812,
+      "median_pred_over_actual": 0.692,
+      "width80_mean": 7.93
+     },
+     "weeks_ge_20": {
+      "n": 138,
+      "under_share": 1.0,
+      "bias": -10.674,
+      "coverage80": 0.145
+     },
+     "alert": {
+      "recall": 0.719,
+      "precision": 0.558,
+      "false_alert_rate": 0.087,
+      "alerts": 1523
+     }
+    },
+    "4": {
+     "n": 8700,
+     "mae": 1.511,
+     "rmse": 3.007,
+     "bias": -0.204,
+     "share_zero_weeks": 0.544,
+     "coverage": {
+      "all": {
+       "80": 0.841,
+       "90": 0.919
+      },
+      "zero_weeks": {
+       "80": 0.978,
+       "90": 0.99
+      },
+      "positive_below_peak": {
+       "80": 0.74,
+       "90": 0.878
+      },
+      "peaks": {
+       "80": 0.517,
+       "90": 0.722
+      },
+      "weeks_ge_20": {
+       "80": 0.051,
+       "90": 0.268
+      }
+     },
+     "width_mean": {
+      "80": 3.24,
+      "90": 4.77
+     },
+     "peaks": {
+      "n": 1123,
+      "definition": "y_true >= training q90 (outbreak threshold)",
+      "mae": 5.273,
+      "bias": -4.703,
+      "under_share": 0.818,
+      "median_pred_over_actual": 0.667,
+      "width80_mean": 7.77
+     },
+     "weeks_ge_20": {
+      "n": 138,
+      "under_share": 1.0,
+      "bias": -12.435,
+      "coverage80": 0.051
+     },
+     "alert": {
+      "recall": 0.69,
+      "precision": 0.415,
+      "false_alert_rate": 0.144,
+      "alerts": 1867
+     }
+    }
+   },
+   "pooled_all_horizons": {
+    "n": 26640,
+    "mae": 1.333,
+    "rmse": 2.695,
+    "bias": -0.202,
+    "share_zero_weeks": 0.552,
+    "coverage": {
+     "all": {
+      "80": 0.864,
+      "90": 0.921
+     },
+     "zero_weeks": {
+      "80": 0.984,
+      "90": 0.991
+     },
+     "positive_below_peak": {
+      "80": 0.775,
+      "90": 0.881
+     },
+     "peaks": {
+      "80": 0.569,
+      "90": 0.723
+     },
+     "weeks_ge_20": {
+      "80": 0.193,
+      "90": 0.355
+     }
+    },
+    "width_mean": {
+     "80": 3.04,
+     "90": 4.17
+    },
+    "peaks": {
+     "n": 3489,
+     "definition": "y_true >= training q90 (outbreak threshold)",
+     "mae": 4.729,
+     "bias": -3.802,
+     "under_share": 0.791,
+     "median_pred_over_actual": 0.714,
+     "width80_mean": 8.04
+    },
+    "weeks_ge_20": {
+     "n": 414,
+     "under_share": 0.93,
+     "bias": -9.563,
+     "coverage80": 0.193
+    },
+    "alert": {
+     "recall": 0.735,
+     "precision": 0.539,
+     "false_alert_rate": 0.095,
+     "alerts": 4757
+    }
+   }
+  }
+ },
+ "blind_test_2025": {
+  "status": "sealed",
+  "evaluated": false,
+  "note": "The 2025 organizer holdout has never been read. It is the only blind test and is evaluated once, after a model is frozen."
+ },
+ "by_season_mae": {
+  "2019": {
+   "2": {
+    "mae": 1.349,
+    "n": 3000
+   },
+   "3": {
+    "mae": 1.595,
+    "n": 2940
+   },
+   "4": {
+    "mae": 1.8,
+    "n": 2880
+   }
+  },
+  "2020": {
+   "2": {
+    "mae": 0.993,
+    "n": 3000
+   },
+   "3": {
+    "mae": 1.178,
+    "n": 2940
+   },
+   "4": {
+    "mae": 1.357,
+    "n": 2880
+   }
+  },
+  "2021": {
+   "2": {
+    "mae": 1.014,
+    "n": 3000
+   },
+   "3": {
+    "mae": 1.39,
+    "n": 2940
+   },
+   "4": {
+    "mae": 1.865,
+    "n": 2880
+   }
+  },
+  "2022": {
+   "2": {
+    "mae": 1.242,
+    "n": 3000
+   },
+   "3": {
+    "mae": 1.507,
+    "n": 2940
+   },
+   "4": {
+    "mae": 1.66,
+    "n": 2880
+   }
+  },
+  "2023": {
+   "2": {
+    "mae": 1.156,
+    "n": 3000
+   },
+   "3": {
+    "mae": 1.421,
+    "n": 2940
+   },
+   "4": {
+    "mae": 1.573,
+    "n": 2880
+   }
+  },
+  "2024": {
+   "2": {
+    "mae": 0.923,
+    "n": 3060
+   },
+   "3": {
+    "mae": 1.25,
+    "n": 3000
+   },
+   "4": {
+    "mae": 1.304,
+    "n": 2940
+   }
+  }
+ },
+ "legacy_cell_mean": {
+  "note": "Unweighted mean over the 18 season x horizon cells (2019\u20132024 x h2\u2013h4). Earlier documents quoted these; pooled figures above weight every week equally.",
+  "cov80_peaks": 0.607,
+  "cov90_peaks": 0.74,
+  "peak_under_share": 0.739,
+  "peak_bias": -3.21,
+  "cells": [
+   {
+    "year": 2019,
+    "horizon": 2,
+    "cov80_peaks": 0.596,
+    "cov90_peaks": 0.691,
+    "under_share": 0.689,
+    "bias": -2.924,
+    "mae": 1.349
+   },
+   {
+    "year": 2019,
+    "horizon": 3,
+    "cov80_peaks": 0.517,
+    "cov90_peaks": 0.604,
+    "under_share": 0.759,
+    "bias": -4.05,
+    "mae": 1.595
+   },
+   {
+    "year": 2019,
+    "horizon": 4,
+    "cov80_peaks": 0.383,
+    "cov90_peaks": 0.485,
+    "under_share": 0.948,
+    "bias": -6.231,
+    "mae": 1.8
+   },
+   {
+    "year": 2020,
+    "horizon": 2,
+    "cov80_peaks": 0.64,
+    "cov90_peaks": 0.757,
+    "under_share": 0.824,
+    "bias": -3.51,
+    "mae": 0.993
+   },
+   {
+    "year": 2020,
+    "horizon": 3,
+    "cov80_peaks": 0.586,
+    "cov90_peaks": 0.707,
+    "under_share": 0.845,
+    "bias": -3.895,
+    "mae": 1.178
+   },
+   {
+    "year": 2020,
+    "horizon": 4,
+    "cov80_peaks": 0.695,
+    "cov90_peaks": 0.879,
+    "under_share": 0.649,
+    "bias": -1.987,
+    "mae": 1.357
+   },
+   {
+    "year": 2021,
+    "horizon": 2,
+    "cov80_peaks": 0.689,
+    "cov90_peaks": 0.763,
+    "under_share": 0.78,
+    "bias": -3.085,
+    "mae": 1.014
+   },
+   {
+    "year": 2021,
+    "horizon": 3,
+    "cov80_peaks": 0.774,
+    "cov90_peaks": 0.859,
+    "under_share": 0.588,
+    "bias": -1.644,
+    "mae": 1.39
+   },
+   {
+    "year": 2021,
+    "horizon": 4,
+    "cov80_peaks": 0.712,
+    "cov90_peaks": 0.876,
+    "under_share": 0.35,
+    "bias": 0.508,
+    "mae": 1.865
+   },
+   {
+    "year": 2022,
+    "horizon": 2,
+    "cov80_peaks": 0.591,
+    "cov90_peaks": 0.727,
+    "under_share": 0.862,
+    "bias": -3.903,
+    "mae": 1.242
+   },
+   {
+    "year": 2022,
+    "horizon": 3,
+    "cov80_peaks": 0.488,
+    "cov90_peaks": 0.573,
+    "under_share": 0.864,
+    "bias": -4.858,
+    "mae": 1.507
+   },
+   {
+    "year": 2022,
+    "horizon": 4,
+    "cov80_peaks": 0.48,
+    "cov90_peaks": 0.652,
+    "under_share": 0.844,
+    "bias": -5.091,
+    "mae": 1.66
+   },
+   {
+    "year": 2023,
+    "horizon": 2,
+    "cov80_peaks": 0.691,
+    "cov90_peaks": 0.795,
+    "under_share": 0.649,
+    "bias": -1.72,
+    "mae": 1.156
+   },
+   {
+    "year": 2023,
+    "horizon": 3,
+    "cov80_peaks": 0.579,
+    "cov90_peaks": 0.759,
+    "under_share": 0.807,
+    "bias": -3.867,
+    "mae": 1.421
+   },
+   {
+    "year": 2023,
+    "horizon": 4,
+    "cov80_peaks": 0.427,
+    "cov90_peaks": 0.716,
+    "under_share": 0.891,
+    "bias": -5.787,
+    "mae": 1.573
+   },
+   {
+    "year": 2024,
+    "horizon": 2,
+    "cov80_peaks": 0.692,
+    "cov90_peaks": 0.821,
+    "under_share": 0.672,
+    "bias": -2.0,
+    "mae": 0.923
+   },
+   {
+    "year": 2024,
+    "horizon": 3,
+    "cov80_peaks": 0.574,
+    "cov90_peaks": 0.744,
+    "under_share": 0.692,
+    "bias": -2.4,
+    "mae": 1.25
+   },
+   {
+    "year": 2024,
+    "horizon": 4,
+    "cov80_peaks": 0.81,
+    "cov90_peaks": 0.918,
+    "under_share": 0.595,
+    "bias": -1.354,
+    "mae": 1.304
+   }
+  ]
+ }
+}

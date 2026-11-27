@@ -41,7 +41,7 @@ export default function ClimateFutures() {
     download(`dengueshield_scenario_${r.scenario}_${r.year}_${r.city.replace(/\s/g, "_")}.csv`, head.concat(r.summary.weekly_median.map((m: number, i: number) => `${i + 1},${m},${r.summary.weekly_q10[i]},${r.summary.weekly_q90[i]}`)).join("\n"));
   }
 
-  return (<section className="mt-8 grid gap-5" aria-label="Climate Futures 2026–2030">
+  return (<section id="climate-futures" className="mt-8 grid scroll-mt-20 gap-5" aria-label="Climate Futures 2026–2030">
     <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-white">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div><span className="rounded-full bg-violet-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">Exploratory multi-year climate scenario</span>
@@ -65,7 +65,7 @@ export default function ClimateFutures() {
       </div>)}
     </Card>
 
-    <Loading q={run} h={320}>{(r: any) => { const T = r.summary.total; return (<>
+    <Loading q={run} h={320} kind="chart" label="Climate scenario run">{(r: any) => { const T = r.summary.total; return (<>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Kpi label={`Median cases · ${r.year}`} value={T.median} hint={r.city === "All" ? "all 60 synthetic wards" : r.city} />
         <RangeTile label="50% simulation range" lo={T.q50[0]} hi={T.q50[1]} hint="cases in the year" />
@@ -97,7 +97,7 @@ export default function ClimateFutures() {
 
     <Card><CardTitle title="Compare two hypothetical futures" sub="Paired simulation: both use the same random draws, so the difference isolates the weather assumption" />
       <div className="flex flex-wrap gap-4"><Segmented label="Scenario A" value={cmpA} onChange={(v) => setCmpA(String(v))} options={SCEN.slice(0, 4)} /><Segmented label="Scenario B" value={cmpB} onChange={(v) => setCmpB(String(v))} options={SCEN.slice(0, 4)} /></div>
-      <Loading q={cmp} h={200}>{(c: any) => (<div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.4fr]">
+      <Loading q={cmp} h={200} kind="chart" label="Scenario comparison">{(c: any) => (<div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.4fr]">
         <div className="grid grid-cols-2 gap-3">
           <Kpi label="Difference B − A" value={c.difference.mean} hint={`80%: ${n0(c.difference.q80[0])} to ${n0(c.difference.q80[1])}`} tone={c.difference.mean > 0 ? "bad" : "ok"} />
           <Kpi label="Relative change" value={c.difference.relative_pct} digits={1} suffix="%" hint={`B higher in ${pct(c.difference.share_of_draws_b_higher)} of draws`} />
@@ -110,7 +110,7 @@ export default function ClimateFutures() {
     </Card>
 
     <Card><CardTitle title="Season-ahead backtest (2019–2024)" sub="Each year simulated by a model fit only on earlier years · mean over six seasons · computed live from the engine" />
-      <Loading q={bt} h={160}>{(b: any) => (<><DataTable dense rows={b.mean} cols={[{ key: "model", label: "Model", render: (r: any) => <b>{r.model}</b> }, { key: "ward_week_mae", label: "Ward-week MAE", align: "right", render: (r: any) => r.ward_week_mae.toFixed(3) }, { key: "ward_week_rmse", label: "RMSE", align: "right", render: (r: any) => r.ward_week_rmse.toFixed(3) }, { key: "annual_ape", label: "Annual total error", align: "right", render: (r: any) => pct(r.annual_ape) }, { key: "peak_week_error", label: "Peak timing error (wk)", align: "right", render: (r: any) => r.peak_week_error.toFixed(1) }, { key: "cov80_ward_week", label: "80% cov. (ward-week)", align: "right", render: (r: any) => pct(r.cov80_ward_week) }, { key: "cov90_ward_week", label: "90% cov. (ward-week)", align: "right", render: (r: any) => pct(r.cov90_ward_week) }, { key: "cov80_annual_city", label: "80% cov. (city-year)", align: "right", render: (r: any) => pct(r.cov80_annual_city) }]} />
+      <Loading q={bt} h={160} kind="table" label="Backtest">{(b: any) => (<><DataTable dense rows={b.mean} cols={[{ key: "model", label: "Model", render: (r: any) => <b>{r.model}</b> }, { key: "ward_week_mae", label: "Ward-week MAE", align: "right", render: (r: any) => r.ward_week_mae.toFixed(3) }, { key: "ward_week_rmse", label: "RMSE", align: "right", render: (r: any) => r.ward_week_rmse.toFixed(3) }, { key: "annual_ape", label: "Annual total error", align: "right", render: (r: any) => pct(r.annual_ape) }, { key: "peak_week_error", label: "Peak timing error (wk)", align: "right", render: (r: any) => r.peak_week_error.toFixed(1) }, { key: "cov80_ward_week", label: "80% cov. (ward-week)", align: "right", render: (r: any) => pct(r.cov80_ward_week) }, { key: "cov90_ward_week", label: "90% cov. (ward-week)", align: "right", render: (r: any) => pct(r.cov90_ward_week) }, { key: "cov80_annual_city", label: "80% cov. (city-year)", align: "right", render: (r: any) => pct(r.cov80_annual_city) }]} />
         <p className="mt-2 text-[12px] text-ink-3">The oracle row uses the real target-year weather and is a diagnostic ceiling, never available for the future. Ranges are labelled “simulation ranges”: at ward-week level they were conservative (covering more than nominal); city-year coverage rests on only 30 city-seasons.</p></>)}</Loading>
     </Card>
   </section>);

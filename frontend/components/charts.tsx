@@ -19,10 +19,10 @@ export function FanChart({ series, markDate, height = 320, title }: { series: an
       tooltip: { trigger: "axis", formatter: (ps: any[]) => { const r = series[ps[0].dataIndex]; return `<b>${r.target_date}</b><br/>${t("fc.median")}: <b>${r.median}</b> · ${t("fc.mean")}: ${r.mean.toFixed(1)}<br/>80%: ${r.lo80}–${r.hi80} · 90%: ${r.lo90}–${r.hi90}<br/>${t("fc.prob")}: ${(r.p_outbreak * 100).toFixed(0)}% (${r.tier})<br/>${r.y_true === null ? "" : `${t("fc.actual")}: <b>${r.y_true}</b>`}`; } },
       xAxis: { type: "category", data: x, boundaryGap: false, ...axisStyle, axisLabel: { ...axisStyle.axisLabel, formatter: (v: string) => v.slice(5), hideOverlap: true } },
       yAxis: { type: "value", name: t("fc.cases"), ...axisStyle, nameGap: 12, nameTextStyle: { ...axisStyle.nameTextStyle, align: "left" }, min: 0 },
-      dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", fillerColor: "rgba(14,143,102,.15)" }],
+      dataZoom: [{ type: "inside" }, { type: "slider", height: 18, bottom: 8, borderColor: "transparent", fillerColor: "rgba(75,69,209,.15)" }],
       series: [
-        ...band("lo90", "hi90", "#cdeadd", t("fc.interval90")), ...band("lo80", "hi80", "#7fcaa6", t("fc.interval80")),
-        { name: t("fc.median"), type: "line", step: "middle", data: series.map((r) => r.median), symbol: "none", lineStyle: { width: 2.4, color: "#073b2b" }, itemStyle: { color: "#073b2b" }, z: 5,
+        ...band("lo90", "hi90", "#dcdafc", t("fc.interval90")), ...band("lo80", "hi80", "#a9a5f2", t("fc.interval80")),
+        { name: t("fc.median"), type: "line", step: "middle", data: series.map((r) => r.median), symbol: "none", lineStyle: { width: 2.4, color: "#2f2e72" }, itemStyle: { color: "#2f2e72" }, z: 5,
           markLine: markDate ? { symbol: "none", lineStyle: { color: "#ea575b", type: "dashed" }, label: { formatter: "▼", color: "#ea575b", position: "start" }, data: [{ xAxis: markDate }] } : undefined },
         { name: t("fc.mean"), type: "line", data: series.map((r) => +r.mean.toFixed(2)), symbol: "none", lineStyle: { width: 1.4, type: "dashed", color: "#3b82c4" }, itemStyle: { color: "#3b82c4" }, z: 4 },
         { name: t("fc.actual"), type: "scatter", data: series.map((r) => r.y_true), symbolSize: 6, itemStyle: { color: "#ea575b", borderColor: "#fff", borderWidth: 1 }, z: 6 }],
@@ -46,7 +46,7 @@ export function Gauge({ value, tier, height = 170 }: { value: number; tier: Tier
   const option = useMemo(() => ({
     series: [{ type: "gauge", startAngle: 200, endAngle: -20, min: 0, max: 100, radius: "96%", center: ["50%", "68%"], progress: { show: true, width: 14, itemStyle: { color: TIER_COLOR[tier] } },
       axisLine: { lineStyle: { width: 14, color: [[1, "#e8eef3"]] } }, pointer: { show: false }, axisTick: { show: false }, splitLine: { show: false }, axisLabel: { show: false },
-      detail: { valueAnimation: true, formatter: "{value}%", fontSize: 28, fontWeight: 700, color: "#073b2b", offsetCenter: [0, "-4%"] }, data: [{ value: Math.round(value * 100) }] }],
+      detail: { valueAnimation: true, formatter: "{value}%", fontSize: 28, fontWeight: 700, color: "#2f2e72", offsetCenter: [0, "-4%"] }, data: [{ value: Math.round(value * 100) }] }],
   }), [value, tier]);
   return <Chart option={option} height={height} ariaLabel={`Outbreak probability ${Math.round(value * 100)} percent`} />;
 }
@@ -57,7 +57,7 @@ export function DriverBars({ contrib, height = 170 }: { contrib: Record<string, 
   const option = useMemo(() => ({
     grid: { left: 170, right: 40, top: 6, bottom: 22 }, tooltip: { trigger: "item", formatter: (p: any) => `${p.name}: ${p.value >= 0 ? "+" : ""}${p.value.toFixed(2)} (log-rate)` },
     xAxis: { type: "value", ...axisStyle }, yAxis: { type: "category", data: rows.map(([k]) => t("drv." + k)), axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: "#0d1b2a", fontSize: 12, width: 160, overflow: "truncate" } },
-    series: [{ type: "bar", barWidth: 18, data: rows.map(([, v]) => ({ value: +v.toFixed(3), itemStyle: { color: v >= 0 ? "#0e8f66" : "#3b82c4", borderRadius: 6 } })), label: { show: true, position: "right", formatter: (p: any) => (p.value >= 0 ? "+" : "") + p.value.toFixed(2), color: "#44566a", fontSize: 11 } }],
+    series: [{ type: "bar", barWidth: 18, data: rows.map(([, v]) => ({ value: +v.toFixed(3), itemStyle: { color: v >= 0 ? "#3b3a8c" : "#3b82c4", borderRadius: 6 } })), label: { show: true, position: "right", formatter: (p: any) => (p.value >= 0 ? "+" : "") + p.value.toFixed(2), color: "#44566a", fontSize: 11 } }],
   }), [rows, t]);
   return <Chart option={option} height={height} ariaLabel="Driver contributions to the log case rate" />;
 }

@@ -57,6 +57,19 @@ def test_replay_forecasts_are_out_of_time_and_never_expose_2025(client):
     assert f["source"] == "bundle" and f["actual_cases"] is None and f["target_date"] == "2025-01-20"
 
 
+def test_series_by_origin_adds_the_forward_forecast_without_2025_observations(client):
+    d = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2025-01-06").json()
+    fwd = [r for r in d["series"] if r.get("forward")]
+    assert d["season"] == 2024 and [r["target_date"] for r in fwd] == ["2025-01-20", "2025-01-27", "2025-02-03"]
+    assert all(r["y_true"] is None and r["lo90"] <= r["median"] <= r["hi90"] for r in fwd)
+    assert max(r["target_date"] for r in d["series"] if not r.get("forward")) <= "2024-12-31"
+    both = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&year=2024&origin=2025-01-06").json()   # what the dashboard sends
+    assert both["series"] == d["series"] and both["season"] == 2024
+    same = client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2022-08-01").json()["series"]
+    assert same == client.get(f"/api/forecast/series?ward_id={W}&horizon=3&year=2022").json()["series"]
+    assert client.get(f"/api/forecast/series?ward_id={W}&horizon=3&origin=2017-08-07").json()["series"] == []
+
+
 def test_requests_beyond_the_record_or_invalid_are_refused(client):
     r = client.get(f"/api/forecast?ward_id={W}&origin=2025-02-03&horizon=2")
     assert r.status_code == 422 and "refused" in r.json()["detail"]
@@ -147,7 +160,7 @@ def test_assistant_disabled_path_is_honest_and_does_not_call_openai(client, monk
 def test_rag_corpus_is_approved_documents_only_and_tools_are_strict():
     from dengueshield.api import rag
     srcs = {c["source"] for c in rag.build_corpus()}
-    assert {"docs/model_selection.md", "ARCHITECTURE.md"} <= srcs
+    assert {"docs/model_selection.md", "ARCHITECTURE.md", "docs/architecture/COMPLETE_ARCHITECTURE.md"} <= srcs
     assert not any(s.startswith(("data/raw", ".env")) or s.endswith(".env") for s in srcs)
     names = {t["name"] for t in rag.TOOLS}
     assert names == {"get_ward_forecast", "compare_wards", "get_risk_rankings", "get_model_metrics", "get_feature_importance", "get_data_profile", "find_health_facilities"}
@@ -236,8 +249,11 @@ def test_document_viewer_serves_architecture_and_refuses_unlisted_files(client):
     document = client.get("/api/docs/read", params={"path": "ARCHITECTURE.md"})
     assert document.status_code == 200
     overview = document.json()["text"]
-    assert overview.count("\n```mermaid\n") >= 20                                    # every architecture diagram lives in this one file
-    for section in ("## ML pipeline", "## Backend", "## Frontend", "## Geospatial", "## Copilot", "## Decision support", "## Launch, deployment and security"):
-        assert section in overview
+    assert 1 <= overview.count("\n```mermaid\n") <= 3 and len(overview.splitlines()) <= 160     # concise judge-facing overview
+    assert "docs/architecture/COMPLETE_ARCHITECTURE.md" in overview and "docs/architecture/COMPLETE_ARCHITECTURE.md" in paths
+    full = client.get("/api/docs/read", params={"path": "docs/architecture/COMPLETE_ARCHITECTURE.md"}).json()["text"]
+    assert full.count("\n```mermaid\n") >= 26                                         # every diagram preserved
+    for section in ("## ML pipeline", "## Backend", "## Frontend", "## Geospatial", "## Copilot", "## Decision support", "## Launch, deployment and security", "## Climate Futures"):
+        assert section in full
     for bad in ("../.env", "docs/../.env", "app_data/geo/manifest.json", "dengueshield/api/main.py", "docs/architecture/ml-pipeline.md"):
         assert client.get("/api/docs/read", params={"path": bad}).status_code == 404
