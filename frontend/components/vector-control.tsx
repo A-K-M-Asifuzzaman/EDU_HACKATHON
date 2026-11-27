@@ -58,10 +58,8 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
   const { sel } = useSel();
   const { lang } = useI18n();
   const { city, service, stock, crews, setCrews, maxCrews, setMaxCrews, risk, floor, perCrew, capPct, overrides } = shared;
+  const { vecMode: mode, setVecMode: setMode, manual, setManual, eff, setEff } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const [mode, setMode] = useState<Mode>("optimized");
-  const [manual, setManual] = useState<Record<string, number>>({});
-  const [eff, setEff] = useState({ effect: 30, coverage: 35, delay: 1, buildup: 2, sensLow: 50, sensHigh: 150 });
   const [tab, setTab] = useState("crews");
   const [showAll, setShowAll] = useState(false);
   const used = Object.values(manual).reduce((a, b) => a + b, 0);
@@ -150,7 +148,7 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
             <tbody>{d.horizons.map((h: number) => { const x = d.totals.by_horizon[h]; return (<tr key={h} className="border-t border-line"><td className="py-1.5 pr-3">+{h} weeks, {dateFmt(d.target_dates[h], lang)} <span className="text-ink-3">({d.sources[h] === "replay" ? "validated replay" : "deployed model, out-of-time"})</span></td>
               <td className="num pr-3 text-right">{n1(x.baseline)}</td><td className="num pr-3 text-right">{n1(x.scenario)}</td><td className="num pr-3 text-right"><b>{n1(x.prevented)}</b> <span className="text-ink-3">({n1(x.prevented_low)} to {n1(x.prevented_high)})</span></td><td className="num text-right">{Math.round(x.timing * 100)}%</td></tr>); })}</tbody></table></div>
 
-          <div className="mt-5"><Tabs value={tab} onChange={setTab} tabs={[{ id: "crews", label: "Crew plan and ROI" }, { id: "supplies", label: "Supplies" }, { id: "hospital", label: "Hospital" }, { id: "sensitivity", label: "Sensitivity" }, { id: "sources", label: "Sources and limits" }]} /></div>
+          <div className="mt-5"><Tabs group="vector" value={tab} onChange={setTab} tabs={[{ id: "crews", label: "Crew plan and ROI" }, { id: "supplies", label: "Supplies" }, { id: "hospital", label: "Hospital" }, { id: "sensitivity", label: "Sensitivity" }, { id: "sources", label: "Sources and limits" }]} /></div>
 
           {tab === "crews" && (<div role="tabpanel" aria-label="Crew plan and ROI">
             <p className="text-[12.5px] text-ink-2">{d.totals.weakest_assigned_gain !== null && d.totals.best_unused_gain !== null

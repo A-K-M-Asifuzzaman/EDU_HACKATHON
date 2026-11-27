@@ -11,7 +11,7 @@ import dynamic from "next/dynamic";
 import { useI18n } from "@/lib/i18n";
 import { useSel } from "@/lib/ctx";
 import { dateFmt, cls } from "@/lib/format";
-import type { ApiEvent } from "@/lib/api";
+import { api, type ApiEvent } from "@/lib/api";
 import { getTheme, setTheme, type Theme } from "@/lib/theme";
 import { Icon, Logo } from "./icons";
 import { ProvChip, useFocusTrap } from "./ui";
@@ -220,6 +220,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               <Link key={p.href} href={p.href} aria-current={a ? "page" : undefined} className={cls("shrink-0 whitespace-nowrap rounded-full border-2 px-3 py-1 text-[13px] font-bold transition-colors", a ? "border-[#1a1438] bg-[#ffffff] text-[#1a1438] shadow-[2px_2px_0_#1a1438]" : "border-transparent text-white/80 hover:bg-white/10 hover:text-white")}>{t(p.key)}</Link>); })}</nav>}
             <div className="ml-auto flex items-center gap-1.5">
               <ProvChip tone="warn"><Icon name="shield" size={12} />{t("mode.replay")}</ProvChip>
+              <OfflineChip />
               <span className="hidden gap-1.5 md:inline-flex">{meta ? <><ProvChip tone="info">{t("fresh.data")} {dateFmt(meta.data.last_observed_week, lang)}</ProvChip><span className="hidden 2xl:inline-flex"><ProvChip tone="neutral">{t("fresh.model")}: {meta.model.bundle_version ? `v${meta.model.bundle_version}` : "—"} · {meta.model.features} features</ProvChip></span></>
                 : !error && <span className="skeleton inline-block h-[22px] w-[160px] rounded-full" aria-hidden />}</span>{/* placeholder keeps the bar's width stable while metadata loads (no layout shift) */}
               {error && <ProvChip tone="warn">{t("state.offline")}</ProvChip>}
@@ -233,4 +234,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <br />Sources: organizer dataset (EDU AI Engineering Hackathon 2026) · hospitals, clinics and roads © OpenStreetMap contributors (ODbL) · basemap © MapTiler © OpenStreetMap · weather: NASA POWER, Open-Meteo (CC BY 4.0) · boundaries: DGHS Bangladesh GIS · Copilot: OpenAI (server-side). Emergency: call 999. Shortcuts: G then O, C, W, L, R, M or E.</div></footer>}
       <Intro />
     </div>);
+}
+
+/** Shown only when the server runs in offline mode (scripts/launch_offline.sh): every engine is local; optional online services are off. */
+function OfflineChip() {
+  const [st, setSt] = useState<{ offline_mode: boolean; services: { name: string; status: string }[] | null } | null>(null);
+  useEffect(() => { api<any>("/api/system/offline", { ttl: 60_000 }).then(setSt).catch(() => {}); }, []);
+  if (!st?.offline_mode) return null;
+  const title = (st.services ?? []).map((x) => `${x.name}: ${x.status}`).join("\n");
+  return <span title={title} data-testid="offline-chip"><ProvChip tone="ok"><Icon name="shield" size={12} />Offline mode: local engines</ProvChip></span>;
 }
