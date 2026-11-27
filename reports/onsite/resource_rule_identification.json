@@ -1,0 +1,134 @@
+{
+  "dataset": {
+    "file": "data/raw/onsite/bangladesh_dengue_large_dataset_onsite.csv",
+    "sha256": "3500fb22fc19afde9b242449f08e441eb88e62a8985411f54e915f6582daf7e4",
+    "development_rows": 28200,
+    "sealed_2025_rows": 3120
+  },
+  "identification": {
+    "window": "2016-01-04..2024-12-30 (development rows only)",
+    "rule": "resource = floor(multiplier * cases + 0.5)",
+    "past_only_check": "rule identified on 2016-2018 reproduces 2019-2024 exactly"
+  },
+  "resources": {
+    "saline_bags_needed": {
+      "multiplier": 2.3848484848484848,
+      "feasible_interval": [
+        2.3833333333333333,
+        2.3863636363636362
+      ],
+      "reproduction_rate": 1.0,
+      "reproduction_2019_2024_from_2016_2018_rule": 1.0
+    },
+    "diagnostic_kits_needed": {
+      "multiplier": 1.1642156862745099,
+      "feasible_interval": [
+        1.161764705882353,
+        1.1666666666666667
+      ],
+      "reproduction_rate": 1.0,
+      "reproduction_2019_2024_from_2016_2018_rule": 1.0
+    },
+    "hospital_beds_required": {
+      "multiplier": 0.2984375,
+      "feasible_interval": [
+        0.296875,
+        0.3
+      ],
+      "reproduction_rate": 1.0,
+      "reproduction_2019_2024_from_2016_2018_rule": 1.0
+    }
+  },
+  "replay_evaluation_2019_2024": [
+    {
+      "resource": "saline_bags_needed",
+      "horizon": 2,
+      "ward-weeks": 18060,
+      "MAE": 2.6343,
+      "bias (forecast - actual)": -0.3657,
+      "80% range held": 0.8879,
+      "90% range held": 0.9299,
+      "cases: 80% range held": 0.8879
+    },
+    {
+      "resource": "saline_bags_needed",
+      "horizon": 3,
+      "ward-weeks": 17700,
+      "MAE": 3.2941,
+      "bias (forecast - actual)": -0.1923,
+      "80% range held": 0.8501,
+      "90% range held": 0.9015,
+      "cases: 80% range held": 0.8501
+    },
+    {
+      "resource": "saline_bags_needed",
+      "horizon": 4,
+      "ward-weeks": 17340,
+      "MAE": 3.7785,
+      "bias (forecast - actual)": 0.022,
+      "80% range held": 0.8247,
+      "90% range held": 0.9013,
+      "cases: 80% range held": 0.8247
+    },
+    {
+      "resource": "diagnostic_kits_needed",
+      "horizon": 2,
+      "ward-weeks": 18060,
+      "MAE": 1.2833,
+      "bias (forecast - actual)": -0.1591,
+      "80% range held": 0.8879,
+      "90% range held": 0.9299,
+      "cases: 80% range held": 0.8879
+    },
+    {
+      "resource": "diagnostic_kits_needed",
+      "horizon": 3,
+      "ward-weeks": 17700,
+      "MAE": 1.6016,
+      "bias (forecast - actual)": -0.0764,
+      "80% range held": 0.8501,
+      "90% range held": 0.9015,
+      "cases: 80% range held": 0.8501
+    },
+    {
+      "resource": "diagnostic_kits_needed",
+      "horizon": 4,
+      "ward-weeks": 17340,
+      "MAE": 1.8333,
+      "bias (forecast - actual)": 0.0196,
+      "80% range held": 0.8247,
+      "90% range held": 0.9013,
+      "cases: 80% range held": 0.8247
+    },
+    {
+      "resource": "hospital_beds_required",
+      "horizon": 2,
+      "ward-weeks": 18060,
+      "MAE": 0.3214,
+      "bias (forecast - actual)": -0.0666,
+      "80% range held": 0.9384,
+      "90% range held": 0.9624,
+      "cases: 80% range held": 0.8879
+    },
+    {
+      "resource": "hospital_beds_required",
+      "horizon": 3,
+      "ward-weeks": 17700,
+      "MAE": 0.4127,
+      "bias (forecast - actual)": -0.0401,
+      "80% range held": 0.9105,
+      "90% range held": 0.9441,
+      "cases: 80% range held": 0.8501
+    },
+    {
+      "resource": "hospital_beds_required",
+      "horizon": 4,
+      "ward-weeks": 17340,
+      "MAE": 0.4769,
+      "bias (forecast - actual)": -0.0099,
+      "80% range held": 0.8913,
+      "90% range held": 0.9413,
+      "cases: 80% range held": 0.8247
+    }
+  ]
+}
