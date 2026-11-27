@@ -9,8 +9,8 @@ Nothing on this branch has been merged or deployed beyond what the owner merged 
 
 | # | Blocker | Why it matters | Needed from the owner |
 |---|---|---|---|
-| B1 | **No working live URL with the onsite stages** | Criterion 5 asks for "a working deployed URL". The Vercel project is paused (`we-are-hack-squad.vercel.app` returns 503). Its backend, the Hugging Face Space `AsifZaman1912/dengueshield-ai-api` (revision `57c8afa`, deployed 22 Nov), predates V4: `/api/allocation/plan` and `/api/dispatch/brief` return 404 there. | Approve the release plan in section 9 (backend deploy, merge, unpause), or present local-only and accept the criterion-5 risk |
-| B2 | **Do not unpause Vercel before the backend is deployed** | The newest production frontend build (`85fe10d`, Stage 3) is ready behind the pause. Unpausing now would show Stage 1-3 sections calling missing backend routes. | Follow the order in section 9 |
+| B1 | **Live URL shows Stages 1-3; Stage 4 needs the merge** | Done with owner approval on 27 Nov: backend deployed and Vercel unpaused (section 9a). `https://we-are-hack-squad.vercel.app` serves frontend `85fe10d`, which has the Stage 1-3 sections, with backend `4ce4801`, which has every engine including dispatch. The dispatch desk and offline chip appear on the live site only after `version-onsite-final` is merged into `main`. | Approve the merge pull request (then smoke-test as in section 9) |
+| B2 | **Older address unassigned** | `dengueshield-ai.vercel.app` returns 404; the project's domain is `we-are-hack-squad.vercel.app` | Submit `we-are-hack-squad.vercel.app` |
 | B3 | **The official repository is private** | Judges must read the code, `ARCHITECTURE.md` and `/exports`. Teammates have access; judges may not. | Make it public, or add the judges' GitHub accounts, before submission |
 | B4 | **Submission destination unknown** | The problem set (SHA-256 `ad6f6370…`, 3 pages) states the criteria but no submission link or form. The organizers' email could not be read: the Gmail connector session expired. | Confirm the submission form, link or channel, and the video upload deadline |
 | B5 | **The 7-minute uncut video is not recorded yet** | Criterion 6 is 10 points; a commit hash mismatch scores 0 | Record after the final commit, following section 4. The footer shows the build commit. |
@@ -206,6 +206,31 @@ the 390 px dispatch view.
 - Revert the merge on `main` with a pull request.
 - The local offline demonstration stays available throughout.
 
+## 9a. Release performed (27 Nov 2026, owner-approved: "deploy the backend and unpause vercel")
+
+**Backend.** Deployed from `4ce4801` with `python3 scripts/deploy_space.py`.
+- Hugging Face Space commit `9ea3e06`; it built in about 2 minutes and runs with `build_commit` `4ce4801`.
+- Smoke test against the Space: 21 of 21 results identical to the local baseline. Each call took 1-2 s from Dhaka, network included.
+- Every route used by the live frontend answers 200: metadata, canonical metrics, auth config, allocation, overflow, simulator and risk.
+- `/api/system/offline` on the Space lists the two `frontend/out` pages as missing. That is expected: the backend image serves the API only.
+
+**Vercel.** The project was unpaused. Production deployment `dpl_9r8U4v4MNnTFzFX9k4qCLvwbPfSN` (frontend `85fe10d`) is live at
+https://we-are-hack-squad.vercel.app, and `/api` routes to the new backend.
+
+Live smoke tests:
+
+| Check | Result |
+|---|---|
+| 21 API results through the live URL | identical to the baseline |
+| `allocation.spec.ts` and `hospital.spec.ts` against the live URL | 10 of 10 passed, no retries |
+| Vector-control headline | 63.2 cases prevented, the same as locally |
+| Page errors | none |
+
+**Not yet live.** The Stage 4 dispatch desk, offline chip and footer build stamp need the merge into `main` (B1).
+
+**Rollback.** Nothing changes from section 9. The previous Hugging Face revision is `57c8afa`. The previous Vercel production deployments are
+`dpl_J26oSwxiT7mf7aL6VQ5Y445mRgdD` (`9c99f0c`) and `dpl_4pCH8xzSEAEawPZqxaJdWmxagqD9` (`938ff3b`). The project can also be paused again.
+
 ## 10. Checklists
 
 **Submission**
@@ -219,9 +244,9 @@ the 390 px dispatch view.
 - [ ] Submission link and form completed (B4)
 
 **Release authorization (owner, explicit)**
-- [ ] Deploy the backend to the Hugging Face Space
+- [x] Deploy the backend to the Hugging Face Space (27 Nov, `4ce4801`)
 - [ ] Merge the pull request into `main`
-- [ ] Unpause the Vercel project
+- [x] Unpause the Vercel project (27 Nov; live frontend `85fe10d` until the merge)
 - [ ] Create the tag (optional)
 - [ ] Change repository visibility or add judges
 
