@@ -25,3 +25,6 @@ frontend/public/maplibre/
 .vercel
 # local account database (V4 auth)
 var/
+
+# kill-switch test output (evidence is copied to exports/offline)
+killswitch/

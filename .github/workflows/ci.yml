@@ -107,3 +107,49 @@ jobs:
             frontend/test-results
             api.log
           retention-days: 7
+
+  killswitch:
+    name: Offline kill-switch (no internet)
+    needs: [frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Fetch the organizer datasets (online, as in scripts/setup.sh)
+        run: python scripts/fetch_data.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-out
+          path: frontend/out
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: Online baseline (same build, normal network)
+        run: |
+          nohup python -m uvicorn dengueshield.api.main:app --host 127.0.0.1 --port 8000 > baseline_api.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:8000/api/health >/dev/null && break; sleep 2; done
+          mkdir -p killswitch
+          python scripts/offline_verify.py --base http://127.0.0.1:8000 --write killswitch/baseline.json
+          pkill -f "uvicorn dengueshield" || true
+      - name: Kill switch (private network namespace, loopback only)
+        run: PYBIN="$(which python)" PORT=8765 bash scripts/killswitch.sh
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: killswitch-evidence
+          path: |
+            killswitch
+            baseline_api.log
+          retention-days: 14
