@@ -1,7 +1,8 @@
 # Phase 2 onsite, Stage 4: offline resilience and deterministic dispatch
 
 Stage 4 only; final submission work (Stage 5) is not started. Nothing was merged into `main` or deployed, and the Vercel project stays
-paused. Its public domains, `dengueshield-ai.vercel.app` and `we-are-hack-squad.vercel.app`, both return 503.
+paused: its public domain `we-are-hack-squad.vercel.app` returns 503. The older `dengueshield-ai.vercel.app` address now returns 404
+(no longer assigned).
 
 What a judge can do with Wi-Fi switched off, on a laptop prepared once:
 - start DengueShield
