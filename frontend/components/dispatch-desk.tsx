@@ -2,16 +2,22 @@
 // Stage 4: dispatch desk. One immutable snapshot per ward from GET /api/dispatch/brief (the scenario set in the sections above), shown as
 // SMS, WhatsApp and a printable brief. Every copy and download uses that same snapshot: downloads are requested with the snapshot's own
 // query string and refused if the server returns a different scenario id or content hash. Generated on this computer; nothing is sent.
-import { useEffect, useMemo, useState } from "react";
-import { BASE, api } from "@/lib/api";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BASE } from "@/lib/api";
 import { useSel } from "@/lib/ctx";
 import { dateFmt } from "@/lib/format";
 import { useI18n } from "@/lib/i18n";
 import { Icon } from "./icons";
-import { CITIES, Live, PlanShared, scenarioQuery, useDebounced, useDecisionGuard } from "./supply-allocation";
-import { Btn, Card, Notice, ProvChip, Segmented, Select, Tabs, useAsync, useToast } from "./ui";
+import { CITIES, planParams, SCENARIO_VERSION, wardInScope } from "@/lib/plan-scenario";
+import { Live, PlanShared, useDecisionGuard, useScenarioRequest } from "./supply-allocation";
+import { Btn, Card, Notice, ProvChip, Segmented, Select, Tabs, useToast } from "./ui";
 
-type Snap = { qs: string; data: any };
+type DispatchSnapshot = {
+  scenario: { id: string; version?: typeof SCENARIO_VERSION; settings: { stock: number; crews: number; capacity_pct: number; vector: { effect: number; coverage: number } } };
+  content_sha256: string;
+  brief: any;
+  formats: { sms: Record<"en" | "bn", any>; whatsapp: Record<"en" | "bn", string>; html: Record<"en" | "bn", string> };
+};
 const STATUS: Record<string, string> = { critical: "critical supply gap", deficit: "supply gap", met: "supplies met" };
 
 /** WhatsApp markup (*bold*, _italic_) as React nodes, escaped by React. */
@@ -22,63 +28,77 @@ function waLine(line: string, i: number) {
 }
 
 export default function DispatchDesk({ shared }: { shared: PlanShared }) {
-  const { sel, wards } = useSel();
-  const { lang: uiLang } = useI18n();
+  const { sel, set, wards } = useSel();
+  const { lang: uiLang, t } = useI18n();
   const toast = useToast();
   const { blocked, notice } = useDecisionGuard();
-  const [pickCity, setPickCity] = useState("Dhaka South");
-  const briefCity = shared.city === "All" ? pickCity : shared.city;
-  const [ward, setWard] = useState<string | null>(null);
+  const ward = sel.ward;
+  const briefCity = shared.city === "All" ? wards.find(w => w.ward_id === ward)?.city : shared.city;
   const [lang, setLang] = useState<"en" | "bn">("en");
   const [tab, setTab] = useState("sms");
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  // query and guard are debounced together: a request never pairs fixed settings with stale ones (e.g. a refused 2025 origin)
-  const deb = useDebounced({ scen: scenarioQuery(sel, shared), blocked }, 300);
-  const scen = deb.scen, off = blocked || deb.blocked;
-
-  // wards of the chosen city in priority order, with their plan status, from the same cached allocation engine
-  const ranking = useAsync((s) => off ? Promise.resolve(null) : api<any>(`/api/allocation/plan?${scen}`, { signal: s }), [scen, off]);
+  const ready = shared.readyScenario && !blocked;
+  const query = planParams(sel, shared);
+  const rankedQuery = new URLSearchParams(query);
+  for (const key of ["capacity_pct", "override", "mode", "assign", "effect", "coverage", "delay", "buildup", "sens_low", "sens_high"]) rankedQuery.delete(key);
+  const ranking = useScenarioRequest(ready ? `/api/allocation/plan?${rankedQuery}` : null);
   const options = useMemo(() => {
-    const ranked = (ranking.data?.wards ?? []).filter((w: any) => w.city === briefCity);
+    const ranked = ranking.stale ? [] : (ranking.data?.wards ?? []).filter((w: any) => w.city === briefCity);
     return ranked.length ? ranked.map((w: any) => ({ value: w.ward_id, label: `${w.ward_id} (#${w.rank}, ${STATUS[w.status]})` }))
-      : wards.filter((w) => w.city === briefCity).map((w) => ({ value: w.ward_id, label: w.ward_id }));
-  }, [ranking.data, wards, briefCity]);
-  useEffect(() => { if (options.length && !options.some((o: any) => o.value === ward)) setWard(options[0].value); }, [options, ward]);
-
-  const q = useAsync<Snap | null>((s) => {
-    if (off || !ward || !options.some((o: any) => o.value === ward)) return Promise.resolve(null);
-    const qs = `${scen}&ward=${encodeURIComponent(ward)}`;
-    return api<any>(`/api/dispatch/brief?${qs}`, { signal: s }).then((data) => ({ qs: scen, data }));
-  }, [scen, ward, off, options]);
-
+      : wards.filter(w => w.city === briefCity).map(w => ({ value: w.ward_id, label: w.ward_id }));
+  }, [ranking.data, ranking.stale, wards, briefCity]);
+  query.set("scenario_v", String(SCENARIO_VERSION));
+  const scen = query.toString();
+  const briefUrl = ready && briefCity ? `/api/dispatch/brief?${scen}&ward=${encodeURIComponent(ward)}` : null;
+  const q = useScenarioRequest<DispatchSnapshot>(briefUrl);
   const { report } = shared;
-  const brief = q.data?.data;
-  useEffect(() => { report("dispatch", brief ? { id: brief.scenario.id, ward, stale: !!q.stale } : null); }, [brief, ward, q.stale, report]);
+  const brief = q.data;
+  const canExport = !!brief && !q.stale && brief.brief.ward.ward_id === ward;
+  useEffect(() => {
+    report("dispatch", q.status === "failed" ? { failed: true } : brief ? {
+      id: brief.scenario.id, ward: brief.brief.ward.ward_id, city: brief.brief.ward.city,
+      planned: brief.brief.forecast.planned_cases, saline: brief.brief.resources.saline,
+      withoutBed: brief.brief.hospital.without_bed, stale: !canExport,
+    } : null);
+  }, [brief, canExport, q.status, report]);
 
-  const copy = async (what: "sms" | "whatsapp", snap: Snap) => {
-    const text = what === "sms" ? snap.data.formats.sms[lang].text : snap.data.formats.whatsapp[lang];
+  const exporting = useRef<AbortController | null>(null);
+  useEffect(() => () => { exporting.current?.abort(); }, [briefUrl]);
+
+  const copy = async (what: "sms" | "whatsapp", snap: DispatchSnapshot) => {
+    if (!canExport) return;
+    const text = what === "sms" ? snap.formats.sms[lang].text : snap.formats.whatsapp[lang];
     try {
       await navigator.clipboard.writeText(text);
-      toast(what === "sms" ? `SMS copied: ${snap.data.formats.sms[lang].chars} characters, ${snap.data.formats.sms[lang].segments} segment(s)` : "WhatsApp notice copied");
+      toast(what === "sms" ? `SMS copied: ${snap.formats.sms[lang].chars} characters, ${snap.formats.sms[lang].segments} segment(s)` : "WhatsApp notice copied");
     } catch { setErr("This browser blocked clipboard access. Select the text in the preview and copy it by hand."); }
   };
 
   /** Download from the snapshot's own settings; refuse the file if the server answers for a different scenario. */
-  const download = async (snap: Snap, kind: "ward" | "city" | "wards", format: "html" | "pdf") => {
+  const download = async (snap: DispatchSnapshot, kind: "ward" | "city" | "wards", format: "html" | "pdf") => {
+    if (!canExport || exporting.current) return;
+    const request = new AbortController();
+    exporting.current = request;
     setErr(null); setBusy(`${kind}-${format}`);
     try {
-      const extra = kind === "ward" ? `&ward=${encodeURIComponent(snap.data.brief.ward.ward_id)}` : `&brief_city=${encodeURIComponent(snap.data.brief.ward.city)}`;
-      const r = await fetch(`${BASE}/api/dispatch/document?${snap.qs}&kind=${kind}&format=${format}&lang=${format === "pdf" || kind === "city" ? "en" : lang}${extra}`);
+      const extra = kind === "ward" ? `&ward=${encodeURIComponent(snap.brief.ward.ward_id)}` : `&brief_city=${encodeURIComponent(snap.brief.ward.city)}`;
+      const r = await fetch(`${BASE}/api/dispatch/document?${scen}&kind=${kind}&format=${format}&lang=${format === "pdf" || kind === "city" ? "en" : lang}${extra}`, { signal: request.signal });
       if (!r.ok) { const j = await r.json().catch(() => null); throw new Error(j?.detail ?? `HTTP ${r.status}`); }
       const sid = r.headers.get("x-scenario-id"), sha = r.headers.get("x-content-sha256");
-      if (sid !== snap.data.scenario.id || (kind === "ward" && sha !== snap.data.content_sha256)) throw new Error("the scenario changed during the download, so nothing was saved; try again");
+      if (sid !== snap.scenario.id || (kind === "ward" && sha !== snap.content_sha256)) throw new Error("the scenario changed during the download, so nothing was saved; try again");
       const blob = await r.blob();
+      if (request.signal.aborted) return;
       const name = /filename="([^"]+)"/.exec(r.headers.get("content-disposition") ?? "")?.[1] ?? `dengueshield_${kind}.${format}`;
       const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name });
       document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       toast(`Saved ${name}`);
-    } catch (e: any) { setErr(`Export failed: ${e?.message ?? e}`); } finally { setBusy(null); }
+    } catch (e: any) {
+      if (!request.signal.aborted) setErr(`Export failed: ${e?.message ?? e}`);
+    } finally {
+      exporting.current = null;
+      setBusy(null);
+    }
   };
 
   return (<Card id="dispatch" className="mt-5 scroll-mt-20" aria-labelledby="dispatch-title">
@@ -89,32 +109,33 @@ export default function DispatchDesk({ shared }: { shared: PlanShared }) {
     </div>
     {blocked ? notice : (<div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
       <aside aria-label="Brief settings" className="self-start space-y-4 rounded-2xl border-2 border-ink/80 bg-ivory p-4">
-        {shared.city === "All" ? <Select label="City" value={pickCity} onChange={setPickCity} options={CITIES.map((c) => ({ value: c, label: c }))} />
+        {shared.city === "All" ? <Select label={t("scenario.briefCity")} value={briefCity ?? ""} onChange={city => set({ ward: wardInScope(wards, city, ward) })} options={CITIES.map((c) => ({ value: c, label: c }))} />
           : <div className="text-[13px]"><span className="block text-[12px] font-semibold text-ink-3">City</span><b>{shared.city}</b> <span className="text-ink-3">(set in Supply allocation)</span></div>}
-        <Select label="Ward (priority order)" value={ward ?? ""} onChange={setWard} options={options} />
+        <Select label="Ward (priority order)" value={ward} onChange={ward => set({ ward })} options={options} />
         <Segmented label="Message language" value={lang} onChange={(v) => setLang(v as any)} options={[{ value: "en", label: "English" }, { value: "bn", label: "বাংলা" }]} />
-        {q.data && (() => { const s = q.data.data.scenario.settings; const b = q.data.data.brief; return (
+        {q.data && (() => { const s = q.data.scenario.settings; const b = q.data.brief; return (
           <div data-testid="snapshot" className="rounded-xl border border-line bg-white p-3 text-[12px] leading-relaxed text-ink-2">
-            <div className="flex items-center justify-between gap-2"><b className="text-ink">Snapshot</b><code data-testid="scenario-id" className="rounded bg-mint-l px-1.5 py-0.5 text-[12px] font-bold text-ink">{q.data.data.scenario.id}</code></div>
+            <div className="flex items-center justify-between gap-2"><b className="text-ink">Snapshot</b><code data-testid="scenario-id" className="rounded bg-mint-l px-1.5 py-0.5 text-[12px] font-bold text-ink">{q.data.scenario.id}</code></div>
+            {!canExport && <p role="status" className="mt-1 font-semibold text-ink">{t("scenario.previousBrief")}</p>}
             <p className="mt-1">Forecast issued {dateFmt(b.forecast.origin, uiLang)} for the week of {dateFmt(b.forecast.target_week, uiLang)} ({b.forecast.horizon_weeks} weeks, {b.forecast.source === "replay" ? "validated replay" : "deployed model, out-of-time"}).</p>
             <p>Stock {Math.round(s.stock * 100)}%, {s.crews} crews ({b.crews.deployment_label}), capacity {s.capacity_pct}%, effect {Math.round(s.vector.effect * 100)}% at {Math.round(s.vector.coverage * 100)}% per crew.</p>
-            <p className="mt-1 text-ink-3">Every copy and download below uses this snapshot. Content hash {q.data.data.content_sha256.slice(0, 12)}.</p></div>); })()}
+            <p className="mt-1 text-ink-3">Every copy and download below uses this snapshot. Content hash {q.data.content_sha256.slice(0, 12)}.</p></div>); })()}
         {q.data && (<div className="divide-y divide-line rounded-xl border border-line bg-white text-[13px]">
-          {([["This ward", q.data.data.brief.ward.ward_id, "ward"], ["City summary", q.data.data.brief.ward.city, "city"],
-             ["Wards needing attention", q.data.data.brief.ward.city, "wards"]] as const).map(([label, sub, kind]) => (
+          {([["This ward", q.data.brief.ward.ward_id, "ward"], ["City summary", q.data.brief.ward.city, "city"],
+             ["Wards needing attention", q.data.brief.ward.city, "wards"]] as const).map(([label, sub, kind]) => (
             <div key={kind} className="flex flex-wrap items-center justify-between gap-2 p-2.5">
               <div className="min-w-0"><b className="block text-ink">{label}</b><span className="text-[11.5px] text-ink-3">{sub}</span></div>
               <div className="flex gap-1.5">{(["html", "pdf"] as const).map((f) => (
-                <Btn key={f} variant="ghost" className="!min-h-10 !px-3 sm:!min-h-8" aria-label={`Download ${label.toLowerCase()} as ${f.toUpperCase()}`} disabled={!!busy}
+                <Btn key={f} variant="ghost" className="!min-h-10 !px-3 sm:!min-h-8" aria-label={`Download ${label.toLowerCase()} as ${f.toUpperCase()}`} disabled={!canExport || !!busy}
                   onClick={() => download(q.data!, kind, f)}>{busy === `${kind}-${f}` ? "…" : f.toUpperCase()}</Btn>))}</div></div>))}
-          <div className="flex flex-wrap gap-1.5 p-2.5"><Btn variant="ghost" className="!min-h-10 sm:!min-h-8" onClick={() => copy("sms", q.data!)}>Copy SMS</Btn>
-            <Btn variant="ghost" className="!min-h-10 sm:!min-h-8" onClick={() => copy("whatsapp", q.data!)}>Copy WhatsApp</Btn></div></div>)}
+          <div className="flex flex-wrap gap-1.5 p-2.5"><Btn variant="ghost" className="!min-h-10 sm:!min-h-8" disabled={!canExport} onClick={() => copy("sms", q.data!)}>Copy SMS</Btn>
+            <Btn variant="ghost" className="!min-h-10 sm:!min-h-8" disabled={!canExport} onClick={() => copy("whatsapp", q.data!)}>Copy WhatsApp</Btn></div></div>)}
         {q.data && <p className="text-[11.5px] text-ink-3">PDFs are in English (standard PDF fonts have no Bengali letters); Bangla is in the HTML brief and the messages.</p>}
       </aside>
 
       <div className="min-w-0">
         {err && <div className="mb-3"><Notice tone="warn">{err}</Notice></div>}
-        <Live q={q} h={460} label="Dispatch brief">{(snap: any) => { const d = snap.data; const sms = d.formats.sms[lang]; const b = d.brief; return (<div>
+        <Live q={q} h={460} label="Dispatch brief">{d => { const sms = d.formats.sms[lang]; const b = d.brief; return (<div>
           <Tabs group="dispatch" value={tab} onChange={setTab} tabs={[{ id: "sms", label: "SMS" }, { id: "whatsapp", label: "WhatsApp" }, { id: "brief", label: "Printable brief" }, { id: "sources", label: "Assumptions and sources" }]} />
           {tab === "sms" && (<div role="tabpanel" aria-label="SMS" className="grid gap-5 xl:grid-cols-[minmax(0,420px)_minmax(0,1fr)]"><div>
             <div className="mx-auto max-w-[420px] rounded-[26px] border-2 border-ink bg-mint-l p-4">

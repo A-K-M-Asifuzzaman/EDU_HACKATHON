@@ -37,6 +37,7 @@ The onsite final extended this repository on the branch `version-onsite-final` (
 | 3. Vector-control simulator | Assumption-driven crew response over 2-4 weeks, optimal crew placement, ROI ranking, effect on supplies and beds | Response Intelligence → Vector control |
 | 4. Dispatch notices | SMS and WhatsApp text (English and Bangla) and printable HTML and PDF briefs from one deterministic snapshot; nothing is sent | Response Intelligence → Dispatch briefs, and [`exports/`](exports/README.md) |
 | 5. Offline resilience | `./scripts/setup.sh` once online, then `./scripts/launch_offline.sh` with the internet off; kill-switch test in CI | [`docs/onsite/STAGE4_HANDOFF.md`](docs/onsite/STAGE4_HANDOFF.md) |
+| Mentor scope: hospital preparedness | Beds already holding other-illness and dengue patients, projected admissions, protected reserve, surge beds, saline and kit inventory with reorder points, rule-based alerts, baseline/crisis/response with an LP referral plan, real OSM hospitals by road tier (capacity unknown), 999/16263, preparation brief. Fictional planning hospitals; real forecast. One-click Mentor demonstration | Response Intelligence → Hospital preparedness, [`docs/upgrade/HOSPITAL_PREPAREDNESS.md`](docs/upgrade/HOSPITAL_PREPAREDNESS.md) |
 
 ```bash
 git clone -b version-onsite-final https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON

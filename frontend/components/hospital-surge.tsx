@@ -4,13 +4,13 @@
 // from GET /api/overflow/plan on the local API. No distances exist for the synthetic ward IDs, so the flow chart is abstract, not a map.
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { api, qs } from "@/lib/api";
+import { qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
 import { Icon } from "./icons";
-import { CITIES, Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
-import { Btn, Card, DataTable, Kpi, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
+import { CITIES, Live, PlanShared, Range, useDecisionGuard, useScenarioRequest } from "./supply-allocation";
+import { Btn, Card, DataTable, Kpi, ProvChip, RiskBadge, Segmented, Select } from "./ui";
 import SurgeNetwork from "./surge-network";
 
 // the geographic view loads MapLibre only when it is opened; the ward network needs nothing beyond the overflow plan
@@ -55,14 +55,14 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
   const { lang } = useI18n();
   const { city, setCity, service, setService, stock, capPct, setCapPct, overrides, setOverrides } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const p = useDebounced({ capPct, overrides, stock });
-  const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/overflow/plan?${qs({
-    origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service, capacity_pct: p.capPct,
-    stock: p.stock / 100 })}${Object.entries(p.overrides).map(([k, v]) => `&override=${encodeURIComponent(`${k}:${v}`)}`).join("")}`, { signal: s })),
-  [sel.origin, sel.horizon, sel.source, city, service, p, blocked]);
+  const query = new URLSearchParams(qs({
+    origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city,
+    service, capacity_pct: capPct, stock: stock / 100 }));
+  for (const k of Object.keys(overrides).sort()) query.append("override", `${k}:${overrides[k]}`);
+  const q = useScenarioRequest(shared.readyScenario && !blocked ? `/api/overflow/plan?${query}` : null);
   const d: any = q.data;
   const { report } = shared;
-  useEffect(() => { report("surge", d ? { totals: d.totals, capPct: d.settings.capacity_pct, stale: !!q.stale } : null); }, [d, q.stale, report]);
+  useEffect(() => { report("surge", q.status === "failed" ? { failed: true } : d ? { totals: d.totals, capPct: d.settings.capacity_pct, stale: !!q.stale } : null); }, [d, q.stale, q.status, report]);
   const nOverrides = Object.keys(overrides).length;
   const setOverride = (w: string, v: string, base: number) => setOverrides((o) => {
     const n = Math.max(0, Math.min(500, Math.round(Number(v))));
@@ -70,7 +70,7 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
     if (v === "" || !Number.isFinite(n) || n === base) delete next[w]; else next[w] = n;
     return next;
   });
-  const exportCsv = () => d && download(`dengueshield_overflow_${d.origin}_h${d.horizon}_${d.city}_cap${d.settings.capacity_pct}.csv`, toCsv([
+  const exportCsv = () => d && !q.stale && download(`dengueshield_overflow_${d.origin}_h${d.horizon}_${d.city}_cap${d.settings.capacity_pct}.csv`, toCsv([
     ...d.transfers.map((t: any) => ({ kind: "transfer", city: t.city, from_ward: t.from_ward, to_ward: t.to_ward, patients: t.patients })),
     ...d.wards.map((w: any) => ({ kind: "ward", city: w.city, ward_id: w.ward_id, bed_demand: w.demand, capacity: w.capacity, capacity_baseline: w.capacity_baseline,
       overridden: w.overridden, deficit: w.deficit, headroom: w.headroom, sent: w.sent, received: w.received, unresolved: w.unresolved, status: w.status }))]));
@@ -79,7 +79,7 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
     <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
       <div><h2 id="surge-title" className="flex items-center gap-2 text-[15px] font-semibold text-ink"><Icon name="bed" size={18} className="text-coral-d" />Hospital surge and overflow</h2>
         <p className="mt-0.5 max-w-[80ch] text-[12.5px] leading-snug text-ink-3">Projected bed demand from the same forecast as Supply allocation, against an illustrative capacity for each ward. Patients over capacity move only to wards with spare beds in the same city.</p></div>
-      <div className="flex flex-wrap items-center gap-2"><ProvChip tone="warn">Illustrative capacity</ProvChip><ProvChip tone="info">Same-city transfers only</ProvChip>{d && <Btn variant="ghost" onClick={exportCsv}>Export CSV</Btn>}</div>
+      <div className="flex flex-wrap items-center gap-2"><ProvChip tone="warn">Illustrative capacity</ProvChip><ProvChip tone="info">Same-city transfers only</ProvChip>{d && <Btn variant="ghost" disabled={q.stale} onClick={exportCsv}>Export CSV</Btn>}</div>
     </div>
 
     {blocked ? notice : (<>

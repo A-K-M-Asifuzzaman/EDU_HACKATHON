@@ -22,6 +22,7 @@ import Palette from "./palette";
 import { AccountButton, AccountLinks } from "./account";
 import { Magnifier, MapPin, Mosquito, ShieldChart } from "./illustrations";
 import { atLeast, useAuth } from "@/lib/auth";
+import MosquitoCursor from "./mosquito-cursor";
 const SiteFooter = dynamic(() => import("./site-footer"));          // landing only: other pages do not download it
 
 type NavItem = readonly [string, string, string];                     // href, i18n key, icon (palette format)
@@ -228,6 +229,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div></div>)}
       </header>
       <main id="main" className={landing ? "" : "mx-auto max-w-[1440px] px-4 py-6 sm:px-6"}>{children}</main>
+      <MosquitoCursor />
       {landing && <SiteFooter />}
       {!landing && <footer className="mx-auto max-w-[1440px] px-4 pb-8 pt-4 text-[11px] leading-relaxed text-ink-3 sm:px-6">
         <div className="border-t border-line pt-4"><b className="text-ink-2">DengueShield AI</b> · Historical Replay on the organizers' synthetic dataset (2016–2024); the 2025 test year is locked. Not live surveillance, not medical advice.

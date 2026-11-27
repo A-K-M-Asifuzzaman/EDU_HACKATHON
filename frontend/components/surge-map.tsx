@@ -63,7 +63,7 @@ export default function SurgeMap({ d, city, onCity }: { d: any; city: string | n
     <div className="min-w-0">
       <CommandMap ref={mapRef} facilities={fac.data ?? null} dghs={null} cityRisk={[]} weather={[]} layers={LAYERS} origin={origin} routes={route ?? {}} routeMode="both"
         dest={route && picked ? picked.geometry.coordinates : null} selectedId={picked?.properties.id ?? null} reduce={reduce} height="min(560px, 70vh)"
-        onPick={nearest} onFacility={pickFacility} overlays={overlays} onOverlay={onOverlay} />
+        onPick={nearest} onFacility={pickFacility} overlays={overlays} onOverlay={onOverlay} initialFit={overlays.map((o: any) => o.lngLat)} />
       {Object.entries(els).map(([k, el]) => { const c = d.cities.find((x: any) => x.city === k); return el && c ? createPortal(<Gauge c={c} on={city === k} onClick={() => { onCity(k); mapRef.current?.flyTo(CITY_POS[k] as LngLat, 11.5); }} />, el, k) : null; })}
       <p className="mt-2 text-[12px] leading-relaxed text-ink-3">Blue points are {fac.data ? fac.data.meta.count : "the"} OpenStreetMap hospitals bundled with the app; roads and routing are bundled too, so both work offline (the street basemap needs the internet).
         Gauges sit at city centres and sum that city&apos;s synthetic wards: illustrative beds, not any hospital&apos;s beds. Tap the map to find the nearest hospitals by road.</p>

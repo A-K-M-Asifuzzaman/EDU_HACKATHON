@@ -3,53 +3,76 @@
 // configurable regional stock level, with a fairness floor and a risk-and-density priority; spraying crews are assigned by priority.
 // Every number comes from GET /api/allocation/plan, which runs locally (no external service). Stock, crews and capacity are planning
 // assumptions: the dataset contains none of them.
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type SetStateAction } from "react";
 import { api, qs } from "@/lib/api";
-import { srcParam, useSel } from "@/lib/ctx";
+import { DEFAULT, srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
 import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBadge, Segmented, Select, useAsync, type AsyncState } from "./ui";
+import { CITIES, DEFAULT_PLAN, planParams, readScenario, scenarioSearch, wardInScope, type PlanSettings, type Service } from "@/lib/plan-scenario";
 import { provenance, PROV_TEXT } from "@/lib/provenance";
 import AllocationFlow from "./allocation-flow";
+import AllocationComparison from "./allocation-comparison";
 
 export const LAST_ORIGIN = "2024-12-30";
-export const CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"];
-export type Service = "median" | "p80" | "p90";
-/** One plan state for Supply allocation, Hospital surge and Vector control: the same city, service level, stock, crew budget and
- *  illustrative capacity, so every section reads the same projected demand and the same resources. */
+export { CITIES, type Service };
+
 export function usePlanState() {
-  const [city, setCity] = useState("All");
-  const [service, setService] = useState<Service>("p80");
-  const [stock, setStock] = useState(60);
-  const [crews, setCrews] = useState(20);
-  const [maxCrews, setMaxCrews] = useState(3);
-  const [risk, setRisk] = useState(70);
-  const [floor, setFloor] = useState(25);
-  const [perCrew, setPerCrew] = useState(10);
-  const [capPct, setCapPct] = useState(100);
-  const [overrides, setOverrides] = useState<Record<string, number>>({});
-  const [vecMode, setVecMode] = useState<"optimized" | "manual" | "stage1">("optimized");
-  const [manual, setManual] = useState<Record<string, number>>({});
-  const [eff, setEff] = useState({ effect: 30, coverage: 35, delay: 1, buildup: 2, sensLow: 50, sensHigh: 150 });   // Moderate preset
-  // each stage publishes the API result it already fetched, so the Operations engine rail reads real numbers without a second request.
-  // Equal content is ignored, so a re-render can never turn a report into a loop.
+  const { sel, set, ready, wards } = useSel();
+  const [plan, setPlan] = useState(DEFAULT_PLAN);
+  const [loaded, setLoaded] = useState(false);
+  const [unsupported, setUnsupported] = useState(false);
+  const restore = useRef(true);
+  const [revision, setRevision] = useState(0);
+  const selection = useRef(sel);
+  useEffect(() => { selection.current = sel; }, [sel]);
+  useEffect(() => {
+    if (!ready) return;
+    const read = () => {
+      if (!/^\/response\/?$/.test(window.location.pathname)) return;
+      const state = readScenario(new URLSearchParams(window.location.search), wards, selection.current);
+      restore.current = true;
+      set(state.sel);
+      setPlan(state.plan);
+      setUnsupported(state.unsupported);
+      setLoaded(true);
+      setRevision(n => n + 1);
+    };
+    read();
+    window.addEventListener("popstate", read);
+    return () => window.removeEventListener("popstate", read);
+  }, [ready, wards, set]);
+
+  const readyScenario = ready && loaded;
+  const currentUrl = useDebounced(planParams(sel, plan).toString() + "&ward=" + encodeURIComponent(sel.ward));
+  useEffect(() => {
+    if (!readyScenario || !/^\/response\/?$/.test(window.location.pathname)) return;
+    // Wait for atomic restoration or a settled edit before writing one browser-history entry.
+    if (currentUrl !== planParams(sel, plan).toString() + "&ward=" + encodeURIComponent(sel.ward)) return;
+    const query = scenarioSearch(sel, plan, new URLSearchParams(window.location.search));
+    const url = `${window.location.pathname}?${query}${window.location.hash}`;
+    if (url !== window.location.pathname + window.location.search + window.location.hash) {
+      if (restore.current) window.history.replaceState(window.history.state, "", url);
+      else window.history.pushState(window.history.state, "", url);
+    }
+    restore.current = false;
+  }, [readyScenario, currentUrl, sel, plan, revision]);
+
+  const field = <K extends keyof PlanSettings>(key: K) => (action: SetStateAction<PlanSettings[K]>) =>
+    setPlan(p => ({ ...p, [key]: typeof action === "function" ? (action as (v: PlanSettings[K]) => PlanSettings[K])(p[key]) : action }));
+  const setCity = (city: string) => {
+    set({ city, ward: wardInScope(wards, city, sel.ward) });
+    if (city !== "All") field("manual")(assign => Object.fromEntries(Object.entries(assign).filter(([id]) => wards.some(w => w.ward_id === id && w.city === city))));
+  };
+  const reset = () => { set(DEFAULT); setPlan(DEFAULT_PLAN); setUnsupported(false); };
   const [reports, setReports] = useState<Record<string, any>>({});
-  const report = useCallback((k: string, v: any) => setReports((o) => (JSON.stringify(o[k]) === JSON.stringify(v) ? o : { ...o, [k]: v })), []);
-  return { reports, report, city, setCity, service, setService, stock, setStock, crews, setCrews, maxCrews, setMaxCrews, risk, setRisk, floor, setFloor,
-    perCrew, setPerCrew, capPct, setCapPct, overrides, setOverrides, vecMode, setVecMode, manual, setManual, eff, setEff };
+  const report = useCallback((k: string, v: any) => setReports(o => JSON.stringify(o[k]) === JSON.stringify(v) ? o : { ...o, [k]: v }), []);
+  return { ...plan, city: sel.city, readyScenario, unsupported, reset, reports, report, setCity,
+    setService: field("service"), setStock: field("stock"), setCrews: field("crews"), setMaxCrews: field("maxCrews"),
+    setRisk: field("risk"), setFloor: field("floor"), setPerCrew: field("perCrew"), setCapPct: field("capPct"),
+    setOverrides: field("overrides"), setVecMode: field("vecMode"), setManual: field("manual"), setEff: field("eff") };
 }
 export type PlanShared = ReturnType<typeof usePlanState>;
-
-/** The complete scenario as query parameters (the same names the API uses), for allocation, overflow, intervention and dispatch. */
-export function scenarioQuery(sel: { origin: string; horizon: number; source: string }, p: PlanShared): string {
-  const base = qs({ origin: sel.origin, horizon: sel.horizon, source: sel.source === "auto" ? undefined : sel.source, city: p.city === "All" ? undefined : p.city,
-    service: p.service, stock: p.stock / 100, crews: p.crews, max_crews_per_ward: p.maxCrews, risk_weight: p.risk / 100, floor: p.floor / 100,
-    cases_per_crew: p.perCrew, capacity_pct: p.capPct, mode: p.vecMode, effect: p.eff.effect / 100, coverage: p.eff.coverage / 100,
-    delay: p.eff.delay, buildup: p.eff.buildup, sens_low: p.eff.sensLow / 100, sens_high: p.eff.sensHigh / 100 });
-  const ovr = Object.entries(p.overrides).map(([k, v]) => `&override=${encodeURIComponent(`${k}:${v}`)}`).join("");
-  const asg = p.vecMode === "manual" ? Object.entries(p.manual).filter(([, v]) => v > 0).map(([k, v]) => `&assign=${encodeURIComponent(`${k}:${v}`)}`).join("") : "";
-  return base + ovr + asg;
-}
 
 /** Decision tools accept only out-of-time forecasts issued in 2024 or earlier; otherwise explain why and offer the fix. */
 export function useDecisionGuard() {
@@ -88,6 +111,18 @@ export function useDebounced<T>(v: T, ms = 250): T {
   return d;
 }
 
+/** Associate each response with its exact inputs, including the time before the debounce settles. */
+export function useScenarioRequest<T = any>(url: string | null): AsyncState<T> {
+  const settled = useDebounced(url);
+  const path = url === null ? null : settled;
+  const q = useAsync((signal) => path ? api<T>(path, { signal }).then(value => ({ path, value })) : Promise.resolve(null), [path]);
+  return {
+    ...q, data: q.data?.value ?? null,
+    stale: !!q.data && (q.stale || q.data.path !== url),
+    loading: q.loading || (url !== null && q.status === "ready" && !q.data),
+  };
+}
+
 export function Range({ label, value, min, max, step, onChange, fmt }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; fmt: (v: number) => string }) {
   return (<label className="flex min-w-[200px] flex-1 flex-col gap-1">
     <span className="flex items-baseline justify-between text-[12px] font-semibold text-ink-3"><span>{label}</span><b className="num text-[15px] text-ink">{fmt(value)}</b></span>
@@ -100,19 +135,16 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
   const { lang } = useI18n();
   const { city, setCity, service, setService, stock, setStock, crews, setCrews, risk, setRisk, floor, setFloor, perCrew, setPerCrew, maxCrews, setMaxCrews } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const params = useDebounced({ stock, crews, risk, floor, perCrew, maxCrews });
-  const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/allocation/plan?${qs({
-    origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service,
-    stock: params.stock / 100, crews: params.crews, risk_weight: params.risk / 100, floor: params.floor / 100,
-    cases_per_crew: params.perCrew, max_crews_per_ward: params.maxCrews })}`, { signal: s })),
-  [sel.origin, sel.horizon, sel.source, city, service, params, blocked]);
+  const query = qs({ origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service,
+    stock: stock / 100, crews, risk_weight: risk / 100, floor: floor / 100, cases_per_crew: perCrew, max_crews_per_ward: maxCrews });
+  const q = useScenarioRequest(shared.readyScenario && !blocked ? `/api/allocation/plan?${query}` : null);
   const d: any = q.data;
   const critical = useMemo(() => (d?.wards ?? []).filter((w: any) => w.status === "critical"), [d]);
   const { report } = shared;
-  useEffect(() => { report("allocate", d ? { target: d.target_date, service: d.settings.service_label, cases: d.wards.reduce((a: number, w: any) => a + w.forecast_cases, 0),
-    totals: d.totals, counts: d.counts, stale: !!q.stale } : null); }, [d, q.stale, report]);
+  useEffect(() => { report("allocate", q.status === "failed" ? { failed: true } : d ? { target: d.target_date, service: d.settings.service_label, cases: d.wards.reduce((a: number, w: any) => a + w.forecast_cases, 0),
+    totals: d.totals, counts: d.counts, stale: !!q.stale } : null); }, [d, q.stale, q.status, report]);
 
-  const exportCsv = () => d && download(`dengueshield_allocation_${d.origin}_h${d.horizon}_${d.city}_stock${Math.round(d.settings.stock * 100)}.csv`, toCsv(d.wards.map((w: any) => ({
+  const exportCsv = () => d && !q.stale && download(`dengueshield_allocation_${d.origin}_h${d.horizon}_${d.city}_stock${Math.round(d.settings.stock * 100)}.csv`, toCsv(d.wards.map((w: any) => ({
     rank: w.rank, ward_id: w.ward_id, city: w.city, risk_tier: w.risk_tier, p_outbreak: w.p_outbreak, population_density_sqkm: w.population_density_sqkm,
     priority: w.priority, forecast_cases: w.forecast_cases, ...Object.fromEntries(RES.flatMap(([k]) => [[`${k}_demand`, w[k].demand], [`${k}_allocated`, w[k].allocated], [`${k}_unmet`, w[k].unmet]])),
     crews_needed: w.crews_needed, crews_assigned: w.crews_assigned, status: w.status }))));
@@ -121,7 +153,7 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
     <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
       <div><h2 id="supply-title" className="text-[15px] font-semibold text-ink">Supply allocation</h2>
         <p className="mt-0.5 max-w-[80ch] text-[12.5px] leading-snug text-ink-3">Saline, diagnostic kits and beds from the forecast, placed under a stock limit; spraying crews by priority. Runs on this computer, no internet needed.</p></div>
-      <div className="flex flex-wrap items-center gap-2"><ProvChip tone="info">Planning estimate</ProvChip>{d && <Btn variant="ghost" onClick={exportCsv}>Export CSV</Btn>}</div>
+      <div className="flex flex-wrap items-center gap-2"><ProvChip tone="info">Planning estimate</ProvChip>{d && <Btn variant="ghost" disabled={q.stale} onClick={exportCsv}>Export CSV</Btn>}</div>
     </div>
 
     {blocked ? notice : (<>
@@ -172,6 +204,8 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
       <details className="mt-4 rounded-xl border border-line p-4 text-[13px] text-ink-2"><summary className="cursor-pointer font-semibold text-ink">How the allocation works</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">{d.assumptions.map((a: string) => <li key={a}>{a}</li>)}</ul>
         <p className="mt-2">Demand multipliers: saline {d.multipliers.saline_bags_needed.toFixed(4)}, kits {d.multipliers.diagnostic_kits_needed.toFixed(4)}, beds {d.multipliers.hospital_beds_required.toFixed(4)} per forecast case. Within each city the remaining stock fills wards in priority order, which maximises the priority-weighted supply for the given floor (checked against an exact solver in the tests).</p></details>
-    </div>)}</Live></>)}
+    </div>)}</Live>
+    <AllocationComparison query={query} city={city} />
+    </>)}
   </Card>);
 }

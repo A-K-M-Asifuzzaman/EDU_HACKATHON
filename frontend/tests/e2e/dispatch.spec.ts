@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "./fixtures";
 
-const PAGE = "/response/?origin=2024-08-05&horizon=3&nointro";
+const PAGE = "/response/?ward=DSCC_Ward_04&origin=2024-08-05&horizon=3&nointro";
 
 async function ready(page: any) {
   await page.goto(PAGE);

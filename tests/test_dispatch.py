@@ -175,3 +175,12 @@ def test_dispatch_runs_offline(monkeypatch):
     monkeypatch.setattr(socket.socket, "connect", no_network)
     assert brief(crews=33)["brief"]["crews"]["assigned"] >= 0
     assert doc(kind="city", brief_city="Dhaka North", format="pdf", crews=33).content.startswith(b"%PDF")
+
+
+def test_scenario_contract_version_is_additive_and_validated():
+    old = brief()
+    explicit = brief(scenario_v=1)
+    assert old["scenario"] == explicit["scenario"]
+    assert explicit["scenario"]["version"] == 1
+    assert explicit["scenario"]["id"] == D.scenario_id(explicit["scenario"]["settings"], explicit["scenario"]["artifacts"])
+    assert client.get("/api/dispatch/brief", params={**BASE, "ward": W, "scenario_v": 2}).status_code == 422

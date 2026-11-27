@@ -93,6 +93,13 @@ test.describe("Operations engine", () => {
     await expect(gauges).toHaveCount(5, { timeout: 30_000 });
     await expect(box.locator(".maplibregl-marker")).toHaveCount(5);
     await expect(box.locator(".maplibregl-marker", { hasText: /_Ward_/ })).toHaveCount(0);
+    // the map opens framed on the five city centres, so every gauge is inside the visible map
+    await page.waitForTimeout(500);
+    const frame = (await box.locator("canvas.maplibregl-canvas").boundingBox())!;
+    for (const g of await gauges.all()) {
+      const r = (await g.boundingBox())!, cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+      expect(cx > frame.x && cx < frame.x + frame.width && cy > frame.y && cy < frame.y + frame.height).toBe(true);
+    }
     await gauges.filter({ hasText: "Chattogram" }).click();
     await expect(box.getByRole("complementary", { name: "Map inspector" })).toContainText("Projected bed need");
     await box.getByRole("button", { name: "Ward transfer network" }).click();     // the chosen city carries over to the network view
@@ -129,4 +136,66 @@ test.describe("Operations engine", () => {
       await expect(rail(page, /Surge/)).toContainText("16 without a bed", { timeout: 30_000 });
     });
   }
+});
+
+test("presentation and fullscreen preserve the shared ward summary", async ({ page }) => {
+  await page.goto(PAGE);
+  const engine = page.locator("#engine");
+  const ward = engine.getByTestId("ops-ward-summary");
+  await expect(ward).toContainText("DNCC_Ward_19", { timeout: 30_000 });
+  const api = await (await page.request.get("/api/dispatch/brief?origin=2024-08-05&horizon=3&ward=DNCC_Ward_19")).json();
+  await expect(ward.locator("dd")).toHaveText([
+    String(api.brief.forecast.planned_cases),
+    `${api.brief.resources.saline.allocated} / ${api.brief.resources.saline.required}`,
+    String(api.brief.hospital.without_bed),
+  ]);
+  const present = engine.getByRole("button", { name: "Presentation mode", exact: true });
+  await present.focus();
+  await present.press("Enter");
+  await expect(engine.getByRole("button", { name: "Show scenario controls" })).toHaveAttribute("aria-pressed", "true");
+  await expect(engine.getByRole("button", { name: "Copy scenario link" })).toHaveCount(0);
+  await expect(ward).toBeVisible();
+  const enabled = await page.evaluate(() => document.fullscreenEnabled);
+  await engine.getByRole("button", { name: "Enter fullscreen" }).click();
+  if (enabled) {
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement?.id)).toBe("engine");
+    await expect(ward).toBeVisible();
+    await engine.getByRole("button", { name: "Exit fullscreen" }).click();
+    await expect.poll(() => page.evaluate(() => document.fullscreenElement)).toBe(null);
+  } else {
+    await expect(page.getByText("Fullscreen is unavailable in this browser.")).toBeVisible();
+  }
+  await engine.getByRole("button", { name: "Show scenario controls" }).click();
+  await expect(engine.getByRole("button", { name: "Copy scenario link" })).toBeEnabled();
+});
+
+test("the review stage reflects scoped forecasts and local draft actions", async ({ page }) => {
+  await page.goto(PAGE);
+  const engine = page.locator("#engine");
+  const queue = page.locator("#alert-queue");
+  await engine.getByLabel("City", { exact: true }).first().selectOption("Dhaka South");
+  const response = await (await page.request.get("/api/risk/wards?origin=2024-08-05&horizon=3&city=Dhaka+South")).json();
+  const alerts = response.wards.filter((w: any) => w.outbreak_alert);
+  expect(alerts.length).toBeGreaterThan(0);
+  const node = rail(page, /Review/);
+  await expect(node).toContainText(`0/${alerts.length} reviewed`);
+  await node.click();
+  await expect(page).toHaveURL(/#alert-queue$/);
+  await expect(queue.getByRole("listitem")).toHaveCount(alerts.length);
+  await queue.getByLabel(`Review status for ${alerts[0].ward_id}`).selectOption("reviewed");
+  await expect(node).toContainText(`1/${alerts.length} reviewed`);
+  await page.reload();
+  await expect(node).toContainText(`1/${alerts.length} reviewed`);
+});
+
+test("a failed engine is marked unavailable and can recover independently", async ({ page }) => {
+  const path = /\/api\/intervention\/simulate\?/;
+  await page.route(path, r => r.fulfill({ status: 503, json: { detail: "Planning service unavailable for this scenario" } }));
+  await page.goto(PAGE);
+  await expect(rail(page, /Intervention/)).toContainText("Unavailable", { timeout: 30_000 });
+  await expect(rail(page, /Demand/)).toContainText("224 beds");
+  await expect(page.locator("#vector").getByRole("alert")).toContainText("Vector-control scenario is unavailable right now");
+  await page.unroute(path);
+  await page.locator("#vector").getByRole("button", { name: "Try again" }).click();
+  await expect(rail(page, /Intervention/)).toContainText("63.2 fewer cases", { timeout: 30_000 });
 });

@@ -1,0 +1,434 @@
+{
+ "version": 1,
+ "provenance": "synthetic_demo",
+ "label": "Fictional planning hospitals for demonstration. They are not real facilities and none of these numbers describe a real hospital.",
+ "generated_from": "Bed totals scale with each city's observed dengue cases in the week of 5 Aug 2024 (organizer data, 260 beds for Dhaka North); occupancy shares, surge beds (14%), reserves (10%), stock cover (26-34 days), safety stock (3 days), lead times (5-10 days) and one confirmed delivery of 10 days' stock on day 10 are planning assumptions chosen to demonstrate the engine.",
+ "hospitals": [
+  {
+   "id": "DN-A",
+   "name": "Planning Hospital A (Dhaka North)",
+   "city": "Dhaka North",
+   "role": "general",
+   "licensed_beds": 143,
+   "functional_beds": 130,
+   "staffed_beds": 130,
+   "non_dengue_occupied": 88,
+   "dengue_occupied": 16,
+   "surge_beds": 18,
+   "reserve_pct": 10,
+   "catchment_share": 0.5,
+   "saline_stock": 787,
+   "saline_reserve": 79,
+   "kits_stock": 384,
+   "kits_reserve": 38,
+   "lead_time_days": 7,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 262,
+     "kits": 128
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "DN-B",
+   "name": "Planning Hospital B (Dhaka North)",
+   "city": "Dhaka North",
+   "role": "general",
+   "licensed_beds": 89,
+   "functional_beds": 81,
+   "staffed_beds": 81,
+   "non_dengue_occupied": 49,
+   "dengue_occupied": 9,
+   "surge_beds": 11,
+   "reserve_pct": 10,
+   "catchment_share": 0.26,
+   "saline_stock": 464,
+   "saline_reserve": 41,
+   "kits_stock": 226,
+   "kits_reserve": 20,
+   "lead_time_days": 10,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 136,
+     "kits": 67
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "DN-C",
+   "name": "Planning Hospital C (Dhaka North)",
+   "city": "Dhaka North",
+   "role": "general",
+   "licensed_beds": 54,
+   "functional_beds": 49,
+   "staffed_beds": 49,
+   "non_dengue_occupied": 34,
+   "dengue_occupied": 8,
+   "surge_beds": 7,
+   "reserve_pct": 10,
+   "catchment_share": 0.24,
+   "saline_stock": 327,
+   "saline_reserve": 38,
+   "kits_stock": 160,
+   "kits_reserve": 18,
+   "lead_time_days": 5,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 126,
+     "kits": 61
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "DS-A",
+   "name": "Planning Hospital A (Dhaka South)",
+   "city": "Dhaka South",
+   "role": "general",
+   "licensed_beds": 141,
+   "functional_beds": 128,
+   "staffed_beds": 128,
+   "non_dengue_occupied": 87,
+   "dengue_occupied": 16,
+   "surge_beds": 18,
+   "reserve_pct": 10,
+   "catchment_share": 0.5,
+   "saline_stock": 777,
+   "saline_reserve": 78,
+   "kits_stock": 379,
+   "kits_reserve": 38,
+   "lead_time_days": 7,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 259,
+     "kits": 126
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "DS-B",
+   "name": "Planning Hospital B (Dhaka South)",
+   "city": "Dhaka South",
+   "role": "general",
+   "licensed_beds": 88,
+   "functional_beds": 80,
+   "staffed_beds": 80,
+   "non_dengue_occupied": 48,
+   "dengue_occupied": 8,
+   "surge_beds": 11,
+   "reserve_pct": 10,
+   "catchment_share": 0.26,
+   "saline_stock": 458,
+   "saline_reserve": 40,
+   "kits_stock": 223,
+   "kits_reserve": 20,
+   "lead_time_days": 10,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 135,
+     "kits": 66
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "DS-C",
+   "name": "Planning Hospital C (Dhaka South)",
+   "city": "Dhaka South",
+   "role": "general",
+   "licensed_beds": 54,
+   "functional_beds": 49,
+   "staffed_beds": 49,
+   "non_dengue_occupied": 34,
+   "dengue_occupied": 8,
+   "surge_beds": 7,
+   "reserve_pct": 10,
+   "catchment_share": 0.24,
+   "saline_stock": 323,
+   "saline_reserve": 37,
+   "kits_stock": 158,
+   "kits_reserve": 18,
+   "lead_time_days": 5,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 124,
+     "kits": 61
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "CT-A",
+   "name": "Planning Hospital A (Chattogram)",
+   "city": "Chattogram",
+   "role": "general",
+   "licensed_beds": 85,
+   "functional_beds": 77,
+   "staffed_beds": 77,
+   "non_dengue_occupied": 52,
+   "dengue_occupied": 10,
+   "surge_beds": 11,
+   "reserve_pct": 10,
+   "catchment_share": 0.5,
+   "saline_stock": 465,
+   "saline_reserve": 46,
+   "kits_stock": 227,
+   "kits_reserve": 23,
+   "lead_time_days": 7,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 155,
+     "kits": 76
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "CT-B",
+   "name": "Planning Hospital B (Chattogram)",
+   "city": "Chattogram",
+   "role": "general",
+   "licensed_beds": 53,
+   "functional_beds": 48,
+   "staffed_beds": 48,
+   "non_dengue_occupied": 29,
+   "dengue_occupied": 5,
+   "surge_beds": 7,
+   "reserve_pct": 10,
+   "catchment_share": 0.26,
+   "saline_stock": 274,
+   "saline_reserve": 24,
+   "kits_stock": 134,
+   "kits_reserve": 12,
+   "lead_time_days": 10,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 81,
+     "kits": 39
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "CT-C",
+   "name": "Planning Hospital C (Chattogram)",
+   "city": "Chattogram",
+   "role": "general",
+   "licensed_beds": 32,
+   "functional_beds": 29,
+   "staffed_beds": 29,
+   "non_dengue_occupied": 20,
+   "dengue_occupied": 5,
+   "surge_beds": 4,
+   "reserve_pct": 10,
+   "catchment_share": 0.24,
+   "saline_stock": 193,
+   "saline_reserve": 22,
+   "kits_stock": 94,
+   "kits_reserve": 11,
+   "lead_time_days": 5,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 74,
+     "kits": 36
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "GZ-A",
+   "name": "Planning Hospital A (Gazipur)",
+   "city": "Gazipur",
+   "role": "general",
+   "licensed_beds": 40,
+   "functional_beds": 36,
+   "staffed_beds": 36,
+   "non_dengue_occupied": 24,
+   "dengue_occupied": 4,
+   "surge_beds": 5,
+   "reserve_pct": 10,
+   "catchment_share": 0.5,
+   "saline_stock": 215,
+   "saline_reserve": 21,
+   "kits_stock": 105,
+   "kits_reserve": 10,
+   "lead_time_days": 7,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 72,
+     "kits": 35
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "GZ-B",
+   "name": "Planning Hospital B (Gazipur)",
+   "city": "Gazipur",
+   "role": "general",
+   "licensed_beds": 24,
+   "functional_beds": 22,
+   "staffed_beds": 22,
+   "non_dengue_occupied": 13,
+   "dengue_occupied": 2,
+   "surge_beds": 3,
+   "reserve_pct": 10,
+   "catchment_share": 0.26,
+   "saline_stock": 126,
+   "saline_reserve": 11,
+   "kits_stock": 62,
+   "kits_reserve": 5,
+   "lead_time_days": 10,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 37,
+     "kits": 18
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "GZ-C",
+   "name": "Planning Hospital C (Gazipur)",
+   "city": "Gazipur",
+   "role": "general",
+   "licensed_beds": 14,
+   "functional_beds": 13,
+   "staffed_beds": 13,
+   "non_dengue_occupied": 9,
+   "dengue_occupied": 2,
+   "surge_beds": 2,
+   "reserve_pct": 10,
+   "catchment_share": 0.24,
+   "saline_stock": 89,
+   "saline_reserve": 10,
+   "kits_stock": 44,
+   "kits_reserve": 5,
+   "lead_time_days": 5,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 34,
+     "kits": 17
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "NG-A",
+   "name": "Planning Hospital A (Narayanganj)",
+   "city": "Narayanganj",
+   "role": "general",
+   "licensed_beds": 29,
+   "functional_beds": 26,
+   "staffed_beds": 26,
+   "non_dengue_occupied": 18,
+   "dengue_occupied": 3,
+   "surge_beds": 4,
+   "reserve_pct": 10,
+   "catchment_share": 0.5,
+   "saline_stock": 158,
+   "saline_reserve": 16,
+   "kits_stock": 77,
+   "kits_reserve": 8,
+   "lead_time_days": 7,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 53,
+     "kits": 26
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "NG-B",
+   "name": "Planning Hospital B (Narayanganj)",
+   "city": "Narayanganj",
+   "role": "general",
+   "licensed_beds": 18,
+   "functional_beds": 16,
+   "staffed_beds": 16,
+   "non_dengue_occupied": 10,
+   "dengue_occupied": 2,
+   "surge_beds": 2,
+   "reserve_pct": 10,
+   "catchment_share": 0.26,
+   "saline_stock": 93,
+   "saline_reserve": 8,
+   "kits_stock": 46,
+   "kits_reserve": 4,
+   "lead_time_days": 10,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 27,
+     "kits": 13
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "NG-C",
+   "name": "Planning Hospital C (Narayanganj)",
+   "city": "Narayanganj",
+   "role": "general",
+   "licensed_beds": 13,
+   "functional_beds": 12,
+   "staffed_beds": 12,
+   "non_dengue_occupied": 8,
+   "dengue_occupied": 2,
+   "surge_beds": 2,
+   "reserve_pct": 10,
+   "catchment_share": 0.24,
+   "saline_stock": 66,
+   "saline_reserve": 8,
+   "kits_stock": 32,
+   "kits_reserve": 4,
+   "lead_time_days": 5,
+   "confirmed_resupply": [
+    {
+     "day": 10,
+     "saline": 25,
+     "kits": 12
+    }
+   ],
+   "provenance": "synthetic_demo"
+  },
+  {
+   "id": "RRSC",
+   "name": "Regional Referral Simulation Center",
+   "city": "Regional",
+   "role": "referral",
+   "licensed_beds": 240,
+   "functional_beds": 220,
+   "staffed_beds": 220,
+   "non_dengue_occupied": 150,
+   "dengue_occupied": 10,
+   "surge_beds": 30,
+   "reserve_pct": 10,
+   "catchment_share": 0.0,
+   "saline_stock": 1200,
+   "saline_reserve": 200,
+   "kits_stock": 500,
+   "kits_reserve": 80,
+   "lead_time_days": 7,
+   "confirmed_resupply": [],
+   "provenance": "synthetic_demo"
+  }
+ ]
+}

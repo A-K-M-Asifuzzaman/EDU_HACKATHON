@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-27",
+  "source": {
+    "main": "2124600fc55ea07a37a77b22ec46059a8895e7bf",
+    "version_onsite_final": "57be72a1b20dfa30b4586dedbbddf02086fad2c0",
+    "ops_engine": "8718c85eecbd7d8a5c3a33f37a7be4165c3e096b",
+    "frontend_deployment": "dpl_646YykxSpPTa5qVAqkoBMzULPxc2",
+    "backend_revision": "4ce4801",
+    "last_observed_week": "2024-12-30"
+  },
+  "production": {
+    "health": "ok",
+    "inference_probe_ms": 610.2,
+    "offline_mode": false,
+    "offline_artifacts_present": 19,
+    "offline_artifacts_expected": 21,
+    "missing_artifacts": [
+      "frontend/out/index.html",
+      "frontend/out/response/index.html"
+    ],
+    "smoke_routes_http_200": [
+      "/",
+      "/command/",
+      "/lab/",
+      "/geography/",
+      "/evidence/",
+      "/provenance/",
+      "/climate/",
+      "/signin/",
+      "/response/"
+    ],
+    "response_viewports_px": [
+      390,
+      768,
+      1440
+    ],
+    "response_document_overflow_px": [
+      0,
+      0,
+      0
+    ],
+    "uncaught_browser_exceptions": 0,
+    "requested_ward": "DNCC_Ward_19",
+    "displayed_dispatch_ward_by_width": {
+      "390": "DSCC_Ward_04",
+      "768": "DSCC_Ward_01",
+      "1440": "DSCC_Ward_04"
+    },
+    "direct_dispatch_ward": "DNCC_Ward_19",
+    "direct_dispatch_id": "S-0c7176001119"
+  },
+  "scenario": {
+    "origin": "2024-08-05",
+    "horizon": 3,
+    "wards": 60,
+    "stock_30_saline": {
+      "demand": 1767,
+      "allocated": 528,
+      "unmet": 1239
+    },
+    "stock_30_kits": {
+      "demand": 864,
+      "allocated": 256,
+      "unmet": 608
+    },
+    "stock_30_regional_beds": {
+      "demand": 224,
+      "allocated": 65,
+      "unmet": 159
+    },
+    "capacity_120_transfers": 9,
+    "capacity_120_unresolved": 16,
+    "capacity_120_all_transfers_within_city": true,
+    "default_assumed_cases_prevented_weeks_2_to_4": 63.188
+  },
+  "single_serial_public_request_ms": {
+    "forecast": 380.305,
+    "allocation": 451.326,
+    "overflow": 399.008,
+    "intervention": 444.612,
+    "dispatch": 616.7
+  },
+  "published_development_metrics": {
+    "source": "reports/MODEL_COMPARISON.md",
+    "learner": "Ridge Poisson, F8",
+    "convention": "B",
+    "window": "2019–2024",
+    "horizons_weeks": [
+      2,
+      3,
+      4
+    ],
+    "mae": [
+      1.113,
+      1.39,
+      1.593
+    ],
+    "r2": [
+      0.78,
+      0.67,
+      0.58
+    ],
+    "peak_mae": [
+      3.98,
+      4.56,
+      4.73
+    ],
+    "retrained_in_audit": false
+  },
+  "verification": {
+    "next_webpack_build": "PASS",
+    "local_test_initial": {
+      "passed": 298,
+      "failed": 4,
+      "failure_context": "Missing google-auth in old environment, and local socket binding restriction."
+    },
+    "github_parent_ci": {
+      "run": 45975154766,
+      "status": "success"
+    },
+    "github_main_ci": {
+      "run": 45983690994,
+      "status": "success"
+    },
+    "github_ops_engine_pr_ci": {
+      "run": 45983662993,
+      "status": "success"
+    },
+    "local_test_rerun": {
+      "passed": 302,
+      "failed": 0,
+      "wall_seconds": 26.05,
+      "scope": [
+        "allocation",
+        "overflow",
+        "intervention",
+        "intervention API",
+        "dispatch",
+        "offline",
+        "auth",
+        "temporal invariants"
+      ]
+    }
+  }
+}

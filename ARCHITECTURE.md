@@ -92,6 +92,16 @@ every brief describe the same scenario. Assumptions that are not in the data (st
 settings and are labelled as such everywhere. Details and evidence: [`docs/onsite/`](docs/onsite/) (Stage 0 to Stage 4 handoffs and
 [`FINAL_RELEASE.md`](docs/onsite/FINAL_RELEASE.md)).
 
+## Hospital preparedness engine (upgrade branch)
+
+`dengueshield/preparedness.py` runs a deterministic daily model (28 days) for fictional planning hospitals
+(`app_data/preparedness/planning_hospitals.json`, provenance `synthetic_demo`) driven by the origin-safe forecast: mixed-patient
+occupancy with admitted and unresolved demand kept apart, saline and kit inventory with conservation and dynamic reorder points,
+rule-based alerts, and three states (baseline, crisis, response) where the response opens surge beds, places orders and solves an LP
+referral plan checked by `scipy` max-flow. `/api/preparedness/plan|brief|referrals|contacts`. The official ward-level overflow engine
+is unchanged. Real facilities (OSM) are searched by road time; their capacity and availability are reported as unknown.
+Details: [`docs/upgrade/HOSPITAL_PREPAREDNESS.md`](docs/upgrade/HOSPITAL_PREPAREDNESS.md).
+
 ## Compute and cost controls
 
 - CPU-only inference, bounded in-memory caches, no online fitting; charts, maps and 3D load only on the pages that use them.

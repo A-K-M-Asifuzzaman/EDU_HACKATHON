@@ -29,6 +29,13 @@ CALLS = [
     ("dispatch PDF, ward", f"/api/dispatch/document?{Q}&kind=ward&ward=DSCC_Ward_04&format=pdf&capacity_pct=120&crews=40"),
     ("dispatch HTML, city summary", f"/api/dispatch/document?{Q}&kind=city&brief_city=Chattogram&format=html&capacity_pct=120&crews=40"),
     ("dispatch PDF, wards needing attention", f"/api/dispatch/document?{Q}&kind=wards&brief_city=Chattogram&format=pdf&capacity_pct=120&crews=40"),
+    ("allocation comparison, Gazipur", f"/api/allocation/uncertainty?{Q}&city=Gazipur&reserve_pct=10"),
+    ("hospital preparedness, mentor demonstration", "/api/preparedness/plan?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60&kits=60&lead=10&non_dengue=105&crews=20"),
+    ("hospital preparedness, all cities", "/api/preparedness/plan?origin=2024-08-05&city=All"),
+    ("preparation brief CSV", "/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&format=csv"),
+    ("preparation brief HTML", "/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&format=html"),
+    ("real hospitals by road tier", "/api/preparedness/referrals?lat=23.84&lon=90.395"),
+    ("bundled contact directory", "/api/preparedness/contacts"),
 ]
 
 
@@ -38,7 +45,11 @@ def fetch(base: str, path: str):
         body, ctype = r.read(), r.headers.get("content-type", "")
     ms = round((time.perf_counter() - t) * 1000, 1)
     if "json" in ctype:
-        body = json.dumps(json.loads(body), sort_keys=True, separators=(",", ":")).encode()
+        data = json.loads(body)
+        if path.startswith("/api/allocation/uncertainty?"):
+            for pool in data["cities"]:
+                pool["solver"].pop("runtime_ms")
+        body = json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(body).hexdigest(), ms
 
 
