@@ -7,6 +7,7 @@ from __future__ import annotations
 import base64
 import json
 import hmac
+import math
 import os
 import re
 import subprocess
@@ -28,6 +29,7 @@ from dengueshield import allocation as alloc
 from dengueshield import overflow as ovf
 from dengueshield import intervention as iv
 from dengueshield import dispatch as dsp
+from dengueshield import preparedness as prep
 from dengueshield.onsite_data import ONSITE_SHA256 as ONSITE_SHA256_, load_onsite_development_panel
 from dengueshield.api import climate, geo, integrations
 from dengueshield import offline as offline_mode
@@ -1224,6 +1226,251 @@ EMERGENCY = {"numbers": [
                       "signs": ["severe abdominal pain", "persistent vomiting", "rapid breathing", "bleeding gums or nose", "fatigue or restlessness",
                                 "blood in vomit or stool", "being very thirsty", "pale and cold skin", "feeling weak"]},
     "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999."}
+
+
+# ------------------------------------------------------------------ hospital preparedness and emergency surge (mentor scope)
+PREP_CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"]
+PREP_PROVENANCE = [
+    {"what": "Weekly dengue cases, weeks 2-4", "source": "organizer_synthetic + model_estimate", "note": "origin-safe forecast of the organizer's synthetic dataset at the chosen service level"},
+    {"what": "Week 1 cases", "source": "model_estimate (scenario-derived)", "note": "midpoint of the observed week 0 and forecast week 2; the model has no 1-week horizon"},
+    {"what": "Saline, kit and bed multipliers per case", "source": "organizer_synthetic", "note": "the organizer's aggregate resource rules"},
+    {"what": "Planning hospitals, beds, occupancy, stock, deliveries, lead times", "source": "synthetic_demo", "note": "fictional facilities; not real hospitals"},
+    {"what": "Length of stay, admission rate, reserve, shocks, closures", "source": "planning_assumption", "note": "set by the user; defaults documented"},
+    {"what": "Real facilities, phones, roads", "source": "verified_public (OpenStreetMap, community-mapped)", "note": "identity and location only; capacity and availability unknown"},
+]
+PREP_UNKNOWN = {"capacity": "Actual hospital capacity unavailable.", "availability": "Bed availability unconfirmed — contact hospital."}
+
+
+def _prep_cases(origin: str, service: str, cities: list[str], source: Optional[str]) -> tuple[dict, dict]:
+    col = alloc.SERVICE_COLUMN[service]
+    weekly = {c: [0.0] * 4 for c in cities}
+    targets = {}
+    for h in (2, 3, 4):
+        fc, _ = decision_forecast(origin, h, source, None)
+        targets[h] = str(fc.target_date.iloc[0])[:10]
+        for c, v in fc.groupby("city")[col].sum().items():
+            if c in weekly:
+                weekly[c][h - 1] = float(v)
+    p = S.panel
+    obs = p[p.date == pd.Timestamp(origin)].groupby("city").dengue_cases.sum()
+    for c in cities:
+        weekly[c][0] = (float(obs.get(c, 0.0)) + weekly[c][1]) / 2
+    meta = {"observed_week0": {c: int(obs.get(c, 0)) for c in cities}, "target_dates": targets}
+    return weekly, meta
+
+
+def _prep_signal(city: str, origin: str) -> dict:
+    p = S.panel
+    ser = p[(p.city == city) & (p.date <= pd.Timestamp(origin))].groupby("date").dengue_cases.sum().sort_index()
+    return prep.replay_signal(ser.tolist())
+
+
+def _prep_compact(state: dict) -> dict:
+    """Daily rows stay on the server; the page gets weekly rows, metrics and one daily network series for the timeline."""
+    hs = [h for h in state["hospitals"] if h["role"] != "referral"]
+    daily = [{"day": d + 1, "needed": sum(h["daily_needed"][d] for h in hs), "occupied_other": sum(h["daily"][d]["other"] for h in hs),
+              "occupied_dengue": sum(h["daily"][d]["dengue"] for h in hs), "capacity": sum(h["beds"]["capacity"] for h in hs),
+              "routine_limit": sum(h["beds"]["routine_limit"] for h in hs),
+              "saline": sum(h["inventory"]["saline"]["rows"][d]["closing"] for h in hs), "kits": sum(h["inventory"]["kits"]["rows"][d]["closing"] for h in hs),
+              "saline_reserve": sum(h["inventory"]["saline"]["reserve"] for h in hs), "kits_reserve": sum(h["inventory"]["kits"]["reserve"] for h in hs)}
+             for d in range(prep.DAYS)]
+    out = []
+    for h in state["hospitals"]:
+        x = {k: v for k, v in h.items() if k not in ("daily", "daily_needed")}
+        x["inventory"] = {r: {k: v for k, v in inv.items() if k != "rows"} for r, inv in h["inventory"].items()}
+        out.append(x)
+    return {"hospitals": out, "network": state["network"], "summary": state["summary"], "checks": state["checks"], "daily": daily}
+
+
+def _prep_after(summary: dict) -> str:
+    if summary["bed_gap_after_referral"] > 0:
+        return "Emergency Surge"
+    if summary["saline_unmet"] or summary["kits_unmet"]:
+        return "Critical"
+    return "Warning" if summary["referred"] else "Normal"
+
+
+def preparedness_compute(origin: str, service: str, city: str, source: Optional[str], sc: "prep.Scenario", crews: int) -> dict:
+    cities = PREP_CITIES if city == "All" else [city]
+    if city != "All" and city not in PREP_CITIES:
+        bad(f"unknown city '{city}'", 404)
+    params = {"origin": origin, "service": service, "city": city, "source": source, "crews": crews, **json.loads(sc.key())}
+    key = ("preparedness", json.dumps(params, sort_keys=True))
+
+    def compute():
+        weekly, meta = _prep_cases(origin, service, cities, source)
+        scen = sc
+        iv_note = None
+        if crews > 0:
+            shares = []
+            sim = intervention_simulate(origin=origin, horizon=3, city=None if city == "All" else city, service=service, source=source, mode="optimized",
+                                        crews=crews, max_crews_per_ward=3, assign=None, effect=0.30, coverage=0.35, delay=1, buildup=2, sens_low=0.5,
+                                        sens_high=1.5, stock=0.6, risk_weight=0.7, floor=0.25, cases_per_crew=10, capacity_pct=100, city_pct=None, override=None)
+            for h in ("2", "3", "4"):
+                t = sim["totals"]["by_horizon"].get(h) or {}
+                shares.append(0.0 if not t.get("baseline") else min(0.9, t["prevented"] / t["baseline"]))
+            scen = prep.replace(sc, prevented_share=(0.0, *shares))
+            iv_note = {"crews": crews, "prevented_share_weeks_2_4": [round(x, 4) for x in shares],
+                       "basis": "Stage 3 simulator, moderate assumed effect; an assumption, not a measured reduction"}
+        fx, rules = prep.load_fixture(), alloc_rules()
+        base = prep.plan_state(fx, weekly, prep.Scenario(prevented_share=scen.prevented_share), rules, False)
+        crisis = prep.plan_state(fx, weekly, scen, rules, False)
+        resp = prep.plan_state(fx, weekly, scen, rules, True)
+        resp["summary"]["status_after_response"] = _prep_after(resp["summary"])
+        acts = prep.actions(base, crisis, resp)
+        sid = prep.scenario_id({**params, "fixture_version": fx["version"]})
+        return {"scenario_id": sid, "origin": origin, "service": service, "service_label": alloc.SERVICE_LABEL.get(service, service) if hasattr(alloc, "SERVICE_LABEL") else service,
+                "city": city, "cities": cities, "weekly_cases": weekly, "forecast": meta, "inputs": params, "intervention": iv_note,
+                "states": {"baseline": _prep_compact(base), "crisis": _prep_compact(crisis), "response": _prep_compact(resp)},
+                "actions": acts, "signals": {c: _prep_signal(c, origin) for c in cities},
+                "detection_note": "Live outbreak detection unavailable. Historical replay and hypothetical outbreak stress testing are available.",
+                "provenance": PREP_PROVENANCE, "fixture_label": fx["label"], "fixture_basis": fx["generated_from"], "unknown": PREP_UNKNOWN,
+                "assumptions": ["Weekly admissions = round(cases x admission rate); the default rate is the organizer's bed multiplier per case.",
+                                "Each admitted patient stays exactly the length of stay; existing patients leave evenly over their stay.",
+                                "Routine admissions stop at the protected reserve; patients who cannot be admitted are counted as unresolved, never as occupying a bed.",
+                                "Saline and kit demand = the organizer's multipliers x the hospital's share of all cases; stock never goes negative; deliveries count only from their arrival day.",
+                                "Reorder point = demand during the lead time + safety stock. Order-by day = first safety-stock breach - lead time.",
+                                "Referral plan: maximum patients placed at the network's worst day (LP, checked by max-flow), then same-city receivers first.",
+                                "Planning rules, not clinical triage or official warning levels. No dosage or treatment instructions."],
+                "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(key, compute)
+    except ValueError as e:
+        bad(str(e))
+    return v
+
+
+def _prep_scenario(shock, non_dengue, dengue_now, closed, surge, reserve, saline, kits, lead, los, los_other, admission) -> "prep.Scenario":
+    return prep.Scenario(shock=round(shock, 3), non_dengue_scale=non_dengue / 100, dengue_occupied_scale=dengue_now / 100, closed_pct=float(closed),
+                         surge_available_pct=float(surge), reserve_pct=None if reserve is None else float(reserve), saline_pct=float(saline), kits_pct=float(kits),
+                         lead_time_days=lead, los_dengue_days=los, los_other_days=los_other, admission_rate=None if admission is None else round(admission, 4))
+
+
+PrepCity = Annotated[str, Query(max_length=40)]
+
+
+@app.get("/api/preparedness/plan")
+def preparedness_plan(origin: str, service: Literal["median", "p80", "p90"] = "p80", city: PrepCity = "Dhaka North",
+                      source: Optional[Literal["replay", "bundle"]] = None,
+                      shock: Annotated[float, Query(ge=0.5, le=4.0)] = 1.0, non_dengue: Annotated[int, Query(ge=50, le=130)] = 100,
+                      dengue_now: Annotated[int, Query(ge=0, le=300)] = 100, closed: Annotated[int, Query(ge=0, le=50)] = 0,
+                      surge: Annotated[int, Query(ge=0, le=100)] = 100, reserve: Annotated[Optional[int], Query(ge=0, le=30)] = None,
+                      saline: Annotated[int, Query(ge=0, le=200)] = 100, kits: Annotated[int, Query(ge=0, le=200)] = 100,
+                      lead: Annotated[Optional[int], Query(ge=1, le=28)] = None, los: Annotated[int, Query(ge=2, le=14)] = 5,
+                      los_other: Annotated[int, Query(ge=2, le=14)] = 6, admission: Annotated[Optional[float], Query(ge=0.05, le=0.6)] = None,
+                      crews: Annotated[int, Query(ge=0, le=500)] = 0):
+    """Mixed-patient bed occupancy, saline and kit inventory, dynamic alerts and a three-state crisis comparison for fictional planning
+    hospitals driven by the real (synthetic-dataset) forecast. See dengueshield/preparedness.py."""
+    need("replay")
+    sc = _prep_scenario(shock, non_dengue, dengue_now, closed, surge, reserve, saline, kits, lead, los, los_other, admission)
+    return preparedness_compute(origin, service, city, source, sc, crews)
+
+
+def _csv_safe(v) -> str:
+    t = "" if v is None else str(v)
+    return "'" + t if t[:1] in ("=", "+", "-", "@", "\t", "\r") and not t.lstrip("-").replace(".", "", 1).isdigit() else t
+
+
+@app.get("/api/preparedness/brief")
+def preparedness_brief(origin: str, format: Literal["html", "csv", "txt", "json"] = "html", service: Literal["median", "p80", "p90"] = "p80",
+                       city: PrepCity = "Dhaka North", source: Optional[Literal["replay", "bundle"]] = None,
+                       shock: Annotated[float, Query(ge=0.5, le=4.0)] = 1.0, non_dengue: Annotated[int, Query(ge=50, le=130)] = 100,
+                       dengue_now: Annotated[int, Query(ge=0, le=300)] = 100, closed: Annotated[int, Query(ge=0, le=50)] = 0,
+                       surge: Annotated[int, Query(ge=0, le=100)] = 100, reserve: Annotated[Optional[int], Query(ge=0, le=30)] = None,
+                       saline: Annotated[int, Query(ge=0, le=200)] = 100, kits: Annotated[int, Query(ge=0, le=200)] = 100,
+                       lead: Annotated[Optional[int], Query(ge=1, le=28)] = None, los: Annotated[int, Query(ge=2, le=14)] = 5,
+                       los_other: Annotated[int, Query(ge=2, le=14)] = 6, admission: Annotated[Optional[float], Query(ge=0.05, le=0.6)] = None,
+                       crews: Annotated[int, Query(ge=0, le=500)] = 0):
+    """The preparation brief for one scenario: deterministic, every number from /api/preparedness/plan."""
+    import html as _h
+    need("replay")
+    sc = _prep_scenario(shock, non_dengue, dengue_now, closed, surge, reserve, saline, kits, lead, los, los_other, admission)
+    d = preparedness_compute(origin, service, city, source, sc, crews)
+    c, r = d["states"]["crisis"]["summary"], d["states"]["response"]["summary"]
+    wk = lambda w: "none in 4 weeks" if w is None else f"week {w}"
+    rows = [("Scenario", d["scenario_id"]), ("Forecast issued", origin), ("Target weeks (2-4)", ", ".join(d["forecast"]["target_dates"].values())),
+            ("Service level", service), ("Planning area", city), ("Projected cases, weeks 1-4", ", ".join(f"{sum(v[i] for v in d['weekly_cases'].values()):.0f}" for i in range(4))),
+            ("Demand shock", f"x{sc.shock:g}"), ("Admission rate per case", sc.admission_rate or "organizer bed multiplier"), ("Length of stay (dengue / other), days", f"{sc.los_dengue_days} / {sc.los_other_days}"),
+            ("Other-illness patients now", c["other_now"]), ("Dengue patients now", c["dengue_now"]), ("Open beds (planning network)", c["capacity"]),
+            ("Protected reserve", c["reserve"]), ("Peak patients needing a bed", c["peak_needed"]), ("Extra beds to keep the reserve", c["extra_beds_to_protect_reserve"]),
+            ("First reserve breach", wk(c["first_reserve_breach_week"])), ("First bed shortage", wk(c["first_shortage_week"])),
+            ("Saline to procure", c["saline_required"]), ("Diagnostic kits to procure", c["kits_required"]), ("First saline stockout", wk(c["first_saline_stockout_week"])),
+            ("Referrals in the planning network", r["referred"]), ("Bed gap after response", r["bed_gap_after_referral"]),
+            ("Saline still unmet after orders", r["saline_unmet"]), ("Status: crisis / after response", f"{c['status']} / {r['status_after_response']}"),
+            ("Intervention", "none" if not d["intervention"] else f"{crews} crews, assumed effect"),
+            ("Emergency contacts", "999 (National Emergency Service, ambulance), 16263 (DGHS Shasthya Batayon)"),
+            ("Data", "Planning hospitals are fictional (synthetic_demo). Real facility capacity and availability are unknown.")]
+    acts = [(a["action"], "" if a["quantity"] is None else a["quantity"], a["when"], a["why"]) for a in d["actions"]]
+    name = f"dengueshield_preparedness_{d['scenario_id']}"
+    if format == "json":
+        return {"scenario_id": d["scenario_id"], "rows": rows, "actions": acts}
+    if format == "csv":
+        lines = ["field,value"] + [",".join('"' + _csv_safe(x).replace('"', '""') + '"' for x in row) for row in rows] + ["", "action,quantity,when,why"] + \
+                [",".join('"' + _csv_safe(x).replace('"', '""') + '"' for x in a) for a in acts]
+        return Response("\n".join(lines) + "\n", media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{name}.csv"', "X-Scenario-Id": d["scenario_id"]})
+    if format == "txt":
+        txt = (f"DengueShield preparedness {d['scenario_id']} ({city}, forecast {origin}): status {c['status']}; prepare {c['extra_beds_to_protect_reserve']} beds before "
+               f"{wk(c['first_reserve_breach_week'])}; order {c['saline_required']} saline, {c['kits_required']} kits; referrals {r['referred']}, gap after {r['bed_gap_after_referral']}. "
+               "Fictional planning hospitals; not an order. Emergency 999.")
+        return Response(txt, media_type="text/plain; charset=utf-8", headers={"X-Scenario-Id": d["scenario_id"]})
+    tr = "".join(f"<tr><th>{_h.escape(str(k))}</th><td>{_h.escape(str(v))}</td></tr>" for k, v in rows)
+    ar = "".join(f"<li><b>{_h.escape(a[0])}</b>{(' — ' + _h.escape(str(a[1]))) if a[1] != '' else ''}, {_h.escape(a[2])}. {_h.escape(a[3])}</li>" for a in acts)
+    doc = (f"<!doctype html><html lang='en'><meta charset='utf-8'><title>{name}</title><style>body{{font:14px/1.5 system-ui,sans-serif;max-width:820px;margin:24px auto;padding:0 16px;color:#1a1438}}"
+           f"th{{text-align:left;padding:4px 12px 4px 0;color:#5e567f;font-weight:600}}td{{padding:4px 0}}.note{{background:#fff4dc;padding:8px 12px;border-radius:8px}}</style>"
+           f"<h1>Hospital preparation brief</h1><p class='note'>Planning estimate on fictional planning hospitals (synthetic_demo) driven by the organizer's synthetic forecast. "
+           f"Not an operational or clinical order. Real hospital capacity and availability are unknown.</p><table>{tr}</table><h2>Preparation actions</h2><ol>{ar}</ol>"
+           f"<p>Scenario {_h.escape(d['scenario_id'])}. Same settings always give the same brief.</p></html>")
+    return Response(doc, media_type="text/html; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="{name}.html"', "X-Scenario-Id": d["scenario_id"]})
+
+
+@app.get("/api/preparedness/referrals")
+def preparedness_referrals(lat: Lat, lon: Lon):
+    """Progressive search for real facilities by estimated road time: nearby, wider city, district, neighbouring districts, then the other
+    bundled region by straight-line distance (no road route is bundled between regions). Availability is never known."""
+    _routing_ready()
+    near = routing.nearest_facilities(lat, lon, k=1000, kind="hospital", purpose="emergency")   # every eligible hospital in the area, by road time
+    tiers = {"nearby": [], "wider_city": [], "district": [], "neighbouring_districts": [], "other_region": []}
+    home = near["results"][0]["facility"]["properties"]["city"] if near["results"] else None
+    for r in near["results"]:
+        p, t = r["facility"]["properties"], r["est_time_s"]
+        card = {"id": p["id"], "name": p["name"], "city": p["city"], "category": p.get("category"), "phone": p.get("phone") or [],
+                "phone_source": "OpenStreetMap tag (community-mapped, not verified)" if p.get("phone") else None, "last_edited": p.get("last_edited"),
+                "est_time_s": t, "distance_m": r["distance_m"], "osm_url": p.get("osm_url"), "coordinates": r["facility"]["geometry"]["coordinates"],
+                "emergency_tag": p.get("emergency_status"), "capacity": PREP_UNKNOWN["capacity"], "availability": PREP_UNKNOWN["availability"]}
+        tier = "nearby" if t <= 900 else "wider_city" if t <= 1800 and p["city"] == home else "district" if p["city"] == home else "neighbouring_districts"
+        if len(tiers[tier]) < 6:
+            tiers[tier].append(card)
+    far = [f for f in routing.facilities()["features"] if f["properties"].get("area") != near["area"] and f["properties"].get("kind") == "hospital"
+           and f["properties"].get("care") == "human"]
+    far.sort(key=lambda f: (f["geometry"]["coordinates"][0] - lon) ** 2 + (f["geometry"]["coordinates"][1] - lat) ** 2)
+    for f in far[:4]:
+        p = f["properties"]
+        km = 111.32 * math.hypot((f["geometry"]["coordinates"][0] - lon) * math.cos(math.radians(lat)), f["geometry"]["coordinates"][1] - lat)
+        tiers["other_region"].append({"id": p["id"], "name": p["name"], "city": p["city"], "category": p.get("category"), "phone": p.get("phone") or [],
+                                      "phone_source": "OpenStreetMap tag (community-mapped, not verified)" if p.get("phone") else None,
+                                      "straight_line_km": round(km, 1), "est_time_s": None, "osm_url": p.get("osm_url"),
+                                      "coordinates": f["geometry"]["coordinates"], "capacity": PREP_UNKNOWN["capacity"], "availability": PREP_UNKNOWN["availability"],
+                                      "route_note": "No bundled road route between regions; straight-line distance only."})
+    return {"area": near["area"], "home_city": home, "tiers": tiers, "emergency": EMERGENCY["numbers"],
+            "rules": ["Tiers by estimated road time: nearby <= 15 min, wider city <= 30 min, then the rest of the district, then neighbouring districts.",
+                      "Missing availability is unknown, never 'full'. Do not bypass nearby emergency stabilization for a distant hospital.",
+                      "Inter-facility transfers need clinical coordination and the receiving hospital's confirmation."],
+            "attribution": OSM_ATTR, "note": FACILITY_NOTE}
+
+
+@app.get("/api/preparedness/contacts")
+def preparedness_contacts(city: Optional[Literal["Dhaka", "Narayanganj", "Gazipur", "Chattogram"]] = None):
+    """National numbers plus facility phone numbers present in the bundled OpenStreetMap data (community-mapped). No number is invented;
+    no ambulance availability or arrival time is claimed."""
+    _routing_ready()
+    rows = [{"id": f["properties"]["id"], "name": f["properties"]["name"], "city": f["properties"]["city"], "kind": f["properties"]["kind"],
+             "phone": f["properties"]["phone"], "source": "OpenStreetMap phone tag (community-mapped, not verified)", "last_edited": f["properties"].get("last_edited"),
+             "osm_url": f["properties"].get("osm_url")}
+            for f in routing.facilities()["features"] if f["properties"].get("phone") and (city is None or f["properties"]["city"] == city)]
+    return {"national": EMERGENCY["numbers"], "facilities": rows, "count": len(rows),
+            "ambulance": "999 includes ambulance dispatch. No hospital-owned ambulance numbers are in the bundled data.",
+            "note": "Call the hospital before transferring a patient. Numbers come from public sources and may be out of date."}
 
 
 def _routing_ready():
