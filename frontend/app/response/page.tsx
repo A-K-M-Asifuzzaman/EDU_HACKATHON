@@ -11,6 +11,7 @@ import HospitalSurge from "@/components/hospital-surge";
 import VectorControl from "@/components/vector-control";
 import DispatchDesk from "@/components/dispatch-desk";
 import OpsEngine from "@/components/ops-engine";
+import HospitalPreparedness from "@/components/hospital-preparedness";
 import AlertQueue from "@/components/alert-queue";
 import { Btn, Card, CardTitle, DataTable, Loading, Modal, Notice, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import Link from "next/link";
@@ -59,8 +60,9 @@ export default function Response() {
     <ControlsBar show={["origin", "horizon", "source"]} />
     <Notice tone="warn">{t("resp.noofficial")} {t("disc.official")}</Notice>
     {/* long page on phones: jump straight to each part of the workflow */}
-    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#priority", "Priority wards"], ["#engine", "Operations engine"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#vector", "Vector control"], ["#dispatch", "Dispatch briefs"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
+    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#prepare", "Hospital preparedness"], ["#priority", "Priority wards"], ["#engine", "Operations engine"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#vector", "Vector control"], ["#dispatch", "Dispatch briefs"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
       <a key={h} href={h} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line bg-white px-3.5 font-medium text-forest hover:bg-mint-l">{l}</a>))}</nav>
+    <HospitalPreparedness shared={plan} />
     <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
       <Card id="priority" className="scroll-mt-20"><CardTitle title="Priority wards" sub={`${sel.horizon} ${t("ctl.weeks")} · origin ${dateFmt(sel.origin, lang)} · ranked by ${by === "p_outbreak" ? "outbreak probability" : "expected cases"}`} right={<div className="flex flex-wrap gap-2"><Segmented value={by} onChange={setBy} options={[{ value: "p_outbreak", label: "Probability" }, { value: "expected_cases", label: "Expected cases" }]} />
         <Btn variant="ghost" onClick={() => { download(`dengueshield_priority_${sel.origin}_h${sel.horizon}.csv`, toCsv(wards.map((w, i) => ({ rank: i + 1, ward_id: w.ward_id, city: w.city, tier: w.risk_tier, p_outbreak: w.p_outbreak, median: w.median_cases, mean: w.expected_cases, lo90: w.lower_90, hi90: w.upper_90, confidence: confidence(w).label, origin: w.origin_date, target: w.target_date, source: w.source, note: "statistical categories; not official; synthetic dataset" })))); toast(t("act.export")); }}>{t("act.export")}</Btn></div>} />
