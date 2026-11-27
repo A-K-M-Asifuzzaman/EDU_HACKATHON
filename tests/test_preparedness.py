@@ -254,3 +254,6 @@ def test_scenario_id_covers_dataset_and_model(client):
 def test_brief_reports_the_28_day_plan_and_inventory_policies(client):
     csv = client.get("/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60&format=csv").text
     assert "28-day referral plan" in csv and "redistribution + procurement" in csv
+    d = client.get("/api/preparedness/plan?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60").json()["states"]["response"]["summary"]
+    txt = client.get("/api/preparedness/brief?origin=2024-08-05&city=Dhaka%20North&shock=2&saline=60&format=txt").text
+    assert f"28-day plan: referrals {d['referred_28d']}, without a bed {d['unresolved_28d']}" in txt

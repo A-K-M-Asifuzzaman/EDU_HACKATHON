@@ -15,7 +15,8 @@ test.describe("Hospital preparedness", () => {
     await expect(box.getByTestId("prep-scenario-id")).toHaveText(api.scenario_id, { timeout: 60_000 });
     await expect(answers).toContainText(`${c.peak_needed} need / ${c.capacity} beds`);
     await expect(answers).toContainText(`${c.saline_required} saline`);
-    await expect(answers).toContainText(`${r.referred} referrals`);
+    await expect(answers).toContainText(`${r.referred_28d} referrals`);
+    await expect(answers).toContainText("28-day plan");
     await expect(answers).toContainText(c.status);
     expect(r.referred + r.bed_gap_after_referral).toBe(r.bed_gap_worst_day);
     for (const t of api.states.response.network.transfers) await expect(box.getByRole("cell", { name: t.from_name }).first()).toBeVisible();

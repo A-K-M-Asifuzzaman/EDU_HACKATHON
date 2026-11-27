@@ -24,40 +24,29 @@ Resume here. Keep this file short; update after every unit.
 | Docs: method, data, thresholds, offline, rubric, release, 7-min script, Bangla Q&A; README/ARCHITECTURE | `f7ee003` | — |
 | Optional mosquito cursor + flight sound (off by default, footer toggles); full regression fixes | `a7f37b9` | `mosquito-cursor.spec.ts` passed; FINAL_TEST_REPORT.md |
 
+## Closure sprint (done)
+
+| Unit | Commit |
+|---|---|
+| Restore race fixed (edits before URL restore re-applied; tests no longer work around it) | `0724c98` |
+| 28-day time-expanded referral program (peak-day fallback), emergency redistribution + 4 policies, integrity labels, scenario id covers data/model | `dcffa45` |
+| Playback, gauges, stockout countdown, inventory policies, 28-day network, action "where", Geography separation, 999/16263 rechecked | `12dda5f` |
+| Referral numbers consistent (28-day plan everywhere), final docs, 100 Q&A | final commit |
+
 ## Open
 
-- CI run 45999833899 on `a7f37b9` (see FINAL_TEST_REPORT.md for the local runs).
-- Not done: physical Wi-Fi-off run on the judging laptop, fresh-clone setup, video recording, production deploy (needs owner
-  approval), 3D mosquitoes on other pages (only the existing landing intro), real hospital capacity data (none exists in the bundle),
-  more districts (OSM data and road graphs cover Dhaka, Gazipur, Narayanganj, Chattogram only).
+- **Production is partly broken** (owner action): PR #9 merged `f9372e5` into `main`, Vercel published it, the backend deploy was
+  skipped (no `HF_TOKEN`). See FINAL_RELEASE_CHECKLIST.md "Fix now".
+- This sprint is not merged or deployed.
+- Judging-laptop Wi-Fi-off run, 7-minute video, submission destination, repository access: not done.
 
 ## Acceptance gates
 
-| Gate | Status | Evidence |
-|---|---|---|
-| 1 Codex work recovered | PASS | `bab676e`, 65 tests |
-| 2 Existing functionality preserved | PASS (local) | full Python and browser runs, FINAL_TEST_REPORT.md |
-| 3 Mixed-patient occupancy | PASS | flow/split checks on every row, 17 unit tests |
-| 4 Bed capacity and reserve accounting | PASS | capacity, reserve, zero capacity, surge, closure tests |
-| 5 Inventory | PASS | conservation, zero stock, delayed delivery, ROP, procurement tests |
-| 6 Dynamic thresholds | PASS | Normal→Emergency rule tests; scenario changes move statuses |
-| 7 Sudden outbreak simulation integrated | PASS | three states; Stage 3 prevented share feeds demand |
-| 8 Resource allocation preserved | PASS | allocation suites unchanged and passing |
-| 9 Hospital network optimization | PASS | LP vs independent max-flow, receiver limits, city rules |
-| 10 Verified alternatives where coverage permits | CONDITIONAL | OSM tiers by road time in 4 districts; capacity unknown everywhere |
-| 11 Verified ambulance and emergency information | CONDITIONAL | 999 and 16263 only (pre-existing sources, not re-verified); 59 OSM phone tags; no ambulance-provider numbers |
-| 12 Synthetic and real data separated | PASS | provenance labels, tests that real cards never carry capacity |
-| 13 Brief and dispatch consistency | PASS | scenario id equal on screen and in files (API and browser tests) |
-| 14 Premium hospital command UI | PASS (screenshots) | `#prepare` workspace; owner review pending |
-| 15 Immersive visuals optional and performant | CONDITIONAL | cursor and sound opt-in, idle-safe; no new 3D placements |
-| 16 Offline core execution | PASS (macOS sandbox) | 28/28; physical Wi-Fi run NOT RUN |
-| 17 Regression tests | PASS (local) / CI pending | see above |
-| 18 Accessibility and responsive | PASS (automated) | axe light and Dim on /response/, 360/390 px tests |
-| 19 Build and scenario compatibility | PASS | build, scenario.spec |
-| 20 Official rubric evidence | PASS | FINAL_RUBRIC_CHECKLIST.md |
-| 21 Video readiness | CONDITIONAL | script ready; not recorded |
-| 22 Technical Q&A readiness | PASS | JUDGE_QA_BANGLA.md, 46 answers |
+Unchanged from the previous table except: 9 now includes the 28-day program and redistribution (PASS); 17 PASS locally (CI: see run
+id in the final report to the owner); 16 PASS on the macOS sandbox and a fresh clone, physical Wi-Fi NOT RUN; **live production: FAIL**
+until the backend is deployed.
 
 ## Next exact step
 
-Owner review of the branch; then the release checklist (FINAL_RELEASE_CHECKLIST.md): judging-laptop offline run, video, deploy approval.
+Owner: deploy the backend from `main` (restores the live preparedness section), then review and merge this sprint's PR and deploy
+backend-first.

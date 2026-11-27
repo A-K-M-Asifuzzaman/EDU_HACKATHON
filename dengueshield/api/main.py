@@ -1294,12 +1294,20 @@ def _prep_compact(state: dict) -> dict:
     return res
 
 
+def _prep_referrals(summary: dict) -> tuple[int, int, str]:
+    """(patients referred, patients still without a bed, basis): the 28-day program when it passed its checks, else the peak-day plan."""
+    if summary.get("unresolved_28d") is not None:
+        return summary["referred_28d"], summary["unresolved_28d"], "28-day plan"
+    return summary["referred"], summary["bed_gap_after_referral"], "peak-day plan"
+
+
 def _prep_after(summary: dict) -> str:
-    if summary["bed_gap_after_referral"] > 0:
+    referred, unresolved, _ = _prep_referrals(summary)
+    if unresolved > 0:
         return "Emergency Surge"
     if summary["saline_unmet"] or summary["kits_unmet"]:
         return "Critical"
-    return "Warning" if summary["referred"] else "Normal"
+    return "Warning" if referred else "Normal"
 
 
 def preparedness_compute(origin: str, service: str, city: str, source: Optional[str], sc: "prep.Scenario", crews: int) -> dict:
@@ -1414,7 +1422,7 @@ def preparedness_brief(origin: str, format: Literal["html", "csv", "txt", "json"
             ("Protected reserve", c["reserve"]), ("Peak patients needing a bed", c["peak_needed"]), ("Extra beds to keep the reserve", c["extra_beds_to_protect_reserve"]),
             ("First reserve breach", wk(c["first_reserve_breach_week"])), ("First bed shortage", wk(c["first_shortage_week"])),
             ("Saline to procure", c["saline_required"]), ("Diagnostic kits to procure", c["kits_required"]), ("First saline stockout", wk(c["first_saline_stockout_week"])),
-            ("Referrals in the planning network", r["referred"]), ("Bed gap after response", r["bed_gap_after_referral"]),
+            ("Peak-day referrals / bed gap after (cross-check)", f"{r['referred']} / {r['bed_gap_after_referral']}"),
             ("28-day referral plan", "not available" if r.get("referred_28d") is None else f"{r['referred_28d']} referred, {r['unresolved_28d']} still without a bed"),
             *[(f"{lab} unmet: no action / procurement only / redistribution + procurement",
                f"{ic[res]['no_action']} / {ic[res]['procurement_only']} / {ic[res]['redistribution_and_procurement']}")
@@ -1433,7 +1441,7 @@ def preparedness_brief(origin: str, format: Literal["html", "csv", "txt", "json"
         return Response("\n".join(lines) + "\n", media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{name}.csv"', "X-Scenario-Id": d["scenario_id"]})
     if format == "txt":
         txt = (f"DengueShield preparedness {d['scenario_id']} ({city}, forecast {origin}): status {c['status']}; prepare {c['extra_beds_to_protect_reserve']} beds before "
-               f"{wk(c['first_reserve_breach_week'])}; order {c['saline_required']} saline, {c['kits_required']} kits; referrals {r['referred']}, gap after {r['bed_gap_after_referral']}. "
+               f"{wk(c['first_reserve_breach_week'])}; need {c['saline_required']} saline, {c['kits_required']} kits (incl. redistribution); {_prep_referrals(r)[2]}: referrals {_prep_referrals(r)[0]}, without a bed {_prep_referrals(r)[1]}. "
                "Fictional planning hospitals; not an order. Emergency 999.")
         return Response(txt, media_type="text/plain; charset=utf-8", headers={"X-Scenario-Id": d["scenario_id"]})
     tr = "".join(f"<tr><th>{_h.escape(str(k))}</th><td>{_h.escape(str(v))}</td></tr>" for k, v in rows)

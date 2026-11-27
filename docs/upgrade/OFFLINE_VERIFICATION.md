@@ -13,6 +13,9 @@ Result:
 - Offline browser workflow (`frontend/tests/e2e/offline.spec.ts`): 1 passed.
 - Outbound attempts refused by the server: 0 (offline mode on, artifacts complete).
 
-Not done: a physical Wi-Fi-off run on the judging laptop and a fresh-clone setup. Do both before recording (see
-[JUDGE_DEMO_SCRIPT_7MIN.md](JUDGE_DEMO_SCRIPT_7MIN.md)). Without internet the map basemap is blank; facility points, routes and all
+Closure sprint, same day: a fresh clone of the pushed branch (`12dda5f`) ran `scripts/setup.sh` (datasets downloaded and
+checksum-verified), wrote its own online baseline and matched it 28/28 under `scripts/launch_offline.sh`; the final build passed the
+macOS kill-switch again (28/28, 0 outbound attempts).
+
+Not done: the physical Wi-Fi-off run on the judging laptop ([WIFI_OFF_CHECKLIST.md](WIFI_OFF_CHECKLIST.md)). Without internet the map basemap is blank; facility points, routes and all
 planning engines still work. Live weather, Copilot generation, DGHS polygons and Firebase sign-in are optional online services.

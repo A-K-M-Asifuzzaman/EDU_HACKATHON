@@ -100,7 +100,7 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
       <Answer q="When?" a={wk(cr.first_reserve_breach_week)} sub={`reserve reached; beds run out ${wk(cr.first_shortage_week)}${weekDate(cr.first_shortage_week)}`} />
       <Answer q="Extra beds" a={String(cr.extra_beds_to_protect_reserve)} sub="to admit everyone and keep the reserve" />
       <Answer q="Supplies to order" a={`${cr.saline_required} saline`} sub={`${cr.kits_required} diagnostic kits; first saline stockout ${wk(cr.first_saline_stockout_week)}`} />
-      <Answer q="Alternatives" a={`${rs.referred} referrals`} sub={rs.bed_gap_after_referral ? `${rs.bed_gap_after_referral} beds still missing after surge and referrals` : "surge beds and referrals close the bed gap"} />
+      <Answer q="Alternatives" a={`${rs.referred_28d ?? rs.referred} referrals`} sub={`${rs.unresolved_28d != null ? "28-day plan" : "peak-day plan"}: ${(rs.unresolved_28d ?? rs.bed_gap_after_referral) ? `${rs.unresolved_28d ?? rs.bed_gap_after_referral} still without a bed after surge and referrals` : "surge beds and referrals leave nobody without a bed"}`} />
     </div>
 
     <div role="group" aria-label="Scenario state" className="flex flex-wrap items-center gap-1.5">
@@ -126,8 +126,9 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
     <section aria-labelledby="lab-title" className="ops-panel p-4"><h3 id="lab-title" className="text-[14px] font-semibold text-ink">Crisis laboratory: baseline, crisis and optimized response</h3>
       <div className="mt-3 overflow-x-auto"><table className="num w-full min-w-[560px] text-[12.5px]"><thead><tr className="text-left text-ink-3"><th className="py-1 pr-3 font-semibold">Measure</th>{(Object.keys(STATE_LABEL) as StateKey[]).map((k) => <th key={k} className="py-1 pr-3 text-right font-semibold">{STATE_LABEL[k]}</th>)}</tr></thead>
         <tbody>{([["Status", (s: any, k: StateKey) => <Pill s={k === "response" ? s.status_after_response : s.status} />], ["Peak patients needing a bed", (s: any) => s.peak_needed], ["Open beds", (s: any) => s.capacity],
-          ["Extra beds to keep the reserve", (s: any) => s.extra_beds_to_protect_reserve], ["Bed gap at the worst day", (s: any) => s.bed_gap_worst_day], ["Referred in the network", (s: any) => s.referred],
-          ["Bed gap after referral", (s: any) => s.bed_gap_after_referral], ["Dengue patients turned away (4 weeks, before referral)", (s: any) => s.unresolved_dengue],
+          ["Extra beds to keep the reserve", (s: any) => s.extra_beds_to_protect_reserve], ["Bed gap on the worst day", (s: any) => s.bed_gap_worst_day], ["Referred on the worst day (peak-day plan)", (s: any) => s.referred],
+          ["Bed gap on the worst day after referral", (s: any) => s.bed_gap_after_referral], ["Referred over 28 days (28-day plan)", (s: any) => s.referred_28d ?? "-"],
+          ["Without a bed over 28 days, after referrals", (s: any) => s.unresolved_28d ?? "-"], ["Dengue patients turned away (4 weeks, before referral)", (s: any) => s.unresolved_dengue],
           ["Saline to order / still unmet", (s: any) => `${s.saline_required} / ${s.saline_unmet}`], ["Kits to order / still unmet", (s: any) => `${s.kits_required} / ${s.kits_unmet}`]] as [string, (s: any, k: StateKey) => any][]).map(([label, f]) => (
           <tr key={label} className="border-t border-line"><th className="py-1.5 pr-3 text-left font-normal text-ink-2">{label}</th>{(Object.keys(STATE_LABEL) as StateKey[]).map((k) => <td key={k} className="py-1.5 pr-3 text-right text-ink">{f(d.states[k].summary, k)}</td>)}</tr>))}</tbody></table></div>
       <p className="mt-2 text-[12px] text-ink-3">Response = crisis + surge beds opened + orders placed today (they arrive after the lead time) + referrals inside the planning network. Remaining shortages are shown, not hidden. Baseline uses the forecast with the planned hospital settings{d.intervention ? " and the same assumed crew effect" : ""}.</p></section>
