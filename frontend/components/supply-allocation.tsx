@@ -9,43 +9,59 @@ import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
 import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
+import { provenance, PROV_TEXT } from "@/lib/provenance";
 
-const LAST_ORIGIN = "2024-12-30";
+export const LAST_ORIGIN = "2024-12-30";
+export const CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"];
+export type Service = "median" | "p80" | "p90";
+/** City, service level and stock shared by Supply allocation and Hospital surge, so both read the same projected demand. */
+export type PlanShared = { city: string; setCity: (v: string) => void; service: Service; setService: (v: Service) => void; stock: number; setStock: (v: number) => void };
+
+/** Decision tools accept only out-of-time forecasts issued in 2024 or earlier; otherwise explain why and offer the fix. */
+export function useDecisionGuard() {
+  const { sel, set, meta } = useSel();
+  const { lang } = useI18n();
+  const pv = provenance(sel.origin, sel.horizon, sel.source, meta);
+  const sealed = sel.origin > LAST_ORIGIN;
+  const blocked = sealed || pv.kind === "in_sample" || pv.kind === "none";
+  const notice = sealed ? (<Notice tone="warn"><b>Decision tools use forecasts issued in 2024 or earlier.</b> 2025 is the sealed test year. The forecast issued {dateFmt(LAST_ORIGIN, lang)} already covers January 2025.
+      <div className="mt-2"><Btn variant="ghost" onClick={() => set({ origin: LAST_ORIGIN, source: "auto" })}>Use the forecast issued {dateFmt(LAST_ORIGIN, lang)}</Btn></div></Notice>)
+    : blocked ? (<Notice tone="warn"><b>This plan needs an out-of-time forecast.</b> {PROV_TEXT[pv.kind]}
+      {pv.fix && <div className="mt-2"><Btn variant="ghost" onClick={() => set(pv.fix!)}>{pv.fix.origin ? `Use origin ${dateFmt(pv.fix.origin, lang)}` : "Use the validated replay"}</Btn></div>}</Notice>) : null;
+  return { blocked, notice, pv };
+}
 const RES = [["saline_bags_needed", "Saline bags"], ["diagnostic_kits_needed", "Diagnostic kits"], ["hospital_beds_required", "Hospital beds"]] as const;
-const CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"];
 const STATUS: Record<string, [string, string]> = { met: ["Fully supplied", "bg-[#d9f7ea] text-[#0b5d44]"], deficit: ["Deficit", "bg-[#fff1cc] text-[#6b4a00]"], critical: ["Critical deficit", "bg-[#ffe9ea] text-[#8f1d25]"] };
 
-function useDebounced<T>(v: T, ms = 250): T {
+export function useDebounced<T>(v: T, ms = 250): T {
   const [d, setD] = useState(v);
   useEffect(() => { const id = setTimeout(() => setD(v), ms); return () => clearTimeout(id); }, [v, ms]);
   return d;
 }
 
-function Range({ label, value, min, max, step, onChange, fmt }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; fmt: (v: number) => string }) {
+export function Range({ label, value, min, max, step, onChange, fmt }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void; fmt: (v: number) => string }) {
   return (<label className="flex min-w-[200px] flex-1 flex-col gap-1">
     <span className="flex items-baseline justify-between text-[12px] font-semibold text-ink-3"><span>{label}</span><b className="num text-[15px] text-ink">{fmt(value)}</b></span>
     <input type="range" aria-label={label} min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="h-2 w-full accent-emerald" />
     <span className="flex justify-between text-[11px] text-ink-3"><span>{fmt(min)}</span><span>{fmt(max)}</span></span></label>);
 }
 
-export default function SupplyAllocation() {
-  const { sel, set } = useSel();
+export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
+  const { sel } = useSel();
   const { lang } = useI18n();
-  const [city, setCity] = useState("All");
-  const [service, setService] = useState<"median" | "p80" | "p90">("p80");
-  const [stock, setStock] = useState(60);
+  const { city, setCity, service, setService, stock, setStock } = shared;
+  const { blocked, notice } = useDecisionGuard();
   const [crews, setCrews] = useState(20);
   const [risk, setRisk] = useState(70);
   const [floor, setFloor] = useState(25);
   const [perCrew, setPerCrew] = useState(10);
   const [maxCrews, setMaxCrews] = useState(3);
   const params = useDebounced({ stock, crews, risk, floor, perCrew, maxCrews });
-  const sealed = sel.origin > LAST_ORIGIN;
-  const q = useAsync((s) => (sealed ? Promise.resolve(null) : api(`/api/allocation/plan?${qs({
+  const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/allocation/plan?${qs({
     origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service,
     stock: params.stock / 100, crews: params.crews, risk_weight: params.risk / 100, floor: params.floor / 100,
     cases_per_crew: params.perCrew, max_crews_per_ward: params.maxCrews })}`, { signal: s })),
-  [sel.origin, sel.horizon, sel.source, city, service, params, sealed]);
+  [sel.origin, sel.horizon, sel.source, city, service, params, blocked]);
   const d: any = q.data;
   const critical = useMemo(() => (d?.wards ?? []).filter((w: any) => w.status === "critical"), [d]);
 
@@ -61,8 +77,7 @@ export default function SupplyAllocation() {
       <div className="flex flex-wrap items-center gap-2"><ProvChip tone="info">Planning estimate</ProvChip>{d && <Btn variant="ghost" onClick={exportCsv}>Export CSV</Btn>}</div>
     </div>
 
-    {sealed ? (<Notice tone="warn"><b>Allocation uses forecasts issued in 2024 or earlier.</b> 2025 is the sealed test year. The forecast issued {dateFmt(LAST_ORIGIN, lang)} already covers January 2025.
-      <div className="mt-2"><Btn variant="ghost" onClick={() => set({ origin: LAST_ORIGIN })}>Use the forecast issued {dateFmt(LAST_ORIGIN, lang)}</Btn></div></Notice>) : (<>
+    {blocked ? notice : (<>
     <div className="flex flex-wrap items-end gap-x-6 gap-y-4 rounded-xl border border-line p-4">
       <Select label="City" value={city} onChange={setCity} options={[{ value: "All", label: "All five cities" }, ...CITIES.map((c) => ({ value: c, label: c }))]} />
       <Segmented label="Plan for" value={service} onChange={(v) => setService(v as any)} options={[{ value: "median", label: "Median" }, { value: "p80", label: "Upper 80%" }, { value: "p90", label: "Upper 90%" }]} />

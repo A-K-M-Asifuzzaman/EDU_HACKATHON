@@ -32,7 +32,7 @@ test.describe("Supply allocation", () => {
     page.on("request", (r) => { if (r.url().includes("/api/allocation/plan") && r.url().includes("origin=2025")) called = true; });
     await page.goto("/response/?origin=2025-03-03&horizon=3&nointro");
     const box = page.locator("#supply");
-    await expect(box.getByText("Allocation uses forecasts issued in 2024 or earlier.")).toBeVisible();
+    await expect(box.getByText("Decision tools use forecasts issued in 2024 or earlier.")).toBeVisible();
     await box.getByRole("button", { name: /Use the forecast issued/ }).click();
     await expect(box.getByText(/for the week of/)).toBeVisible({ timeout: 30_000 });
     expect(called).toBe(false);
