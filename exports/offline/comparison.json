@@ -1,0 +1,111 @@
+{
+ "compared": 21,
+ "identical": 21,
+ "results": {
+  "forecast, 2 weeks": {
+   "sha256": "7a0735f9f0bc7398608df4ba3d0bb4ba0fea201a11b6c223ff370c941d35707f",
+   "ms": 28.3,
+   "path": "/api/risk/wards?origin=2024-08-05&horizon=2"
+  },
+  "forecast, 3 weeks": {
+   "sha256": "37fb4043d6bf10cab1dc8f7cfb153413a6ef217dadd94b82b86a139f0cc1e829",
+   "ms": 15.4,
+   "path": "/api/risk/wards?origin=2024-08-05&horizon=3"
+  },
+  "forecast, 4 weeks": {
+   "sha256": "e9c99b2533ae4d2492b8eeb35c09ab476f615fbf89bb9f1955dfcee424a97ede",
+   "ms": 14.9,
+   "path": "/api/risk/wards?origin=2024-08-05&horizon=4"
+  },
+  "ward forecast": {
+   "sha256": "705597baa1fda919631b78672356976b82c172f504f44c97fbfa34f7000fa98d",
+   "ms": 180.7,
+   "path": "/api/forecast?ward_id=DSCC_Ward_04&origin=2024-08-05&horizon=3"
+  },
+  "forward forecast into 2025": {
+   "sha256": "4a2526676e56fa64246fc939e701dd8a5b40c73ba230495f9daba7d41630bd67",
+   "ms": 205.2,
+   "path": "/api/allocation/plan?origin=2024-12-30&horizon=3"
+  },
+  "supply at 30% stock": {
+   "sha256": "43510b0334c96fad37304e8ed41643e659dbe044d8482758deafe13b26388746",
+   "ms": 21.4,
+   "path": "/api/allocation/plan?origin=2024-08-05&horizon=3&stock=0.3"
+  },
+  "supply at 50% stock": {
+   "sha256": "c8404eac3391a52b995c8e21578c9a147526bf1a7a4992015fe60ebcf4e74a00",
+   "ms": 21.8,
+   "path": "/api/allocation/plan?origin=2024-08-05&horizon=3&stock=0.5"
+  },
+  "supply at 75% stock": {
+   "sha256": "de8c03f4e943d7069e521d71b4fef92a3848efa0d1337c484eefa8aef7925f75",
+   "ms": 21.1,
+   "path": "/api/allocation/plan?origin=2024-08-05&horizon=3&stock=0.75"
+  },
+  "supply at 100% stock": {
+   "sha256": "bee24af0773ed95268179d4ada579a98c22e9b45a87216087cac14471287101f",
+   "ms": 20.5,
+   "path": "/api/allocation/plan?origin=2024-08-05&horizon=3&stock=1.0"
+  },
+  "supply, Gazipur, 7 crews, p90, h=4, risk 40%, floor 10%": {
+   "sha256": "c5f56261d4e2f0553463193676488a5a42dc1405c83f2ecad89801b728afb234",
+   "ms": 15.1,
+   "path": "/api/allocation/plan?origin=2024-08-05&horizon=4&city=Gazipur&crews=7&service=p90&risk_weight=0.4&floor=0.1"
+  },
+  "hospital overflow, baseline capacity": {
+   "sha256": "fb2ecda5ed8c7ae51e53dc542d97b20974f458de3d28a067087b1b9326410fc6",
+   "ms": 59.6,
+   "path": "/api/overflow/plan?origin=2024-08-05&horizon=3"
+  },
+  "hospital overflow, +20% beds": {
+   "sha256": "6c2a4a35e1a889608aff18887a426ba4bd0e3bf0b2350ecf363c7d6d73eb452e",
+   "ms": 20.7,
+   "path": "/api/overflow/plan?origin=2024-08-05&horizon=3&capacity_pct=120"
+  },
+  "hospital overflow, typed capacity": {
+   "sha256": "0e0d65d9101da92dfea7713d154807259ba7dea0bf52ea4d5d526d2f0f7bdb62",
+   "ms": 16.9,
+   "path": "/api/overflow/plan?origin=2024-08-05&horizon=3&city=Gazipur&override=GCC_Ward_04:9"
+  },
+  "vector control, optimized": {
+   "sha256": "653b42f55eeb6d23e29cb7741daa552030bc77db2ae54b3e61e9e207285a7c66",
+   "ms": 99.9,
+   "path": "/api/intervention/simulate?origin=2024-08-05&horizon=3"
+  },
+  "vector control, strong preset, 40 crews": {
+   "sha256": "ab92b1879863b1fa676849694621eeec95e1c0920e17eb5056dbb04120f2a4eb",
+   "ms": 96.0,
+   "path": "/api/intervention/simulate?origin=2024-08-05&horizon=3&crews=40&effect=0.45&coverage=0.5&buildup=1"
+  },
+  "vector control, manual": {
+   "sha256": "04482aee01e69e681ef8527d468e86e0e14428ce81531306abd39164e748f231",
+   "ms": 109.2,
+   "path": "/api/intervention/simulate?origin=2024-08-05&horizon=3&mode=manual&assign=DSCC_Ward_04:2&assign=GCC_Ward_01:1"
+  },
+  "vector control, supply-plan crews": {
+   "sha256": "7fd3a6010c2e6cf1665a458ec08954c3c046e1c4aff340b8cb8213a3fdc41238",
+   "ms": 107.6,
+   "path": "/api/intervention/simulate?origin=2024-08-05&horizon=3&mode=stage1"
+  },
+  "dispatch brief (all text formats)": {
+   "sha256": "1e28a6dcbf5610ce0c876df60127b3b2db7065f985af3cce749421065b7a9eac",
+   "ms": 136.3,
+   "path": "/api/dispatch/brief?origin=2024-08-05&horizon=3&ward=DSCC_Ward_04&capacity_pct=120&crews=40"
+  },
+  "dispatch PDF, ward": {
+   "sha256": "13418f13a8117ec249bc99905fc9ac457ac5c8a4f99aa1ecee49a91b9baaa716",
+   "ms": 57.5,
+   "path": "/api/dispatch/document?origin=2024-08-05&horizon=3&kind=ward&ward=DSCC_Ward_04&format=pdf&capacity_pct=120&crews=40"
+  },
+  "dispatch HTML, city summary": {
+   "sha256": "48a9de113087d910ec788099ddc5615e9262782fe5a3c39e03104d22053b788b",
+   "ms": 43.9,
+   "path": "/api/dispatch/document?origin=2024-08-05&horizon=3&kind=city&brief_city=Chattogram&format=html&capacity_pct=120&crews=40"
+  },
+  "dispatch PDF, wards needing attention": {
+   "sha256": "ffefb87510f6ffb49358a8a5af60cd693e70ef2e9e768c5c5c41405e24fa06c4",
+   "ms": 72.9,
+   "path": "/api/dispatch/document?origin=2024-08-05&horizon=3&kind=wards&brief_city=Chattogram&format=pdf&capacity_pct=120&crews=40"
+  }
+ }
+}

@@ -1,0 +1,200 @@
+{
+ "scenario": {
+  "id": "S-94fbd8367d09",
+  "settings": {
+   "origin": "2024-08-05",
+   "horizon": 3,
+   "view_city": "All",
+   "service": "p80",
+   "source": "auto",
+   "stock": 0.6,
+   "crews": 40,
+   "max_crews_per_ward": 3,
+   "risk_weight": 0.7,
+   "floor": 0.25,
+   "cases_per_crew": 10,
+   "capacity_pct": 120,
+   "city_pct": {},
+   "overrides": {},
+   "vector": {
+    "mode": "optimized",
+    "assign": {},
+    "effect": 0.3,
+    "coverage": 0.35,
+    "delay": 1,
+    "buildup": 2,
+    "sens_low": 0.5,
+    "sens_high": 1.5
+   }
+  },
+  "artifacts": {
+   "dataset_sha256": "a4088765084a0bcf37b86222e22f89d06ef92ad2ac68a40c8057a21e13703dd7",
+   "onsite_sha256": "3500fb22fc19afde9b242449f08e441eb88e62a8985411f54e915f6582daf7e4",
+   "bundle_sha256": "758a3bae433878695d66eaa0ceb3a4cb995f7853bad107567e2856dae4d0283a",
+   "replay_sha256": "1f91c3178ce174a01df8ed7f0deada4b74158b78b87121c8a202ca6781815f8e",
+   "resource_rules": {
+    "saline_bags_needed": 2.3843582887700534,
+    "diagnostic_kits_needed": 1.1642156862745099,
+    "hospital_beds_required": 0.2984375
+   }
+  }
+ },
+ "brief": {
+  "schema": "dengueshield.dispatch/1",
+  "kind": "ward_brief",
+  "scenario": {
+   "id": "S-94fbd8367d09",
+   "settings": {
+    "origin": "2024-08-05",
+    "horizon": 3,
+    "view_city": "All",
+    "service": "p80",
+    "source": "auto",
+    "stock": 0.6,
+    "crews": 40,
+    "max_crews_per_ward": 3,
+    "risk_weight": 0.7,
+    "floor": 0.25,
+    "cases_per_crew": 10,
+    "capacity_pct": 120,
+    "city_pct": {},
+    "overrides": {},
+    "vector": {
+     "mode": "optimized",
+     "assign": {},
+     "effect": 0.3,
+     "coverage": 0.35,
+     "delay": 1,
+     "buildup": 2,
+     "sens_low": 0.5,
+     "sens_high": 1.5
+    }
+   },
+   "artifacts": {
+    "dataset_sha256": "a4088765084a0bcf37b86222e22f89d06ef92ad2ac68a40c8057a21e13703dd7",
+    "onsite_sha256": "3500fb22fc19afde9b242449f08e441eb88e62a8985411f54e915f6582daf7e4",
+    "bundle_sha256": "758a3bae433878695d66eaa0ceb3a4cb995f7853bad107567e2856dae4d0283a",
+    "replay_sha256": "1f91c3178ce174a01df8ed7f0deada4b74158b78b87121c8a202ca6781815f8e",
+    "resource_rules": {
+     "saline_bags_needed": 2.3843582887700534,
+     "diagnostic_kits_needed": 1.1642156862745099,
+     "hospital_beds_required": 0.2984375
+    }
+   }
+  },
+  "ward": {
+   "ward_id": "CCC_Ward_03",
+   "city": "Chattogram",
+   "risk_tier": "Critical",
+   "outbreak_probability": 0.8774,
+   "population_density_sqkm": 64626,
+   "priority_rank": 2,
+   "priority": 0.8753,
+   "plan_status": "met"
+  },
+  "forecast": {
+   "origin": "2024-08-05",
+   "target_week": "2024-08-26",
+   "horizon_weeks": 3,
+   "source": "replay",
+   "source_label": "validated replay (models fitted on earlier seasons only)",
+   "service_level": "p80",
+   "service_label": "upper end of the 80% range",
+   "planned_cases": 19,
+   "expected_cases": 13.766,
+   "median_cases": 14,
+   "upper_80": 19,
+   "upper_90": 20
+  },
+  "resources": {
+   "saline": {
+    "required": 45,
+    "allocated": 45,
+    "short": 0
+   },
+   "kits": {
+    "required": 22,
+    "allocated": 22,
+    "short": 0
+   },
+   "beds": {
+    "required": 6,
+    "allocated": 6,
+    "short": 0
+   }
+  },
+  "hospital": {
+   "bed_demand": 6,
+   "illustrative_capacity": 5,
+   "capacity_baseline": 4,
+   "capacity_typed": false,
+   "over_capacity": 1,
+   "spare_beds": 0,
+   "sent": 1,
+   "received": 0,
+   "without_bed": 0,
+   "transfers_out": [
+    {
+     "to_ward": "CCC_Ward_06",
+     "patients": 1
+    }
+   ],
+   "transfers_in": [],
+   "status": "relieved"
+  },
+  "crews": {
+   "assigned": 2,
+   "deployment": "optimized",
+   "deployment_label": "optimized deployment",
+   "supply_plan_need": 2,
+   "coverage_share": 0.5775,
+   "prevented_window": 6.351,
+   "prevented_window_low": 3.175,
+   "prevented_window_high": 9.526,
+   "expected_cases_at_target": 13.766,
+   "scenario_cases_at_target": 11.381,
+   "prevented_at_target": 2.385,
+   "weeks": [
+    2,
+    3,
+    4
+   ]
+  },
+  "attention": [],
+  "assumptions": [
+   "Regional stock: 60% of each city's projected need, per resource (no inventory data exists).",
+   "Spraying crews: 40 in the shared budget, at most 3 per ward; optimized deployment.",
+   "Hospital capacity: illustrative, 120% of each ward's 90th-percentile weekly bed need before the forecast date. Not a hospital inventory.",
+   "Vector-control effect (assumed, not measured): up to 30% fewer cases at full coverage, one crew treats 35% of a ward, 1-week delay, 2 weeks to full effect, one deployment at the forecast date; sensitivity 50-150% of the effect.",
+   "Transfers stay inside each city; the regional bed stock is never added to ward capacity."
+  ],
+  "provenance": {
+   "measured": "Organizer dataset (synthetic): weekly cases, weather and resource requirements, 2016-2024. Used to train and replay the forecasts and to set the illustrative capacity; target weeks are never read and 2025 is sealed.",
+   "forecast": "Origin-safe forecast issued 2024-08-05 for the week of 2024-08-26 (validated replay).",
+   "assumptions": "Stock level, crew budget, capacity and intervention effect are user settings, listed above.",
+   "simulated": "Allocations, transfers and cases prevented are computed by DengueShield's planning engines. They are not actions taken and not observed outcomes."
+  },
+  "model": {
+   "name": "DengueShield champion (Ridge Poisson GLM, 24 features)",
+   "bundle_sha256": "758a3bae4338",
+   "replay_sha256": "1f91c3178ce1",
+   "data_through": "2024-12-30"
+  },
+  "disclaimer": "Planning estimate on the organizer's synthetic dataset. Not an outbreak report, not an official order, and not sent to anyone.",
+  "content_sha256": "3487131d49f276797b147686a8cf60d27954a0832173b6c21add29be0280e9b6"
+ },
+ "sms_stats": {
+  "en": {
+   "encoding": "GSM-7",
+   "chars": 427,
+   "segments": 3,
+   "per_segment": 153
+  },
+  "bn": {
+   "encoding": "UCS-2",
+   "chars": 459,
+   "segments": 7,
+   "per_segment": 67
+  }
+ }
+}

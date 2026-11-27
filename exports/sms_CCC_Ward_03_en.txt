@@ -1,0 +1,8 @@
+DengueShield plan (forecast, not an outbreak report)
+CCC_Ward_03, Chattogram: week of 26 Aug 2024 (3-wk forecast of 5 Aug 2024)
+Cases 19 planned, risk Critical
+Alloc/need: saline 45/45, kits 22/22, beds 6/6
+Hospital: 6 beds needed, 5 illustrative; transfer 1 to CCC_Ward_06; 0 without bed
+Crews 2; scenario -6.4 cases wks 2-4 (assumed effect)
+Attention: none
+Ref S-94fbd8367d09. Planning estimate, synthetic data, not an order.
