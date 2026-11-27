@@ -35,8 +35,8 @@ const SUGGEST = {
 
 const TOOL_LABEL: Record<string, string> = { get_ward_forecast: "Ward forecast", get_risk_rankings: "Risk rankings", compare_wards: "Ward comparison",
   get_model_metrics: "Validated model metrics", get_feature_importance: "Feature importance", get_data_profile: "Data profile", find_health_facilities: "Hospital directory" };
-const CAPS = [{ i: "📈", t: "Forecasts", d: "Any ward, week and horizon" }, { i: "🧪", t: "Evidence", d: "MAE, coverage, alerts" },
-  { i: "🏥", t: "Hospitals", d: "914 OSM facilities" }, { i: "📚", t: "Methods", d: "Cited project documents" }];
+const CAPS = [{ i: "dashboard", c: "#ffc23d", t: "Forecasts", d: "Any ward, week and horizon" }, { i: "evidence", c: "#3dd598", t: "Evidence", d: "MAE, coverage, alerts" },
+  { i: "geography", c: "#ff9ea3", t: "Hospitals", d: "914 OSM facilities" }, { i: "provenance", c: "#8fe3ff", t: "Methods", d: "Cited project documents" }];
 // [S1] or [S1, S2] -> fragment links the Markdown renderer turns into citation pills
 const withCites = (t: string) => t.replace(/\[(S\d+(?:\s*,\s*S\d+)*)\]/g, (_, ids: string) => ids.split(/\s*,\s*/).map((id) => `[${id}](#cite-${id})`).join(""));
 
@@ -120,7 +120,7 @@ export function ChatPanel({ compact = false }: { compact?: boolean }) {
             <div><div className="text-[17px] font-bold text-white">{t("copilot.title")}</div>
               <div className="flex items-center gap-1.5 text-[12px] text-emerald-100"><span className="ds-status-dot" />{status?.enabled ? `${status.model} · ${retrievalLabel(status.retrieval)}` : `retrieval-only mode (no AI generation) · ${retrievalLabel(status?.retrieval)}`}</div></div></div>
           <p className="mt-3 text-[13px] leading-relaxed text-white/80">{t("copilot.scope")}</p>
-          {!compact && <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{CAPS.map((c) => (<div key={c.t} className="rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur"><div className="text-lg" aria-hidden>{c.i}</div><div className="mt-1 text-[12.5px] font-semibold text-white">{c.t}</div><div className="text-[11px] leading-snug text-white/60">{c.d}</div></div>))}</div>}
+          {!compact && <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{CAPS.map((c) => (<div key={c.t} className="rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur"><span className="grid h-9 w-9 place-items-center rounded-[10px] border-2 border-[#1a1438] text-[#1a1438] shadow-[2px_2px_0_#1a1438]" style={{ background: c.c }} aria-hidden><Icon name={c.i} size={17} /></span><div className="mt-2 text-[12.5px] font-semibold text-white">{c.t}</div><div className="text-[11px] leading-snug text-white/60">{c.d}</div></div>))}</div>}
           <div className="mt-4 grid gap-2 sm:grid-cols-2">{sug.map((q, i) => (<motion.button key={q} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 * i }} onClick={() => send(q)}
             className="group flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.08] px-3.5 py-2.5 text-left text-[13px] text-white/90 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/[0.14]">
             <span className="mt-0.5 text-emerald-300 transition group-hover:translate-x-0.5" aria-hidden>→</span>{q}</motion.button>))}</div>
