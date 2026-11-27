@@ -9,7 +9,8 @@ import { dateFmt } from "@/lib/format";
 import { CITIES, useDecisionGuard, type PlanShared, type Service } from "./supply-allocation";
 import { PRESETS as EFFECTS } from "./vector-control";
 import { PRESETS as BEDS } from "./hospital-surge";
-import { Select } from "./ui";
+import { Btn, Select, useToast } from "./ui";
+import { scenarioSearch } from "@/lib/plan-scenario";
 
 const STAGES = [
   { id: "supply", no: "01", verb: "Allocate", line: "Saline, kits, beds and spraying crews under the stock limit, by ward priority." },
@@ -65,7 +66,9 @@ export default function OpsEngine({ shared, stages }: { shared: PlanShared; stag
       <p className="num text-[12.5px] text-ink-3">Forecast issued {dateFmt(sel.origin, lang)}, {sel.horizon} weeks ahead</p>
     </div>
 
-    <div className="ops-panel mt-4 p-4"><ScenarioControls shared={shared} /></div>
+    <fieldset className="ops-panel mt-4 min-w-0 p-4" disabled={!shared.readyScenario}>
+      <ScenarioControls shared={shared} />
+    </fieldset>
 
     {/* the causal rail: what each stage computed, in order; sticky on desktop, a grid on phones */}
     <nav aria-label="Engine stages" className="z-20 -mx-3 mt-4 bg-[#0e0f1a] px-3 py-2 sm:-mx-5 sm:px-5 lg:sticky lg:top-[var(--ops-top,108px)] lg:border-b lg:border-[#2a2d4a]">
@@ -76,6 +79,7 @@ export default function OpsEngine({ shared, stages }: { shared: PlanShared; stag
       </div>
     </nav>
 
+    <fieldset className="contents" disabled={!shared.readyScenario}>
     {STAGES.map((st) => (<div key={st.id} className="mt-8">
       <div className="flex items-start gap-3 px-1">
         <span aria-hidden className="num font-display text-[40px] font-extrabold leading-[0.9] tracking-[-0.04em] text-ink-3">{st.no}</span>
@@ -83,6 +87,7 @@ export default function OpsEngine({ shared, stages }: { shared: PlanShared; stag
       </div>
       {stages[st.id]}
     </div>))}
+    </fieldset>
 
     <div className={"fixed inset-x-0 bottom-0 z-40 border-t border-[#3a3e66] bg-[#0e0f1a] pb-[env(safe-area-inset-bottom)] lg:hidden " + (inView ? "" : "hidden")}>
       <div className="mx-auto flex max-w-xl items-stretch gap-1 px-2 py-1.5">
@@ -127,17 +132,38 @@ function Chips<T extends string | number>({ label, value, options, onChange, not
 }
 
 function ScenarioControls({ shared: p }: { shared: PlanShared }) {
+  const { sel, set, wards } = useSel();
+  const { t } = useI18n();
+  const toast = useToast();
+  const visibleWards = p.city === "All" ? wards : wards.filter(w => w.city === p.city);
+  const copyLink = async () => {
+    const url = new URL(window.location.href);
+    url.search = scenarioSearch(sel, p, url.searchParams);
+    try {
+      await navigator.clipboard.writeText(url.href);
+      toast(t("scenario.linkCopied"));
+    } catch {
+      toast(t("scenario.linkBlocked"));
+    }
+  };
   const effKey = Object.entries(EFFECTS).find(([, x]) => x.effect === p.eff.effect && x.coverage === p.eff.coverage && x.delay === p.eff.delay && x.buildup === p.eff.buildup)?.[0] ?? "custom";
   const custom = (v: number, opts: number[], f: (v: number) => string) => (opts.includes(v) ? undefined : `set to ${f(v)}`);
   return (<div className="grid gap-4">
     <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
       <div className="w-[200px] max-w-full"><Select label="City" value={p.city} onChange={p.setCity} options={[{ value: "All", label: "All five cities" }, ...CITIES.map((c) => ({ value: c, label: c }))]} /></div>
+      <div className="w-[200px] max-w-full"><Select label={t("ctl.ward")} value={sel.ward} onChange={ward => set({ ward })}
+        options={visibleWards.map(w => ({ value: w.ward_id, label: w.ward_id }))} /></div>
       <Chips label="Plan for" value={p.service} onChange={(v) => p.setService(v as Service)} options={[{ value: "median", label: "Median" }, { value: "p80", label: "Upper 80%" }, { value: "p90", label: "Upper 90%" }]} />
       <Chips label="Regional stock" value={p.stock} onChange={p.setStock} note={custom(p.stock, [30, 60, 100], (v) => `${v}%`)} options={[30, 60, 100].map((v) => ({ value: v, label: `${v}%` }))} />
       <Chips label="Spraying crews" value={p.crews} onChange={p.setCrews} note={custom(p.crews, [0, 20, 40, 60], String)} options={[0, 20, 40, 60].map((v) => ({ value: v, label: String(v) }))} />
       <Chips label="Ward beds" value={p.capPct} onChange={p.setCapPct} note={custom(p.capPct, BEDS.map((b) => b.value), (v) => `${v}%`)} options={BEDS.map((b) => ({ value: b.value, label: b.value === 100 ? "Baseline" : `+${b.value - 100}%` }))} />
       <Chips label="Assumed crew effect" value={effKey} onChange={(k) => { const x = EFFECTS[k]; if (x) p.setEff((e) => ({ ...e, effect: x.effect, coverage: x.coverage, delay: x.delay, buildup: x.buildup })); }}
         note={effKey === "custom" ? "custom" : undefined} options={Object.entries(EFFECTS).map(([k, x]) => ({ value: k, label: x.label }))} />
+    </div>
+    {p.unsupported && <p role="status" className="text-sm text-ink-2">{t("scenario.unknownVersion")}</p>}
+    <div className="flex flex-wrap gap-2">
+      <Btn variant="ghost" disabled={!p.readyScenario} onClick={copyLink}>{t("scenario.copyLink")}</Btn>
+      <Btn variant="ghost" disabled={!p.readyScenario} onClick={p.reset}>{t("scenario.reset")}</Btn>
     </div>
     <p className="text-[12px] leading-relaxed text-ink-3">Stock limits supplies, not beds: Stage 2 beds are a separate illustrative number and are never added to stock. Beds change the overflow, never the forecast. Crew effects are assumptions, not measured outcomes.</p>
   </div>);

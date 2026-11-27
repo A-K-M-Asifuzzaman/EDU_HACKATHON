@@ -1044,7 +1044,8 @@ def scenario_params(origin: str, horizon: H = 3, city: Optional[str] = Query(Non
                     mode: Literal["optimized", "manual", "stage1"] = "optimized", assign: Annotated[Optional[list[str]], Query()] = None,
                     effect: Annotated[float, Query(ge=0.0, le=iv.MAX_EFFECT)] = 0.30, coverage: Annotated[float, Query(ge=0.05, le=1.0)] = 0.35,
                     delay: Annotated[int, Query(ge=0, le=3)] = 1, buildup: Annotated[int, Query(ge=1, le=3)] = 2,
-                    sens_low: Annotated[float, Query(ge=0.0, le=1.0)] = 0.5, sens_high: Annotated[float, Query(ge=1.0, le=2.0)] = 1.5) -> dict:
+                    sens_low: Annotated[float, Query(ge=0.0, le=1.0)] = 0.5, sens_high: Annotated[float, Query(ge=1.0, le=2.0)] = 1.5,
+                    scenario_v: Annotated[int, Query(ge=1, le=1)] = 1) -> dict:
     """The full planning scenario shared by Stages 1-3 (the dashboard's shared plan state)."""
     return dict(locals())
 
@@ -1080,7 +1081,7 @@ def run_scenario(p: dict):
                            "delay": st["delay"], "buildup": st["buildup"], "sens_low": st["sens_low"], "sens_high": st["sens_high"]}}
     artifacts = {"dataset_sha256": S.data_sha, "onsite_sha256": ONSITE_SHA256_, "bundle_sha256": S.bundle_sha, "replay_sha256": _REPLAY_SHA,
                  "resource_rules": alloc_rules()}
-    scenario = {"id": dsp.scenario_id(settings, artifacts), "settings": settings, "artifacts": artifacts}
+    scenario = {"version": p["scenario_v"], "id": dsp.scenario_id(settings, artifacts), "settings": settings, "artifacts": artifacts}
     model = {"name": "DengueShield champion (Ridge Poisson GLM, 24 features)", "bundle_sha256": (S.bundle_sha or "")[:12],
              "replay_sha256": _REPLAY_SHA[:12], "data_through": S.last_week.date().isoformat()}
     return scenario, a, o, v, model

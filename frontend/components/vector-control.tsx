@@ -4,14 +4,14 @@
 // (same illustrative capacity). Every number comes from GET /api/intervention/simulate on the local API. The dataset holds no spraying or
 // larvicide records, so every effect is an assumption and every "prevented" figure is a counterfactual estimate, never a measurement.
 import { useEffect, useMemo, useState } from "react";
-import { api, qs } from "@/lib/api";
-import { srcParam, useSel } from "@/lib/ctx";
+import { useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt } from "@/lib/format";
 import { Chart } from "./echart";
 import { Icon } from "./icons";
-import { Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
-import { Btn, Card, DataTable, Notice, ProvChip, RiskBadge, Segmented, Tabs, useAsync } from "./ui";
+import { Live, PlanShared, Range, useDecisionGuard, useScenarioRequest } from "./supply-allocation";
+import { planParams } from "@/lib/plan-scenario";
+import { Btn, Card, DataTable, Notice, ProvChip, RiskBadge, Segmented, Tabs } from "./ui";
 
 type Mode = "optimized" | "manual" | "stage1";
 export const PRESETS: Record<string, { effect: number; coverage: number; delay: number; buildup: number; label: string }> = {
@@ -57,27 +57,21 @@ function curveOption(d: any) {
 export default function VectorControl({ shared }: { shared: PlanShared }) {
   const { sel } = useSel();
   const { lang } = useI18n();
-  const { city, service, stock, crews, setCrews, maxCrews, setMaxCrews, risk, floor, perCrew, capPct, overrides } = shared;
+  const { crews, setCrews, maxCrews, setMaxCrews } = shared;
   const { vecMode: mode, setVecMode: setMode, manual, setManual, eff, setEff } = shared;
   const { blocked, notice } = useDecisionGuard();
   const [tab, setTab] = useState("crews");
   const [showAll, setShowAll] = useState(false);
   const used = Object.values(manual).reduce((a, b) => a + b, 0);
   const overBudget = mode === "manual" && used > crews;
-  const p = useDebounced({ mode, manual, eff, crews, maxCrews, stock, risk, floor, perCrew, capPct, overrides });
-  const q = useAsync((s) => (blocked || overBudget ? Promise.resolve(null) : api(`/api/intervention/simulate?${qs({
-    origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service, mode: p.mode,
-    crews: p.crews, max_crews_per_ward: p.maxCrews, effect: p.eff.effect / 100, coverage: p.eff.coverage / 100, delay: p.eff.delay, buildup: p.eff.buildup,
-    sens_low: p.eff.sensLow / 100, sens_high: p.eff.sensHigh / 100, stock: p.stock / 100, risk_weight: p.risk / 100, floor: p.floor / 100,
-    cases_per_crew: p.perCrew, capacity_pct: p.capPct })}${Object.entries(p.overrides).map(([k, v]) => `&override=${encodeURIComponent(`${k}:${v}`)}`).join("")}${
-    p.mode === "manual" ? Object.entries(p.manual).filter(([, v]) => v > 0).map(([k, v]) => `&assign=${encodeURIComponent(`${k}:${v}`)}`).join("") : ""}`, { signal: s })),
-  [sel.origin, sel.horizon, sel.source, city, service, p, blocked, overBudget]);
+  const query = planParams(sel, shared);
+  const q = useScenarioRequest(shared.readyScenario && !blocked && !overBudget ? `/api/intervention/simulate?${query}` : null);
   const d: any = q.data;
   const { report } = shared;
   useEffect(() => { report("intervene", d ? { totals: d.totals, stale: !!q.stale } : overBudget ? { over: true } : null); }, [d, q.stale, overBudget, report]);
   const preset = Object.entries(PRESETS).find(([, v]) => v.effect === eff.effect && v.coverage === eff.coverage && v.delay === eff.delay && v.buildup === eff.buildup)?.[0] ?? "custom";
   const switchMode = (m: Mode) => {
-    if (m === "manual" && mode !== "manual" && d) setManual(Object.fromEntries(d.wards.filter((w: any) => w.crews > 0).map((w: any) => [w.ward_id, w.crews])));
+    if (m === "manual" && mode !== "manual" && d && !q.stale) setManual(Object.fromEntries(d.wards.filter((w: any) => w.crews > 0).map((w: any) => [w.ward_id, w.crews])));
     setMode(m);
   };
   const step = (w: string, delta: number) => setManual((m) => { const v = Math.max(0, Math.min(maxCrews, (m[w] ?? 0) + delta)); const next = { ...m, [w]: v }; if (!v) delete next[w]; return next; });

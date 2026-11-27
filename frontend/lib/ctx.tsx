@@ -25,7 +25,8 @@ function fromUrl(): Partial<Selection> {
 }
 
 function toUrl(s: Selection) {
-  if (typeof window === "undefined") return;
+  // Response owns the complete, versioned planning history entry.
+  if (typeof window === "undefined" || /^\/response\/?$/.test(window.location.pathname)) return;
   const q = new URLSearchParams(window.location.search);
   q.set("ward", s.ward); q.set("origin", s.origin); q.set("horizon", String(s.horizon));
   if (s.source !== "auto") q.set("source", s.source); else q.delete("source");
@@ -55,7 +56,9 @@ export function SelectionProvider({ children }: { children: React.ReactNode }) {
     try { stored = JSON.parse(localStorage.getItem("ds.sel") || "null") || {}; } catch {}
     setSel((p) => ({ ...p, ...stored, ...fromUrl() }));
     inited.current = true;
-    const onPop = () => setSel((p) => ({ ...p, ...fromUrl() }));
+    const onPop = () => {
+      if (!/^\/response\/?$/.test(window.location.pathname)) setSel(p => ({ ...p, ...fromUrl() }));
+    };
     window.addEventListener("popstate", onPop);
     load();
     return () => window.removeEventListener("popstate", onPop);

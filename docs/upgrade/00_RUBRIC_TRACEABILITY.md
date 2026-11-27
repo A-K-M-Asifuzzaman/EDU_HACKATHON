@@ -13,6 +13,10 @@ Source is the supplied `Hackathon_Phase2_Problemset.pdf`, pages 1–3, SHA-256 `
 | Technical Q&A | 30 | NOT RUN | Stage handoffs contain engineering explanations. Judge responses and scores are unassessed. |
 | Bonus domain-relevant innovation | Up to 10, capped as above | CONDITIONAL | Existing Operations Engine, ward flow visualizations and deterministic exports are demonstrable. Bonus decisions belong to judges. |
 
+## Upgrade verification
+
+[Phase 1 evidence](01_SCENARIO_INTEGRITY.md) covers scenario synchronization, cross-engine inputs, and dispatch faithfulness on the upgrade branch. The macOS kill-switch verified 21 of 21 matching outputs. The baseline below describes the original public build at audit time.
+
 ## Acceptance gate baseline
 
 | Gate | Status | Baseline evidence |
