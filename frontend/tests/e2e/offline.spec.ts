@@ -86,7 +86,33 @@ test("with the internet cut off: forecast, supplies, hospital, vector control an
   expect(pdf).toContain(sid);
   steps.push(`PDF brief saved (${pdf.length} bytes), structure checked, scenario ${sid}`);
 
+  // 10b-11b. Bangla notice and Bangla HTML brief carry the same scenario id as the SMS, the PDF and the snapshot
+  await desk.getByRole("radio", { name: "বাংলা" }).click();
+  await expect(desk.getByTestId("sms-text")).toContainText("ডেঙ্গুশিল্ড");
+  await expect(desk.getByTestId("sms-stats")).toContainText("UCS-2");
+  await desk.getByRole("button", { name: "Copy SMS" }).click();
+  const bn = await page.evaluate(() => navigator.clipboard.readText());
+  expect(bn).toContain(sid);
+  const dlh = page.waitForEvent("download");
+  await desk.getByRole("button", { name: "Download this ward as HTML" }).click();
+  const fh = await dlh;
+  await fh.saveAs(`${OUT}/offline_brief_bn.html`);
+  const html = (await import("node:fs")).readFileSync(`${OUT}/offline_brief_bn.html`, "utf-8");
+  expect(html).toContain("<html lang=bn>");
+  expect(html).toContain(sid);
+  expect(file.suggestedFilename()).toContain(sid);
+  expect(fh.suggestedFilename()).toContain(sid);
+  steps.push(`Bangla SMS (UCS-2) and Bangla HTML brief: same scenario ${sid} as the English SMS, the PDF and the snapshot`);
+
+  // status: offline mode, artifacts, nothing refused; the footer shows the build commit
+  const st = await api("/api/system/offline");
+  expect(st.offline_mode && st.artifacts_ok).toBe(true);
+  expect(st.blocked_count).toBe(0);
+  await page.goto("/?nointro");                                                                 // the footer (with the build) is on the landing page
+  await expect(page.getByTestId("build-commit")).toHaveText(st.build_commit, { timeout: 30_000 });
+  steps.push(`server offline mode on, ${st.artifacts.length} artifacts and modules present, 0 refused connections, build ${st.build_commit}`);
+
   // 12. nothing external was delivered; record what the page tried
   expect(delivered).toEqual([]);
-  writeFileSync(`${OUT}/browser.json`, JSON.stringify({ steps, scenario_id: sid, external_hosts_attempted: [...attempted].sort(), external_delivered: delivered }, null, 1));
+  writeFileSync(`${OUT}/browser.json`, JSON.stringify({ steps, scenario_id: sid, build_commit: st.build_commit, external_hosts_attempted: [...attempted].sort(), external_delivered: delivered }, null, 1));
 });

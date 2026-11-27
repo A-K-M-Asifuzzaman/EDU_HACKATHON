@@ -52,6 +52,27 @@ test.describe("Dispatch briefs", () => {
     await expect(box.getByTestId("snapshot")).toContainText("Stock 40%");
   });
 
+  test("rapid control changes settle on the last settings in every section", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    const box = await ready(page);
+    const stock = page.locator("#supply").getByLabel("Regional stock");
+    for (const v of ["30", "90", "45", "70", "55"]) await stock.fill(v);                          // faster than the debounce
+    await page.locator("#surge").getByRole("radio", { name: "+50%" }).click();
+    await page.locator("#surge").getByRole("radio", { name: "+20% surge beds" }).click();
+    const q = "origin=2024-08-05&horizon=3";
+    const a = await page.evaluate(async (p) => (await fetch(p)).json(), `/api/allocation/plan?${q}&stock=0.55`);
+    const t = a.totals.saline_bags_needed;
+    await expect(page.locator("#supply").getByText(`of ${t.demand} needed; supply ${t.supply}; short ${t.unmet}`)).toBeVisible({ timeout: 30_000 });
+    const o = await page.evaluate(async (p) => (await fetch(p)).json(), `/api/overflow/plan?${q}&capacity_pct=120&stock=0.55`);
+    await expect(page.locator("#surge").getByRole("alert")).toContainText(`${o.totals.unresolved} projected patients`);
+    await expect(box.getByTestId("snapshot")).toContainText("Stock 55%", { timeout: 30_000 });
+    await expect(box.getByTestId("snapshot")).toContainText("capacity 120%");
+    const sid = (await box.getByTestId("scenario-id").innerText()).trim();
+    await expect(box.getByTestId("sms-text")).toContainText(`Ref ${sid}`);
+    expect(errors).toEqual([]);
+  });
+
   test("Bangla notices are UCS-2 and render in Bengali", async ({ page }) => {
     const box = await ready(page);
     await box.getByRole("radio", { name: "বাংলা" }).click();
