@@ -87,6 +87,11 @@ def allocate_pool(d: np.ndarray, supply: int, w: np.ndarray, keys: list[str], fl
     return x
 
 
+def pool_supply(stock: float, total_demand: int) -> int:
+    """A city's configured supply of one resource: floor(stock x projected demand). Problem 2 reports it for beds, never adds it."""
+    return int(np.floor(stock * total_demand + 1e-9))
+
+
 def crew_need(cases, cases_per_crew: int, max_per_ward: int) -> np.ndarray:
     c = np.asarray(cases, dtype=np.int64)
     return np.where(c > 0, np.minimum(max_per_ward, 1 + c // cases_per_crew), 0).astype(np.int64)
@@ -152,7 +157,7 @@ def plan(fc: pd.DataFrame, wards: pd.DataFrame, rules: dict[str, float], st: Set
         summ = {"city": city, "wards": len(g)}
         for r in RESOURCES:
             d = g[f"{r}_demand"].to_numpy()
-            supply = int(np.floor(st.stock * d.sum() + 1e-9))
+            supply = pool_supply(st.stock, int(d.sum()))
             x = allocate_pool(d, supply, w, keys, st.floor_share)
             df.loc[idx, f"{r}_allocated"] = x
             summ[r] = {"demand": int(d.sum()), "supply": supply, "allocated": int(x.sum()), "unmet": int(d.sum() - x.sum()),
