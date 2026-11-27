@@ -157,11 +157,13 @@ def provenance(alloc: dict, iv: dict) -> dict:
 def _transfers(b: dict, bn: bool = False) -> str:
     hsp = b["hospital"]
     if hsp["transfers_out"]:
-        t = ", ".join(f"{x['patients']} to {x['to_ward']}" for x in hsp["transfers_out"])
-        return ("স্থানান্তর " if bn else "transfer ") + t
+        if bn:
+            return "স্থানান্তর: " + ", ".join(f"{x['to_ward']}-এ {x['patients']} জন" for x in hsp["transfers_out"])
+        return "transfer " + ", ".join(f"{x['patients']} to {x['to_ward']}" for x in hsp["transfers_out"])
     if hsp["transfers_in"]:
-        t = ", ".join(f"{x['patients']} from {x['from_ward']}" for x in hsp["transfers_in"])
-        return ("গ্রহণ " if bn else "receive ") + t
+        if bn:
+            return "গ্রহণ: " + ", ".join(f"{x['from_ward']} থেকে {x['patients']} জন" for x in hsp["transfers_in"])
+        return "receive " + ", ".join(f"{x['patients']} from {x['from_ward']}" for x in hsp["transfers_in"])
     return "স্থানান্তর নেই" if bn else "no transfers"
 
 
@@ -216,7 +218,7 @@ def whatsapp(b: dict, lang: str = "en") -> str:
              f"Diagnostic kits: {r['kits']['allocated']} / {r['kits']['required']}",
              f"Beds, regional stock: {r['beds']['allocated']} / {r['beds']['required']}", "",
              "*Hospital* (illustrative capacity)", f"Bed demand {hsp['bed_demand']}, capacity {hsp['illustrative_capacity']}",
-             f"{_transfers(b).capitalize()}; {hsp['without_bed']} without a bed in {w['city']}", "",
+             f"{_transfers(b)[:1].upper()}{_transfers(b)[1:]}; {hsp['without_bed']} without a bed in {w['city']}", "",
              f"*Spraying crews*: {c['assigned']} assigned ({c['deployment_label']})",
              f"Scenario estimate: about {n1(c['prevented_window'])} fewer cases over weeks 2-4 (range {n1(c['prevented_window_low'])} to "
              f"{n1(c['prevented_window_high'])}), under the assumed effect", "",

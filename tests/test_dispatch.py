@@ -88,6 +88,14 @@ def test_sms_length_reporting():
     assert bn["encoding"] == "UCS-2" and bn["segments"] == D.sms_stats(bn["text"])["segments"]
 
 
+def test_ward_ids_are_never_altered_in_any_format():
+    j = brief()
+    out = next(t["to_ward"] for t in client.get("/api/overflow/plan", params=BASE).json()["transfers"] if t["from_ward"] == W)
+    for text in (j["formats"]["sms"]["en"]["text"], j["formats"]["sms"]["bn"]["text"], j["formats"]["whatsapp"]["en"], j["formats"]["whatsapp"]["bn"]):
+        assert W in text and out in text and out.lower() not in text
+    assert " to " not in j["formats"]["sms"]["bn"]["text"] and " from " not in j["formats"]["sms"]["bn"]["text"]
+
+
 def test_bangla_rendering():
     j = brief()
     assert "ডেঙ্গুশিল্ড" in j["formats"]["sms"]["bn"]["text"] and "স্যালাইন" in j["formats"]["whatsapp"]["bn"]

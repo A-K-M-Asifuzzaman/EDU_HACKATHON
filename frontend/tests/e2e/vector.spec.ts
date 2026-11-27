@@ -12,6 +12,7 @@ test.describe("Vector-control scenarios", () => {
     await expect(box.getByRole("heading", { name: "Vector-control scenarios" })).toBeVisible();
     await expect(total(box)).toHaveText("63.2", { timeout: 30_000 });
     await expect(box.getByText(/Optimality check passed/)).toBeVisible();
+    await expect(box.getByTestId("crews-by-city")).toContainText("Chattogram");                       // transparent city totals of the shared budget
     await box.getByRole("tab", { name: "Supplies" }).click();
     await expect(box.getByRole("tabpanel")).toContainText("1767 → 1690");
     await box.getByRole("tab", { name: "Hospital" }).click();

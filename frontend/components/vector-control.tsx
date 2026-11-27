@@ -133,6 +133,7 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
               <div><div className="text-ink-3">Per crew</div><b className="num text-ink">{n1(d.totals.per_crew)} cases</b></div>
               <div><div className="text-ink-3">Optimized plan</div><b className="num text-ink">{n1(d.totals.compare.optimized)}</b></div>
               <div><div className="text-ink-3">Supply-plan crews</div><b className="num text-ink">{n1(d.totals.compare.stage1_rule)}</b></div></div>
+            {d.totals.crews_by_city && <p data-testid="crews-by-city" className="mt-2 text-[12px] text-ink-2"><b>Crews by city</b> (one shared budget): {Object.entries(d.totals.crews_by_city).map(([c, n]) => `${c} ${n}`).join(", ")}.</p>}
             {d.totals.crews.unassigned > 0 && <p className="mt-2 text-[12px] text-ink-3">{d.totals.crews.unassigned} crew{d.totals.crews.unassigned === 1 ? "" : "s"} unassigned{mode === "optimized" ? ": every ward is at its crew limit or has no projected cases" : ""}.</p>}
           </div>
 
