@@ -1,8 +1,7 @@
 # Phase 2 onsite, Stage 4: offline resilience and deterministic dispatch
 
-Stage 4 only; final submission work (Stage 5) is not started. Nothing was merged into `main` or deployed, and the Vercel project stays
-paused: its public domain `we-are-hack-squad.vercel.app` returns 503. The older `dengueshield-ai.vercel.app` address now returns 404
-(no longer assigned).
+Stage 4 only. At the time of writing nothing was merged or deployed. **Update:** the owner later merged Stage 4 into `main`
+(PR #6, `7cf8e0d`) and released the backend; see [`FINAL_RELEASE.md`](FINAL_RELEASE.md) section 9b for the current production state.
 
 What a judge can do with Wi-Fi switched off, on a laptop prepared once:
 - start DengueShield
@@ -356,8 +355,8 @@ kill-switch job passed; see the Stage 4 report message for the final result of t
 
 ## 17. Requirements for Stage 5
 
-1. Owner decision on merging `version-onsite-final` into `main`, and on deployment. Production is paused; a deployment would need
-   the backend redeployed with Stages 1-4.
+1. Merging into `main` and deployment: done for `main` (PR #6) and the backend; the production frontend redeploy is tracked in
+   [`FINAL_RELEASE.md`](FINAL_RELEASE.md) section 9b.
 2. A final submission README section that points to `scripts/setup.sh`, `scripts/launch_offline.sh`, the kill-switch procedure and
    `exports/`.
 3. Optional: an embedded Bengali font for Bangla PDFs; a Windows launch script; a packaged offline bundle (venv, `frontend/out`,
