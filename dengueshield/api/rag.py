@@ -291,7 +291,14 @@ def status() -> dict:
                                                                         "input_chars": 1200, **LEDGER.snapshot(),
                                                                         "note": "Application-level limits; the provider account should also have its own hard limit."},
             "scope": "Project documents, dataset-derived results and read-only forecast tools. Not medical advice; not a live surveillance feed.",
-            "reason_disabled": None if integrations.openai_configured() else "OPENAI_API_KEY is not set; Copilot shows retrieved sources only."}
+            "reason_disabled": None if integrations.openai_configured() else (
+                "Offline mode: answer generation needs the internet and is off; Copilot shows sources found locally." if _offline_active()
+                else "OPENAI_API_KEY is not set; Copilot shows retrieved sources only.")}
+
+
+def _offline_active() -> bool:
+    from dengueshield import offline
+    return offline.active()
 
 
 def _sse(obj) -> str:

@@ -9,6 +9,7 @@ import ResourceSandbox from "@/components/sandbox";
 import SupplyAllocation, { usePlanState } from "@/components/supply-allocation";
 import HospitalSurge from "@/components/hospital-surge";
 import VectorControl from "@/components/vector-control";
+import DispatchDesk from "@/components/dispatch-desk";
 import AlertQueue from "@/components/alert-queue";
 import { Btn, Card, CardTitle, DataTable, Loading, Modal, Notice, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import Link from "next/link";
@@ -53,11 +54,11 @@ export default function Response() {
   const wq = (w: Forecast) => selQuery({ ...sel, ward: w.ward_id });
   const plan = usePlanState();
   return (<>
-    <PageHeader art={<Clipboard className="w-full" />} eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, allocate saline, kits, beds and spraying crews under a stock limit, route hospital overflow within each city, test vector-control scenarios, and review generic options. Quantities are planning estimates from the forecast, not orders." />
+    <PageHeader art={<Clipboard className="w-full" />} eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, allocate saline, kits, beds and spraying crews under a stock limit, route hospital overflow within each city, test vector-control scenarios, prepare ward dispatch briefs, and review generic options. Quantities are planning estimates from the forecast, not orders." />
     <ControlsBar show={["origin", "horizon", "source"]} />
     <Notice tone="warn">{t("resp.noofficial")} {t("disc.official")}</Notice>
     {/* long page on phones: jump straight to each part of the workflow */}
-    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#priority", "Priority wards"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#vector", "Vector control"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
+    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#priority", "Priority wards"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#vector", "Vector control"], ["#dispatch", "Dispatch briefs"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
       <a key={h} href={h} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line bg-white px-3.5 font-medium text-forest hover:bg-mint-l">{l}</a>))}</nav>
     <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
       <Card id="priority" className="scroll-mt-20"><CardTitle title="Priority wards" sub={`${sel.horizon} ${t("ctl.weeks")} · origin ${dateFmt(sel.origin, lang)} · ranked by ${by === "p_outbreak" ? "outbreak probability" : "expected cases"}`} right={<div className="flex flex-wrap gap-2"><Segmented value={by} onChange={setBy} options={[{ value: "p_outbreak", label: "Probability" }, { value: "expected_cases", label: "Expected cases" }]} />
@@ -74,6 +75,7 @@ export default function Response() {
     <SupplyAllocation shared={plan} />
     <HospitalSurge shared={plan} />
     <VectorControl shared={plan} />
+    <DispatchDesk shared={plan} />
     <Card id="options" className="mt-5 scroll-mt-20"><CardTitle title={t("resp.generic")} sub="Generic, evidence-informed options for officers to review against national guidance" />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{OPTIONS.map((o) => (<div key={o.title} className="rounded-xl border border-line p-4"><h3 className="text-sm font-semibold text-forest">{o.title}</h3><p className="mt-1 text-[13px] text-ink-2">{o.body}</p><p className="mt-2 text-[11px] text-ink-3"><b>Consider when:</b> {o.when}</p></div>))}</div>
       <p className="mt-3 text-xs text-ink-3">These are not official government decisions or recommendations, and these options carry no quantities (the supply allocation above gives planning estimates). They were written for this prototype as generic examples.</p></Card>

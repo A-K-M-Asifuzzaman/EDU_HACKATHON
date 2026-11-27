@@ -27,10 +27,24 @@ export function usePlanState() {
   const [perCrew, setPerCrew] = useState(10);
   const [capPct, setCapPct] = useState(100);
   const [overrides, setOverrides] = useState<Record<string, number>>({});
+  const [vecMode, setVecMode] = useState<"optimized" | "manual" | "stage1">("optimized");
+  const [manual, setManual] = useState<Record<string, number>>({});
+  const [eff, setEff] = useState({ effect: 30, coverage: 35, delay: 1, buildup: 2, sensLow: 50, sensHigh: 150 });   // Moderate preset
   return { city, setCity, service, setService, stock, setStock, crews, setCrews, maxCrews, setMaxCrews, risk, setRisk, floor, setFloor,
-    perCrew, setPerCrew, capPct, setCapPct, overrides, setOverrides };
+    perCrew, setPerCrew, capPct, setCapPct, overrides, setOverrides, vecMode, setVecMode, manual, setManual, eff, setEff };
 }
 export type PlanShared = ReturnType<typeof usePlanState>;
+
+/** The complete scenario as query parameters (the same names the API uses), for allocation, overflow, intervention and dispatch. */
+export function scenarioQuery(sel: { origin: string; horizon: number; source: string }, p: PlanShared): string {
+  const base = qs({ origin: sel.origin, horizon: sel.horizon, source: sel.source === "auto" ? undefined : sel.source, city: p.city === "All" ? undefined : p.city,
+    service: p.service, stock: p.stock / 100, crews: p.crews, max_crews_per_ward: p.maxCrews, risk_weight: p.risk / 100, floor: p.floor / 100,
+    cases_per_crew: p.perCrew, capacity_pct: p.capPct, mode: p.vecMode, effect: p.eff.effect / 100, coverage: p.eff.coverage / 100,
+    delay: p.eff.delay, buildup: p.eff.buildup, sens_low: p.eff.sensLow / 100, sens_high: p.eff.sensHigh / 100 });
+  const ovr = Object.entries(p.overrides).map(([k, v]) => `&override=${encodeURIComponent(`${k}:${v}`)}`).join("");
+  const asg = p.vecMode === "manual" ? Object.entries(p.manual).filter(([, v]) => v > 0).map(([k, v]) => `&assign=${encodeURIComponent(`${k}:${v}`)}`).join("") : "";
+  return base + ovr + asg;
+}
 
 /** Decision tools accept only out-of-time forecasts issued in 2024 or earlier; otherwise explain why and offer the fix. */
 export function useDecisionGuard() {
@@ -52,14 +66,20 @@ const STATUS: Record<string, [string, string]> = { met: ["Fully supplied", "bg-[
  *  survive every control change. First load and errors use the shared Loading states. */
 export function Live<T>({ q, h, label, children }: { q: AsyncState<T>; h: number; label: string; children: (d: T) => React.ReactNode }) {
   if (!q.data) return <Loading q={q} h={h} kind="table" label={label}>{() => null}</Loading>;
+  // while recomputing: a chip and a thin bar, never dimmed text (dimming broke contrast for anyone reading during the update)
   return (<div aria-live="polite" aria-busy={q.stale || undefined} className="relative">
-    {q.stale && <span role="status" className="absolute right-2 top-2 z-10 rounded-full bg-ink px-2.5 py-1 text-[11px] text-canvas">Updating…</span>}
-    <div className={"transition-opacity " + (q.stale ? "opacity-60" : "")}>{children(q.data)}</div></div>);
+    {q.stale && <><span role="status" className="absolute right-2 top-2 z-10 rounded-full bg-ink px-2.5 py-1 text-[11px] text-canvas">Updating…</span>
+      <span aria-hidden className="absolute inset-x-0 -top-1 z-10 h-[3px] animate-pulse rounded-full bg-forest" /></>}
+    <div>{children(q.data)}</div></div>);
 }
 
+/** Debounce by content, not identity: callers pass fresh object literals on every render, and an identity dependency would re-fire the
+ *  timer after each render (a re-render loop that aborted slow requests before they finished). */
 export function useDebounced<T>(v: T, ms = 250): T {
+  const key = JSON.stringify(v);
   const [d, setD] = useState(v);
-  useEffect(() => { const id = setTimeout(() => setD(v), ms); return () => clearTimeout(id); }, [v, ms]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { const id = setTimeout(() => setD(v), ms); return () => clearTimeout(id); }, [key, ms]);
   return d;
 }
 

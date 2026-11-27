@@ -6,7 +6,7 @@
 Stages only what the backend image needs, adds the Space README front matter, and uploads with upload_folder (replaces files in a single
 commit; earlier commits stay in the Space's git history). Secrets (OPENAI_API_KEY, ACCESS_PASSWORD) are set in the Space settings, never in git.
 """
-import fnmatch, shutil, sys, tempfile
+import fnmatch, shutil, subprocess, sys, tempfile
 from pathlib import Path
 from huggingface_hub import HfApi
 
@@ -25,6 +25,8 @@ def main(repo_id: str) -> None:
             dst.parent.mkdir(parents=True, exist_ok=True)
             shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store", "screenshots", *SECRET_PATTERNS)) if src.is_dir() else shutil.copy2(src, dst)
         shutil.copy2(ROOT / "Dockerfile.backend", stage / "Dockerfile")
+        commit = subprocess.run(["git", "rev-parse", "--short=7", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        (stage / "app_data" / "BUILD_COMMIT").write_text(commit + "\n")             # the backend reports the commit it was built from
         (stage / "README.md").write_text(FRONT + (ROOT / "README.md").read_text())
         leaked = [str(p.relative_to(stage)) for p in stage.rglob("*") if p.is_file() and any(fnmatch.fnmatch(p.name, pat) for pat in SECRET_PATTERNS)]
         if leaked:

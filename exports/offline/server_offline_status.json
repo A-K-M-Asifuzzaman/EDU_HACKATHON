@@ -1,0 +1,186 @@
+{
+ "offline_mode": true,
+ "artifacts_ok": true,
+ "artifacts": [
+  {
+   "path": "data/raw/bangladesh_dengue_large_dataset.csv",
+   "purpose": "organizer dataset: forecast inputs (2025 rows are dropped on load)",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "data/raw/onsite/bangladesh_dengue_large_dataset_onsite.csv",
+   "purpose": "onsite dataset: illustrative bed capacity (2025 rows dropped on load)",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "models/dengueshield_B.joblib",
+   "purpose": "deployed forecasting bundle (forward forecasts past 2024)",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/replay.csv.gz",
+   "purpose": "validated replay forecasts for 2019-2024 targets",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/resource_rules.json",
+   "purpose": "saline, kit and bed demand rule",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/validation.json",
+   "purpose": "model evidence",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/profile.json",
+   "purpose": "data profile",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/geo/greater_dhaka_graph.npz",
+   "purpose": "offline road network for hospital routing (Dhaka, Gazipur, Narayanganj)",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/geo/chattogram_graph.npz",
+   "purpose": "offline road network for hospital routing (Chattogram)",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "app_data/geo/facilities.geojson",
+   "purpose": "health facilities directory",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "frontend/out/index.html",
+   "purpose": "built dashboard",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "frontend/out/response/index.html",
+   "purpose": "built Response Intelligence page",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module fastapi",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module uvicorn",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module pandas",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module numpy",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module scipy",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module sklearn",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module joblib",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module httpx",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  },
+  {
+   "path": "python module pydantic",
+   "purpose": "runtime dependency",
+   "ok": true,
+   "problem": null
+  }
+ ],
+ "external_assets": [],
+ "services": [
+  {
+   "id": "core",
+   "name": "Forecasts, supply allocation, hospital overflow, vector-control simulator, dispatch briefs",
+   "status": "available",
+   "note": "local files and local computation only"
+  },
+  {
+   "id": "routing",
+   "name": "Hospital search and road routing",
+   "status": "available",
+   "note": "local road graph and facility list"
+  },
+  {
+   "id": "copilot",
+   "name": "Copilot",
+   "status": "local retrieval only",
+   "note": "answer generation needs OpenAI and is off in offline mode; sources are still searched locally"
+  },
+  {
+   "id": "firebase",
+   "name": "Sign-in (Firebase)",
+   "status": "unavailable offline",
+   "note": "the public decision tools need no account; officer workspaces need sign-in"
+  },
+  {
+   "id": "applink",
+   "name": "SMS sending (AppLink)",
+   "status": "not used",
+   "note": "dispatch notices are generated as text and documents only; nothing is sent"
+  },
+  {
+   "id": "weather",
+   "name": "Live weather (NASA POWER, Open-Meteo)",
+   "status": "unavailable offline",
+   "note": "the forecast does not need it"
+  },
+  {
+   "id": "boundaries",
+   "name": "Ward boundaries (DGHS)",
+   "status": "unavailable offline",
+   "note": "the abstract ward matrix is shown instead"
+  },
+  {
+   "id": "tiles",
+   "name": "Basemap tiles (MapTiler, loaded by the browser)",
+   "status": "need internet",
+   "note": "routes and facilities still draw from local data"
+  }
+ ],
+ "blocked_attempts": [],
+ "blocked_count": 0,
+ "note": "Offline mode is set by scripts/launch_offline.sh (DENGUESHIELD_OFFLINE=1). Blocked attempts come from optional services only."
+}

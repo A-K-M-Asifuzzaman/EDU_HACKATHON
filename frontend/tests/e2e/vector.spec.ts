@@ -12,6 +12,7 @@ test.describe("Vector-control scenarios", () => {
     await expect(box.getByRole("heading", { name: "Vector-control scenarios" })).toBeVisible();
     await expect(total(box)).toHaveText("63.2", { timeout: 30_000 });
     await expect(box.getByText(/Optimality check passed/)).toBeVisible();
+    await expect(box.getByTestId("crews-by-city")).toContainText("Chattogram");                       // transparent city totals of the shared budget
     await box.getByRole("tab", { name: "Supplies" }).click();
     await expect(box.getByRole("tabpanel")).toContainText("1767 → 1690");
     await box.getByRole("tab", { name: "Hospital" }).click();
@@ -48,6 +49,31 @@ test.describe("Vector-control scenarios", () => {
     await expect(box.getByText(/This plan can be improved/)).toBeVisible();
     const v = Number(await total(box).innerText());
     expect(v).toBeLessThan(63.2);
+  });
+
+  test("decision sections stay idle when nothing changes (no re-render loop)", async ({ page }) => {
+    await page.goto(PAGE);
+    await expect(total(page.locator("#vector"))).toHaveText("63.2", { timeout: 30_000 });
+    await expect(page.locator("#dispatch").getByTestId("sms-text")).toContainText("Ref S-", { timeout: 30_000 });
+    await page.waitForTimeout(1000);
+    const changes = await page.evaluate(() => new Promise<Record<string, number>>((res) => {
+      const out: Record<string, number> = { supply: 0, surge: 0, vector: 0, dispatch: 0 };
+      for (const id of Object.keys(out)) new MutationObserver((ms) => { out[id] += ms.length; })
+        .observe(document.getElementById(id)!, { subtree: true, attributes: true, childList: true, characterData: true });
+      setTimeout(() => res(out), 3000);
+    }));
+    expect(changes).toEqual({ supply: 0, surge: 0, vector: 0, dispatch: 0 });
+  });
+
+  test("a slow server still settles: manual crews with a 600 ms simulator response", async ({ page }) => {
+    await page.route(/\/api\/intervention\/simulate/, async (r) => { await new Promise((x) => setTimeout(x, 600)); await r.continue(); });
+    await page.goto(PAGE);
+    const box = page.locator("#vector");
+    await expect(total(box)).toHaveText("63.2", { timeout: 30_000 });
+    await box.getByRole("radio", { name: "Manual" }).click();
+    await box.getByRole("button", { name: "Remove a crew from CCC_Ward_03" }).click();
+    await box.getByRole("button", { name: "Add a crew to DSCC_Ward_04" }).click();
+    await expect(box.getByText(/This plan can be improved/)).toBeVisible({ timeout: 20_000 });
   });
 
   test("an in-sample forecast is refused", async ({ page }) => {

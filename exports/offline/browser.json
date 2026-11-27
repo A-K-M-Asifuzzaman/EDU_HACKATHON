@@ -1,0 +1,16 @@
+{
+ "steps": [
+  "browser cannot reach example.com",
+  "forecasts at 2, 3 and 4 weeks; offline chip shown",
+  "supply at 40% stock: saline 705/1767",
+  "hospital: 53 without a bed at baseline, 16 with +20% beds and 9 transfers",
+  "vector control: 63.2 cases prevented over weeks 2-4 (assumed effect)",
+  "SMS and WhatsApp copied for scenario S-32dedead1fd2",
+  "PDF brief saved (8429 bytes), structure checked, scenario S-32dedead1fd2"
+ ],
+ "scenario_id": "S-32dedead1fd2",
+ "external_hosts_attempted": [
+  "example.com"
+ ],
+ "external_delivered": []
+}

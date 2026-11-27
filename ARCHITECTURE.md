@@ -56,9 +56,41 @@ Source of every figure: `app_data/metrics_canonical.json` (built by `scripts/bui
 
 FastAPI loads the bundle once and caches all-ward predictions by model checksum, origin and horizon; heavy calls run at most four at a time.
 The validated replay serves out-of-time predictions for the evidence and decision tools; bundle results inside the training period are labelled
-in-sample. Routing uses a custom A\* on directed OSM road graphs, each route checked against Dijkstra; emergency search lists general hospitals
+in-sample on display pages and refused by the decision tools (Phase 2). Routing uses a custom A\* on directed OSM road graphs, each route checked against Dijkstra; emergency search lists general hospitals
 only (veterinary, diagnostic-only and specialist facilities are classified and left out). The static frontend is served by Vercel and proxies
 `/api` to a Hugging Face Space; locally one command serves both.
+
+## Phase 2 onsite: operational engines
+
+The onsite final adds four engines behind the same forecasts, all pure Python on local files, exposed on the Response Intelligence page
+and fully usable offline.
+
+```mermaid
+flowchart LR
+  fc["decision_forecast()<br/>replay 2019-2024 targets,<br/>bundle only past training;<br/>in-sample refused"]
+  rules["Resource rule<br/>floor(m x cases + 0.5)<br/>(identified on 2016-2018)"]
+  s1["Stage 1 allocation<br/>per-city stock pools,<br/>priority + fairness floor, crews"]
+  s2["Stage 2 overflow<br/>illustrative capacity (p90 of past<br/>bed need), max-flow inside each city"]
+  s3["Stage 3 simulator<br/>assumed crew response,<br/>greedy optimal crews, ROI"]
+  d["Dispatch<br/>one canonical brief per ward:<br/>SMS, WhatsApp, HTML, PDF"]
+  fc --> rules --> s1 & s2
+  fc --> s3
+  s3 -->|"scenario cases"| s1 & s2
+  s1 & s2 & s3 --> d
+```
+
+| Engine | Module, endpoint | Guarantees (tested) |
+|---|---|---|
+| Allocation | `dengueshield/allocation.py`, `/api/allocation/plan` | integers, exact conservation, no ward above demand, deterministic ties, optimum checked against an LP solver |
+| Overflow | `dengueshield/overflow.py`, `/api/overflow/plan` | transfers only inside a city, no duplicated patients, maximum flow, checked against brute force and Edmonds-Karp; capacity uses only weeks before the forecast date |
+| Simulator | `dengueshield/intervention.py`, `/api/intervention/simulate` | zero crews or zero effect reproduce the forecast exactly, bounded reductions, crew optimum checked against brute force and dynamic programming |
+| Dispatch | `dengueshield/dispatch.py`, `dengueshield/pdfmini.py`, `/api/dispatch/brief`, `/api/dispatch/document` | numbers copied from the engines, scenario id and content hash, byte-identical outputs, nothing sent |
+| Offline | `dengueshield/offline.py`, `scripts/launch_offline.sh`, `/api/system/offline` | artifact and dependency check before start; outbound connections refused and recorded; kill-switch test in CI (network namespace) with results identical to the online run |
+
+The dashboard sections share one plan state (city, service level, stock, crews, capacity, intervention settings), so all four sections and
+every brief describe the same scenario. Assumptions that are not in the data (stock, crews, ward capacity, intervention effect) are user
+settings and are labelled as such everywhere. Details and evidence: [`docs/onsite/`](docs/onsite/) (Stage 0 to Stage 4 handoffs and
+[`FINAL_RELEASE.md`](docs/onsite/FINAL_RELEASE.md)).
 
 ## Compute and cost controls
 

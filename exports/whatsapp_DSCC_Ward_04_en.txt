@@ -1,0 +1,24 @@
+*DengueShield planning notice*
+_Forecast-based plan for officers. Not an outbreak report and not an official order._
+
+*DSCC_Ward_04, Dhaka South*
+Week of 26 Aug 2024; 3-week forecast issued 5 Aug 2024
+Risk: *Critical* (outbreak chance 88%)
+Projected cases: 19 at the upper end of the 80% range (expected 13.9)
+
+*Supplies* (allocated / needed)
+Saline bags: 45 / 45
+Diagnostic kits: 22 / 22
+Beds, regional stock: 6 / 6
+
+*Hospital* (illustrative capacity)
+Bed demand 6, capacity 5
+Transfer 1 to DSCC_Ward_11; 0 without a bed in Dhaka South
+
+*Spraying crews*: 2 assigned (optimized deployment)
+Scenario estimate: about 6.3 fewer cases over weeks 2-4 (range 3.1 to 9.4), under the assumed effect
+
+*Needs attention*
+- Nothing flagged
+
+Ref S-94fbd8367d09; model DengueShield champion (Ridge Poisson GLM, 24 features); data through 30 Dec 2024

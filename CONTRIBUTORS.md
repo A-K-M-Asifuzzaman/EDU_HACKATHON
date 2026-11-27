@@ -12,6 +12,12 @@ DengueShield AI, EDU AI Engineering Hackathon 2026 (preliminary round). The perc
 
 The [contribution plan](docs/team/contribution_plan.md) records the history audit and how teammates can submit work for review.
 
+## Phase 2 onsite final (27 Nov 2026)
+
+The onsite stages on `version-onsite-final` were committed under A-K-M-Asifuzzaman's account with AI assistance, as disclosed in
+[`README.md`](README.md#-ai-assistants--external-apis-disclosure). Teammates' onsite work (for example demonstration, review, testing or
+recording) is not recorded in this repository yet; it should be added here with links before submission, and only as it actually happened.
+
 ## How contributions are recorded
 
 - Each person uses their own Git identity for changes they authored. The lead reviews each pull request and merges it with the original commits so their authors appear on `main`.

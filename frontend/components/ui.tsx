@@ -183,10 +183,10 @@ export function Segmented<T extends string | number>({ label, value, onChange, o
     {options.map((o) => (<button key={String(o.value)} role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}
       className={cls("relative min-h-10 shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13.5px] font-bold transition-colors sm:min-h-8", o.value === value ? "bg-forest text-white" : "text-ink-2 hover:bg-mint-l")}>{o.label}</button>))}</div></div>);
 }
-export function Tabs({ tabs, value, onChange }: { tabs: { id: string; label: string }[]; value: string; onChange: (v: string) => void }) {
+export function Tabs({ tabs, value, onChange, group = "default" }: { tabs: { id: string; label: string }[]; value: string; onChange: (v: string) => void; group?: string }) {
   return (<div role="tablist" className="scroll-thin mb-6 flex snap-x gap-1.5 overflow-x-auto overscroll-x-contain pb-1">{tabs.map((x) => (
     <button key={x.id} role="tab" aria-selected={x.id === value} onClick={() => onChange(x.id)} className={cls("relative shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-[14px] font-bold transition-colors", x.id === value ? "text-white" : "text-ink-3 hover:text-forest")}>
-      {x.id === value && <motion.span layoutId="tabpill" className="absolute inset-0 rounded-full border-2 border-[#1a1438] bg-[#4a2bd0]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}<span className="relative">{x.label}</span></button>))}</div>);
+      {x.id === value && <motion.span layoutId={`tabpill-${group}`} className="absolute inset-0 rounded-full border-2 border-[#1a1438] bg-[#4a2bd0]" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}<span className="relative">{x.label}</span></button>))}</div>);
 }
 export const ProvChip = ({ children, tone = "ok" }: { children: React.ReactNode; tone?: "ok" | "warn" | "info" | "neutral" }) => (
   <span className={cls("inline-flex items-center gap-1 rounded-full border-[1.5px] px-2 py-px text-[11.5px] font-bold", tone === "ok" && "border-[#1a1438] bg-[#d9f7ea] text-[#0b5d44]", tone === "warn" && "border-[#1a1438] bg-[#fff1cc] text-[#6b4a00]", tone === "info" && "border-[#1a1438] bg-[#dbe9ff] text-[#1c3f8f]", tone === "neutral" && "border-[#1a1438] bg-[#fff] text-[#3d3566]")}>{children}</span>);
