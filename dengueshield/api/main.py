@@ -23,6 +23,7 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from dengueshield import decision, routing
+from dengueshield import allocation as alloc
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
@@ -618,6 +619,71 @@ def decision_allocate(origin: str, horizon: H = 3, teams: Annotated[int, Query(g
 def decision_allocation_season(year: Annotated[int, Query(ge=2019, le=2024)], horizon: H = 3, teams: Annotated[int, Query(ge=1, le=60)] = 10):
     R = _replay_or_503()
     v, _ = S.cache.get_or(("alloc_season", year, horizon, teams), lambda: decision.allocation_season(R, S.panel, year, horizon, teams))
+    return v
+
+
+# ------------------------------------------------------------------ Phase 2 onsite, Problem 1: constrained resource allocation
+ALLOC_LAST_ORIGIN = "2024-12-30"      # owner decision: forecasts issued in 2024 or earlier; January 2025 targets only from 2024 origins
+ALLOC_ASSUMPTIONS = [
+    "Demand: saline, kits and beds follow the dataset's own rule, floor(m x forecast cases + 0.5), identified on 2016-2018 only.",
+    "Stock is not in the dataset. Each city receives the chosen share (30-100%) of its own projected requirement; cities never share supply.",
+    "Fairness floor: every ward first receives that share of its demand (never more than the stock level), then the rest goes by priority.",
+    "Priority = risk weight x outbreak probability + (1 - risk weight) x population density / highest density of the 60 wards.",
+    "Crews are not in the dataset. A ward with forecast cases needs 1 crew, plus 1 per extra block of cases, up to the per-ward maximum; "
+    "crews go first to as many wards as possible in priority order.",
+    "Beds here are the configured regional bed supply. They are not local hospital capacity; overflow routing (Problem 2) will use a separate, "
+    "illustrative capacity baseline and will not add these beds on top of it.",
+    "Forecasts are planning estimates on synthetic data, not official orders or warnings.",
+]
+_ALLOC_RULES: dict | None = None
+
+
+@app.get("/api/allocation/plan")
+def allocation_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
+                    service: Literal["median", "p80", "p90"] = "p80", stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6,
+                    crews: Annotated[int, Query(ge=0, le=1000)] = 20, risk_weight: Annotated[float, Query(ge=0.0, le=1.0)] = 0.7,
+                    floor: Annotated[float, Query(ge=0.0, le=0.5)] = 0.25, cases_per_crew: Annotated[int, Query(ge=1, le=100)] = 10,
+                    max_crews_per_ward: Annotated[int, Query(ge=1, le=10)] = 3, source: Optional[Literal["replay", "bundle"]] = None):
+    """Allocate saline, diagnostic kits, beds and spraying crews to wards under scarcity (dengueshield/allocation.py)."""
+    global _ALLOC_RULES
+    origin_check(origin)
+    if origin > ALLOC_LAST_ORIGIN:
+        bad(f"allocation uses forecasts issued on or before {ALLOC_LAST_ORIGIN} (2025 is the sealed test year); "
+            f"the forecast issued {ALLOC_LAST_ORIGIN} covers targets in January 2025", 422)
+    if city and city not in set(S.wards.city):
+        bad(f"unknown city '{city}'", 404)
+    source = source or src_default(origin, horizon)
+    st = alloc.Settings(service=service, stock=round(stock, 4), crews=crews, alpha=round(risk_weight, 4), floor_share=round(floor, 4),
+                        cases_per_crew=cases_per_crew, max_crews_per_ward=max_crews_per_ward)
+    if _ALLOC_RULES is None:
+        _ALLOC_RULES = alloc.load_rules()
+
+    def compute():
+        fc = forecast_frame(origin, horizon, source)
+        if city:
+            fc = fc[fc.city == city]
+        res = alloc.plan(fc[["ward_id", "city", "median_cases", "upper_80", "upper_90", "p_outbreak", "risk_tier"]], S.wards, _ALLOC_RULES, st)
+        wards_out = []
+        for r in res["wards"].itertuples(index=False):
+            row = {"rank": int(r.rank), "ward_id": r.ward_id, "city": r.city, "risk_tier": r.risk_tier, "p_outbreak": round(float(r.p_outbreak), 4),
+                   "population_density_sqkm": int(r.population_density_sqkm), "priority": round(float(r.priority), 4),
+                   "forecast_cases": int(r.cases), "median_cases": int(r.median_cases), "upper_80": int(r.upper_80), "upper_90": int(r.upper_90),
+                   "crews_needed": int(r.crews_needed), "crews_assigned": int(r.crews_assigned), "fill_rate": round(float(r.fill_rate), 4), "status": r.status}
+            for k in alloc.RESOURCES:
+                row[k] = {"demand": int(getattr(r, f"{k}_demand")), "allocated": int(getattr(r, f"{k}_allocated")), "unmet": int(getattr(r, f"{k}_unmet"))}
+            wards_out.append(row)
+        target = str(fc.target_date.iloc[0]) if len(fc) else None
+        return {"origin": origin, "horizon": horizon, "target_date": target, "source": source, "city": city or "All",
+                "settings": {"service": service, "service_label": alloc.SERVICE_LABEL[service], "stock": st.stock, "crews": crews,
+                             "risk_weight": st.alpha, "density_weight": round(1 - st.alpha, 4), "floor": st.floor_share,
+                             "cases_per_crew": cases_per_crew, "max_crews_per_ward": max_crews_per_ward},
+                "multipliers": _ALLOC_RULES, "totals": res["totals"], "cities": res["cities"], "counts": res["counts"],
+                "wards": wards_out, "assumptions": ALLOC_ASSUMPTIONS, "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(("alloc_plan", origin, horizon, source, city, st), compute)
+    except ValueError as e:
+        bad(str(e))
     return v
 
 
