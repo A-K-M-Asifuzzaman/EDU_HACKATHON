@@ -93,6 +93,13 @@ test.describe("Operations engine", () => {
     await expect(gauges).toHaveCount(5, { timeout: 30_000 });
     await expect(box.locator(".maplibregl-marker")).toHaveCount(5);
     await expect(box.locator(".maplibregl-marker", { hasText: /_Ward_/ })).toHaveCount(0);
+    // the map opens framed on the five city centres, so every gauge is inside the visible map
+    await page.waitForTimeout(500);
+    const frame = (await box.locator("canvas.maplibregl-canvas").boundingBox())!;
+    for (const g of await gauges.all()) {
+      const r = (await g.boundingBox())!, cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+      expect(cx > frame.x && cx < frame.x + frame.width && cy > frame.y && cy < frame.y + frame.height).toBe(true);
+    }
     await gauges.filter({ hasText: "Chattogram" }).click();
     await expect(box.getByRole("complementary", { name: "Map inspector" })).toContainText("Projected bed need");
     await box.getByRole("button", { name: "Ward transfer network" }).click();     // the chosen city carries over to the network view

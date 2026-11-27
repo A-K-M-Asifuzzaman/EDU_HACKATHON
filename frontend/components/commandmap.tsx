@@ -30,6 +30,8 @@ interface Props {
   /** persistent HTML markers (one element per key, kept across updates so the caller can render into it, e.g. with a React portal) */
   overlays?: { key: string; lngLat: LngLat }[]; onOverlay?: (key: string, el: HTMLElement | null) => void;
   basemap?: "auto" | "blank";
+  /** open framed on these points (instead of the default Dhaka view) */
+  initialFit?: LngLat[];
 }
 
 const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
@@ -106,6 +108,11 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
           mp.on("click", "fac-point", (e: any) => { const f = e.features?.[0]; if (f) cb.current.onFacility(f); });
           mp.on("click", (e: any) => { if (e.originalEvent?.target?.closest?.(".maplibregl-marker")) return; if (!mp.queryRenderedFeatures(e.point, { layers: ["fac-point", "fac-cluster"].filter((l) => mp.getLayer(l)) }).length) cb.current.onPick([e.lngLat.lng, e.lngLat.lat]); });
           for (const l of ["fac-point", "fac-cluster"]) { mp.on("mouseenter", l, () => (mp.getCanvas().style.cursor = "pointer")); mp.on("mouseleave", l, () => (mp.getCanvas().style.cursor = "")); }
+          const fit = cb.current.initialFit;
+          if (fit && fit.length > 1) {
+            const xs = fit.map((c) => c[0]), ys = fit.map((c) => c[1]);
+            mp.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: { top: 70, bottom: 50, left: 90, right: 90 }, duration: 0 });
+          }
           setReady(true);
         });
       } catch { setFailed(true); }
