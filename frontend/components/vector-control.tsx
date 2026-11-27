@@ -3,7 +3,7 @@
 // and 4 weeks through an explicit, user-set response model; the scenario then flows into Supply allocation (same stock) and Hospital surge
 // (same illustrative capacity). Every number comes from GET /api/intervention/simulate on the local API. The dataset holds no spraying or
 // larvicide records, so every effect is an assumption and every "prevented" figure is a counterfactual estimate, never a measurement.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
@@ -14,7 +14,7 @@ import { Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./suppl
 import { Btn, Card, DataTable, Notice, ProvChip, RiskBadge, Segmented, Tabs, useAsync } from "./ui";
 
 type Mode = "optimized" | "manual" | "stage1";
-const PRESETS: Record<string, { effect: number; coverage: number; delay: number; buildup: number; label: string }> = {
+export const PRESETS: Record<string, { effect: number; coverage: number; delay: number; buildup: number; label: string }> = {
   cautious: { effect: 15, coverage: 25, delay: 1, buildup: 2, label: "Cautious" },
   moderate: { effect: 30, coverage: 35, delay: 1, buildup: 2, label: "Moderate" },
   strong: { effect: 45, coverage: 50, delay: 1, buildup: 1, label: "Strong" },
@@ -73,6 +73,8 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
     p.mode === "manual" ? Object.entries(p.manual).filter(([, v]) => v > 0).map(([k, v]) => `&assign=${encodeURIComponent(`${k}:${v}`)}`).join("") : ""}`, { signal: s })),
   [sel.origin, sel.horizon, sel.source, city, service, p, blocked, overBudget]);
   const d: any = q.data;
+  const { report } = shared;
+  useEffect(() => { report("intervene", d ? { totals: d.totals, stale: !!q.stale } : overBudget ? { over: true } : null); }, [d, q.stale, overBudget, report]);
   const preset = Object.entries(PRESETS).find(([, v]) => v.effect === eff.effect && v.coverage === eff.coverage && v.delay === eff.delay && v.buildup === eff.buildup)?.[0] ?? "custom";
   const switchMode = (m: Mode) => {
     if (m === "manual" && mode !== "manual" && d) setManual(Object.fromEntries(d.wards.filter((w: any) => w.crews > 0).map((w: any) => [w.ward_id, w.crews])));

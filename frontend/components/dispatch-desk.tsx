@@ -52,6 +52,10 @@ export default function DispatchDesk({ shared }: { shared: PlanShared }) {
     return api<any>(`/api/dispatch/brief?${qs}`, { signal: s }).then((data) => ({ qs: scen, data }));
   }, [scen, ward, off, options]);
 
+  const { report } = shared;
+  const brief = q.data?.data;
+  useEffect(() => { report("dispatch", brief ? { id: brief.scenario.id, ward, stale: !!q.stale } : null); }, [brief, ward, q.stale, report]);
+
   const copy = async (what: "sms" | "whatsapp", snap: Snap) => {
     const text = what === "sms" ? snap.data.formats.sms[lang].text : snap.data.formats.whatsapp[lang];
     try {

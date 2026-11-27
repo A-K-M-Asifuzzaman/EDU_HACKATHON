@@ -3,13 +3,14 @@
 // configurable regional stock level, with a fairness floor and a risk-and-density priority; spraying crews are assigned by priority.
 // Every number comes from GET /api/allocation/plan, which runs locally (no external service). Stock, crews and capacity are planning
 // assumptions: the dataset contains none of them.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api, qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
 import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBadge, Segmented, Select, useAsync, type AsyncState } from "./ui";
 import { provenance, PROV_TEXT } from "@/lib/provenance";
+import AllocationFlow from "./allocation-flow";
 
 export const LAST_ORIGIN = "2024-12-30";
 export const CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"];
@@ -30,7 +31,11 @@ export function usePlanState() {
   const [vecMode, setVecMode] = useState<"optimized" | "manual" | "stage1">("optimized");
   const [manual, setManual] = useState<Record<string, number>>({});
   const [eff, setEff] = useState({ effect: 30, coverage: 35, delay: 1, buildup: 2, sensLow: 50, sensHigh: 150 });   // Moderate preset
-  return { city, setCity, service, setService, stock, setStock, crews, setCrews, maxCrews, setMaxCrews, risk, setRisk, floor, setFloor,
+  // each stage publishes the API result it already fetched, so the Operations engine rail reads real numbers without a second request.
+  // Equal content is ignored, so a re-render can never turn a report into a loop.
+  const [reports, setReports] = useState<Record<string, any>>({});
+  const report = useCallback((k: string, v: any) => setReports((o) => (JSON.stringify(o[k]) === JSON.stringify(v) ? o : { ...o, [k]: v })), []);
+  return { reports, report, city, setCity, service, setService, stock, setStock, crews, setCrews, maxCrews, setMaxCrews, risk, setRisk, floor, setFloor,
     perCrew, setPerCrew, capPct, setCapPct, overrides, setOverrides, vecMode, setVecMode, manual, setManual, eff, setEff };
 }
 export type PlanShared = ReturnType<typeof usePlanState>;
@@ -103,6 +108,9 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
   [sel.origin, sel.horizon, sel.source, city, service, params, blocked]);
   const d: any = q.data;
   const critical = useMemo(() => (d?.wards ?? []).filter((w: any) => w.status === "critical"), [d]);
+  const { report } = shared;
+  useEffect(() => { report("allocate", d ? { target: d.target_date, service: d.settings.service_label, cases: d.wards.reduce((a: number, w: any) => a + w.forecast_cases, 0),
+    totals: d.totals, counts: d.counts, stale: !!q.stale } : null); }, [d, q.stale, report]);
 
   const exportCsv = () => d && download(`dengueshield_allocation_${d.origin}_h${d.horizon}_${d.city}_stock${Math.round(d.settings.stock * 100)}.csv`, toCsv(d.wards.map((w: any) => ({
     rank: w.rank, ward_id: w.ward_id, city: w.city, risk_tier: w.risk_tier, p_outbreak: w.p_outbreak, population_density_sqkm: w.population_density_sqkm,
@@ -141,6 +149,8 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
         <b>Critical supply deficit in {critical.length} ward{critical.length === 1 ? "" : "s"}</b> (High or Critical risk with any shortfall, or under half of demand covered): {critical.slice(0, 8).map((w: any) => w.ward_id).join(", ")}{critical.length > 8 ? ` and ${critical.length - 8} more` : ""}.
         <span className="block text-[12px]">{d.counts.deficit > 0 ? `${d.counts.deficit} more ward${d.counts.deficit === 1 ? "" : "s"} short (not critical); ` : ""}{d.counts.met} fully supplied.</span></div>)
         : <div role="status" className="mt-4 rounded-xl border border-line bg-[#d9f7ea] p-3 text-[13px] text-[#0b5d44]">{d.counts.deficit === 0 ? `Every ward in view is fully supplied at ${Math.round(d.settings.stock * 100)}% stock.` : `${d.counts.deficit} ward(s) short, none critical.`}</div>}
+
+      <AllocationFlow d={d} />
 
       <h3 className="mb-2 mt-5 text-[14px] font-semibold text-ink">By city</h3>
       <DataTable dense maxH={260} rows={d.cities.map((c: any) => ({ ...c, ...Object.fromEntries(RES.map(([k]) => [k, `${c[k].allocated} / ${c[k].demand}${c[k].unmet ? ` (short ${c[k].unmet})` : ""}`])), crews: `${c.crews.assigned} / ${c.crews.needed}` }))}

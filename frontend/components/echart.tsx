@@ -9,13 +9,14 @@ function loadEcharts() {
 
 export const PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"];   // validated categorical order (dataviz reference palette)
 const reduce = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-const isDim = () => typeof document !== "undefined" && document.documentElement.dataset.theme === "dim";
+// a chart is dim when the page is in Dim mode or when it sits inside a dark section (the Operations engine)
+const isDim = (el?: Element | null) => typeof document !== "undefined" && (document.documentElement.dataset.theme === "dim" || !!el?.closest('[data-theme="dim"]'));
 // Dim mode: chart options name light-theme ink and grid colours directly; swap each for its dim counterpart (series colours stay).
 const DIM: Record<string, string> = { "#5b6b7b": "#a9b6c2", "#44566a": "#c3ced8", "#3f5064": "#c3ced8", "#0e1a2b": "#e7edf2", "#0d1b2a": "#e7edf2", "#0a0d14": "#e7edf2",
   "#7a8a9a": "#9eacb8", "#5f6f7f": "#9eacb8", "#2f2a8f": "#c9c6ff", "#eef2f6": "#2a3846", "#cfd9e2": "#3a4a5a", "#e4dfd3": "#33414f", "#e3e9ef": "#33414f",
   "#e4ebf0": "#33414f", "#f1f5f9": "#243241", "rgba(255,255,255,0.97)": "rgba(27,39,51,0.97)",
   // validated categorical slots: light -> dark-surface variants (same hue order)
-  "#2a78d6": "#3987e5", "#eb6834": "#d95926", "#1baf7a": "#199e70", "#eda100": "#c98500", "#e87ba4": "#d55181" };
+  "#2a78d6": "#3987e5", "#eb6834": "#d95926", "#1baf7a": "#199e70", "#eda100": "#c98500", "#e87ba4": "#d55181", "#4a2bd0": "#b4a6ff" };
 const dimify = (v: any): any => typeof v === "string" ? (DIM[v.toLowerCase()] ?? v) : Array.isArray(v) ? v.map(dimify)
   : v && typeof v === "object" && !(v instanceof Date) ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, typeof x === "function" ? x : dimify(x)])) : v;
 
@@ -30,11 +31,11 @@ export function Chart({ option, height = 300, onClick, ariaLabel, className = ""
       if (dead || !el.current) return;
       inst.current = core.init(el.current, undefined, { renderer: "canvas" });
       let narrow = isNarrow(el.current);
-      inst.current.setOption(withDefaults(opt.current, el.current.clientWidth), true);
+      inst.current.setOption(withDefaults(opt.current, el.current.clientWidth, el.current), true);
       if (onClick) inst.current.on("click", onClick);
       ro = new ResizeObserver(() => {
         if (!inst.current || !el.current) return;
-        if (isNarrow(el.current) !== narrow) { narrow = !narrow; inst.current.setOption(withDefaults(opt.current, el.current.clientWidth), true); } // phone rotated or panel resized
+        if (isNarrow(el.current) !== narrow) { narrow = !narrow; inst.current.setOption(withDefaults(opt.current, el.current.clientWidth, el.current), true); } // phone rotated or panel resized
         inst.current.resize();
       });
       ro.observe(el.current);
@@ -42,9 +43,9 @@ export function Chart({ option, height = 300, onClick, ariaLabel, className = ""
     return () => { dead = true; ro?.disconnect(); inst.current?.dispose(); inst.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => { inst.current?.setOption(withDefaults(option, el.current?.clientWidth ?? 0), true); }, [option]);
+  useEffect(() => { inst.current?.setOption(withDefaults(option, el.current?.clientWidth ?? 0, el.current), true); }, [option]);
   useEffect(() => {                                                    // colour mode switched: redraw with the matching ink and grid colours
-    const on = () => inst.current?.setOption(withDefaults(opt.current, el.current?.clientWidth ?? 0), true);
+    const on = () => inst.current?.setOption(withDefaults(opt.current, el.current?.clientWidth ?? 0, el.current), true);
     window.addEventListener("ds:theme", on); return () => window.removeEventListener("ds:theme", on);
   }, []);
   return <div ref={el} role="img" aria-label={ariaLabel} className={className} style={{ height, width: "100%" }} />;
@@ -79,7 +80,7 @@ function compact(o: any, w: number) {
   return { ...o, xAxis: o.xAxis && axis(o.xAxis, false), yAxis: o.yAxis && axis(o.yAxis, true), grid: Array.isArray(o.grid) ? o.grid.map(grid) : grid(o.grid), series, legend };
 }
 
-function withDefaults(o: any, width = 0) {
+function withDefaults(o: any, width = 0, el?: Element | null) {
   // Merge (not replace) the page's tooltip with the defaults: a chart that passed its own `tooltip: { trigger: "axis" }`
   // used to lose `confine`, so on phones a tapped tooltip opened half outside the screen.
   const tooltip = o.tooltip === undefined ? TOOLTIP : Array.isArray(o.tooltip) ? o.tooltip.map((x: any) => ({ ...TOOLTIP, ...x })) : { ...TOOLTIP, ...o.tooltip };
@@ -91,6 +92,6 @@ function withDefaults(o: any, width = 0) {
     tooltip,
   };
   const out = width > 0 && width < NARROW ? compact(merged, width) : merged;
-  return isDim() ? { ...dimify(out), textStyle: { ...out.textStyle, color: "#c3ced8" }, legend: out.legend && !Array.isArray(out.legend) ? { ...dimify(out.legend), textStyle: { color: "#c3ced8", ...dimify(out.legend.textStyle || {}) } } : dimify(out.legend) } : out;
+  return isDim(el) ? { ...dimify(out), textStyle: { ...out.textStyle, color: "#c3ced8" }, legend: out.legend && !Array.isArray(out.legend) ? { ...dimify(out.legend), textStyle: { color: "#c3ced8", ...dimify(out.legend.textStyle || {}) } } : dimify(out.legend) } : out;
 }
 export const axisStyle = { axisLine: { lineStyle: { color: "#cfd9e2" } }, axisLabel: { color: "#5b6b7b", fontSize: 11 }, splitLine: { lineStyle: { color: "#eef2f6" } }, nameTextStyle: { color: "#7a8a9a", fontSize: 11 } };

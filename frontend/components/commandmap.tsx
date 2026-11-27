@@ -27,10 +27,14 @@ interface Props {
   routes: { fastest?: LngLat[]; shortest?: LngLat[] }; selectedId?: string | null; reduce: boolean; height?: number | string;
   routeMode?: "fastest" | "shortest" | "both"; dest?: LngLat | null; explored?: { astar?: LngLat[]; dijkstra?: LngLat[] } | null;
   onPick: (p: LngLat) => void; onFacility: (f: any) => void; onBuildings?: (available: boolean) => void;
+  /** persistent HTML markers (one element per key, kept across updates so the caller can render into it, e.g. with a React portal) */
+  overlays?: { key: string; lngLat: LngLat }[]; onOverlay?: (key: string, el: HTMLElement | null) => void;
+  basemap?: "auto" | "blank";
 }
 
 const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
   const el = useRef<HTMLDivElement>(null), map = useRef<any>(null), lib = useRef<any>(null);
+  const ov = useRef(new Map<string, any>());
   const markers = useRef<any[]>([]), originMarker = useRef<any>(null), destMarker = useRef<any>(null), anim = useRef<number>(0), anim2 = useRef<number>(0);
   const cb = useRef(p); cb.current = p;
   const [ready, setReady] = useState(false), [failed, setFailed] = useState(false), [slow, setSlow] = useState(false), [tileErr, setTileErr] = useState(false);
@@ -53,7 +57,7 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
       const L = (lib.current = (m as any).default ?? m);
       try { L.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs"); } catch {}
       try {
-        const mp = (map.current = new L.Map({ container: el.current, style: KEY ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${KEY}` : BLANK,
+        const mp = (map.current = new L.Map({ container: el.current, style: KEY && cb.current.basemap !== "blank" ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${KEY}` : BLANK,
           center: [90.4, 23.78], zoom: 11.2, maxPitch: 70, cooperativeGestures: true,
           attributionControl: { compact: true, customAttribution: "Facilities & routing © OpenStreetMap contributors (ODbL) · Boundaries © DGHS" } }));
         mp.addControl(new L.NavigationControl({ visualizePitch: true }), "top-right");
@@ -100,7 +104,7 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
             try { const z = await mp.getSource("fac").getClusterExpansionZoom(f.properties.cluster_id); mp.easeTo({ center: f.geometry.coordinates, zoom: z, duration: cb.current.reduce ? 0 : 600 }); } catch {}
           });
           mp.on("click", "fac-point", (e: any) => { const f = e.features?.[0]; if (f) cb.current.onFacility(f); });
-          mp.on("click", (e: any) => { if (!mp.queryRenderedFeatures(e.point, { layers: ["fac-point", "fac-cluster"].filter((l) => mp.getLayer(l)) }).length) cb.current.onPick([e.lngLat.lng, e.lngLat.lat]); });
+          mp.on("click", (e: any) => { if (e.originalEvent?.target?.closest?.(".maplibregl-marker")) return; if (!mp.queryRenderedFeatures(e.point, { layers: ["fac-point", "fac-cluster"].filter((l) => mp.getLayer(l)) }).length) cb.current.onPick([e.lngLat.lng, e.lngLat.lat]); });
           for (const l of ["fac-point", "fac-cluster"]) { mp.on("mouseenter", l, () => (mp.getCanvas().style.cursor = "pointer")); mp.on("mouseleave", l, () => (mp.getCanvas().style.cursor = "")); }
           setReady(true);
         });
@@ -168,6 +172,19 @@ const CommandMap = forwardRef<MapHandle, Props>(function CommandMap(p, ref) {
     const d = document.createElement("div"); d.className = "ds-dest"; d.setAttribute("aria-label", "Destination");
     destMarker.current = new lib.current.Marker({ element: d, anchor: "bottom" }).setLngLat(p.dest).addTo(map.current);
   }, [ready, p.dest]);
+
+  useEffect(() => {
+    if (!ready || !lib.current) return;
+    const keep = new Set((p.overlays ?? []).map((o) => o.key));
+    ov.current.forEach((m, k) => { if (!keep.has(k)) { m.remove(); ov.current.delete(k); cb.current.onOverlay?.(k, null); } });
+    for (const o of p.overlays ?? []) {
+      const m = ov.current.get(o.key);
+      if (m) { m.setLngLat(o.lngLat); continue; }
+      const el = document.createElement("div");
+      ov.current.set(o.key, new lib.current.Marker({ element: el }).setLngLat(o.lngLat).addTo(map.current));
+      cb.current.onOverlay?.(o.key, el);
+    }
+  }, [ready, p.overlays]);
 
   // which route(s) are visible
   useEffect(() => {
