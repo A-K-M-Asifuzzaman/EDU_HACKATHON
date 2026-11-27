@@ -9,8 +9,8 @@ import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
 import { Chart } from "./echart";
 import { Icon } from "./icons";
-import { CITIES, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
-import { Btn, Card, DataTable, Kpi, Loading, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
+import { CITIES, Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
+import { Btn, Card, DataTable, Kpi, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
 
 const C_OCC = "#4a2bd0", C_MOVE = "#1baf7a", C_SPARE = "#cdeedd", C_SHORT = "#c2303a";
 const STRIPES = `repeating-linear-gradient(135deg, ${C_SHORT} 0 5px, #e2646c 5px 10px)`;
@@ -57,10 +57,8 @@ function flowOption(d: any, city: string) {
 export default function HospitalSurge({ shared }: { shared: PlanShared }) {
   const { sel } = useSel();
   const { lang } = useI18n();
-  const { city, setCity, service, setService, stock } = shared;
+  const { city, setCity, service, setService, stock, capPct, setCapPct, overrides, setOverrides } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const [capPct, setCapPct] = useState(100);
-  const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [focus, setFocus] = useState<string | null>(null);
   const p = useDebounced({ capPct, overrides, stock });
   const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/overflow/plan?${qs({
@@ -100,7 +98,7 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
       {nOverrides > 0 && <Btn variant="ghost" onClick={() => setOverrides({})}>Clear {nOverrides} typed capacit{nOverrides === 1 ? "y" : "ies"}</Btn>}
     </div>
 
-    <Loading q={q} h={460} kind="table" label="Hospital surge">{() => (<div aria-live="polite">
+    <Live q={q} h={460} label="Hospital surge">{() => (<div>
       <p className="mt-4 text-[12.5px] text-ink-3">Forecast issued {dateFmt(d.origin, lang)} for the week of {dateFmt(d.target_date, lang)} at the {d.settings.service_label}. Baseline capacity: the 90th percentile of each ward's weekly bed need over the {d.capacity_rule.history_weeks} weeks before {dateFmt(d.origin, lang)}, at {d.settings.capacity_pct}%.</p>
       <div className="mt-3 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Projected bed demand" value={d.totals.demand} hint={`against ${d.totals.capacity} beds of illustrative capacity`} tone={d.totals.demand > d.totals.capacity ? "bad" : "ok"} />
@@ -166,6 +164,6 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
       <details className="mt-4 rounded-xl border border-line p-4 text-[13px] text-ink-2"><summary className="cursor-pointer font-semibold text-ink">How the overflow routing works</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">{d.assumptions.map((a: string) => <li key={a}>{a}</li>)}</ul>
         <p className="mt-2">Within each city the routing first places as many patients as possible (a maximum flow: the smaller of total overflow and total spare beds), then, among such plans, relieves the most overloaded ward first and fills the ward with the most spare beds first. The tests check it against brute force and an independent max-flow solver.</p></details>
-    </div>)}</Loading></>)}
+    </div>)}</Live></>)}
   </Card>);
 }

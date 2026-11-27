@@ -6,8 +6,9 @@ import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, isoWeek, num, pct, toCsv } from "@/lib/format";
 import ControlsBar from "@/components/controls";
 import ResourceSandbox from "@/components/sandbox";
-import SupplyAllocation, { type Service } from "@/components/supply-allocation";
+import SupplyAllocation, { usePlanState } from "@/components/supply-allocation";
 import HospitalSurge from "@/components/hospital-surge";
+import VectorControl from "@/components/vector-control";
 import AlertQueue from "@/components/alert-queue";
 import { Btn, Card, CardTitle, DataTable, Loading, Modal, Notice, PageHeader, ProvChip, RiskBadge, Segmented, useAsync, useToast } from "@/components/ui";
 import Link from "next/link";
@@ -50,16 +51,13 @@ export default function Response() {
   const allWards: Forecast[] = rank.data?.wards ?? [];
   const wards = tierF === "All" ? allWards : allWards.filter((w) => w.risk_tier === tierF);
   const wq = (w: Forecast) => selQuery({ ...sel, ward: w.ward_id });
-  const [planCity, setPlanCity] = useState("All");
-  const [service, setService] = useState<Service>("p80");
-  const [stock, setStock] = useState(60);
-  const plan = { city: planCity, setCity: setPlanCity, service, setService, stock, setStock };
+  const plan = usePlanState();
   return (<>
-    <PageHeader art={<Clipboard className="w-full" />} eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, allocate saline, kits, beds and spraying crews under a stock limit, route hospital overflow within each city, and review generic options. Quantities are planning estimates from the forecast, not orders." />
+    <PageHeader art={<Clipboard className="w-full" />} eyebrow="Decision support · not official guidance" title={t("resp.title")} sub="Prioritise wards, check how confident each forecast is, allocate saline, kits, beds and spraying crews under a stock limit, route hospital overflow within each city, test vector-control scenarios, and review generic options. Quantities are planning estimates from the forecast, not orders." />
     <ControlsBar show={["origin", "horizon", "source"]} />
     <Notice tone="warn">{t("resp.noofficial")} {t("disc.official")}</Notice>
     {/* long page on phones: jump straight to each part of the workflow */}
-    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#priority", "Priority wards"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
+    <nav aria-label="On this page" className="mt-4 flex gap-2 overflow-x-auto pb-1 text-[13px]">{[["#priority", "Priority wards"], ["#supply", "Supply allocation"], ["#surge", "Hospital surge"], ["#vector", "Vector control"], ["#alert-queue", "Review queue"], ["#options", "Generic options"], ["#sandbox", "Resource sandbox"]].map(([h, l]) => (
       <a key={h} href={h} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line bg-white px-3.5 font-medium text-forest hover:bg-mint-l">{l}</a>))}</nav>
     <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
       <Card id="priority" className="scroll-mt-20"><CardTitle title="Priority wards" sub={`${sel.horizon} ${t("ctl.weeks")} · origin ${dateFmt(sel.origin, lang)} · ranked by ${by === "p_outbreak" ? "outbreak probability" : "expected cases"}`} right={<div className="flex flex-wrap gap-2"><Segmented value={by} onChange={setBy} options={[{ value: "p_outbreak", label: "Probability" }, { value: "expected_cases", label: "Expected cases" }]} />
@@ -75,6 +73,7 @@ export default function Response() {
           {sig.loading ? <p className="text-sm text-ink-3">{t("state.loading")}</p> : (<div className="space-y-2">{signals.map((s: any) => (<div key={s.city} className="flex items-center gap-3 text-[13px]"><span className="w-28 font-medium">{s.city}</span><div className="h-2.5 flex-1 overflow-hidden rounded-full bg-line"><div className="h-full rounded-full" style={{ width: `${Math.min(100, (s.ratio / 2) * 100)}%`, background: s.ratio > 1.3 ? "#d93a42" : s.ratio < 0.7 ? "#3b82c4" : "#3b3a8c" }} /></div><span className="num w-24 text-right text-xs">{num(s.recent, lang, 0)} / {num(s.typ, lang, 0)} mm</span></div>))}<p className="text-[11px] text-ink-3">Above typical rain 2–4 weeks before the target week is the pattern the model associates with higher counts.</p></div>)}</Card></div></div>
     <SupplyAllocation shared={plan} />
     <HospitalSurge shared={plan} />
+    <VectorControl shared={plan} />
     <Card id="options" className="mt-5 scroll-mt-20"><CardTitle title={t("resp.generic")} sub="Generic, evidence-informed options for officers to review against national guidance" />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">{OPTIONS.map((o) => (<div key={o.title} className="rounded-xl border border-line p-4"><h3 className="text-sm font-semibold text-forest">{o.title}</h3><p className="mt-1 text-[13px] text-ink-2">{o.body}</p><p className="mt-2 text-[11px] text-ink-3"><b>Consider when:</b> {o.when}</p></div>))}</div>
       <p className="mt-3 text-xs text-ink-3">These are not official government decisions or recommendations, and these options carry no quantities (the supply allocation above gives planning estimates). They were written for this prototype as generic examples.</p></Card>

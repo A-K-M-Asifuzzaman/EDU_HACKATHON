@@ -16,7 +16,7 @@ const P: Record<string, string> = {
   menu: "M4 7h16M4 12h16M4 17h16", close: "M6 6l12 12M18 6L6 18", search: "M11 18a7 7 0 100-14 7 7 0 000 14zm9 3l-4.3-4.3",
   download: "M12 4v11m0 0l-4-4m4 4l4-4M5 20h14", alert: "M12 4l9 16H3L12 4zm0 6v4m0 3h.01", info: "M12 11v5m0-8.5h.01M12 3a9 9 0 100 18 9 9 0 000-18z",
   play: "M8 5v14l11-7L8 5z", pause: "M8 5v14M16 5v14", send: "M4 12l16-8-6 16-3-7-7-1z", check: "M5 12l4 4 10-10", chevron: "M8 10l4 4 4-4", external: "M14 4h6v6m0-6L10 14M18 14v5H5V6h5",
-  shield: "M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6l8-3z", bed: "M3 6v13M3 15h18v4M21 15v-3a3 3 0 00-3-3h-8v6M7 13a2 2 0 100-4 2 2 0 000 4z", drop: "M12 3s6 6.2 6 10.5A6 6 0 016 13.5C6 9.2 12 3 12 3z",
+  shield: "M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6l8-3z", bed: "M3 6v13M3 15h18v4M21 15v-3a3 3 0 00-3-3h-8v6M7 13a2 2 0 100-4 2 2 0 000 4z", spray: "M8 7h6l1 4v9a1 1 0 01-1 1H8a1 1 0 01-1-1v-9l1-4zM9 3h4v4H9zM13 4h2.5M17 3l2-1M17 5h2.5M17 7l2 1", drop: "M12 3s6 6.2 6 10.5A6 6 0 016 13.5C6 9.2 12 3 12 3z",
 };
 export function Icon({ name, size = 20, className = "" }: { name: string; size?: number; className?: string }) {
   return (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><path d={P[name] ?? P.info} /></svg>);

@@ -135,9 +135,11 @@ class Settings:
             raise ValueError("crew settings out of range")
 
 
-def plan(fc: pd.DataFrame, wards: pd.DataFrame, rules: dict[str, float], st: Settings) -> dict:
-    """fc: one forecast row per ward (ward_id, city, median_cases, upper_80, upper_90, p_outbreak, risk_tier).
-    wards: the 60 wards' static attributes (ward_id, population_density_sqkm); its maximum density scales the density term."""
+def plan(fc: pd.DataFrame, wards: pd.DataFrame, rules: dict[str, float], st: Settings, supply: dict | None = None) -> dict:
+    """fc: one forecast row per ward (ward_id, city, median_cases, upper_80, upper_90, p_outbreak, risk_tier). Case columns may be
+    fractional (scenario forecasts); demand rounds once, through the resource rule.
+    wards: the 60 wards' static attributes (ward_id, population_density_sqkm); its maximum density scales the density term.
+    supply: optional fixed pool per (city, resource), e.g. the baseline stock when demand changes under a scenario."""
     st.validate()
     if fc.ward_id.duplicated().any():
         raise ValueError("one forecast row per ward expected")
@@ -145,7 +147,7 @@ def plan(fc: pd.DataFrame, wards: pd.DataFrame, rules: dict[str, float], st: Set
     if df.population_density_sqkm.isna().any():
         raise ValueError("unknown ward in forecast")
     df = df.sort_values(["city", "ward_id"], ignore_index=True)
-    df["cases"] = df[SERVICE_COLUMN[st.service]].astype(np.int64)
+    df["cases"] = df[SERVICE_COLUMN[st.service]].astype(float)
     df["priority"] = priority(df.p_outbreak, df.population_density_sqkm, float(wards.population_density_sqkm.max()), st.alpha)
     for r in RESOURCES:
         df[f"{r}_demand"] = demand(df.cases, rules[r])
@@ -157,11 +159,11 @@ def plan(fc: pd.DataFrame, wards: pd.DataFrame, rules: dict[str, float], st: Set
         summ = {"city": city, "wards": len(g)}
         for r in RESOURCES:
             d = g[f"{r}_demand"].to_numpy()
-            supply = pool_supply(st.stock, int(d.sum()))
-            x = allocate_pool(d, supply, w, keys, st.floor_share)
+            pool = pool_supply(st.stock, int(d.sum())) if supply is None else int(supply[(city, r)])
+            x = allocate_pool(d, pool, w, keys, st.floor_share)
             df.loc[idx, f"{r}_allocated"] = x
-            summ[r] = {"demand": int(d.sum()), "supply": supply, "allocated": int(x.sum()), "unmet": int(d.sum() - x.sum()),
-                       "surplus": int(supply - x.sum())}
+            summ[r] = {"demand": int(d.sum()), "supply": pool, "allocated": int(x.sum()), "unmet": int(d.sum() - x.sum()),
+                       "surplus": int(pool - x.sum())}
         cities.append(summ)
     # crews: one regional team pool, assigned across all wards in view by priority (crews move between cities within the region)
     df["crews_assigned"] = assign_crews(df.crews_needed.to_numpy(), st.crews, df.priority.to_numpy(), df.ward_id.tolist())

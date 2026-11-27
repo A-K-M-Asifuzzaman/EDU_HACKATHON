@@ -25,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from dengueshield import decision, routing
 from dengueshield import allocation as alloc
 from dengueshield import overflow as ovf
+from dengueshield import intervention as iv
 from dengueshield.onsite_data import load_onsite_development_panel
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
@@ -755,6 +756,19 @@ def name_values(values: Optional[list[str]], what: str, valid: set, hi: int) -> 
     return out
 
 
+def ward_capacity(wards: pd.DataFrame, origin: str, capacity_pct: int, cpct: dict, ovr: dict) -> pd.DataFrame:
+    """Stage 2 illustrative capacity for the given wards (ward_id, city): baseline, history_weeks, pct, capacity, overridden."""
+    base, _ = S.cache.get_or(("bed_baseline", origin), lambda: ovf.capacity_baseline(bed_history(), origin))
+    df = wards[["ward_id", "city"]].merge(base, on="ward_id", how="left", validate="one_to_one")
+    if df.baseline.isna().any():
+        bad("capacity baseline missing for some wards", 503)
+    df["pct"] = [cpct.get(c, capacity_pct) for c in df.city]
+    df["capacity"] = ovf.scale(df.baseline.astype(int), df.pct)
+    df["overridden"] = df.ward_id.isin(ovr)
+    df.loc[df.overridden, "capacity"] = df.loc[df.overridden, "ward_id"].map(ovr)
+    return df.drop(columns="city")
+
+
 @app.get("/api/overflow/plan")
 def overflow_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
                   service: Literal["median", "p80", "p90"] = "p80", capacity_pct: Annotated[int, Query(ge=0, le=ovf.MAX_PCT)] = 100,
@@ -768,17 +782,11 @@ def overflow_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None,
     key = ("overflow", origin, horizon, source, city, service, capacity_pct, tuple(sorted(cpct.items())), tuple(sorted(ovr.items())), round(stock, 4))
 
     def compute():
-        base, _ = S.cache.get_or(("bed_baseline", origin), lambda: ovf.capacity_baseline(bed_history(), origin))
-        df = fc[["ward_id", "city", "risk_tier", "p_outbreak", "median_cases", "upper_80", "upper_90"]].merge(base, on="ward_id", how="left", validate="one_to_one")
-        if df.baseline.isna().any():
-            bad("capacity baseline missing for some wards", 503)
+        df = fc[["ward_id", "city", "risk_tier", "p_outbreak", "median_cases", "upper_80", "upper_90"]].merge(
+            ward_capacity(fc, origin, capacity_pct, cpct, ovr), on="ward_id", how="left", validate="one_to_one")
         for lvl, col in alloc.SERVICE_COLUMN.items():
             df[f"beds_{lvl}"] = alloc.demand(df[col], rules["hospital_beds_required"])
         df["demand"] = df[f"beds_{service}"]
-        df["pct"] = [cpct.get(c, capacity_pct) for c in df.city]
-        df["capacity"] = ovf.scale(df.baseline.astype(int), df.pct)
-        df["overridden"] = df.ward_id.isin(ovr)
-        df.loc[df.overridden, "capacity"] = df.loc[df.overridden, "ward_id"].map(ovr)
         res = ovf.plan(df)
         w = res["wards"].sort_values(["city", "deficit", "headroom", "ward_id"], ascending=[True, False, True, True])
         wards_out = [{"ward_id": r.ward_id, "city": r.city, "risk_tier": r.risk_tier, "p_outbreak": round(float(r.p_outbreak), 4),
@@ -803,6 +811,187 @@ def overflow_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None,
                               "regional_supply_scenario": sum(c["regional_supply_scenario"] for c in res["cities"])},
                 "totals": t, "cities": res["cities"], "transfers": res["transfers"], "wards": wards_out,
                 "assumptions": SURGE_ASSUMPTIONS, "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(key, compute)
+    except ValueError as e:
+        bad(str(e))
+    return v
+
+
+# ------------------------------------------------------------------ vector-control scenario simulator (Phase 2 onsite, Problem 3)
+VECTOR_DISCLOSURE = {
+    "observed": "Weekly cases, weather and resource requirements for 2016-2024 from the organizer dataset (synthetic). They trained and replayed "
+                "the forecasts and set the illustrative bed capacity; target-week outcomes are never read, and 2025 stays sealed.",
+    "forecast": "Saved, origin-safe forecasts of expected weekly cases: the validated replay for 2019-2024 targets (each season forecast by models "
+                "fitted on earlier seasons only) and the deployed model only past its training window. The deployed model is unchanged.",
+    "assumptions": "Maximum reduction, coverage per crew, delay and build-up are scenario assumptions set by the user. Presets are illustrative; "
+                   "the dataset contains no spraying or larvicide records and no intervention outcomes, so no efficacy was measured.",
+    "scenario": "Scenario cases = (1 - reduction) x forecast cases. Cases prevented, resource savings and hospital changes are counterfactual "
+                "estimates under those assumptions, not predictions of what will happen.",
+    "limitations": [
+        "No causal effect is estimated: without intervention records the data cannot identify one.",
+        "Coverage per crew is an interpretation (share of a ward one crew can treat); wards have no area or breeding-site data, so every ward "
+        "is treated alike.",
+        "A single deployment at the forecast origin is assumed to persist through week 4; waning, repeat rounds and spill-over between "
+        "neighbouring wards are not modelled.",
+        "The reduction scales the forecast proportionally, including its 80% and 90% range ends; transmission feedback is not simulated.",
+        "Forecast error carries into every estimate, largest at outbreak peaks.",
+    ],
+}
+
+
+@app.get("/api/intervention/simulate")
+def intervention_simulate(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
+                          service: Literal["median", "p80", "p90"] = "p80", source: Optional[Literal["replay", "bundle"]] = None,
+                          mode: Literal["optimized", "manual", "stage1"] = "optimized",
+                          crews: Annotated[int, Query(ge=0, le=1000)] = 20, max_crews_per_ward: Annotated[int, Query(ge=1, le=10)] = 3,
+                          assign: Annotated[Optional[list[str]], Query()] = None,
+                          effect: Annotated[float, Query(ge=0.0, le=iv.MAX_EFFECT)] = 0.30, coverage: Annotated[float, Query(ge=0.05, le=1.0)] = 0.35,
+                          delay: Annotated[int, Query(ge=0, le=3)] = 1, buildup: Annotated[int, Query(ge=1, le=3)] = 2,
+                          sens_low: Annotated[float, Query(ge=0.0, le=1.0)] = 0.5, sens_high: Annotated[float, Query(ge=1.0, le=2.0)] = 1.5,
+                          stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6, risk_weight: Annotated[float, Query(ge=0.0, le=1.0)] = 0.7,
+                          floor: Annotated[float, Query(ge=0.0, le=0.5)] = 0.25, cases_per_crew: Annotated[int, Query(ge=1, le=100)] = 10,
+                          capacity_pct: Annotated[int, Query(ge=0, le=ovf.MAX_PCT)] = 100,
+                          city_pct: Annotated[Optional[list[str]], Query()] = None, override: Annotated[Optional[list[str]], Query()] = None):
+    """Assumption-driven vector-control scenario: crews -> scenario cases at 2, 3 and 4 weeks -> resource demand and hospital overflow."""
+    fcs, missing = {}, {}
+    for h in iv.HORIZONS:
+        try:
+            fcs[h], _ = decision_forecast(origin, h, source, city)
+        except HTTPException as e:
+            if e.status_code != 422:
+                raise
+            missing[h] = e.detail
+    if horizon not in fcs:
+        bad(f"no out-of-time forecast at the planning horizon h={horizon}: {missing[horizon]}")
+    eff = iv.Effect(round(effect, 4), round(coverage, 4), delay, buildup, round(sens_low, 4), round(sens_high, 4))
+    try:
+        eff.validate()
+    except ValueError as e:
+        bad(str(e))
+    cpct = name_values(city_pct, "city", set(S.wards.city), ovf.MAX_PCT)
+    ovr = name_values(override, "ward", set(S.ward_ids), 500)
+    base_fc = fcs[horizon].sort_values(["city", "ward_id"], ignore_index=True)
+    order = base_fc.ward_id.tolist()
+    manual = name_values(assign, "ward", set(S.ward_ids), 10) if mode == "manual" else {}
+    if set(manual) - set(order):
+        bad(f"manual crews for wards outside this view: {sorted(set(manual) - set(order))[:5]}")
+    if any(v > max_crews_per_ward for v in manual.values()):
+        bad(f"at most {max_crews_per_ward} crews per ward")
+    if sum(manual.values()) > crews:
+        bad(f"manual assignment uses {sum(manual.values())} crews but only {crews} are available")
+    st = alloc.Settings(service=service, stock=round(stock, 4), crews=crews, alpha=round(risk_weight, 4), floor_share=round(floor, 4),
+                        cases_per_crew=cases_per_crew, max_crews_per_ward=max_crews_per_ward)
+    rules = alloc_rules()
+    key = ("intervention", origin, horizon, source, city, service, mode, tuple(sorted(manual.items())), eff, st, capacity_pct,
+           tuple(sorted(cpct.items())), tuple(sorted(ovr.items())))
+
+    def compute():
+        avail = sorted(fcs)
+        mu = {h: fcs[h].set_index("ward_id").loc[order, "expected_cases"].to_numpy(float) for h in avail}
+        weight = iv.window_weight(mu, eff)
+        p = base_fc.p_outbreak.to_numpy(float)
+        tie = [(-round(float(p[i]), 6), order[i]) for i in range(len(order))]
+        cols = ["ward_id", "city", "median_cases", "upper_80", "upper_90", "p_outbreak", "risk_tier"]
+        s1 = alloc.plan(base_fc[cols], S.wards, rules, st)
+        k_stage1 = s1["wards"].set_index("ward_id").loc[order, "crews_assigned"].to_numpy(np.int64)
+        k_opt = iv.optimise(weight, crews, max_crews_per_ward, eff, tie)
+        k = {"optimized": k_opt, "stage1": k_stage1, "manual": np.array([manual.get(w, 0) for w in order], dtype=np.int64)}[mode]
+        sim = iv.simulate(mu, k, eff)
+        window = lambda part, kk=None: float(sum((iv.simulate(mu, kk, eff) if kk is not None else sim)[h][part].sum() for h in avail))
+        prevented_w = sum(sim[h]["prevented"] for h in avail)
+
+        # downstream: the planning horizon's service-level quantiles, scaled by the same reduction
+        r_star = sim[horizon]["reduction"]
+        scen_fc = base_fc[cols].copy()
+        for c in ("median_cases", "upper_80", "upper_90"):
+            scen_fc[c] = scen_fc[c].to_numpy(float) * (1.0 - r_star)
+        s1_base = alloc.plan(base_fc[cols], S.wards, rules, st)
+        fixed = {(c["city"], r): c[r]["supply"] for c in s1_base["cities"] for r in alloc.RESOURCES}
+        s1_scen = alloc.plan(scen_fc, S.wards, rules, st, supply=fixed)                 # same stock: demand falls, nothing is created
+        res_city = []
+        for cb, cs in zip(s1_base["cities"], s1_scen["cities"]):
+            row = {"city": cb["city"]}
+            for r in alloc.RESOURCES:
+                row[r] = {"supply": cb[r]["supply"], "baseline_demand": cb[r]["demand"], "scenario_demand": cs[r]["demand"],
+                          "demand_saving": cb[r]["demand"] - cs[r]["demand"], "baseline_unmet": cb[r]["unmet"], "scenario_unmet": cs[r]["unmet"],
+                          "stock_not_required": cs[r]["surplus"]}
+            res_city.append(row)
+        res_tot = {r: {k2: int(sum(c[r][k2] for c in res_city)) for k2 in res_city[0][alloc.RESOURCES[0]]} for r in alloc.RESOURCES} if res_city else {}
+
+        cap = ward_capacity(base_fc, origin, capacity_pct, cpct, ovr)
+        hb = base_fc[["ward_id", "city", "p_outbreak"]].merge(cap[["ward_id", "capacity"]], on="ward_id")
+        col = alloc.SERVICE_COLUMN[service]
+        hb["demand"] = alloc.demand(base_fc[col], rules["hospital_beds_required"])
+        hs = hb.copy()
+        hs["demand"] = alloc.demand(scen_fc[col], rules["hospital_beds_required"])
+        ob, os_ = ovf.plan(hb), ovf.plan(hs)
+        hosp_city = [{"city": a["city"], "capacity": a["capacity"], **{f"{t}_{k2}": c[k2] for t, c in (("baseline", a), ("scenario", b))
+                      for k2 in ("demand", "deficit", "transferred", "unresolved", "utilization_after")}}
+                     for a, b in zip(ob["cities"], os_["cities"])]
+
+        wards_out = []
+        bm = alloc.demand(base_fc[col], rules["hospital_beds_required"]), alloc.demand(scen_fc[col], rules["hospital_beds_required"])
+        sm = alloc.demand(base_fc[col], rules["saline_bags_needed"]), alloc.demand(scen_fc[col], rules["saline_bags_needed"])
+        for i, w in enumerate(order):
+            ki = int(k[i])
+            pw = float(prevented_w[i])
+            wards_out.append({
+                "ward_id": w, "city": base_fc.city[i], "risk_tier": base_fc.risk_tier[i], "p_outbreak": round(float(p[i]), 4), "crews": ki,
+                "coverage": round(float(iv.coverage(ki, eff.coverage)), 4), "window_weight": round(float(weight[i]), 4),
+                "by_horizon": {str(h): {"target_date": str(fcs[h].set_index("ward_id").at[w, "target_date"]),
+                                        "baseline": round(float(sim[h]["baseline"][i]), 3), "scenario": round(float(sim[h]["scenario"][i]), 3),
+                                        "prevented": round(float(sim[h]["prevented"][i]), 3), "reduction": round(float(sim[h]["reduction"][i]), 4),
+                                        "prevented_low": round(float(sim[h]["prevented_low"][i]), 3),
+                                        "prevented_high": round(float(sim[h]["prevented_high"][i]), 3)} for h in avail},
+                "prevented_window": round(pw, 3), "per_crew": round(pw / ki, 3) if ki else None,
+                "last_crew_gain": round(float(iv.marginal(weight[i], ki, eff)), 3) if ki else None,
+                "next_crew_gain": round(float(iv.marginal(weight[i], ki + 1, eff)), 3) if ki < max_crews_per_ward else None,
+                "beds": {"baseline": int(bm[0][i]), "scenario": int(bm[1][i])}, "saline": {"baseline": int(sm[0][i]), "scenario": int(sm[1][i])}})
+        ranked = sorted((x for x in wards_out if x["crews"]), key=lambda x: (-x["per_crew"], -x["p_outbreak"], x["ward_id"]))
+        for rank, x in enumerate(ranked, 1):
+            x["roi_rank"] = rank
+        assigned = [i for i in range(len(order)) if k[i] > 0]
+        open_ = [i for i in range(len(order)) if k[i] < max_crews_per_ward]
+        tot = {"crews": {"total": crews, "assigned": int(k.sum()), "unassigned": int(crews - k.sum()), "max_per_ward": max_crews_per_ward},
+               "by_horizon": {str(h): {"baseline": round(float(sim[h]["baseline"].sum()), 3), "scenario": round(float(sim[h]["scenario"].sum()), 3),
+                                       "prevented": round(float(sim[h]["prevented"].sum()), 3), "prevented_low": round(float(sim[h]["prevented_low"].sum()), 3),
+                                       "prevented_high": round(float(sim[h]["prevented_high"].sum()), 3),
+                                       "timing": iv.timing(h, eff.delay, eff.buildup)} for h in avail},
+               "prevented_window": round(window("prevented"), 3), "prevented_window_low": round(window("prevented_low"), 3),
+               "prevented_window_high": round(window("prevented_high"), 3), "baseline_window": round(window("baseline"), 3),
+               "per_crew": round(window("prevented") / int(k.sum()), 3) if k.sum() else None,
+               "weakest_assigned_gain": round(min(float(iv.marginal(weight[i], k[i], eff)) for i in assigned), 3) if assigned else None,
+               "best_unused_gain": round(max(float(iv.marginal(weight[i], k[i] + 1, eff)) for i in open_), 3) if open_ else None,
+               "compare": {"optimized": round(window("prevented", k_opt), 3), "stage1_rule": round(window("prevented", k_stage1), 3),
+                           "current": round(window("prevented"), 3)}}
+        sens = [{"effect_multiplier": m, "delay": dl, "prevented_window": round(float(sum(iv.simulate(
+                    mu, k, iv.Effect(min(iv.MAX_EFFECT, eff.max_reduction * m), eff.coverage, dl, eff.buildup))[h]["prevented"].sum() for h in avail)), 3)}
+                for m in sorted({eff.sens_low, 1.0, eff.sens_high}) for dl in (0, 1, 2, 3)]
+        curve = [{"crews": kk, "coverage": round(float(iv.coverage(kk, eff.coverage)), 4),
+                  **{f"reduction_h{h}": round(float(iv.reduction(kk, h, eff)), 4) for h in avail}} for kk in range(max_crews_per_ward + 1)]
+        return {"origin": origin, "planning_horizon": horizon, "city": city or "All", "horizons": avail, "horizons_missing": {str(h): m for h, m in missing.items()},
+                "sources": {str(h): str(fcs[h].source.iloc[0]) for h in avail}, "target_dates": {str(h): str(fcs[h].target_date.iloc[0]) for h in avail},
+                "mode": mode,
+                "settings": {"service": service, "service_label": alloc.SERVICE_LABEL[service], "effect": eff.max_reduction, "coverage": eff.coverage,
+                             "delay": eff.delay, "buildup": eff.buildup, "sens_low": eff.sens_low, "sens_high": eff.sens_high, "stock": st.stock,
+                             "capacity_pct": capacity_pct, "crews": crews, "max_crews_per_ward": max_crews_per_ward},
+                "equations": {"coverage": "C(k) = 1 - (1 - a)^k", "timing": "T(h) = min(1, max(0, (h - d) / w))", "reduction": "R(k, h) = E x C(k) x T(h)",
+                              "scenario": "scenario cases = (1 - R) x forecast cases; prevented = R x forecast cases",
+                              "marginal": "g(k) = E x W x a x (1 - a)^(k - 1), W = sum over h of T(h) x forecast cases"},
+                "totals": tot, "wards": wards_out, "roi": [{"rank": x["roi_rank"], "ward_id": x["ward_id"], "city": x["city"], "crews": x["crews"],
+                                                            "prevented_window": x["prevented_window"], "per_crew": x["per_crew"],
+                                                            "last_crew_gain": x["last_crew_gain"], "next_crew_gain": x["next_crew_gain"]} for x in ranked],
+                "sensitivity": sens, "response_curve": curve,
+                "resources": {"totals": res_tot, "cities": res_city,
+                              "note": "Savings are lower projected demand under the scenario. Supply stays at the baseline stock; stock not required is not "
+                                      "redistributed, delivered or created."},
+                "hospital": {"totals": {t: {k2: o["totals"][k2] for k2 in ("demand", "capacity", "deficit", "transferred", "unresolved", "utilization_after")}
+                                        for t, o in (("baseline", ob), ("scenario", os_))},
+                             "cities": hosp_city, "transfers": {"baseline": ob["transfers"], "scenario": os_["transfers"]},
+                             "note": "Same illustrative capacity as Hospital surge; transfers stay inside each city; Supply allocation beds are not added."},
+                "disclosure": VECTOR_DISCLOSURE, "disclaimer": DISCLAIMER}
 
     try:
         v, _ = S.cache.get_or(key, compute)
