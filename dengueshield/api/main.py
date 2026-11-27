@@ -16,17 +16,18 @@ from typing import Annotated, Literal, Optional
 
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from dengueshield import decision, routing
 from dengueshield import allocation as alloc
 from dengueshield import overflow as ovf
 from dengueshield import intervention as iv
-from dengueshield.onsite_data import load_onsite_development_panel
+from dengueshield import dispatch as dsp
+from dengueshield.onsite_data import ONSITE_SHA256 as ONSITE_SHA256_, load_onsite_development_panel
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
@@ -965,7 +966,8 @@ def intervention_simulate(origin: str, horizon: H = 3, city: Optional[str] = Que
                "weakest_assigned_gain": round(min(float(iv.marginal(weight[i], k[i], eff)) for i in assigned), 3) if assigned else None,
                "best_unused_gain": round(max(float(iv.marginal(weight[i], k[i] + 1, eff)) for i in open_), 3) if open_ else None,
                "compare": {"optimized": round(window("prevented", k_opt), 3), "stage1_rule": round(window("prevented", k_stage1), 3),
-                           "current": round(window("prevented"), 3)}}
+                           "current": round(window("prevented"), 3)},
+               "crews_by_city": {c: int(sum(int(k[i]) for i in range(len(order)) if base_fc.city[i] == c)) for c in sorted(set(base_fc.city))}}
         sens = [{"effect_multiplier": m, "delay": dl, "prevented_window": round(float(sum(iv.simulate(
                     mu, k, iv.Effect(min(iv.MAX_EFFECT, eff.max_reduction * m), eff.coverage, dl, eff.buildup))[h]["prevented"].sum() for h in avail)), 3)}
                 for m in sorted({eff.sens_low, 1.0, eff.sens_high}) for dl in (0, 1, 2, 3)]
@@ -998,6 +1000,124 @@ def intervention_simulate(origin: str, horizon: H = 3, city: Optional[str] = Que
     except ValueError as e:
         bad(str(e))
     return v
+
+
+# ------------------------------------------------------------------ ward dispatch briefs (Phase 2 onsite, Stage 4)
+def scenario_params(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40), service: Literal["median", "p80", "p90"] = "p80",
+                    source: Optional[Literal["replay", "bundle"]] = None, stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6,
+                    crews: Annotated[int, Query(ge=0, le=1000)] = 20, max_crews_per_ward: Annotated[int, Query(ge=1, le=10)] = 3,
+                    risk_weight: Annotated[float, Query(ge=0.0, le=1.0)] = 0.7, floor: Annotated[float, Query(ge=0.0, le=0.5)] = 0.25,
+                    cases_per_crew: Annotated[int, Query(ge=1, le=100)] = 10, capacity_pct: Annotated[int, Query(ge=0, le=ovf.MAX_PCT)] = 100,
+                    city_pct: Annotated[Optional[list[str]], Query()] = None, override: Annotated[Optional[list[str]], Query()] = None,
+                    mode: Literal["optimized", "manual", "stage1"] = "optimized", assign: Annotated[Optional[list[str]], Query()] = None,
+                    effect: Annotated[float, Query(ge=0.0, le=iv.MAX_EFFECT)] = 0.30, coverage: Annotated[float, Query(ge=0.05, le=1.0)] = 0.35,
+                    delay: Annotated[int, Query(ge=0, le=3)] = 1, buildup: Annotated[int, Query(ge=1, le=3)] = 2,
+                    sens_low: Annotated[float, Query(ge=0.0, le=1.0)] = 0.5, sens_high: Annotated[float, Query(ge=1.0, le=2.0)] = 1.5) -> dict:
+    """The full planning scenario shared by Stages 1-3 (the dashboard's shared plan state)."""
+    return dict(locals())
+
+
+_REPLAY_SHA: Optional[str] = None
+
+
+def run_scenario(p: dict):
+    """Run Stages 1-3 for one scenario and return (scenario, allocation, overflow, intervention, model). Results come from the same cached
+    engine calls the dashboard uses, so a brief and the dashboard always show the same numbers."""
+    global _REPLAY_SHA
+    a = allocation_plan(origin=p["origin"], horizon=p["horizon"], city=p["city"], service=p["service"], stock=p["stock"], crews=p["crews"],
+                        risk_weight=p["risk_weight"], floor=p["floor"], cases_per_crew=p["cases_per_crew"],
+                        max_crews_per_ward=p["max_crews_per_ward"], source=p["source"])
+    o = overflow_plan(origin=p["origin"], horizon=p["horizon"], city=p["city"], service=p["service"], capacity_pct=p["capacity_pct"],
+                      city_pct=p["city_pct"], override=p["override"], stock=p["stock"], source=p["source"])
+    v = intervention_simulate(origin=p["origin"], horizon=p["horizon"], city=p["city"], service=p["service"], source=p["source"], mode=p["mode"],
+                              crews=p["crews"], max_crews_per_ward=p["max_crews_per_ward"], assign=p["assign"], effect=p["effect"],
+                              coverage=p["coverage"], delay=p["delay"], buildup=p["buildup"], sens_low=p["sens_low"], sens_high=p["sens_high"],
+                              stock=p["stock"], risk_weight=p["risk_weight"], floor=p["floor"], cases_per_crew=p["cases_per_crew"],
+                              capacity_pct=p["capacity_pct"], city_pct=p["city_pct"], override=p["override"])
+    if _REPLAY_SHA is None:
+        import hashlib as _h
+        _REPLAY_SHA = _h.sha256((ROOT / "app_data" / "replay.csv.gz").read_bytes()).hexdigest()
+    manual = name_values(p["assign"], "ward", set(S.ward_ids), 10) if p["mode"] == "manual" else {}
+    st = v["settings"]
+    settings = {"origin": p["origin"], "horizon": p["horizon"], "view_city": p["city"] or "All", "service": p["service"], "source": p["source"] or "auto",
+                "stock": a["settings"]["stock"], "crews": p["crews"], "max_crews_per_ward": p["max_crews_per_ward"],
+                "risk_weight": a["settings"]["risk_weight"], "floor": a["settings"]["floor"], "cases_per_crew": p["cases_per_crew"],
+                "capacity_pct": p["capacity_pct"], "city_pct": dict(sorted(o["settings"]["city_pct"].items())),
+                "overrides": dict(sorted(o["settings"]["overrides"].items())),
+                "vector": {"mode": v["mode"], "assign": dict(sorted(manual.items())), "effect": st["effect"], "coverage": st["coverage"],
+                           "delay": st["delay"], "buildup": st["buildup"], "sens_low": st["sens_low"], "sens_high": st["sens_high"]}}
+    artifacts = {"dataset_sha256": S.data_sha, "onsite_sha256": ONSITE_SHA256_, "bundle_sha256": S.bundle_sha, "replay_sha256": _REPLAY_SHA,
+                 "resource_rules": alloc_rules()}
+    scenario = {"id": dsp.scenario_id(settings, artifacts), "settings": settings, "artifacts": artifacts}
+    model = {"name": "DengueShield champion (Ridge Poisson GLM, 24 features)", "bundle_sha256": (S.bundle_sha or "")[:12],
+             "replay_sha256": _REPLAY_SHA[:12], "data_through": S.last_week.date().isoformat()}
+    return scenario, a, o, v, model
+
+
+def _ward_in_view(ward: str, a: dict):
+    if ward not in S.ward_ids:
+        bad(f"unknown ward '{ward}'", 404)
+    if ward not in {w["ward_id"] for w in a["wards"]}:
+        bad(f"ward '{ward}' is outside the selected city view")
+
+
+@app.get("/api/dispatch/brief")
+def dispatch_brief(ward: str = Query(..., max_length=40), p: dict = Depends(scenario_params)):
+    """One immutable snapshot for a ward: the canonical brief plus every text format rendered from it (SMS, WhatsApp, HTML; English and
+    Bangla). Downloads use /api/dispatch/document with the same settings and carry the same scenario id and content hash."""
+    scenario, a, o, v, model = run_scenario(p)
+    _ward_in_view(ward, a)
+    b = dsp.ward_brief(ward, scenario, a, o, v, model)
+    sms = {lang: dsp.sms(b, lang) for lang in ("en", "bn")}
+    return {"scenario": scenario, "content_sha256": b["content_sha256"], "brief": b,
+            "formats": {"sms": {lang: {"text": t, **dsp.sms_stats(t)} for lang, t in sms.items()},
+                        "whatsapp": {lang: dsp.whatsapp(b, lang) for lang in ("en", "bn")},
+                        "html": {lang: dsp.html_doc([b], lang) for lang in ("en", "bn")}},
+            "note": "Generated text and documents only. Nothing is sent by DengueShield."}
+
+
+@app.get("/api/dispatch/document")
+def dispatch_document(kind: Literal["ward", "city", "wards"], format: Literal["html", "pdf"] = "html", lang: Literal["en", "bn"] = "en",
+                      ward: Optional[str] = Query(None, max_length=40), brief_city: Optional[str] = Query(None, max_length=40),
+                      scope: Literal["attention", "all"] = "attention", p: dict = Depends(scenario_params)):
+    """Downloadable brief: one ward, a city summary, or every ward in a city that needs attention (or all). PDFs are English (the standard
+    PDF fonts have no Bengali glyphs); Bangla is in the HTML."""
+    if format == "pdf" and lang == "bn":
+        bad("PDF briefs are in English (the standard PDF fonts have no Bengali glyphs); use format=html for Bangla")
+    scenario, a, o, v, model = run_scenario(p)
+    if kind == "ward":
+        if not ward:
+            bad("ward is required for kind=ward")
+        _ward_in_view(ward, a)
+        b = dsp.ward_brief(ward, scenario, a, o, v, model)
+        content, sha, name = (dsp.pdf_briefs([b]) if format == "pdf" else dsp.html_doc([b], lang).encode()), b["content_sha256"], ward
+    else:
+        if not brief_city:
+            bad(f"brief_city is required for kind={kind}")
+        if brief_city not in set(S.wards.city):
+            bad(f"unknown city '{brief_city}'", 404)
+        if brief_city not in {w["city"] for w in a["wards"]}:
+            bad(f"city '{brief_city}' is outside the selected city view")
+        if kind == "city":
+            if lang == "bn":
+                bad("the city summary is in English; Bangla is available in the ward briefs")
+            s = dsp.city_summary(brief_city, scenario, a, o, v, model)
+            content, sha = (dsp.pdf_city(s) if format == "pdf" else dsp.city_html(s).encode()), s["content_sha256"]
+        else:
+            ow = {w["ward_id"]: w for w in o["wards"]}
+            wards = [w["ward_id"] for w in sorted(a["wards"], key=lambda w: w["rank"]) if w["city"] == brief_city
+                     and (scope == "all" or w["status"] != "met" or ow[w["ward_id"]]["unresolved"] > 0)]
+            if not wards:
+                bad(f"no ward in {brief_city} needs attention in this scenario; use scope=all")
+            briefs = [dsp.ward_brief(w, scenario, a, o, v, model) for w in wards]
+            sha = dsp.digest([b["content_sha256"] for b in briefs])
+            content = dsp.pdf_briefs(briefs) if format == "pdf" else dsp.html_doc(
+                briefs, lang, f"DengueShield ward briefs {brief_city} {scenario['id']}").encode()
+        name = f"{brief_city.replace(' ', '_')}_{kind}"
+    fname = f"dengueshield_{name}_{scenario['id']}.{format}"
+    return Response(content, media_type="application/pdf" if format == "pdf" else "text/html; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{fname}"', "X-Scenario-Id": scenario["id"],
+                             "X-Content-SHA256": sha, "Cache-Control": "no-store", "Access-Control-Expose-Headers": "X-Scenario-Id, X-Content-SHA256"})
 
 
 # ------------------------------------------------------------------ healthcare facilities, A* routing, emergency help (OpenStreetMap, ODbL)
