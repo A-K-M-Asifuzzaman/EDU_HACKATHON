@@ -4,7 +4,7 @@
 
 <br/>
 
-[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL/actions/workflows/ci.yml)
+[![CI](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml/badge.svg)](https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
@@ -18,11 +18,34 @@
 Weekly cases and outbreak risk tiers **2, 3 and 4 weeks ahead** for **60 wards** across **5 city corporations**,<br/>
 using only information available at the forecast origin.
 
-<sub>Built for the EDU AI Engineering Hackathon 2026 (preliminary round)</sub>
+<sub>Built for the EDU AI Engineering Hackathon 2026: preliminary round, extended in the Phase 2 onsite final</sub>
 
 [**🎬 Tour**](#-see-it-in-action) · [**⚡ Quick start**](#-quick-start-linux--macos) · [**🪟 Windows**](#-setup-guide-windows) · [**🧭 Pages**](#-dashboard-pages) · [**🧠 Model**](#-model--science) · [**🔌 API**](#-api-reference) · [**🔐 Security**](#-security--privacy)
 
 </div>
+
+---
+
+## 🏁 Phase 2 onsite final (operational engines)
+
+The onsite final extended this repository on the branch `version-onsite-final` (every commit prefixed `version-onsite-final:`):
+
+| Problem | What it does | Where |
+|---|---|---|
+| 1. Constrained resource allocation | Saline, kits and beds from the forecast under a 30-100% stock slider and a crew budget; risk-and-density priority, fairness floor, critical deficit alerts | Response Intelligence → Supply allocation |
+| 2. Hospital overflow routing | Illustrative ward capacity, maximum-flow transfers strictly inside each city, unresolved shortage and bed use | Response Intelligence → Hospital surge |
+| 3. Vector-control simulator | Assumption-driven crew response over 2-4 weeks, optimal crew placement, ROI ranking, effect on supplies and beds | Response Intelligence → Vector control |
+| 4. Dispatch notices | SMS and WhatsApp text (English and Bangla) and printable HTML and PDF briefs from one deterministic snapshot; nothing is sent | Response Intelligence → Dispatch briefs, and [`exports/`](exports/README.md) |
+| 5. Offline resilience | `./scripts/setup.sh` once online, then `./scripts/launch_offline.sh` with the internet off; kill-switch test in CI | [`docs/onsite/STAGE4_HANDOFF.md`](docs/onsite/STAGE4_HANDOFF.md) |
+
+```bash
+git clone -b version-onsite-final https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
+./scripts/setup.sh            # once, with internet: Python env, datasets (checksummed), dashboard build, readiness check
+./scripts/launch_offline.sh   # any time, Wi-Fi off: http://127.0.0.1:8000/response/
+```
+
+Judging guide, demonstration path, evidence and checklists: [`docs/onsite/FINAL_RELEASE.md`](docs/onsite/FINAL_RELEASE.md). Architecture of the
+onsite engines: [`ARCHITECTURE.md`](ARCHITECTURE.md#phase-2-onsite-operational-engines). Stage reports: [`docs/onsite/`](docs/onsite/).
 
 ---
 
@@ -75,6 +98,7 @@ The GIFs above are rebuilt from these screenshots with `python scripts/make_read
 
 ## 📑 Table of Contents
 
+- [🏁 Phase 2 onsite final](#-phase-2-onsite-final-operational-engines)
 - [✨ Features at a Glance](#-features-at-a-glance)
 - [⚡ Quick Start (Linux / macOS)](#-quick-start-linux--macos)
 - [🪟 Setup Guide (Windows)](#-setup-guide-windows)
@@ -124,7 +148,7 @@ The GIFs above are rebuilt from these screenshots with `python scripts/make_read
 **Requirements:** Python 3.12+, Node 20.9+ and npm, internet access for the first run.
 
 ```bash
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git && cd EDU_HACKATHON_FINAL
+git clone -b version-onsite-final https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git && cd EDU_HACKATHON
 ./scripts/launch.sh            # http://127.0.0.1:8000
 # PORT=8100 ./scripts/launch.sh  # if 8000 is busy
 ```
@@ -169,8 +193,8 @@ flowchart LR
 ### Step 1 — Clone the Repository
 
 ```powershell
-git clone https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON_FINAL.git
-cd EDU_HACKATHON_FINAL
+git clone -b version-onsite-final https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.git
+cd EDU_HACKATHON
 ```
 
 ### Step 2 — Download the Dataset
@@ -310,7 +334,7 @@ Architecture: a concise overview in [ARCHITECTURE.md](ARCHITECTURE.md) (data flo
 <summary><b>Show the full tree</b></summary>
 
 ```
-EDU_HACKATHON_FINAL/
+EDU_HACKATHON/
 ├── dengueshield/              # Python library (the core engine)
 │   ├── api/                   #   FastAPI app: main.py, store.py, schemas.py, climate.py,
 │   │                          #     geo.py, integrations.py, rag.py (Copilot)
@@ -728,6 +752,12 @@ not stated in the brief.
 | Claude Code (Opus & Sonnet) | Anthropic | Development assistant: website, API, map, routing, suggestions, test writing, documentation |
 | Claude (claude.ai) | Anthropic | README redesign, animated README banner and GIFs, UI polish and Bangla translation patches |
 | Codex | OpenAI | Release audit, browser/API verification, Vercel deployment, architecture documentation |
+
+**Phase 2 onsite final (27 Nov 2026).** Claude Code (Anthropic, Opus) wrote most of the onsite code, tests and documentation
+(Stages 0-5: resource allocation, hospital overflow, vector-control simulator, dispatch notices, offline operation) from the team
+lead's stage-by-stage specifications. The lead set the requirements and owner decisions, reviewed the scope, and authorised each
+commit and push; the commits appear under the lead's GitHub account. The intervention effects in the simulator are user-set
+assumptions, not AI-generated or measured efficacy, and every reported number comes from executed code and tests.
 
 The team directed the work and set the requirements, reviewed the results, and chose the validation
 protocol and model. Reported numbers come from executed notebooks and saved artifacts, not from an
