@@ -79,9 +79,13 @@ test.describe("Vector-control scenarios", () => {
       const box = page.locator("#vector");
       await expect(total(box)).toHaveText("63.2", { timeout: 30_000 });
       await box.getByRole("radio", { name: "Manual" }).click();
+      const recomputed = page.waitForResponse((r) => r.url().includes("/api/intervention/simulate") && r.url().includes("mode=manual") && !r.url().includes("CCC_Ward_03"));
       await box.getByRole("button", { name: "Remove a crew from CCC_Ward_03" }).click();
       await expect(box.getByText("1 of 20 crews left to place.")).toBeVisible();
-      const bb = await box.getByRole("button", { name: "Add a crew to CCC_Ward_03" }).boundingBox();
+      await recomputed;
+      const add = box.getByRole("button", { name: "Add a crew to CCC_Ward_03" });
+      await expect(add).toBeVisible();
+      const bb = await add.boundingBox();
       expect(bb!.width).toBeGreaterThanOrEqual(44);                                                 // touch target
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(w);
     });

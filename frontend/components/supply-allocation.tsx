@@ -8,7 +8,7 @@ import { api, qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
-import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
+import { Btn, Card, CardTitle, DataTable, Kpi, Loading, Notice, ProvChip, RiskBadge, Segmented, Select, useAsync, type AsyncState } from "./ui";
 import { provenance, PROV_TEXT } from "@/lib/provenance";
 
 export const LAST_ORIGIN = "2024-12-30";
@@ -47,6 +47,15 @@ export function useDecisionGuard() {
 }
 const RES = [["saline_bags_needed", "Saline bags"], ["diagnostic_kits_needed", "Diagnostic kits"], ["hospital_beds_required", "Hospital beds"]] as const;
 const STATUS: Record<string, [string, string]> = { met: ["Fully supplied", "bg-[#d9f7ea] text-[#0b5d44]"], deficit: ["Deficit", "bg-[#fff1cc] text-[#6b4a00]"], critical: ["Critical deficit", "bg-[#ffe9ea] text-[#8f1d25]"] };
+
+/** Keeps a decision section mounted while it recomputes (dimmed, still interactive), so scroll position, table sort and input focus
+ *  survive every control change. First load and errors use the shared Loading states. */
+export function Live<T>({ q, h, label, children }: { q: AsyncState<T>; h: number; label: string; children: (d: T) => React.ReactNode }) {
+  if (!q.data) return <Loading q={q} h={h} kind="table" label={label}>{() => null}</Loading>;
+  return (<div aria-live="polite" aria-busy={q.stale || undefined} className="relative">
+    {q.stale && <span role="status" className="absolute right-2 top-2 z-10 rounded-full bg-ink px-2.5 py-1 text-[11px] text-canvas">Updating…</span>}
+    <div className={"transition-opacity " + (q.stale ? "opacity-60" : "")}>{children(q.data)}</div></div>);
+}
 
 export function useDebounced<T>(v: T, ms = 250): T {
   const [d, setD] = useState(v);
@@ -102,7 +111,7 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
         <Range label="Most crews per ward" value={maxCrews} min={1} max={6} step={1} onChange={setMaxCrews} fmt={(v) => String(v)} />
       </div></details>
 
-    <Loading q={q} h={420} kind="table" label="Supply allocation">{() => (<div aria-live="polite">
+    <Live q={q} h={420} label="Supply allocation">{() => (<div>
       <p className="mt-4 text-[12.5px] text-ink-3">Forecast issued {dateFmt(d.origin, lang)} for the week of {dateFmt(d.target_date, lang)}, planned at the {d.settings.service_label}; {d.city === "All" ? "all 60 wards, each city its own stock pool" : `${d.city} only`}.</p>
       <div className="mt-3 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {RES.map(([k, label]) => { const t = d.totals[k]; return <Kpi key={k} label={`${label}: allocated of needed`} value={t.allocated} hint={`of ${t.demand} needed; supply ${t.supply}; short ${t.unmet}`} tone={t.unmet > 0 ? "bad" : "ok"} />; })}
@@ -133,6 +142,6 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
       <details className="mt-4 rounded-xl border border-line p-4 text-[13px] text-ink-2"><summary className="cursor-pointer font-semibold text-ink">How the allocation works</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">{d.assumptions.map((a: string) => <li key={a}>{a}</li>)}</ul>
         <p className="mt-2">Demand multipliers: saline {d.multipliers.saline_bags_needed.toFixed(4)}, kits {d.multipliers.diagnostic_kits_needed.toFixed(4)}, beds {d.multipliers.hospital_beds_required.toFixed(4)} per forecast case. Within each city the remaining stock fills wards in priority order, which maximises the priority-weighted supply for the given floor (checked against an exact solver in the tests).</p></details>
-    </div>)}</Loading></>)}
+    </div>)}</Live></>)}
   </Card>);
 }

@@ -565,7 +565,7 @@ test.describe("V3.5 keyboard and dialogs", () => {
     await expect(drawer).toBeHidden();
     await expect(opener).toBeFocused();
     await page.goto("/response/?nointro");
-    await page.getByRole("table").first().getByRole("row").filter({ hasText: /_Ward_/ }).first().click({ timeout: 20_000 });   // wait for real ward rows, not a skeleton
+    await page.locator("#priority").getByRole("table").getByRole("row").filter({ hasText: /_Ward_/ }).first().click({ timeout: 20_000 });   // the Priority wards table (other sections also list wards), real rows, not a skeleton
     const dlg = page.getByRole("dialog");
     await expect(dlg).toContainText("Nothing here is sent to anyone");
     await expect(dlg.getByRole("link", { name: /Open in Command Center/ })).toHaveAttribute("href", /\/command\/\?ward=/);

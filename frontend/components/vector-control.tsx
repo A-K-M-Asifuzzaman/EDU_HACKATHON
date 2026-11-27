@@ -10,8 +10,8 @@ import { useI18n } from "@/lib/i18n";
 import { dateFmt } from "@/lib/format";
 import { Chart } from "./echart";
 import { Icon } from "./icons";
-import { PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
-import { Btn, Card, DataTable, Loading, Notice, ProvChip, RiskBadge, Segmented, Tabs, useAsync } from "./ui";
+import { Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
+import { Btn, Card, DataTable, Notice, ProvChip, RiskBadge, Segmented, Tabs, useAsync } from "./ui";
 
 type Mode = "optimized" | "manual" | "stage1";
 const PRESETS: Record<string, { effect: number; coverage: number; delay: number; buildup: number; label: string }> = {
@@ -124,7 +124,7 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
 
       <div className="min-w-0">
         {overBudget && <Notice tone="warn"><b>The manual plan uses {used} crews but only {crews} are available.</b> Remove crews in the table or raise the budget.</Notice>}
-        <Loading q={q} h={520} kind="table" label="Vector-control scenario">{() => (<div aria-live="polite">
+        <Live q={q} h={520} label="Vector-control scenario">{() => (<div>
           {Object.keys(d.horizons_missing).length > 0 && <div className="mb-3"><Notice tone="warn">No out-of-time forecast for {Object.keys(d.horizons_missing).map((h) => `+${h} weeks`).join(" and ")} from this origin (the target falls in the next replay season); the totals cover {d.horizons.map((h: number) => `+${h}`).join(", ")} weeks only.</Notice></div>}
           <div className="rounded-2xl border-2 border-ink bg-mint-l p-4">
             <div className="text-[12.5px] font-semibold text-ink-3">Scenario estimate: cases prevented in the weeks of {d.horizons.map((h: number) => dateFmt(d.target_dates[h], lang)).join(", ")}</div>
@@ -200,7 +200,7 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
             <div className="rounded-xl border border-line border-l-[5px] border-l-[#c2303a] p-3 md:col-span-2"><div className="text-[13px] font-semibold text-ink">Limitations</div>
               <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[12.5px] text-ink-2">{d.disclosure.limitations.map((x: string) => <li key={x}>{x}</li>)}</ul></div>
           </div>)}
-        </div>)}</Loading>
+        </div>)}</Live>
         {mode === "manual" && used > 0 && <div className="mt-3"><Btn variant="ghost" onClick={() => setManual({})}>Clear manual crews</Btn></div>}
       </div>
     </div>)}
