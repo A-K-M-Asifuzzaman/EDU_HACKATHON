@@ -6,6 +6,7 @@ import { addWeeks, isMonday } from "@/lib/api";
 import { dateFmt } from "@/lib/format";
 import { Segmented, Select } from "./ui";
 import { Icon } from "./icons";
+import { provenance, PROV_TEXT } from "@/lib/provenance";
 
 export function snapMonday(iso: string) { let d = new Date(iso + "T00:00:00Z"); while (d.getUTCDay() !== 1) d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); }
 
@@ -21,6 +22,7 @@ export default function ControlsBar({ show = ["city", "ward", "origin", "horizon
   const idx = Math.max(0, Math.round((new Date(sel.origin).getTime() - new Date(min).getTime()) / (7 * 86400000)));
   const total = Math.round((new Date(max).getTime() - new Date(min).getTime()) / (7 * 86400000));
   const setIdx = (i: number) => set({ origin: addWeeks(min, Math.min(total, Math.max(0, i))) });
+  const pv = provenance(sel.origin, sel.horizon, sel.source, meta);
   // Forecast time machine: step the origin forward one week at a time through real forecasts
   const [playing, setPlaying] = useState(false);
   useEffect(() => {
@@ -49,5 +51,11 @@ export default function ControlsBar({ show = ["city", "ward", "origin", "horizon
         {!isMonday(sel.origin) && <div className="mt-1 text-xs text-coral-d">Origin must be a Monday</div>}
       </div>)}
       {show.includes("source") && <Segmented label={t("ctl.source")} value={sel.source} onChange={(v) => set({ source: v as any })} options={[{ value: "auto", label: t("ctl.auto") }, { value: "replay", label: t("ctl.replay") }, { value: "bundle", label: t("ctl.deployed") }]} />}
+      {show.includes("source") && (pv.kind === "in_sample" || pv.kind === "none") && (
+        <div role="status" data-testid="provenance-warning" className="flex w-full basis-full flex-wrap items-center gap-3 rounded-xl border-2 border-[#c2303a]/50 bg-[#ffe9ea] p-3 text-[13px] text-[#8f1d25]">
+          <Icon name="alert" size={16} className="shrink-0" /><span className="min-w-[220px] flex-1"><b>{pv.kind === "in_sample" ? "Not an out-of-time forecast." : "No validated forecast here."}</b> {PROV_TEXT[pv.kind]}</span>
+          {pv.fix && <button type="button" onClick={() => set(pv.fix!)} className="min-h-11 rounded-full border-2 border-[#8f1d25] bg-white px-3.5 font-semibold text-[#8f1d25] hover:bg-[#fff5f5] sm:min-h-9">
+            {pv.fix.origin ? `Use origin ${dateFmt(pv.fix.origin, lang)}` : "Use the validated replay"}</button>}
+        </div>)}
     </div>);
 }

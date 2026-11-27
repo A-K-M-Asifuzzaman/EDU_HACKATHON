@@ -1,0 +1,28 @@
+{
+  "rule": "resource = floor(multiplier * cases + 0.5)",
+  "identified_on": "2016-01-04..2018-12-31: training-only seasons, before every replay origin (2019+), so no evaluated season informs it",
+  "dataset_sha256": "3500fb22fc19afde9b242449f08e441eb88e62a8985411f54e915f6582daf7e4",
+  "resources": {
+    "saline_bags_needed": {
+      "multiplier": 2.3843582887700534,
+      "feasible_interval": [
+        2.3823529411764706,
+        2.3863636363636362
+      ]
+    },
+    "diagnostic_kits_needed": {
+      "multiplier": 1.1642156862745099,
+      "feasible_interval": [
+        1.161764705882353,
+        1.1666666666666667
+      ]
+    },
+    "hospital_beds_required": {
+      "multiplier": 0.2984375,
+      "feasible_interval": [
+        0.296875,
+        0.3
+      ]
+    }
+  }
+}

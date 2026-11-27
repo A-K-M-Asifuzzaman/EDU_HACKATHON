@@ -23,6 +23,9 @@ from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from dengueshield import decision, routing
+from dengueshield import allocation as alloc
+from dengueshield import overflow as ovf
+from dengueshield.onsite_data import load_onsite_development_panel
 from dengueshield.api import climate, geo, integrations
 from dengueshield.api.schemas import ChatRequest, ForecastItem
 from dengueshield.api.store import HORIZONS, ROOT, STARTED, TIER_ORDER, Store, records
@@ -97,8 +100,12 @@ def forecast_frame(origin: str, horizon: int, source: str) -> pd.DataFrame:
         r = S.replay[(S.replay.origin_date == origin) & (S.replay.horizon == horizon)]
         if r.empty:
             rng = S.origin_range().get("replay", {}).get(horizon, {})
-            bad(f"no validated replay for origin {origin} at h={horizon}; replay origins span {rng.get('min')} to {rng.get('max')} "
-                f"(target must fall in the same season). Use source=bundle for live inference.")
+            target = (pd.Timestamp(origin) + pd.Timedelta(weeks=horizon)).date().isoformat()
+            hint = (f"The deployed bundle was trained on weeks through {S.bundle.train_cutoff}, so source=bundle would be in-sample for target "
+                    f"{target}, not an out-of-time forecast." if S.bundle is not None and target <= S.bundle.train_cutoff
+                    else "Use source=bundle for the forward forecast.")
+            bad(f"no validated replay for origin {origin} at h={horizon}: each season was replayed by models fitted on earlier seasons only, "
+                f"so a target in the following season has none (replay origins span {rng.get('min')} to {rng.get('max')}). {hint}")
         out = r.rename(columns={"mean": "expected_cases", "median": "median_cases", "lo80": "lower_80", "hi80": "upper_80", "lo90": "lower_90",
                                 "hi90": "upper_90", "alert": "outbreak_alert", "tier": "risk_tier", "y_true": "actual_cases", "thr_q90": "outbreak_threshold"}).copy()
         out["source"], out["in_sample"] = "replay", False
@@ -618,6 +625,189 @@ def decision_allocate(origin: str, horizon: H = 3, teams: Annotated[int, Query(g
 def decision_allocation_season(year: Annotated[int, Query(ge=2019, le=2024)], horizon: H = 3, teams: Annotated[int, Query(ge=1, le=60)] = 10):
     R = _replay_or_503()
     v, _ = S.cache.get_or(("alloc_season", year, horizon, teams), lambda: decision.allocation_season(R, S.panel, year, horizon, teams))
+    return v
+
+
+# ------------------------------------------------------------------ Phase 2 onsite, Problem 1: constrained resource allocation
+ALLOC_LAST_ORIGIN = "2024-12-30"      # owner decision: forecasts issued in 2024 or earlier; January 2025 targets only from 2024 origins
+ALLOC_ASSUMPTIONS = [
+    "Demand: saline, kits and beds follow the dataset's own rule, floor(m x forecast cases + 0.5), identified on 2016-2018 only.",
+    "Stock is not in the dataset. Each city receives the chosen share (30-100%) of its own projected requirement; cities never share supply.",
+    "Fairness floor: every ward first receives that share of its demand (never more than the stock level), then the rest goes by priority.",
+    "Priority = risk weight x outbreak probability + (1 - risk weight) x population density / highest density of the 60 wards.",
+    "Crews are not in the dataset. A ward with forecast cases needs 1 crew, plus 1 per extra block of cases, up to the per-ward maximum; "
+    "crews go first to as many wards as possible in priority order.",
+    "Beds here are the configured regional bed supply. They are not local hospital capacity; overflow routing (Problem 2) uses a separate, "
+    "illustrative capacity baseline and does not add these beds on top of it.",
+    "Only out-of-time forecasts are used: the validated replay for 2019-2024 targets, the deployed model for January 2025 targets.",
+    "Forecasts are planning estimates on synthetic data, not official orders or warnings.",
+]
+_ALLOC_RULES: dict | None = None
+
+
+def decision_forecast(origin: str, horizon: int, source: Optional[str], city: Optional[str]) -> tuple[pd.DataFrame, str]:
+    """Forecast table for the decision engines (Problems 1 and 2). Origin-safe only: in-sample output of the deployed bundle (trained on
+    2016-2024) is refused here rather than labelled, because a plan built on it would look better than any real forecast could."""
+    origin_check(origin)
+    if origin > ALLOC_LAST_ORIGIN:
+        bad(f"decision tools use forecasts issued on or before {ALLOC_LAST_ORIGIN} (2025 is the sealed test year); "
+            f"the forecast issued {ALLOC_LAST_ORIGIN} covers targets in January 2025", 422)
+    if city and city not in set(S.wards.city):
+        bad(f"unknown city '{city}'", 404)
+    source = source or src_default(origin, horizon)
+    fc = forecast_frame(origin, horizon, source)
+    if bool(fc.in_sample.any()):
+        rng = S.origin_range().get("replay", {}).get(horizon, {})
+        bad(f"in-sample forecast refused: the deployed model was trained on weeks through {S.bundle.train_cutoff}, which include the target "
+            f"week {fc.target_date.iloc[0]}, so its output there is not an out-of-time forecast. Use the validated replay (origins "
+            f"{rng.get('min')} to {rng.get('max')} at h={horizon}) or a December 2024 origin whose target lies in 2025.")
+    return (fc[fc.city == city] if city else fc), source
+
+
+def alloc_rules() -> dict:
+    global _ALLOC_RULES
+    if _ALLOC_RULES is None:
+        _ALLOC_RULES = alloc.load_rules()
+    return _ALLOC_RULES
+
+
+@app.get("/api/allocation/plan")
+def allocation_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
+                    service: Literal["median", "p80", "p90"] = "p80", stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6,
+                    crews: Annotated[int, Query(ge=0, le=1000)] = 20, risk_weight: Annotated[float, Query(ge=0.0, le=1.0)] = 0.7,
+                    floor: Annotated[float, Query(ge=0.0, le=0.5)] = 0.25, cases_per_crew: Annotated[int, Query(ge=1, le=100)] = 10,
+                    max_crews_per_ward: Annotated[int, Query(ge=1, le=10)] = 3, source: Optional[Literal["replay", "bundle"]] = None):
+    """Allocate saline, diagnostic kits, beds and spraying crews to wards under scarcity (dengueshield/allocation.py)."""
+    fc, source = decision_forecast(origin, horizon, source, city)
+    st = alloc.Settings(service=service, stock=round(stock, 4), crews=crews, alpha=round(risk_weight, 4), floor_share=round(floor, 4),
+                        cases_per_crew=cases_per_crew, max_crews_per_ward=max_crews_per_ward)
+    rules = alloc_rules()
+
+    def compute():
+        res = alloc.plan(fc[["ward_id", "city", "median_cases", "upper_80", "upper_90", "p_outbreak", "risk_tier"]], S.wards, rules, st)
+        wards_out = []
+        for r in res["wards"].itertuples(index=False):
+            row = {"rank": int(r.rank), "ward_id": r.ward_id, "city": r.city, "risk_tier": r.risk_tier, "p_outbreak": round(float(r.p_outbreak), 4),
+                   "population_density_sqkm": int(r.population_density_sqkm), "priority": round(float(r.priority), 4),
+                   "forecast_cases": int(r.cases), "median_cases": int(r.median_cases), "upper_80": int(r.upper_80), "upper_90": int(r.upper_90),
+                   "crews_needed": int(r.crews_needed), "crews_assigned": int(r.crews_assigned), "fill_rate": round(float(r.fill_rate), 4), "status": r.status}
+            for k in alloc.RESOURCES:
+                row[k] = {"demand": int(getattr(r, f"{k}_demand")), "allocated": int(getattr(r, f"{k}_allocated")), "unmet": int(getattr(r, f"{k}_unmet"))}
+            wards_out.append(row)
+        target = str(fc.target_date.iloc[0]) if len(fc) else None
+        return {"origin": origin, "horizon": horizon, "target_date": target, "source": source, "city": city or "All",
+                "settings": {"service": service, "service_label": alloc.SERVICE_LABEL[service], "stock": st.stock, "crews": crews,
+                             "risk_weight": st.alpha, "density_weight": round(1 - st.alpha, 4), "floor": st.floor_share,
+                             "cases_per_crew": cases_per_crew, "max_crews_per_ward": max_crews_per_ward},
+                "multipliers": rules, "totals": res["totals"], "cities": res["cities"], "counts": res["counts"],
+                "wards": wards_out, "assumptions": ALLOC_ASSUMPTIONS, "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(("alloc_plan", origin, horizon, source, city, st), compute)
+    except ValueError as e:
+        bad(str(e))
+    return v
+
+
+# ------------------------------------------------------------------ hospital surge and cross-ward overflow (Phase 2 onsite, Problem 2)
+SURGE_ASSUMPTIONS = [
+    "Projected bed demand is the same number Supply allocation uses: floor(0.2984 x forecast cases + 0.5) at the chosen service level.",
+    "Ward capacity is an illustrative planning scenario, not a hospital inventory (the dataset has none). Default: the 90th percentile of the "
+    "ward's own weekly bed requirement in the weeks before the forecast origin (k-th smallest of n weeks, k = ceil(9n/10)).",
+    "The capacity percentage scales that baseline with round-half-up to whole beds; a ward value typed in replaces it.",
+    "Patients move only to wards with spare beds in the same city. No distances or travel times exist for the synthetic ward IDs, so none are "
+    "assumed: every ward in a city is an equally valid destination.",
+    "Transfers first place as many patients as possible, then relieve the most overloaded wards first and draw on the wards with the most "
+    "spare beds first. Ties: the ward with the higher outbreak probability is relieved first, the ward with the lower outbreak probability "
+    "receives first (high-risk wards keep their spare beds), then ward ID.",
+    "The regional bed supply from Supply allocation is a separate stock scenario. It is shown for comparison and never added to ward capacity, "
+    "because both describe the same beds.",
+    "Forecasts are planning estimates on synthetic data, not official orders or warnings.",
+]
+_BED_HISTORY: Optional[pd.DataFrame] = None
+
+
+def bed_history() -> pd.DataFrame:
+    """Weekly hospital_beds_required, 2016-2024 only (the onsite loader drops 2025 rows as bytes before parsing)."""
+    global _BED_HISTORY
+    if _BED_HISTORY is None:
+        try:
+            _BED_HISTORY = load_onsite_development_panel()[["ward_id", "date", "hospital_beds_required"]]
+        except (FileNotFoundError, ValueError) as e:
+            raise HTTPException(503, f"onsite dataset unavailable for the capacity baseline: {e}")
+    return _BED_HISTORY
+
+
+def name_values(values: Optional[list[str]], what: str, valid: set, hi: int) -> dict[str, int]:
+    """Parse repeated NAME:number query values (city percentages, ward overrides)."""
+    if values and len(values) > 60:
+        bad(f"at most 60 {what} values")
+    out: dict[str, int] = {}
+    for v in values or []:
+        k, sep, n = v.rpartition(":")
+        if not sep or not n.isdigit() or len(v) > 80:
+            bad(f"{what} values must look like NAME:whole-number, got '{v[:80]}'")
+        if k not in valid:
+            bad(f"unknown {what} '{k[:40]}'")
+        if int(n) > hi:
+            bad(f"{what} value for {k} must be between 0 and {hi}")
+        out[k] = int(n)
+    return out
+
+
+@app.get("/api/overflow/plan")
+def overflow_plan(origin: str, horizon: H = 3, city: Optional[str] = Query(None, max_length=40),
+                  service: Literal["median", "p80", "p90"] = "p80", capacity_pct: Annotated[int, Query(ge=0, le=ovf.MAX_PCT)] = 100,
+                  city_pct: Annotated[Optional[list[str]], Query()] = None, override: Annotated[Optional[list[str]], Query()] = None,
+                  stock: Annotated[float, Query(ge=0.30, le=1.00)] = 0.6, source: Optional[Literal["replay", "bundle"]] = None):
+    """Hospital surge: projected bed demand vs illustrative ward capacity, with capacity-constrained transfers inside each city."""
+    fc, source = decision_forecast(origin, horizon, source, city)
+    cpct = name_values(city_pct, "city", set(S.wards.city), ovf.MAX_PCT)
+    ovr = name_values(override, "ward", set(S.ward_ids), 500)
+    rules = alloc_rules()
+    key = ("overflow", origin, horizon, source, city, service, capacity_pct, tuple(sorted(cpct.items())), tuple(sorted(ovr.items())), round(stock, 4))
+
+    def compute():
+        base, _ = S.cache.get_or(("bed_baseline", origin), lambda: ovf.capacity_baseline(bed_history(), origin))
+        df = fc[["ward_id", "city", "risk_tier", "p_outbreak", "median_cases", "upper_80", "upper_90"]].merge(base, on="ward_id", how="left", validate="one_to_one")
+        if df.baseline.isna().any():
+            bad("capacity baseline missing for some wards", 503)
+        for lvl, col in alloc.SERVICE_COLUMN.items():
+            df[f"beds_{lvl}"] = alloc.demand(df[col], rules["hospital_beds_required"])
+        df["demand"] = df[f"beds_{service}"]
+        df["pct"] = [cpct.get(c, capacity_pct) for c in df.city]
+        df["capacity"] = ovf.scale(df.baseline.astype(int), df.pct)
+        df["overridden"] = df.ward_id.isin(ovr)
+        df.loc[df.overridden, "capacity"] = df.loc[df.overridden, "ward_id"].map(ovr)
+        res = ovf.plan(df)
+        w = res["wards"].sort_values(["city", "deficit", "headroom", "ward_id"], ascending=[True, False, True, True])
+        wards_out = [{"ward_id": r.ward_id, "city": r.city, "risk_tier": r.risk_tier, "p_outbreak": round(float(r.p_outbreak), 4),
+                      "forecast_cases": {"median": int(r.median_cases), "p80": int(r.upper_80), "p90": int(r.upper_90)},
+                      "bed_demand": {"median": int(r.beds_median), "p80": int(r.beds_p80), "p90": int(r.beds_p90)},
+                      "demand": int(r.demand), "capacity_baseline": int(r.baseline), "capacity_pct": int(r.pct), "capacity": int(r.capacity),
+                      "overridden": bool(r.overridden), "history_weeks": int(r.history_weeks), "deficit": int(r.deficit), "headroom": int(r.headroom),
+                      "sent": int(r.sent), "received": int(r.received), "unresolved": int(r.unresolved), "headroom_after": int(r.headroom_after),
+                      "occupied_after": int(r.occupied_after), "utilization_after": round(r.occupied_after / r.capacity, 4) if r.capacity else None,
+                      "status": r.status} for r in w.itertuples(index=False)]
+        for c in res["cities"]:
+            c["regional_supply_scenario"] = alloc.pool_supply(stock, c["demand"])
+        t = res["totals"]
+        return {"origin": origin, "horizon": horizon, "target_date": str(fc.target_date.iloc[0]) if len(fc) else None, "source": source,
+                "city": city or "All",
+                "settings": {"service": service, "service_label": alloc.SERVICE_LABEL[service], "capacity_pct": capacity_pct,
+                             "city_pct": cpct, "overrides": {k: v for k, v in ovr.items() if k in set(df.ward_id)}, "stock": round(stock, 4)},
+                "capacity_rule": {"quantile": 0.9, "statistic": "k-th smallest of the n weeks before the origin, k = ceil(9n/10)",
+                                  "weeks_before": origin, "history_weeks": int(df.history_weeks.min()), "scaling": "floor(baseline x pct / 100 + 1/2)"},
+                "scenarios": {"projected_bed_demand": t["demand"], "illustrative_capacity": t["capacity"], "transferable_headroom": t["headroom"],
+                              "allocated_transfers": t["transferred"], "unresolved_shortage": t["unresolved"],
+                              "regional_supply_scenario": sum(c["regional_supply_scenario"] for c in res["cities"])},
+                "totals": t, "cities": res["cities"], "transfers": res["transfers"], "wards": wards_out,
+                "assumptions": SURGE_ASSUMPTIONS, "disclaimer": DISCLAIMER}
+
+    try:
+        v, _ = S.cache.get_or(key, compute)
+    except ValueError as e:
+        bad(str(e))
     return v
 
 
