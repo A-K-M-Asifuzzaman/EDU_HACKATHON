@@ -301,6 +301,7 @@ html.js .reveal.in { opacity: 1; transform: none; }
    data-theme="dim" so every existing dark-mode rule applies inside it, and these tokens tune that dark to matte obsidian.
    Resource colours mark data only; text always uses the ink tokens (ink-3 #9ea3c9 on panel #151729 = 7.2:1). ---------- */
 .ops-engine {
+  scroll-margin-top: calc(var(--ops-top, 108px) + 12px);
   color-scheme: dark;
   --color-canvas: #0e0f1a; --color-ivory: #151729; --color-line: #2a2d4a; --color-paper-3: #1c1f36; --color-mint-l: #232745;
   --color-ink: #eef0ff; --color-ink-2: #c6c9e8; --color-ink-3: #9ea3c9;
@@ -347,3 +348,11 @@ dialog.ops-sheet::backdrop { background: rgba(5, 6, 12, 0.5); }
 @media (max-width: 639px) { .ops-engine .card.p-5 { padding: 14px; } }
 /* the brand's heavy ink outlines turn near-white on obsidian; inside the engine they become the quiet panel line */
 .ops-engine :is(.border-ink, .border-\[\#1a1438\]) { border-color: #3a3e66; }
+
+.ops-engine:fullscreen {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  --ops-top: 0px !important;
+}

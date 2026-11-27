@@ -56,8 +56,12 @@ export default function DispatchDesk({ shared }: { shared: PlanShared }) {
   const brief = q.data;
   const canExport = !!brief && !q.stale && brief.brief.ward.ward_id === ward;
   useEffect(() => {
-    report("dispatch", brief ? { id: brief.scenario.id, ward: brief.brief.ward.ward_id, stale: !canExport } : null);
-  }, [brief, canExport, report]);
+    report("dispatch", q.status === "failed" ? { failed: true } : brief ? {
+      id: brief.scenario.id, ward: brief.brief.ward.ward_id, city: brief.brief.ward.city,
+      planned: brief.brief.forecast.planned_cases, saline: brief.brief.resources.saline,
+      withoutBed: brief.brief.hospital.without_bed, stale: !canExport,
+    } : null);
+  }, [brief, canExport, q.status, report]);
 
   const exporting = useRef<AbortController | null>(null);
   useEffect(() => () => { exporting.current?.abort(); }, [briefUrl]);

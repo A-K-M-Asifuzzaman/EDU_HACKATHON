@@ -62,7 +62,7 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
   const q = useScenarioRequest(shared.readyScenario && !blocked ? `/api/overflow/plan?${query}` : null);
   const d: any = q.data;
   const { report } = shared;
-  useEffect(() => { report("surge", d ? { totals: d.totals, capPct: d.settings.capacity_pct, stale: !!q.stale } : null); }, [d, q.stale, report]);
+  useEffect(() => { report("surge", q.status === "failed" ? { failed: true } : d ? { totals: d.totals, capPct: d.settings.capacity_pct, stale: !!q.stale } : null); }, [d, q.stale, q.status, report]);
   const nOverrides = Object.keys(overrides).length;
   const setOverride = (w: string, v: string, base: number) => setOverrides((o) => {
     const n = Math.max(0, Math.min(500, Math.round(Number(v))));

@@ -15,7 +15,7 @@ Source is the supplied `Hackathon_Phase2_Problemset.pdf`, pages 1–3, SHA-256 `
 
 ## Upgrade verification
 
-[Phase 1 evidence](01_SCENARIO_INTEGRITY.md) covers scenario synchronization, cross-engine inputs, and dispatch faithfulness on the upgrade branch. The macOS kill-switch verified 21 of 21 matching outputs. The baseline below describes the original public build at audit time.
+[Phase 1 evidence](01_SCENARIO_INTEGRITY.md) covers scenario synchronization, cross-engine inputs, and dispatch faithfulness on the upgrade branch. The macOS kill-switch verified 21 of 21 matching outputs. [Phase 2 evidence](02_COMMAND_ENGINE.md) adds a scoped review stage, browser-tested presentation and failure recovery, and a repeat of the network-isolated workflow. The baseline below describes the original public build at audit time.
 
 ## Acceptance gate baseline
 

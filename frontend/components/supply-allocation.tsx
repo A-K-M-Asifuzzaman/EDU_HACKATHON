@@ -140,8 +140,8 @@ export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
   const d: any = q.data;
   const critical = useMemo(() => (d?.wards ?? []).filter((w: any) => w.status === "critical"), [d]);
   const { report } = shared;
-  useEffect(() => { report("allocate", d ? { target: d.target_date, service: d.settings.service_label, cases: d.wards.reduce((a: number, w: any) => a + w.forecast_cases, 0),
-    totals: d.totals, counts: d.counts, stale: !!q.stale } : null); }, [d, q.stale, report]);
+  useEffect(() => { report("allocate", q.status === "failed" ? { failed: true } : d ? { target: d.target_date, service: d.settings.service_label, cases: d.wards.reduce((a: number, w: any) => a + w.forecast_cases, 0),
+    totals: d.totals, counts: d.counts, stale: !!q.stale } : null); }, [d, q.stale, q.status, report]);
 
   const exportCsv = () => d && !q.stale && download(`dengueshield_allocation_${d.origin}_h${d.horizon}_${d.city}_stock${Math.round(d.settings.stock * 100)}.csv`, toCsv(d.wards.map((w: any) => ({
     rank: w.rank, ward_id: w.ward_id, city: w.city, risk_tier: w.risk_tier, p_outbreak: w.p_outbreak, population_density_sqkm: w.population_density_sqkm,

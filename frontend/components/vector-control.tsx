@@ -68,7 +68,7 @@ export default function VectorControl({ shared }: { shared: PlanShared }) {
   const q = useScenarioRequest(shared.readyScenario && !blocked && !overBudget ? `/api/intervention/simulate?${query}` : null);
   const d: any = q.data;
   const { report } = shared;
-  useEffect(() => { report("intervene", d ? { totals: d.totals, stale: !!q.stale } : overBudget ? { over: true } : null); }, [d, q.stale, overBudget, report]);
+  useEffect(() => { report("intervene", q.status === "failed" ? { failed: true } : d ? { totals: d.totals, stale: !!q.stale } : overBudget ? { over: true } : null); }, [d, q.stale, q.status, overBudget, report]);
   const preset = Object.entries(PRESETS).find(([, v]) => v.effect === eff.effect && v.coverage === eff.coverage && v.delay === eff.delay && v.buildup === eff.buildup)?.[0] ?? "custom";
   const switchMode = (m: Mode) => {
     if (m === "manual" && mode !== "manual" && d && !q.stale) setManual(Object.fromEntries(d.wards.filter((w: any) => w.crews > 0).map((w: any) => [w.ward_id, w.crews])));
