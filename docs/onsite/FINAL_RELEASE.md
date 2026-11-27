@@ -3,13 +3,14 @@
 For the team lead, the presenter and the judges.
 
 The work is on branch `version-onsite-final` of the official repository https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON.
-Nothing on this branch has been merged or deployed beyond what the owner merged themselves; production is paused.
+Stage 4 was merged into `main` by the owner (PR #6, merge commit `7cf8e0d`; its tree is identical to `4ce4801`). The backend runs
+`4ce4801`, and the Vercel project is live. Production still serves the older frontend: see section 9b.
 
 ## 1. Release blockers (owner decisions)
 
 | # | Blocker | Why it matters | Needed from the owner |
 |---|---|---|---|
-| B1 | **Live URL shows Stages 1-3; Stage 4 needs the merge** | Done with owner approval on 27 Nov: backend deployed and Vercel unpaused (section 9a). `https://we-are-hack-squad.vercel.app` serves frontend `85fe10d`, which has the Stage 1-3 sections, with backend `4ce4801`, which has every engine including dispatch. The dispatch desk and offline chip appear on the live site only after `version-onsite-final` is merged into `main`. | Approve the merge pull request (then smoke-test as in section 9) |
+| B1 | **Production frontend is older than `main`** | `main` (`7cf8e0d`) contains Stage 4, but Vercel's production build of it (`dpl_EvweXZEAUx6WMfPi6ijfDZgt54L6`) is BLOCKED: it was created at 14:30, while the project was still paused. Production therefore still serves `85fe10d` (Stages 1-3, no dispatch desk, no build stamp, footer linking the practice repository). Details in section 9b. | Confirm the release target (section 9b), then redeploy |
 | B2 | **Older address unassigned** | `dengueshield-ai.vercel.app` returns 404; the project's domain is `we-are-hack-squad.vercel.app` | Submit `we-are-hack-squad.vercel.app` |
 | B3 | **The official repository is private** | Judges must read the code, `ARCHITECTURE.md` and `/exports`. Teammates have access; judges may not. | Make it public, or add the judges' GitHub accounts, before submission |
 | B4 | **Submission destination unknown** | The problem set (SHA-256 `ad6f6370…`, 3 pages) states the criteria but no submission link or form. The organizers' email could not be read: the Gmail connector session expired. | Confirm the submission form, link or channel, and the video upload deadline |
@@ -226,10 +227,63 @@ Live smoke tests:
 | Vector-control headline | 63.2 cases prevented, the same as locally |
 | Page errors | none |
 
-**Not yet live.** The Stage 4 dispatch desk, offline chip and footer build stamp need the merge into `main` (B1).
+**Not live at that point.** The Stage 4 dispatch desk and footer build stamp were not yet on `main`. The owner has since merged them
+(section 9b).
 
 **Rollback.** Nothing changes from section 9. The previous Hugging Face revision is `57c8afa`. The previous Vercel production deployments are
 `dpl_J26oSwxiT7mf7aL6VQ5Y445mRgdD` (`9c99f0c`) and `dpl_4pCH8xzSEAEawPZqxaJdWmxagqD9` (`938ff3b`). The project can also be paused again.
+
+## 9b. Production verification after the merge (27 Nov 2026)
+
+**SHAs**
+
+| Item | SHA |
+|---|---|
+| Official `main` | `7cf8e0d` (PR #6 merge); tree identical to `4ce4801`. Main CI https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45966183377 passed all four jobs, kill-switch included. |
+| Hugging Face backend | Space revision `9ea3e06`, built from `4ce4801`; `/api/health` reports `build_commit` `4ce4801` |
+| Vercel production frontend | `85fe10d` (`dpl_9r8U4v4MNnTFzFX9k4qCLvwbPfSN`), the Stage 3 merge |
+
+The production build of `7cf8e0d` (`dpl_EvweXZEAUx6WMfPi6ijfDZgt54L6`) exists but is BLOCKED, because it was created while the project
+was paused. The GitHub Deploy workflow reported success, but its provider steps were skipped, so it did not deploy anything.
+
+**Anonymous browser check of the live site** (fresh context, no account)
+
+| Check | Result |
+|---|---|
+| Home and navigation | pass |
+| Forecasts at 2, 3 and 4 weeks | pass |
+| Supply allocation | pass: saline 1,059 of 1,767 at 60% |
+| Hospital overflow | pass: 53 without a bed in their own city |
+| Vector control | pass: 63.2 cases prevented |
+| Sealed-year refusal | pass |
+| Provenance page | pass |
+| 360 and 390 px | pass, no sideways scroll |
+| Page errors, API 5xx | none |
+| Dispatch desk, SMS and WhatsApp previews, download buttons, footer build stamp | **absent** (older frontend) |
+| Footer source link | points at the practice repository (older frontend) |
+| Offline-mode chip | absent: by design it appears only when the server runs in offline mode (`launch_offline.sh`), and production runs online |
+
+**Live API through the production domain**
+
+| Check | Result |
+|---|---|
+| `/api/health` | ok, build `4ce4801`, dataset, bundle, replay and artifacts all OK |
+| `/api/system/offline` | 200 |
+| `/api/dispatch/brief` | 200 |
+| `/api/dispatch/document` (PDF and HTML) | 200 |
+| 2025 origin | 422 |
+| In-sample forecast | 422 |
+
+A PDF brief downloaded from production is byte-identical to `exports/brief_CCC_Ward_03.pdf` (scenario `S-94fbd8367d09`).
+
+**Release target awaiting the owner's confirmation**
+- Promote or redeploy the production build of `main` `7cf8e0d`.
+- What changes for visitors: the dispatch desk with SMS and WhatsApp previews and HTML and PDF downloads, the footer build stamp and
+  official-repository link, the idle re-render fix, crews by city, and the in-sample label in the controls bar.
+- The backend does not change; it already runs the same code.
+- For a build stamp equal to the `main` SHA, redeploy the backend from a checkout of `7cf8e0d` (same code, stamp `7cf8e0d`). Otherwise
+  the footer will show `4ce4801`, which has an identical tree.
+- After the release, re-run the anonymous check above and `scripts/offline_verify.py` against the live URL.
 
 ## 10. Checklists
 
@@ -245,8 +299,9 @@ Live smoke tests:
 
 **Release authorization (owner, explicit)**
 - [x] Deploy the backend to the Hugging Face Space (27 Nov, `4ce4801`)
-- [ ] Merge the pull request into `main`
-- [x] Unpause the Vercel project (27 Nov; live frontend `85fe10d` until the merge)
+- [x] Merge the pull request into `main` (owner, PR #6, `7cf8e0d`)
+- [ ] Redeploy the production frontend from `main` (section 9b)
+- [x] Unpause the Vercel project (27 Nov; production frontend still `85fe10d`, section 9b)
 - [ ] Create the tag (optional)
 - [ ] Change repository visibility or add judges
 
