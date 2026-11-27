@@ -14,8 +14,23 @@ import { provenance, PROV_TEXT } from "@/lib/provenance";
 export const LAST_ORIGIN = "2024-12-30";
 export const CITIES = ["Dhaka North", "Dhaka South", "Chattogram", "Gazipur", "Narayanganj"];
 export type Service = "median" | "p80" | "p90";
-/** City, service level and stock shared by Supply allocation and Hospital surge, so both read the same projected demand. */
-export type PlanShared = { city: string; setCity: (v: string) => void; service: Service; setService: (v: Service) => void; stock: number; setStock: (v: number) => void };
+/** One plan state for Supply allocation, Hospital surge and Vector control: the same city, service level, stock, crew budget and
+ *  illustrative capacity, so every section reads the same projected demand and the same resources. */
+export function usePlanState() {
+  const [city, setCity] = useState("All");
+  const [service, setService] = useState<Service>("p80");
+  const [stock, setStock] = useState(60);
+  const [crews, setCrews] = useState(20);
+  const [maxCrews, setMaxCrews] = useState(3);
+  const [risk, setRisk] = useState(70);
+  const [floor, setFloor] = useState(25);
+  const [perCrew, setPerCrew] = useState(10);
+  const [capPct, setCapPct] = useState(100);
+  const [overrides, setOverrides] = useState<Record<string, number>>({});
+  return { city, setCity, service, setService, stock, setStock, crews, setCrews, maxCrews, setMaxCrews, risk, setRisk, floor, setFloor,
+    perCrew, setPerCrew, capPct, setCapPct, overrides, setOverrides };
+}
+export type PlanShared = ReturnType<typeof usePlanState>;
 
 /** Decision tools accept only out-of-time forecasts issued in 2024 or earlier; otherwise explain why and offer the fix. */
 export function useDecisionGuard() {
@@ -49,13 +64,8 @@ export function Range({ label, value, min, max, step, onChange, fmt }: { label: 
 export default function SupplyAllocation({ shared }: { shared: PlanShared }) {
   const { sel } = useSel();
   const { lang } = useI18n();
-  const { city, setCity, service, setService, stock, setStock } = shared;
+  const { city, setCity, service, setService, stock, setStock, crews, setCrews, risk, setRisk, floor, setFloor, perCrew, setPerCrew, maxCrews, setMaxCrews } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const [crews, setCrews] = useState(20);
-  const [risk, setRisk] = useState(70);
-  const [floor, setFloor] = useState(25);
-  const [perCrew, setPerCrew] = useState(10);
-  const [maxCrews, setMaxCrews] = useState(3);
   const params = useDebounced({ stock, crews, risk, floor, perCrew, maxCrews });
   const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/allocation/plan?${qs({
     origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service,

@@ -57,10 +57,8 @@ function flowOption(d: any, city: string) {
 export default function HospitalSurge({ shared }: { shared: PlanShared }) {
   const { sel } = useSel();
   const { lang } = useI18n();
-  const { city, setCity, service, setService, stock } = shared;
+  const { city, setCity, service, setService, stock, capPct, setCapPct, overrides, setOverrides } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const [capPct, setCapPct] = useState(100);
-  const [overrides, setOverrides] = useState<Record<string, number>>({});
   const [focus, setFocus] = useState<string | null>(null);
   const p = useDebounced({ capPct, overrides, stock });
   const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/overflow/plan?${qs({
