@@ -21,8 +21,8 @@ Resume here. Keep this file short; update after every unit.
 | Hospital preparedness engine + API | `c030e03` | `tests/test_preparedness.py` 17 passed; allocation/overflow/intervention/dispatch 267 passed |
 | Preparedness command workspace (`#prepare`) | `797a3cf` | `preparedness.spec.ts` 6 passed |
 | Offline parity incl. 6 preparedness calls | `994bf57` | macOS kill-switch: 28/28 identical, offline browser test passed, 0 outbound attempts |
-| Docs: method, data, thresholds, offline, rubric, release, 7-min script, Bangla Q&A; README/ARCHITECTURE | pending commit | — |
-| Optional mosquito cursor + flight sound (off by default, footer toggles) | pending commit | `mosquito-cursor.spec.ts` |
+| Docs: method, data, thresholds, offline, rubric, release, 7-min script, Bangla Q&A; README/ARCHITECTURE | `f7ee003` | — |
+| Optional mosquito cursor + flight sound (off by default, footer toggles); full regression fixes | `a7f37b9` | `mosquito-cursor.spec.ts` passed; FINAL_TEST_REPORT.md |
 
 ## Open
 
