@@ -35,7 +35,7 @@ const GROUPS: Group[] = [
     { href: "/lab/", key: "nav.lab", icon: "lab", desc: "Horizons, rainfall lags, drivers and the rainfall what-if", kbd: "L" },
     { href: "/lab/#climate-futures", key: "nav.futures", icon: "climate", desc: "Exploratory rainfall scenarios, not forecasts" }] },
   { key: "nav.g.response", color: "#f2545b", Art: MapPin, blurb: "Turn this week's alerts into a plan: ranked wards, a resource sandbox and the nearest hospitals by road.", pages: [
-    { href: "/response/", key: "nav.response", icon: "response", desc: "Ranked alerts, review queue and resource sandbox", kbd: "R" },
+    { href: "/response/", key: "nav.response", icon: "response", desc: "Ranked alerts and the Operations engine: allocate, surge, intervene, dispatch", kbd: "R" },
     { href: "/geography/", key: "nav.geography", icon: "geography", desc: "Nearest general hospitals by road from a real location", kbd: "M" },
     { href: "/officer/", key: "nav.officer", icon: "shield", desc: "Review alerts and draft response plans", need: "officer" },
     { href: "/admin/", key: "nav.admin", icon: "provenance", desc: "Roles, plan approvals and the audit log", need: "admin" }] },

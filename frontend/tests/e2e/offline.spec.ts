@@ -51,6 +51,7 @@ test("with the internet cut off: forecast, supplies, hospital, vector control an
   const o120 = await api(`/api/overflow/plan?${Q}&capacity_pct=120`);
   await expect(surge.getByRole("alert")).toContainText(`${o120.totals.unresolved} projected patients`, { timeout: 30_000 });
   await expect(surge.getByRole("table").first().locator("tbody tr")).toHaveCount(o120.transfers.length);
+  await expect(surge.locator("svg path.ops-draw")).toHaveCount(o120.transfers.length);   // the ward transfer network draws offline, link for link
   await shot("offline_hospital", "#surge");
   steps.push(`hospital: ${o100.totals.unresolved} without a bed at baseline, ${o120.totals.unresolved} with +20% beds and ${o120.totals.transferred} transfers`);
 

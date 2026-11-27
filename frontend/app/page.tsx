@@ -226,7 +226,7 @@ export default function Landing() {
         <h2 id="land-tools" className="font-display text-[34px] font-extrabold tracking-[-0.025em] text-ink sm:text-[46px]">Tools</h2>
         <ul className="mt-6 grid gap-x-12 md:grid-cols-2">
           {[[t("nav.command"), "One ward's forecast, how reliable it is and the next step.", `/command/${q}`], [t("nav.lab"), "Horizons, rainfall lags, drivers, the rainfall what-if and Climate Futures.", `/lab/${q}`],
-            [t("nav.wards"), "All 60 synthetic wards ranked by outbreak probability.", `/wards/${q}`], [t("nav.response"), "Alerts to review, generic response options and a resource sandbox.", `/response/${q}`],
+            [t("nav.wards"), "All 60 synthetic wards ranked by outbreak probability.", `/wards/${q}`], [t("nav.response"), "Alerts to review and the Operations engine: allocate stock, route bed overflow, test crews, write the brief.", `/response/${q}#engine`],
             [t("nav.geography"), "General hospitals by road from a real location.", "/geography/"], [t("nav.evidence"), "Validation, model comparison, calibration and provenance.", "/evidence/"]].map(([name, d, href]) => (
             <li key={href} className="border-t border-line"><Link href={href} className="group flex min-h-11 items-baseline justify-between gap-4 py-5">
               <span><span className="block font-display text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-ink transition-colors group-hover:text-emerald-d">{name}</span><span className="mt-1 block text-[14px] text-ink-3">{d}</span></span>

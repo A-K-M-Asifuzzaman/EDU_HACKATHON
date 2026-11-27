@@ -2,56 +2,52 @@
 // Problem 2 (Phase 2 onsite): hospital surge and cross-ward overflow. Projected bed demand (the same number Supply allocation uses)
 // against an illustrative ward capacity; patients over capacity move only to wards with spare beds in the same city. Everything comes
 // from GET /api/overflow/plan on the local API. No distances exist for the synthetic ward IDs, so the flow chart is abstract, not a map.
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { api, qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
 import { dateFmt, download, pct, toCsv } from "@/lib/format";
-import { Chart } from "./echart";
 import { Icon } from "./icons";
 import { CITIES, Live, PlanShared, Range, useDebounced, useDecisionGuard } from "./supply-allocation";
 import { Btn, Card, DataTable, Kpi, ProvChip, RiskBadge, Segmented, Select, useAsync } from "./ui";
+import SurgeNetwork from "./surge-network";
 
-const C_OCC = "#4a2bd0", C_MOVE = "#1baf7a", C_SPARE = "#cdeedd", C_SHORT = "#c2303a";
-const STRIPES = `repeating-linear-gradient(135deg, ${C_SHORT} 0 5px, #e2646c 5px 10px)`;
+// the geographic view loads MapLibre only when it is opened; the ward network needs nothing beyond the overflow plan
+const SurgeMap = dynamic(() => import("./surge-map"), { ssr: false, loading: () => <div role="status" className="ops-panel grid h-[420px] place-items-center text-[13px] text-ink-3">Loading the hospital map…</div> });
+
+/** Two views of the same overflow plan: the abstract ward network (exact transfers) and the real hospital map (city aggregates). */
+function SurgeViews({ d }: { d: any }) {
+  const [view, setView] = useState<"network" | "map">("network");
+  const [city, setCity] = useState<string | null>(null);              // shared, so a city chosen in one view stays chosen in the other
+  return (<div className="mt-5">
+    <div role="group" aria-label="Overflow view" className="flex flex-wrap gap-1.5">
+      {([["network", "Ward transfer network"], ["map", "Hospital map"]] as const).map(([k, l]) => (
+        <button key={k} type="button" aria-pressed={view === k} onClick={() => setView(k)} className="ops-chip">{l}</button>))}
+    </div>
+    {view === "network" ? <SurgeNetwork d={d} cityPick={city} onCity={setCity} />
+      : <div className="mt-3"><h3 className="text-[14px] font-semibold text-ink">Hospital map</h3>
+        <p className="mb-3 mt-0.5 max-w-[72ch] text-[12.5px] text-ink-3">Real hospitals from OpenStreetMap with this scenario&apos;s city totals at each city centre. Ward-level transfers stay in the network view: the synthetic wards have no locations.</p>
+        <SurgeMap d={d} city={city} onCity={setCity} /></div>}
+  </div>);
+}
+
+const C_OCC = "#b4a6ff", C_MOVE = "#3fd3a5", C_SPARE = "#3a3e66", C_SHORT = "#ff6b72";   // Operations engine palette (dark panel)
+const STRIPES = `repeating-linear-gradient(135deg, ${C_SHORT} 0 3px, rgba(255,107,114,.35) 3px 6px)`;
 const STATUS: Record<string, [string, string]> = {
   unresolved: ["Unresolved overflow", "bg-[#ffe9ea] text-[#8f1d25]"], relieved: ["Overflow placed", "bg-[#e6f7ef] text-[#0b5d44]"],
   receiving: ["Receiving", "bg-[#efe7ff] text-[#3a1fa8]"], spare: ["Spare beds", "bg-[#eef3f1] text-[#2d4a3e]"], balanced: ["At capacity", "bg-[#f3f0ea] text-[#5e567f]"],
 };
-const PRESETS = [{ value: 100, label: "Baseline" }, { value: 120, label: "+20% surge beds" }, { value: 150, label: "+50%" }];
+export const PRESETS = [{ value: 100, label: "Baseline" }, { value: 120, label: "+20% surge beds" }, { value: 130, label: "+30%" }, { value: 150, label: "+50%" }];
 
 /** Occupied, transferred, spare and unresolved beds on one track; the tick marks configured capacity. */
 function BedBar({ occupied, moved, spare, short, label }: { occupied: number; moved: number; spare: number; short: number; label: string }) {
   const total = Math.max(1, occupied + moved + spare + short), w = (n: number) => `${(100 * n) / total}%`;
   const seg = "h-full transition-[width] duration-700 ease-out motion-reduce:transition-none";
-  return (<div role="img" aria-label={label} className="relative h-3.5 w-full overflow-hidden rounded-full bg-[#f3f0ea]">
+  return (<div role="img" aria-label={label} className="relative h-3.5 w-full overflow-hidden rounded-full bg-[#1c1f36]">
     <div className="flex h-full"><div className={seg} style={{ width: w(occupied), background: C_OCC }} /><div className={seg} style={{ width: w(moved), background: C_MOVE }} />
       <div className={seg} style={{ width: w(spare), background: C_SPARE }} /><div className={seg} style={{ width: w(short), background: STRIPES }} /></div>
-    {short > 0 && <span aria-hidden className="absolute inset-y-0 w-[3px] bg-ink" style={{ left: `calc(${w(occupied + moved + spare)} - 1px)` }} />}</div>);
-}
-
-function Legend() {
-  const item = (c: string, t: string) => <span className="inline-flex items-center gap-1.5"><span aria-hidden className="h-2.5 w-4 rounded-sm" style={{ background: c }} />{t}</span>;
-  return (<div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-ink-3">{item(C_OCC, "Own patients in own beds")}{item(C_MOVE, "Transferred in")}{item(C_SPARE, "Spare beds")}{item(STRIPES, "No bed in city (beyond capacity)")}</div>);
-}
-
-function flowOption(d: any, city: string) {
-  const tr = d.transfers.filter((t: any) => t.city === city);
-  const short = d.wards.filter((w: any) => w.city === city && w.unresolved > 0);
-  const sinkName = `No bed in ${city}`;
-  const names = new Set<string>();
-  const nodes: any[] = [];
-  const add = (name: string, color: string) => { if (!names.has(name)) { names.add(name); nodes.push({ name, itemStyle: { color, borderColor: "#1a1438", borderWidth: 1 } }); } };
-  tr.forEach((t: any) => { add(t.from_ward, "#f2545b"); add(t.to_ward, C_MOVE); });
-  short.forEach((w: any) => add(w.ward_id, "#f2545b"));
-  if (short.length) add(sinkName, C_SHORT);
-  const links = [...tr.map((t: any) => ({ source: t.from_ward, target: t.to_ward, value: t.patients })),
-    ...short.map((w: any) => ({ source: w.ward_id, target: sinkName, value: w.unresolved, lineStyle: { color: C_SHORT, opacity: 0.35 } }))];
-  return { nodes, links, option: {
-    tooltip: { trigger: "item", formatter: (p: any) => p.dataType === "edge" ? `${p.data.source} → ${p.data.target}: ${p.data.value} patient${p.data.value === 1 ? "" : "s"}` : p.name },
-    series: [{ type: "sankey", left: 6, right: 132, top: 8, bottom: 8, nodeWidth: 12, nodeGap: 10, draggable: false, layoutIterations: 0,
-      data: nodes, links, emphasis: { focus: "adjacency" }, label: { color: "#1a1438", fontSize: 12, fontWeight: 600 },
-      lineStyle: { color: "source", opacity: 0.4, curveness: 0.5 } }] } };
+    {short > 0 && <span aria-hidden className="absolute inset-y-0 w-[3px] bg-[#eef0ff]" style={{ left: `calc(${w(occupied + moved + spare)} - 1px)` }} />}</div>);
 }
 
 export default function HospitalSurge({ shared }: { shared: PlanShared }) {
@@ -59,17 +55,14 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
   const { lang } = useI18n();
   const { city, setCity, service, setService, stock, capPct, setCapPct, overrides, setOverrides } = shared;
   const { blocked, notice } = useDecisionGuard();
-  const [focus, setFocus] = useState<string | null>(null);
   const p = useDebounced({ capPct, overrides, stock });
   const q = useAsync((s) => (blocked ? Promise.resolve(null) : api(`/api/overflow/plan?${qs({
     origin: sel.origin, horizon: sel.horizon, source: srcParam(sel), city: city === "All" ? undefined : city, service, capacity_pct: p.capPct,
     stock: p.stock / 100 })}${Object.entries(p.overrides).map(([k, v]) => `&override=${encodeURIComponent(`${k}:${v}`)}`).join("")}`, { signal: s })),
   [sel.origin, sel.horizon, sel.source, city, service, p, blocked]);
   const d: any = q.data;
-  const flowCities: string[] = useMemo(() => (d?.cities ?? []).filter((c: any) => c.transferred > 0 || c.unresolved > 0).map((c: any) => c.city), [d]);
-  const flowCity = focus && d?.cities.some((c: any) => c.city === focus) ? focus
-    : [...(d?.cities ?? [])].sort((a: any, b: any) => b.transferred - a.transferred || b.unresolved - a.unresolved)[0]?.city ?? null;
-  const flow = useMemo(() => (d && flowCity ? flowOption(d, flowCity) : null), [d, flowCity]);
+  const { report } = shared;
+  useEffect(() => { report("surge", d ? { totals: d.totals, capPct: d.settings.capacity_pct, stale: !!q.stale } : null); }, [d, q.stale, report]);
   const nOverrides = Object.keys(overrides).length;
   const setOverride = (w: string, v: string, base: number) => setOverrides((o) => {
     const n = Math.max(0, Math.min(500, Math.round(Number(v))));
@@ -111,24 +104,7 @@ export default function HospitalSurge({ shared }: { shared: PlanShared }) {
           <span className="block text-[12px]">{d.totals.headroom === 0 ? "No ward in these cities has spare beds: the surge is city-wide, so moving patients between wards cannot help. Only more capacity can (try a surge scenario)." : "Spare beds in the same city were used first; transfers never cross cities."}</span></div></div>)
         : <div role="status" className="mt-4 flex gap-2 rounded-xl border border-line bg-[#e6f7ef] p-3 text-[13px] text-[#0b5d44]"><Icon name="check" size={16} className="mt-0.5 shrink-0" />Every projected patient has a bed in their own city{d.totals.transferred ? `, after ${d.totals.transferred} transfer${d.totals.transferred === 1 ? "" : "s"}` : ""}.</div>}
 
-      <h3 className="mb-2 mt-5 text-[14px] font-semibold text-ink">Cities</h3>
-      <Legend />
-      <div className="mt-2 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">{d.cities.map((c: any) => (
-        <button key={c.city} type="button" onClick={() => setFocus(c.city)} aria-pressed={flowCity === c.city}
-          className={"rounded-xl border-2 p-3 text-left transition-colors " + (flowCity === c.city ? "border-ink bg-mint-l" : "border-line bg-white hover:border-ink/40")}>
-          <div className="flex items-center justify-between gap-2"><b className="text-[14px] text-ink">{c.city}</b>{c.unresolved > 0 ? <span className="rounded-full bg-[#ffe9ea] px-2 py-0.5 text-[11px] font-bold text-[#8f1d25]">{c.unresolved} short</span> : <span className="rounded-full bg-[#e6f7ef] px-2 py-0.5 text-[11px] font-bold text-[#0b5d44]">covered</span>}</div>
-          <div className="mt-2"><BedBar occupied={c.occupied_before} moved={c.transferred} spare={c.spare_after} short={c.unresolved} label={`${c.city}: ${c.demand} beds needed, ${c.capacity} available, ${c.transferred} transferred, ${c.unresolved} without a bed`} /></div>
-          <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[12px] text-ink-3">
-            <dt>Demand / capacity</dt><dd className="num text-right text-ink">{c.demand} / {c.capacity}</dd>
-            <dt>Transferred</dt><dd className="num text-right text-ink">{c.transferred}</dd>
-            <dt>Beds used after</dt><dd className="num text-right text-ink">{c.utilization_after === null ? "no beds" : pct(c.utilization_after, lang)}</dd>
-            <dt>Spare after</dt><dd className="num text-right text-ink">{c.spare_after}</dd></dl></button>))}</div>
-
-      <div className="mt-5 flex flex-wrap items-end justify-between gap-3"><h3 className="text-[14px] font-semibold text-ink">Transfer flow{flowCity ? `: ${flowCity}` : ""}</h3>
-        {d.cities.length > 1 && flowCities.length > 0 && <Segmented label="Show city" value={flowCity ?? ""} onChange={(v) => setFocus(String(v))} options={d.cities.map((c: any) => ({ value: c.city, label: c.city }))} />}</div>
-      <p className="mt-1 text-[12px] text-ink-3">Wards over capacity (left) send patients to wards with spare beds (right). Patients who cannot be placed in the city end in the red node. Ward positions are abstract: no distances exist for these synthetic wards.</p>
-      {flow && flow.links.length > 0 ? <div className="mt-2 rounded-xl border border-line p-2"><Chart option={flow.option} height={Math.min(560, 80 + 30 * Math.max(4, flow.nodes.length / 2))} ariaLabel={`Transfer flow in ${flowCity}; the transfer table below lists the same assignments`} /></div>
-        : <p className="mt-2 rounded-xl border border-dashed border-line p-4 text-[13px] text-ink-3">No overflow in {flowCity ?? "this view"}: every ward is within its capacity, so nothing needs to move.</p>}
+      <SurgeViews d={d} />
 
       <h3 className="mb-2 mt-5 text-[14px] font-semibold text-ink">Transfer assignments</h3>
       {d.transfers.length ? <DataTable dense maxH={280} rows={d.transfers} cols={[{ key: "city", label: "City" }, { key: "from_ward", label: "From ward (over capacity)" }, { key: "to_ward", label: "To ward (spare beds)" }, { key: "patients", label: "Patients", align: "right" }]} />

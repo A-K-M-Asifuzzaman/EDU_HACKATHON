@@ -296,3 +296,54 @@ html.js .reveal.in { opacity: 1; transform: none; }
   background: #1f1846; border-color: #5a4bb0; box-shadow: 5px 5px 0 #07041a;
 }
 [data-theme="dim"] .night :is(.card, .light-panel) :is(select, input, textarea) { color: #f4f0ff; }
+
+/* ---------- Operations engine (Response page): one obsidian engine bay for the four decision stages. The container carries
+   data-theme="dim" so every existing dark-mode rule applies inside it, and these tokens tune that dark to matte obsidian.
+   Resource colours mark data only; text always uses the ink tokens (ink-3 #9ea3c9 on panel #151729 = 7.2:1). ---------- */
+.ops-engine {
+  color-scheme: dark;
+  --color-canvas: #0e0f1a; --color-ivory: #151729; --color-line: #2a2d4a; --color-paper-3: #1c1f36; --color-mint-l: #232745;
+  --color-ink: #eef0ff; --color-ink-2: #c6c9e8; --color-ink-3: #9ea3c9;
+  --color-emerald: #ffd36e; --color-emerald-d: #ffd36e; --color-sky: #5fc3f0; --color-sky-d: #8fd8f7;
+  --color-coral: #ff6b72; --color-coral-d: #ff9a9f; --color-amber: #ffc23d; --color-amber-d: #ffd36e;
+  --ops-raised: #1c1f36; --ops-slot: #262a48; --ops-line-2: #3a3e66;
+  --res-saline: #5fc3f0; --res-kits: #ffc23d; --res-beds: #b4a6ff; --res-crews: #3fd3a5; --res-short: #ff6b72;
+  background-color: #0e0f1a; color: var(--color-ink);
+  background-image: linear-gradient(rgba(158, 163, 201, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(158, 163, 201, 0.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.ops-engine[data-theme] :is(.card, .bg-white) { background-color: #151729; }
+.ops-engine[data-theme] .card { border: 1px solid #2a2d4a; border-radius: 16px; box-shadow: none; }
+.ops-engine[data-theme] .bg-\[\#f1f5f9\] { background-color: #1c1f36; }
+.ops-engine .btn-ghost { background: #1c1f36; color: #eef0ff; border: 1.5px solid #3a3e66 !important; box-shadow: none; }
+.ops-engine .btn-ghost:hover { background: #232745; transform: none; box-shadow: none; }
+.ops-engine [role="radiogroup"] { border-width: 1.5px; border-color: #3a3e66; background: #0e0f1a; }
+.ops-engine .bg-forest { background-color: #eef0ff; color: #0e0f1a; }
+.ops-panel { background: #151729; border: 1px solid #2a2d4a; border-radius: 14px; }
+.ops-chip { display: inline-flex; min-height: 36px; align-items: center; border-radius: 999px; border: 1.5px solid #3a3e66; padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--color-ink-2); background: #0e0f1a; transition: background-color .15s, color .15s, border-color .15s; }
+.ops-chip:hover { border-color: #9ea3c9; color: var(--color-ink); }
+.ops-chip[aria-pressed="true"] { background: #eef0ff; border-color: #eef0ff; color: #0e0f1a; }
+.ops-engine :focus-visible { outline: 2px solid #ffd36e; outline-offset: 2px; }
+/* causal rail: a node flashes once when its computed value changes; nothing loops */
+.ops-node { position: relative; }
+.ops-flash { position: absolute; inset: -1px; border-radius: 12px; border: 1.5px solid #ffd36e; pointer-events: none; animation: ops-flash 1.1s ease-out forwards; }
+@keyframes ops-flash { from { opacity: 1; } to { opacity: 0; } }
+.ops-tick { display: inline-block; animation: ops-tick .45s var(--ease-soft) both; }
+@keyframes ops-tick { from { opacity: .35; transform: translateY(5px); } }
+/* bars and bed segments grow by transform only (no layout); priority order sets a short stagger, so stock visibly pours in rank order */
+.ops-grow { transform-origin: 50% 100%; transition: transform .6s var(--ease-soft); transition-delay: calc(var(--i, 0) * 9ms); }
+.ops-growx { transform-origin: 0 50%; transition: transform .6s var(--ease-soft); }
+svg .ops-seg { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .6s var(--ease-soft); }
+svg .ops-mark { transition: transform .6s var(--ease-soft); }
+.ops-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ops-draw .8s var(--ease-soft) .15s forwards; }
+@keyframes ops-draw { to { stroke-dashoffset: 0; } }
+.ops-hatch { background: repeating-linear-gradient(135deg, rgba(255, 107, 114, .9) 0 3px, rgba(255, 107, 114, .35) 3px 6px); }
+dialog.ops-sheet { margin: auto 0 0; width: 100%; max-width: 100%; max-height: 82vh; border: 1px solid #3a3e66; border-bottom: 0; border-radius: 20px 20px 0 0; padding: 0; background: #151729; color: #eef0ff; }
+dialog.ops-sheet::backdrop { background: rgba(5, 6, 12, 0.5); }
+@media (min-width: 1024px) { dialog.ops-sheet { margin: 0 0 0 auto; height: 100%; max-height: 100%; width: 420px; border: 0; border-left: 1px solid #3a3e66; border-radius: 0; } dialog.ops-sheet::backdrop { background: rgba(5, 6, 12, 0.25); } }
+/* anchors into the engine land below the sticky header (and, on desktop, below the sticky rail) */
+.ops-engine .card[id] { scroll-margin-top: calc(var(--ops-top, 108px) + 12px); }
+@media (min-width: 1024px) { .ops-engine .card[id] { scroll-margin-top: calc(var(--ops-top, 108px) + 112px); } }
+@media (max-width: 639px) { .ops-engine .card.p-5 { padding: 14px; } }
+/* the brand's heavy ink outlines turn near-white on obsidian; inside the engine they become the quiet panel line */
+.ops-engine :is(.border-ink, .border-\[\#1a1438\]) { border-color: #3a3e66; }
