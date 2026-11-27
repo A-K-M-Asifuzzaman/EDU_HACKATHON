@@ -119,8 +119,8 @@ Rules for the recording: one take, no slides, no cuts. Record from the submitted
 | Suite | Result |
 |---|---|
 | Python (pytest) | 633 passed (611 before Stage 4) |
-| Browser (Playwright) | 116 passed with no retries, 1 skipped (the kill-switch workflow, which runs only with the internet cut off) |
-| Recent CI browser jobs | 0 flaky tests, so the allowed retry was never used |
+| Browser (Playwright) | 118 passed with no retries, 1 skipped (the kill-switch workflow, which runs only with the internet cut off) |
+| Recent CI browser jobs | 0 flaky tests, except run 45962769047 (2 flaky; root cause found and fixed, see below) |
 | Kill-switch | macOS sandbox and Linux CI network namespace: 21 of 21 results identical online and offline; the full browser workflow passed |
 
 **Cross-platform.** All 21 result hashes from CI's Linux run equal the macOS run, including the deployed model's 2025 inference.
@@ -132,7 +132,16 @@ Rules for the recording: one take, no slides, no cuts. Record from the submitted
 | `2b7f9a8` | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45956574258 | all four jobs passed |
 | `b95b566` | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45957777217 | all four jobs passed |
 | `1eb3ac2` (Stage 4 tip) | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45959166287 | all four jobs passed; 115 browser tests, 0 flaky |
-| `0b378d3` (build stamp, rehearsal tests) | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45961155193 | see the release report for the final result |
+| `0b378d3` (build stamp, rehearsal tests) | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45961155193 | all four jobs passed |
+| `ed05526` (release docs) | https://github.com/A-K-M-Asifuzzaman/EDU_HACKATHON/actions/runs/45962769047 | all four jobs passed, but the browser job needed its retry for 2 tests |
+| the fix commit after `ed05526` | see the release report | |
+
+The two flaky tests (Dim-mode accessibility on Response, vector manual deployment) exposed a real defect.
+- **Cause.** `useDebounced` depended on object identity, so the vector-control section re-rendered about 7 times a second while
+  idle. Each cycle could abort a slow simulator request, and a refresh could catch text in its dimmed state.
+- **Fix.** The debounce now depends on content, and refreshes no longer dim text.
+- **Regression test.** A new browser test checks that every decision section is idle when nothing changes. It fails on the old code and
+  passes now.
 
 **Rehearsal.** I did not switch Wi-Fi off on this machine, because the session needs the network. The same workflow ran in a sandbox
 that blocks all non-loopback traffic for the server and the browser, after a real `./scripts/setup.sh` and with the default

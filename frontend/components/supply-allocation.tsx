@@ -66,14 +66,20 @@ const STATUS: Record<string, [string, string]> = { met: ["Fully supplied", "bg-[
  *  survive every control change. First load and errors use the shared Loading states. */
 export function Live<T>({ q, h, label, children }: { q: AsyncState<T>; h: number; label: string; children: (d: T) => React.ReactNode }) {
   if (!q.data) return <Loading q={q} h={h} kind="table" label={label}>{() => null}</Loading>;
+  // while recomputing: a chip and a thin bar, never dimmed text (dimming broke contrast for anyone reading during the update)
   return (<div aria-live="polite" aria-busy={q.stale || undefined} className="relative">
-    {q.stale && <span role="status" className="absolute right-2 top-2 z-10 rounded-full bg-ink px-2.5 py-1 text-[11px] text-canvas">Updating…</span>}
-    <div className={"transition-opacity " + (q.stale ? "opacity-60" : "")}>{children(q.data)}</div></div>);
+    {q.stale && <><span role="status" className="absolute right-2 top-2 z-10 rounded-full bg-ink px-2.5 py-1 text-[11px] text-canvas">Updating…</span>
+      <span aria-hidden className="absolute inset-x-0 -top-1 z-10 h-[3px] animate-pulse rounded-full bg-forest" /></>}
+    <div>{children(q.data)}</div></div>);
 }
 
+/** Debounce by content, not identity: callers pass fresh object literals on every render, and an identity dependency would re-fire the
+ *  timer after each render (a re-render loop that aborted slow requests before they finished). */
 export function useDebounced<T>(v: T, ms = 250): T {
+  const key = JSON.stringify(v);
   const [d, setD] = useState(v);
-  useEffect(() => { const id = setTimeout(() => setD(v), ms); return () => clearTimeout(id); }, [v, ms]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { const id = setTimeout(() => setD(v), ms); return () => clearTimeout(id); }, [key, ms]);
   return d;
 }
 
