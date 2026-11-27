@@ -2,7 +2,7 @@
 // Hospital preparedness command workspace (mentor scope). Every number comes from GET /api/preparedness/plan: a deterministic engine
 // over FICTIONAL planning hospitals (synthetic_demo) driven by the organizer-dataset forecast. Real facilities appear only in the
 // emergency discovery panel, with capacity and availability shown as unknown.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, BASE, qs } from "@/lib/api";
 import { srcParam, useSel } from "@/lib/ctx";
 import { useI18n } from "@/lib/i18n";
@@ -47,7 +47,7 @@ export default function HospitalPreparedness({ shared }: { shared: PlanShared })
   return (<section id="prepare" data-theme="dim" aria-labelledby="prepare-title" className="ops-engine relative -mx-4 mt-6 scroll-mt-16 px-3 pb-8 pt-5 sm:mx-0 sm:rounded-[20px] sm:px-5">
     <div className="flex flex-wrap items-end justify-between gap-3 px-1">
       <div><h2 id="prepare-title" className="font-display text-[clamp(26px,3.2vw,36px)] font-extrabold leading-[1.05] tracking-[-0.02em] text-ink">Hospital preparedness</h2>
-        <p className="mt-1.5 max-w-[72ch] text-[13.5px] leading-relaxed text-ink-2">If an outbreak comes, what should hospitals prepare? Beds that are already partly full of other patients, saline, diagnostic kits, referrals and contacts, week by week. The hospitals here are fictional planning hospitals; the forecast is real.</p></div>
+        <p className="mt-1.5 max-w-[72ch] text-[13.5px] leading-relaxed text-ink-2">If an outbreak comes, what should hospitals prepare? Beds that are already partly full of other patients, saline, diagnostic kits, referrals and contacts, week by week. The hospitals here are fictional planning hospitals; the forecast comes from the organizer's synthetic dataset, not live surveillance.</p></div>
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={demo} aria-pressed={isDemo} className="ops-chip !border-[#ffd36e] !text-[#ffd36e] aria-pressed:!bg-[#ffd36e] aria-pressed:!text-[#0e0f1a]">Mentor demonstration</button>
         <button type="button" onClick={() => setC(DEFAULTS)} className="ops-chip">Reset preparedness</button></div>
@@ -84,6 +84,13 @@ export default function HospitalPreparedness({ shared }: { shared: PlanShared })
 function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; setView: (v: StateKey) => void; lang: string; query: string }) {
   const st = d.states[view], cr = d.states.crisis.summary, rs = d.states.response.summary, base = d.states.baseline.summary;
   const td = d.forecast.target_dates;
+  const [day, setDay] = useState(0);                                  // 0 = peak view; 1-28 = that day's census
+  const [play, setPlay] = useState(false);
+  useEffect(() => {                                                   // plays only after the user presses Play, stops at day 28
+    if (!play) return;
+    const id = setInterval(() => setDay((x) => { if (x >= 28) { setPlay(false); return x; } return x + 1; }), 380);
+    return () => clearInterval(id);
+  }, [play]);
   const weekDate = (w: number | null) => (w && w >= 2 ? ` (${dateFmt(td[String(w)], lang as any)})` : "");
   return (<div className="mt-5 grid gap-5">
     {/* B: executive answers */}
@@ -101,9 +108,11 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
       <span className="num ml-1 text-[12px] text-ink-3">Scenario <code data-testid="prep-scenario-id" className="text-ink">{d.scenario_id}</code></span></div>
 
     {/* C: hospital digital twin */}
-    <section aria-labelledby="twin-title"><h3 id="twin-title" className="text-[14px] font-semibold text-ink">Hospital bed boards at the peak: {STATE_LABEL[view].toLowerCase()}</h3>
+    <section aria-labelledby="twin-title"><div className="flex flex-wrap items-end justify-between gap-3"><h3 id="twin-title" className="text-[14px] font-semibold text-ink">Hospital bed boards {day ? `on day ${day}` : "at the peak"}: {STATE_LABEL[view].toLowerCase()}</h3>
+      <div className="flex flex-wrap items-center gap-2"><button type="button" className="ops-chip" onClick={() => { if (day >= 28) setDay(0); setPlay((x) => !x); }} aria-pressed={play}>{play ? "Pause" : "Play 28 days"}</button>
+        <label className="flex items-center gap-2 text-[12px] text-ink-3">Day<input type="range" min={0} max={28} value={day} onChange={(e) => { setPlay(false); setDay(Number(e.target.value)); }} aria-label="Day shown on the bed boards (0 = peak)" className="w-40 accent-[#ffd36e]" /><b className="num w-12 text-ink">{day || "peak"}</b></label></div></div>
       <p className="mt-0.5 text-[12.5px] text-ink-3">One cell per bed. Grey: other illnesses. Lilac: dengue. Dark: free. Amber outline: protected reserve. Green dashes: surge beds opened. Red cells outside the board: patients the beds cannot hold.</p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{st.hospitals.map((h: any) => <BedBoard key={h.id} h={h} />)}</div></section>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{st.hospitals.map((h: any) => <BedBoard key={h.id} h={h} day={day} />)}</div></section>
 
     {/* D + E: timeline and inventory */}
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -123,6 +132,8 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
           <tr key={label} className="border-t border-line"><th className="py-1.5 pr-3 text-left font-normal text-ink-2">{label}</th>{(Object.keys(STATE_LABEL) as StateKey[]).map((k) => <td key={k} className="py-1.5 pr-3 text-right text-ink">{f(d.states[k].summary, k)}</td>)}</tr>))}</tbody></table></div>
       <p className="mt-2 text-[12px] text-ink-3">Response = crisis + surge beds opened + orders placed today (they arrive after the lead time) + referrals inside the planning network. Remaining shortages are shown, not hidden. Baseline uses the forecast with the planned hospital settings{d.intervention ? " and the same assumed crew effect" : ""}.</p></section>
 
+    {d.states.response.inventory_compare && <InventoryPolicies ic={d.states.response.inventory_compare} crisis={d.states.crisis.summary} />}
+
     {/* G: transfer network */}
     <TransferNetwork st={d.states.response} />
 
@@ -133,7 +144,8 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
     <section aria-labelledby="act-title" className="ops-panel p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 id="act-title" className="text-[14px] font-semibold text-ink">Preparation plan</h3>
       <div className="flex flex-wrap gap-1.5">{(["html", "csv", "txt"] as const).map((f) => <a key={f} className="ops-chip" href={`${BASE}/api/preparedness/brief?${query}&format=${f}`} download aria-label={`Download the preparation brief as ${f.toUpperCase()}`}>{f.toUpperCase()}</a>)}</div></div>
       <ol className="mt-3 grid gap-2">{d.actions.map((a: any, i: number) => (<li key={i} className="grid gap-x-3 rounded-lg border border-line p-2.5 text-[12.5px] sm:grid-cols-[minmax(0,1fr)_auto]">
-        <span><b className="text-ink">{a.action}</b>{a.quantity != null && <b className="num ml-1.5 text-[#ffd36e]">{a.quantity}</b>}<span className="block text-ink-3">{a.why}. Trigger: {a.trigger}.</span></span>
+        <span><b className="text-ink">{a.action}</b>{a.quantity != null && <b className="num ml-1.5 text-[#ffd36e]">{a.quantity}</b>}<span className="block text-ink-3">{a.why}. Trigger: {a.trigger}.</span>
+          {a.where?.length > 0 && <span className="mt-1 block text-ink-2">Where: {a.where.join("; ")}</span>}</span>
         <span className="text-ink-2 sm:text-right">{a.when}</span></li>))}</ol>
       <p className="mt-2 text-[12px] text-ink-3">Every item is computed from this scenario (rule ids in the brief). Planning suggestions only: not an operational or clinical order, no dosage or treatment advice.</p></section>
 
@@ -150,17 +162,30 @@ function Workspace({ d, view, setView, lang, query }: { d: any; view: StateKey; 
   </div>);
 }
 
+/** Dynamic threshold gauge: patients needing a bed against the reserve line (routine limit) and the open beds. */
+function Gauge({ need, limit, cap }: { need: number; limit: number; cap: number }) {
+  const top = Math.max(need, cap, 1), col = need > cap ? C.short : need > limit ? C.reserve : C.surge;
+  return (<div className="mt-2" role="img" aria-label={`${need} patients need a bed; reserve line ${limit}; ${cap} open beds`}>
+    <div className="relative h-2.5 overflow-hidden rounded-full bg-[#262a48]">
+      <span className="ops-growx absolute inset-0 rounded-full" style={{ background: col, transform: `scaleX(${need / top})` }} />
+      <span className="absolute inset-y-0 w-[2px] bg-[#ffc23d]" style={{ left: `${(100 * limit) / top}%` }} />
+      <span className="absolute inset-y-0 w-[2px] bg-[#eef0ff]" style={{ left: `calc(${(100 * cap) / top}% - 2px)` }} /></div>
+    <div className="num mt-0.5 flex justify-between text-[10.5px] text-ink-3"><span>need {need}</span><span>reserve line {limit}</span><span>beds {cap}</span></div></div>);
+}
+
 const Answer = ({ q, a, sub }: { q: string; a: React.ReactNode; sub: string }) => (
   <div className="ops-panel p-3"><div className="text-[12px] font-semibold text-ink-3">{q}</div><div className="num mt-1 font-display text-[19px] font-extrabold leading-tight text-ink">{a}</div><p className="mt-1 text-[11.5px] leading-snug text-ink-3">{sub}</p></div>);
 
-function BedBoard({ h }: { h: any }) {
-  const b = h.beds, cap = b.capacity, peak = b.peak_needed;
-  const other = Math.min(b.other_now, cap), dengue = Math.max(0, Math.min(cap, peak) - other);
+function BedBoard({ h, day }: { h: any; day: number }) {
+  const b = h.beds, cap = b.capacity, at = day ? h.occ[day - 1] : null;
+  const peak = at ? at[2] : b.peak_needed;                           // patients needing a bed (all admitted would need)
+  const other = Math.min(at ? at[0] : b.other_now, cap), dengue = Math.max(0, Math.min(cap, peak) - other);
   const over = Math.max(0, peak - cap), shown = Math.min(over, 40);
   const cells = Array.from({ length: cap }, (_, i) => (i < other ? "other" : i < other + dengue ? "dengue" : "free"));
   const reserveFrom = cap - b.reserve, surgeFrom = cap - b.surge_open;
   return (<div className="ops-panel p-3"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><div className="truncate text-[13px] font-bold text-ink">{h.name}</div>
-      <div className="num text-[11.5px] text-ink-3">{peak} need at peak / {cap} beds{b.surge_open ? ` (${b.surge_open} surge)` : ""}</div></div><Pill s={h.status} /></div>
+      <div className="num text-[11.5px] text-ink-3">{peak} need {day ? `on day ${day}` : "at peak"} / {cap} beds{b.surge_open ? ` (${b.surge_open} surge)` : ""}</div></div><Pill s={h.status} /></div>
+    <Gauge need={peak} limit={b.routine_limit} cap={cap} />
     <div role="img" aria-label={`${h.name}: ${b.other_now} other-illness patients, ${b.dengue_now} dengue patients now, ${peak} needing a bed at the peak, ${cap} beds, reserve ${b.reserve}${over ? `, ${over} without a bed` : ""}`}
       className="mt-2 grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${cap > 150 ? 20 : 14}, minmax(0, 1fr))` }}>
       {cells.map((k, i) => <span key={i} className="aspect-square rounded-[2px] transition-colors duration-500 motion-reduce:transition-none"
@@ -213,15 +238,32 @@ function Inventory({ st }: { st: any }) {
     <p className="mt-2 px-1 text-[11.5px] text-ink-3">Light fill: stock plus deliveries. Solid: left after four weeks. Red line: four-week demand. Amber dashes: safety stock. Closing = opening + received − used; unmet demand is kept apart.</p></div>);
 }
 
+function InventoryPolicies({ ic, crisis }: { ic: any; crisis: any }) {
+  const cols: [string, string][] = [["no_action", "No action"], ["procurement_only", "Procurement only"], ["redistribution_only", "Redistribution only"], ["redistribution_and_procurement", "Redistribution + procurement"]];
+  const left = (day: number | null) => (day ? `day ${day}` : "not within 28 days");
+  return (<section aria-labelledby="inv-pol" className="ops-panel p-4"><h3 id="inv-pol" className="text-[14px] font-semibold text-ink">Emergency inventory: four policies (units still unmet over 28 days)</h3>
+    <div className="mt-2 flex flex-wrap gap-2" data-testid="stockout-countdown">
+      <span className="ops-chip !cursor-default">Saline runs out: <b className="num ml-1 text-ink">{left(crisis.first_saline_stockout_day)}</b></span>
+      <span className="ops-chip !cursor-default">Kits run out: <b className="num ml-1 text-ink">{left(crisis.first_kits_stockout_day)}</b></span></div>
+    <div className="mt-3 overflow-x-auto"><table className="num w-full min-w-[560px] text-[12.5px]"><thead><tr className="text-left text-ink-3"><th className="py-1 pr-3 font-semibold">Resource</th>{cols.map(([k, l]) => <th key={k} className="py-1 pr-3 text-right font-semibold">{l}</th>)}</tr></thead>
+      <tbody>{(["saline", "kits"] as const).map((r) => (<tr key={r} className="border-t border-line"><th className="py-1.5 pr-3 text-left font-normal text-ink-2">{r === "saline" ? "Saline bags" : "Diagnostic kits"}</th>
+        {cols.map(([k]) => { const best = k === "redistribution_and_procurement"; return <td key={k} className={"py-1.5 pr-3 text-right " + (best ? "font-bold text-[#ffd36e]" : "text-ink")}>{ic[r][k]}</td>; })}</tr>))}</tbody></table></div>
+    {(["saline", "kits"] as const).map((r) => ic[r].redistribution.transfers.length > 0 && (<p key={r} className="mt-2 text-[12px] text-ink-2"><b className="text-ink">{r === "saline" ? "Saline" : "Kits"} moved on day 1:</b> {ic[r].redistribution.transfers.map((t: any) => `${t.units} from ${t.from_name} to ${t.to_name} (arrives day ${t.arrival_day})`).join("; ")}. Donors had {ic[r].redistribution.donor_available} to spare above their safety stock; receivers needed {ic[r].redistribution.receiver_need} after arrival.</p>))}
+    <p className="mt-2 text-[11.5px] text-ink-3">Checks: donors keep their safety stock {ic.checks.donors_keep_safety_stock ? "holds" : "FAILS"}; conservation {ic.checks.conservation ? "holds" : "FAILS"}. Quantities are aggregate planning units, not dosage.</p></section>);
+}
+
 function TransferNetwork({ st }: { st: any }) {
-  const nodes = st.network.nodes, tr = st.network.transfers;
+  const te = st.network.time_expanded;
+  const [mode, setMode] = useState<"28d" | "peak">(te?.available ? "28d" : "peak");
+  const nodes = st.network.nodes, tr = mode === "28d" && te?.available ? te.transfers : st.network.transfers;
   const W = 640, H = 300, cx = W / 2, cy = H / 2, R = 115;
   const ref = nodes.find((n: any) => n.role === "referral");
   const ring = nodes.filter((n: any) => n.role !== "referral");
   const pos: Record<string, [number, number]> = {};
   ring.forEach((n: any, i: number) => { const a = (2 * Math.PI * i) / Math.max(1, ring.length) - Math.PI / 2; pos[n.id] = [cx + R * 1.9 * Math.cos(a), cy + R * Math.sin(a)]; });
   if (ref) pos[ref.id] = [cx, cy];
-  return (<section aria-labelledby="net-title" className="ops-panel p-4"><h3 id="net-title" className="text-[14px] font-semibold text-ink">Referral network at the worst day (week {st.network.worst_week})</h3>
+  return (<section aria-labelledby="net-title" className="ops-panel p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 id="net-title" className="text-[14px] font-semibold text-ink">{mode === "28d" ? "Referral plan over 28 days" : `Referral network at the worst day (week ${st.network.worst_week})`}</h3>
+      <div role="group" aria-label="Referral plan" className="flex gap-1.5">{te?.available && <button type="button" aria-pressed={mode === "28d"} onClick={() => setMode("28d")} className="ops-chip">28-day plan</button>}<button type="button" aria-pressed={mode === "peak"} onClick={() => setMode("peak")} className="ops-chip">Peak day</button></div></div>
     <p className="mt-0.5 text-[12.5px] text-ink-3">Fictional planning hospitals only; arrows are the computed referrals (patients). Positions are abstract. Real transfers need clinical coordination and the receiving hospital&apos;s confirmation.</p>
     <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full max-w-[760px]" role="img" aria-label={`${tr.length} referral links moving ${st.network.placed} patients; ${st.network.unresolved} still without a bed`}>
       <defs><marker id="prep-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill={C.surge} /></marker></defs>
@@ -234,9 +276,10 @@ function TransferNetwork({ st }: { st: any }) {
           <text x={x} y={y + 4} textAnchor="middle" fontSize="11" fontWeight="800" fill="#eef0ff">{n.id}</text>
           <text x={x} y={y + r + 14} textAnchor="middle" fontSize="10.5" fill="#9ea3c9">{n.gap ? `${n.gap} over` : `${n.spare} spare`}</text></g>); })}
     </svg>
-    <p className="num text-[12px] text-ink-2">Bed gap {st.network.gap}, placed {st.network.placed}, still without a bed {st.network.unresolved}. Linear program (max patients placed, then same-city first), checked by an independent max-flow: {st.network.certificate ? "match" : "MISMATCH"}.</p>
+    {mode === "28d" && te?.available ? <p className="num text-[12px] text-ink-2" data-testid="te-evidence">Patients without a bed over 28 days: {te.unresolved_without_referral} without referrals, {te.unresolved} with this plan ({te.referred} referred). {te.method}; re-simulated day by day: {Object.entries(te.checks).map(([k, v]) => `${k.replace(/_/g, " ")} ${v ? "holds" : "FAILS"}`).join(", ")}.</p>
+      : <p className="num text-[12px] text-ink-2">Bed gap {st.network.gap}, placed {st.network.placed}, still without a bed {st.network.unresolved}. Linear program (max patients placed, then same-city first), checked by an independent max-flow: {st.network.certificate ? "match" : "MISMATCH"}.</p>}
     {tr.length > 0 && <table className="num mt-2 w-full max-w-[640px] text-[12.5px]"><thead><tr className="text-left text-ink-3"><th className="font-semibold">From</th><th className="font-semibold">To</th><th className="text-right font-semibold">Patients</th></tr></thead>
-      <tbody>{tr.map((t: any) => <tr key={`${t.from}>${t.to}`} className="border-t border-line"><td className="py-1 text-ink">{t.from_name}</td><td className="text-ink">{t.to_name}</td><td className="text-right text-ink">{t.patients}</td></tr>)}</tbody></table>}
+      <tbody>{tr.map((t: any) => <tr key={`${t.from}>${t.to}`} className="border-t border-line"><td className="py-1 text-ink">{t.from_name}</td><td className="text-ink">{t.to_name}{t.first_day ? <span className="block text-[11px] text-ink-3">days {t.first_day}-{t.last_day}</span> : null}</td><td className="text-right text-ink">{t.patients}</td></tr>)}</tbody></table>}
   </section>);
 }
 
@@ -252,6 +295,7 @@ function RealDiscovery({ city }: { city: string }) {
   return (<section aria-labelledby="real-title" className="ops-panel p-4"><h3 id="real-title" className="text-[14px] font-semibold text-ink">Real hospitals and emergency contacts</h3>
     <p className="mt-0.5 text-[12.5px] text-ink-3">OpenStreetMap facilities bundled with the app. Their capacity and bed availability are unknown: the planning numbers above never apply to them.</p>
     <div className="mt-3 flex flex-wrap gap-2">{nat.map((n: any) => <a key={n.number} href={`tel:${n.number}`} className="ops-chip !min-h-11 gap-2 !border-[#ff6b72]"><b className="num text-[15px] text-ink">{n.number}</b><span className="text-[12px] font-normal text-ink-2">{n.label}</span></a>)}</div>
+    <p className="mt-2 text-[11.5px] text-ink-3">Numbers checked 27 Nov 2026 against national press, the ITU project record and DGHS/WHO material; 16263&apos;s continuity has been questioned in the press, so call 999 if it does not answer. No ambulance-provider number is published here.</p>
     <div className="mt-3 flex flex-wrap items-center gap-2">
       <button type="button" className="ops-chip" onClick={() => setFrom({ lat: centre[1], lon: centre[0], label: `${city === "All" ? "Dhaka South" : city} centre` })}>Search from the {city === "All" ? "Dhaka South" : city} centre</button>
       <button type="button" className="ops-chip" onClick={locate}>Use my location</button>

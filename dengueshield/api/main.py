@@ -1226,7 +1226,14 @@ EMERGENCY = {"numbers": [
                       "intro": "Seek medical care immediately if any of these warning signs appear, usually 24-48 hours after the fever goes down:",
                       "signs": ["severe abdominal pain", "persistent vomiting", "rapid breathing", "bleeding gums or nose", "fatigue or restlessness",
                                 "blood in vomit or stool", "being very thirsty", "pale and cold skin", "feeling weak"]},
-    "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999."}
+    "disclaimer": "General public-health information, not medical advice or diagnosis. In an emergency call 999.",
+    "checked": {"date": "2026-11-27", "note": "999: toll-free, 24 h, run by Bangladesh Police, connects police, fire service and ambulance (national press and the "
+                "ITU WSIS project record). 16263: DGHS national health call centre (DGHS and WHO SEARO material); press reports have questioned its funding "
+                "continuity, so call 999 if it does not answer. No other ambulance number is published by this app.",
+                "sources": ["https://www.itu.int/net4/wsis/stocktaking/Prizes/2025/Details/15149061210000000",
+                            "https://www.dhakatribune.com/bangladesh/412748/national-emergency-service-999-receives-over-72.36",
+                            "https://seaextranet.searo.who.int/meetings/TMwrshp/Shared%20Documents/Presentations/Plenary%20IV%20Telemedicine%20and%20digital%20health%20tools%20for%20COVID-19%20and%20beyond/SEAR%20TLM%20workshop-7-9%20Feb%202023-%20Plenary%20IV%20-%20Bangladesh.pdf",
+                            "https://en.prothomalo.com/bangladesh/gdmucoatn3"]}}
 
 
 # ------------------------------------------------------------------ hospital preparedness and emergency surge (mentor scope)
@@ -1467,7 +1474,7 @@ def preparedness_referrals(lat: Lat, lon: Lon):
                                       "straight_line_km": round(km, 1), "est_time_s": None, "osm_url": p.get("osm_url"),
                                       "coordinates": f["geometry"]["coordinates"], "capacity": PREP_UNKNOWN["capacity"], "availability": PREP_UNKNOWN["availability"],
                                       "route_note": "No bundled road route between regions; straight-line distance only."})
-    return {"area": near["area"], "home_city": home, "tiers": tiers, "emergency": EMERGENCY["numbers"],
+    return {"area": near["area"], "home_city": home, "tiers": tiers, "emergency": EMERGENCY["numbers"], "emergency_checked": EMERGENCY["checked"],
             "rules": ["Tiers by estimated road time: nearby <= 15 min, wider city <= 30 min, then the rest of the district, then neighbouring districts.",
                       "Missing availability is unknown, never 'full'. Do not bypass nearby emergency stabilization for a distant hospital.",
                       "Inter-facility transfers need clinical coordination and the receiving hospital's confirmation."],

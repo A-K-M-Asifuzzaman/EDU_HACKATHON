@@ -20,6 +20,14 @@ test.describe("Hospital preparedness", () => {
     expect(r.referred + r.bed_gap_after_referral).toBe(r.bed_gap_worst_day);
     for (const t of api.states.response.network.transfers) await expect(box.getByRole("cell", { name: t.from_name }).first()).toBeVisible();
     await expect(box.getByText("Live outbreak detection unavailable.")).toBeVisible();
+    const te = api.states.response.network.time_expanded;
+    expect(te.available && Object.values(te.checks).every(Boolean)).toBe(true);
+    await expect(box.getByTestId("te-evidence")).toContainText(`${te.unresolved_without_referral} without referrals, ${te.unresolved} with this plan (${te.referred} referred)`);
+    await expect(box.getByTestId("stockout-countdown")).toContainText(`day ${c.first_saline_stockout_day}`);
+    const ic = api.states.response.inventory_compare;
+    await expect(box.getByRole("cell", { name: String(ic.saline.redistribution_and_procurement), exact: true }).first()).toBeVisible();
+    await box.getByRole("button", { name: "Play 28 days" }).click();
+    await expect(box.getByRole("heading", { name: /Hospital bed boards on day \d+/ })).toBeVisible();
     await expect(box.getByText(/fictional planning hospitals/i).first()).toBeVisible();
   });
 
@@ -71,6 +79,12 @@ test.describe("Hospital preparedness", () => {
     await expect(page).toHaveURL(/city=Dhaka(\+|%20)North/);
     await page.goto(PAGE + "&city=Gazipur");                                     // a deep link still restores normally
     await expect(page.locator("#prepare").getByLabel("Planning area")).toHaveValue("Gazipur", { timeout: 30_000 });
+  });
+
+  test("the geography directory keeps real hospitals separate from the planning network", async ({ page }) => {
+    await page.goto("/geography/?nointro");
+    await expect(page.getByTestId("directory-modes")).toContainText("fictional planning network");
+    await expect(page.getByTestId("directory-modes")).toContainText("never attached to these facilities");
   });
 
   for (const width of [360, 390]) {

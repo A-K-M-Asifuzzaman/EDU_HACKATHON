@@ -523,7 +523,8 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
     if surge:
         add("Open configured surge beds", surge, f"before week {s['first_shortage_week'] or s['first_reserve_breach_week'] or 1}",
             "Surge beds reduce the bed gap before any referral", "beds_physical")
-    if r["referred"]:
+    te0 = resp["network"].get("time_expanded") or {}
+    if r["referred"] and not te0.get("available"):                    # peak-day plan only when the 28-day plan is unavailable
         add("Coordinate referrals inside the planning network (confirm with receiving hospitals)", r["referred"], f"week {resp['network']['worst_week']}",
             "Receivers with free beds below their own reserve exist", "network")
     te = resp["network"].get("time_expanded") or {}
@@ -542,12 +543,15 @@ def actions(base: dict, crisis: dict, resp: dict) -> list[dict]:
         add("Escalate: bed gap remains after surge beds and referrals", r["bed_gap_after_referral"], f"week {resp['network']['worst_week']}",
             "No modelled option closes the remaining gap; it needs capacity outside this network", "network")
     for res, label in (("saline", "saline bags"), ("kits", "diagnostic kits")):
-        q = s[f"{res}_required"]
+        # the orders the response actually places (after redistribution), with each hospital's own order-by day from the crisis
+        placed = [(p, p["orders"][res]) for p in resp["hospitals"] if p.get("orders", {}).get(res)]
+        q = sum(o["quantity"] for _, o in placed)
         if q:
-            late = [p for p in crisis["hospitals"] if (p["inventory"][res]["order_by_day"] or 1) <= 0]
+            by = {p["id"]: p["inventory"][res]["order_by_day"] for p in crisis["hospitals"]}
+            late = [p for p, _ in placed if (by.get(p["id"]) or 1) <= 0]
             add(f"Order {label}", q, "now (already late for at least one hospital)" if late else "within the reorder window",
-                f"Stock plus confirmed deliveries fall below the safety stock; procurement lead time applies", f"{res}_reserve",
-                [f"{p['name']}: {p['inventory'][res]['procurement_required']}, order by day {max(0, p['inventory'][res]['order_by_day'] or 0)}" for p in hosp if p["inventory"][res]["procurement_required"]])
+                "Stock plus confirmed deliveries and redistribution fall below the safety stock; procurement lead time applies", f"{res}_reserve",
+                [f"{p['name']}: {o['quantity']}, arrives day {o['arrival_day']}" for p, o in placed])
         if r[f"{res}_unmet"]:
             add(f"Expect {label} shortfall until the order arrives", r[f"{res}_unmet"], "until delivery",
                 "Orders placed today still arrive after the first stockout", f"{res}_stockout")
